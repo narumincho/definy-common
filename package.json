@@ -11,5 +11,9 @@
   "repository": {
     "type": "git",
     "url": "https://github.com/narumincho/definy-firestore-type.git"
+  },
+  "devDependencies": {
+    "firebase": "^7.5.0",
+    "typescript": "^3.7.2"
   }
 }
