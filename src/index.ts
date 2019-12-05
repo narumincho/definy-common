@@ -1,25 +1,61 @@
 import { firestore } from "firebase/app";
 import * as crypto from "crypto";
 
+export type Result<error, ok> =
+  | { _type: "error"; value: error }
+  | { _type: "ok"; value: ok };
+
 /** ユーザー名
  * 表示される名前。他のユーザーとかぶっても良い。絵文字も使える
- * ユーザー名と画像の両方が類似していた場合作れないようにする?
- * 全角英数,半角カタカナ,改行文字,制御文字,@ は使えない
+ * 全角英数は半角英数、半角カタカナは全角カタカナ、(株)の合字を分解するなどのNFKCの正規化がされる
+ * U+0000-U+0019 と U+007F-U+00A0 の範囲の文字は入らない
  * 前後に空白を含められない
  * 間の空白は2文字以上連続しない
+ * 文字数のカウント方法は正規化されたあとのCodePoint単位
  * Twitterと同じ、1文字以上50文字以下
  */
 export type UserName = string & { _userName: never };
 
-export const userNameFromString = (text: string): UserName => {
-  if ([...text].length === 0) {
-    throw new Error("userName length must be 1～64");
+type UserNameError = "tooLong" | "empty" | "includeControlCharacter";
+
+export const userNameFromString = (
+  text: string
+): Result<UserNameError, UserName> => {
+  text = removeConsecutiveSpace(text.normalize("NFC").trim());
+  if (text.length < 0) {
+    return { _type: "error", value: "empty" };
   }
-  return text as UserName;
+  if (50 < [...text].length) {
+    return { _type: "error", value: "tooLong" };
+  }
+  if (/[\u{0000}-\u{0019}\u{007F}-\u{00A0}]/u.test(text)) {
+    return { _type: "error", value: "includeControlCharacter" };
+  }
+  return { _type: "ok", value: text as UserName };
+};
+
+/** 連続した空白を削除 */
+const removeConsecutiveSpace = (text: string): string => {
+  let beforeSpace = false;
+  let result = "";
+  for (const char of text) {
+    if (char === " ") {
+      if (beforeSpace) {
+        continue;
+      }
+      beforeSpace = true;
+      result += char;
+      continue;
+    }
+    beforeSpace = false;
+    result += char;
+  }
+  return result;
 };
 
 /**
  * 自己紹介文。改行文字を含めることができる。
+ *
  * Twitterと同じ 0～160文字
  */
 export type UserIntroduction = string & { _userIntroduction: never };
