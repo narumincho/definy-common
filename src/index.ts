@@ -1,4 +1,5 @@
 import * as firestore from "@google-cloud/firestore";
+import * as typedFirestore from "./firestoreType";
 
 export type UserId = string & { _userId: never };
 /**
@@ -96,6 +97,25 @@ export type Project = {
 export const userCollection = (
   firestore: firestore.Firestore
 ): firestore.CollectionReference => firestore.collection("user");
+
+/** プライベートユーザーのコレクション */
+export const userPrivateCollection = (
+  firestore: firestore.Firestore
+): firestore.CollectionReference => firestore.collection("userPrivate");
+
+/** アクセストークンのコレクション */
+export const accessTokenTokenCollection = (
+  firestore: firestore.Firestore
+): typedFirestore.TypedCollectionReference<{ name: string; age: number }> =>
+  firestore.collection(
+    "accessToken"
+  ) as typedFirestore.TypedCollectionReference<{ name: string; age: number }>;
+
+(async () => {
+  const k = await accessTokenTokenCollection(null)
+    .doc("docId")
+    .get();
+})();
 
 /** プロジェクトのコレクション */
 export const projectCollection = (firestore: firestore.Firestore) => {};
