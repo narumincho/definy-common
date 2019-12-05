@@ -1,66 +1,10 @@
 import * as firestore from "@google-cloud/firestore";
 
-export type Result<error, ok> =
-  | { _type: "error"; value: error }
-  | { _type: "ok"; value: ok };
-
-/** ユーザー名
- * 表示される名前。他のユーザーとかぶっても良い。絵文字も使える
- * 全角英数は半角英数、半角カタカナは全角カタカナ、(株)の合字を分解するなどのNFKCの正規化がされる
- * U+0000-U+0019 と U+007F-U+00A0 の範囲の文字は入らない
- * 前後に空白を含められない
- * 間の空白は2文字以上連続しない
- * 文字数のカウント方法は正規化されたあとのCodePoint単位
- * Twitterと同じ、1文字以上50文字以下
- */
-export type UserName = string & { _userName: never };
-
-type UserNameError = "tooLong" | "empty" | "includeControlCharacter";
-
-export const userNameFromString = (
-  text: string
-): Result<UserNameError, UserName> => {
-  text = removeConsecutiveSpace(text.normalize("NFC").trim());
-  if (text.length < 0) {
-    return { _type: "error", value: "empty" };
-  }
-  if (50 < [...text].length) {
-    return { _type: "error", value: "tooLong" };
-  }
-  if (/[\u{0000}-\u{0019}\u{007F}-\u{00A0}]/u.test(text)) {
-    return { _type: "error", value: "includeControlCharacter" };
-  }
-  return { _type: "ok", value: text as UserName };
-};
-
-/** 連続した空白を削除 */
-const removeConsecutiveSpace = (text: string): string => {
-  let beforeSpace = false;
-  let result = "";
-  for (const char of text) {
-    if (char === " ") {
-      if (beforeSpace) {
-        continue;
-      }
-      beforeSpace = true;
-      result += char;
-      continue;
-    }
-    beforeSpace = false;
-    result += char;
-  }
-  return result;
-};
-
+export type UserId = string & { _userId: never };
 /**
- * 自己紹介文。改行文字を含めることができる。
- *
- * Twitterと同じ 0～160文字
- */
-export type UserIntroduction = string & { _userIntroduction: never };
-
-/**
- *
+ *  画像のハッシュ値。
+ *  gs://definy-lang.appspot.com/ハッシュ値
+ *  に保存してある
  */
 export type ImageHash = string & { _imageHash: never };
 
@@ -77,17 +21,11 @@ export type AccessToken = string & { _accessToken: never };
  */
 export type AccessTokenHash = string & { _accessTokenHash: never };
 
-const accessTokenToTypedArray = (accessToken: AccessToken): Uint8Array => {
-  const binary = new Uint8Array(24);
-  for (let i = 0; i < 24; i++) {
-    binary[i] = Number.parseInt(accessToken.slice(i, i + 2), 16);
-  }
-  return binary;
-};
-
 export type ProjectId = string & { _projectId: never };
 
 export type BranchId = string & { _accessTokenHash: never };
+
+export type CommitHash = string & { __commitObjectHashBrand: never };
 
 export type LogInServiceAndId = {
   service: SocialLoginService;
@@ -97,11 +35,26 @@ export type LogInServiceAndId = {
 export type SocialLoginService = "google" | "gitHub" | "line";
 
 export type User = {
-  /** ユーザー名 */
-  readonly name: UserName;
+  /** ユーザー名
+   * 表示される名前。他のユーザーとかぶっても良い。絵文字も使える
+   * 全角英数は半角英数、半角カタカナは全角カタカナ、(株)の合字を分解するなどのNFKCの正規化がされる
+   * U+0000-U+0019 と U+007F-U+00A0 の範囲の文字は入らない
+   * 前後に空白を含められない
+   * 間の空白は2文字以上連続しない
+   * 文字数のカウント方法は正規化されたあとのCodePoint単位
+   * Twitterと同じ、1文字以上50文字以下
+   */
+  readonly name: string;
+  /**
+   * プロフィール画像
+   */
   readonly imageHash: ImageHash;
-  /** 自己紹介文 */
-  readonly introduction: UserIntroduction;
+  /**
+   * 自己紹介文。改行文字を含めることができる。
+   *
+   * Twitterと同じ 0～160文字
+   */
+  readonly introduction: string;
   /** 所有者になっているブランチ */
   readonly branchIds: ReadonlyArray<BranchId>;
   /** ユーザーが作成された日時 */
@@ -116,10 +69,41 @@ export type User = {
 export type UserSecret = {
   /** 他のユーザーから見られたくない、個人的なプロジェクトに対する いいね */
   readonly bookmarkedProjectIds: ReadonlyArray<ProjectId>;
+  /** 最後にログインしたアクセストークンのハッシュ値 */
   readonly lastAccessTokenHash: AccessTokenHash;
+  /** ユーザーのログイン */
   readonly logInServiceAndId: LogInServiceAndId;
 };
 
+export type AccessTokenData = {
+  readonly userId: UserId;
+  readonly issuedAt: FirebaseFirestore.Timestamp;
+};
+
+// コレクションはProject。KeyはProjectId
+export type Project = {
+  /** マスターブランチ、型チェックが通ったもののみコミットできる */
+  readonly masterBranch: BranchId;
+  /** プロジェクトが持つブランチ */
+  readonly branches: ReadonlyArray<BranchId>;
+  /** 安定版としてリソースされたコミット */
+  readonly statableReleasedCommitHashes: ReadonlyArray<CommitHash>;
+  /** ベータ版としてリソースされたコミット */
+  readonly betaReleasedCommitHashes: ReadonlyArray<CommitHash>;
+};
+
+/** ユーザーのコレクション */
 export const userCollection = (
   firestore: firestore.Firestore
 ): firestore.CollectionReference => firestore.collection("user");
+
+/** プロジェクトのコレクション */
+export const projectCollection = (firestore: firestore.Firestore) => {};
+
+const moduleCollection = dataBase.collection("module");
+const branchCollection = dataBase.collection("branch");
+const commitCollection = dataBase.collection("commit");
+const draftCommitCollection = dataBase.collection("draftCommit");
+const typeCollection = dataBase.collection("type");
+const partCollection = dataBase.collection("part");
+const exprCollection = dataBase.collection("expr");
