@@ -1,6 +1,6 @@
 {
   "name": "definy-firestore-type",
-  "version": "0.0.0",
+  "version": "0.0.2",
   "description": "",
   "main": "distribution/index.js",
   "types": "distribution/index.d.ts",
