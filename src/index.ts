@@ -1,5 +1,4 @@
 import { firestore } from "firebase/app";
-import * as crypto from "crypto";
 
 export type Result<error, ok> =
   | { _type: "error"; value: error }
@@ -77,19 +76,6 @@ export type AccessToken = string & { _accessToken: never };
  * firestoreに保存して、functions内でブラウザから送られてきたアクセストークンのハッシュ値を求めて比較して秘密のリソースをブラウザに渡す
  */
 export type AccessTokenHash = string & { _accessTokenHash: never };
-
-/**
- * アクセストークンを生成する。functions向けの処理
- */
-export const createAccessToken = (): AccessToken => {
-  return crypto.randomBytes(24).toString("hex") as AccessToken;
-};
-
-export const hashAccessToken = (accessToken: AccessToken): AccessTokenHash =>
-  crypto
-    .createHash("sha256")
-    .update(accessTokenToTypedArray(accessToken))
-    .digest("hex") as AccessTokenHash;
 
 const accessTokenToTypedArray = (accessToken: AccessToken): Uint8Array => {
   const binary = new Uint8Array(24);
