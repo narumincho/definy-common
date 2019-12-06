@@ -1,5 +1,4 @@
-import * as firestore from "@google-cloud/firestore";
-import * as typedFirestore from "./firestoreType";
+import * as firestore from "@firebase/firestore-types";
 
 export type UserId = string & { _userId: never };
 /**
@@ -78,7 +77,7 @@ export type UserSecret = {
 
 export type AccessTokenData = {
   readonly userId: UserId;
-  readonly issuedAt: FirebaseFirestore.Timestamp;
+  readonly issuedAt: firestore.Timestamp;
 };
 
 // コレクションはProject。KeyはProjectId
@@ -92,38 +91,3 @@ export type Project = {
   /** ベータ版としてリソースされたコミット */
   readonly betaReleasedCommitHashes: ReadonlyArray<CommitHash>;
 };
-
-/** ユーザーのコレクション */
-export const userCollection = (
-  firestore: firestore.Firestore
-): firestore.CollectionReference => firestore.collection("user");
-
-/** プライベートユーザーのコレクション */
-export const userPrivateCollection = (
-  firestore: firestore.Firestore
-): firestore.CollectionReference => firestore.collection("userPrivate");
-
-/** アクセストークンのコレクション */
-export const accessTokenTokenCollection = (
-  firestore: firestore.Firestore
-): typedFirestore.TypedCollectionReference<{ name: string; age: number }> =>
-  firestore.collection(
-    "accessToken"
-  ) as typedFirestore.TypedCollectionReference<{ name: string; age: number }>;
-
-(async () => {
-  const k = await accessTokenTokenCollection(null)
-    .doc("docId")
-    .get();
-})();
-
-/** プロジェクトのコレクション */
-export const projectCollection = (firestore: firestore.Firestore) => {};
-
-const moduleCollection = dataBase.collection("module");
-const branchCollection = dataBase.collection("branch");
-const commitCollection = dataBase.collection("commit");
-const draftCommitCollection = dataBase.collection("draftCommit");
-const typeCollection = dataBase.collection("type");
-const partCollection = dataBase.collection("part");
-const exprCollection = dataBase.collection("expr");
