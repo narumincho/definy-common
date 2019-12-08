@@ -13,7 +13,7 @@
     "url": "https://github.com/narumincho/definy-firestore-type.git"
   },
   "dependencies": {
-    "@firebase/firestore-types": "^1.8.1"
+    "typed-firestore": "0.0.2"
   },
   "devDependencies": {
     "typescript": "^3.7.3"

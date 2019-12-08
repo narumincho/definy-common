@@ -1,5 +1,11 @@
 import * as firestore from "@firebase/firestore-types";
 
+export type Firestore = {
+  user: { doc: User };
+  accessToken: { doc: AccessTokenData };
+  project: { doc: Project };
+};
+
 export type UserId = string & { _userId: never };
 /**
  *  画像のハッシュ値。
