@@ -1,9 +1,9 @@
 import * as firestore from "@firebase/firestore-types";
 
 export type Firestore = {
-  user: { doc: User };
-  accessToken: { doc: AccessTokenData };
-  project: { doc: Project };
+  user: { doc: User; col: {} };
+  accessToken: { doc: AccessTokenData; col: {} };
+  project: { doc: Project; col: {} };
 };
 
 export type UserId = string & { _userId: never };
