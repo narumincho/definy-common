@@ -1,6 +1,6 @@
 {
   "name": "definy-firestore-type",
-  "version": "0.0.5",
+  "version": "0.0.8",
   "description": "",
   "types": "index.d.ts",
   "scripts": {
@@ -13,7 +13,7 @@
     "url": "https://github.com/narumincho/definy-firestore-type.git"
   },
   "dependencies": {
-    "typed-firestore": "0.0.2"
+    "@firebase/firestore-types": "^1.8.1"
   },
   "devDependencies": {
     "typescript": "^3.7.3"
