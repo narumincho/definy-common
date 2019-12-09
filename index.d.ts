@@ -321,7 +321,7 @@ export type TypeBodyKernel = {
   readonly kernelType: KernelType;
 };
 
-export type KernelType = "float64" | "string-uft16" | "array" | "function";
+export type KernelType = "float64" | "string" | "array" | "function";
 
 export type TypeTermOrParenthesis =
   | TypeTermParenthesisStart
