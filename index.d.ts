@@ -1,5 +1,8 @@
 import * as firestore from "@firebase/firestore-types";
 
+/**
+ * firestoreのに保存する形式
+ */
 export type Firestore = {
   user: { doc: User; col: {} };
   accessToken: { doc: AccessTokenData; col: {} };
@@ -42,9 +45,9 @@ export type BranchId = string & { _accessTokenHash: never };
 /**
  * Definyでよく使う識別子 最初の1文字はアルファベット、それ以降は数字と大文字アルファベット、小文字のアルファベット。1文字以上63文字以下
  */
-export type Label = string & { __simpleNameBrand: never };
+export type Label = string & { _Label: never };
 
-export type CommitHash = string & { __commitObjectHashBrand: never };
+export type CommitHash = string & { _commitHash: never };
 
 export type LogInServiceAndId = {
   service: SocialLoginService;
@@ -209,7 +212,7 @@ export type Commit = {
 };
 
 /** 0～fで64文字 256bit SHA-256のハッシュ値 */
-export type ModuleSnapshotHash = string & { __moduleObjectHashBrand: never };
+export type ModuleSnapshotHash = string & { _moduleSnapshot: never };
 
 export type ModuleSnapshot = {
   hash: ModuleSnapshotHash;
@@ -230,9 +233,9 @@ export type ModuleSnapshot = {
   exposing: boolean;
 };
 
-export type ModuleId = string & { __moduleIdBrand: never };
+export type ModuleId = string & { _moduleId: never };
 
-export type TypeId = string & { __typeIdBrand: never };
+export type TypeId = string & { _typeId: never };
 
 export type TypeDefSnapshot = {
   hash: TypeDefSnapshotHash;
@@ -242,24 +245,24 @@ export type TypeDefSnapshot = {
 };
 
 /** 0～fで64文字 256bit SHA-256のハッシュ値 */
-export type TypeDefSnapshotHash = string & { __typeDefObjectBrand: never };
+export type TypeDefSnapshotHash = string & { _typeDefSnapshot: never };
 
 export type TypeBody = TypeBodyTags | TypeBodyKernel;
 
 export type TypeBodyTags = {
-  type: "tag";
-  tags: ReadonlyArray<TypeBodyTag>;
+  readonly type: "tag";
+  readonly tags: ReadonlyArray<TypeBodyTag>;
 };
 
 export type TypeBodyTag = {
-  name: Label;
-  description: string;
-  parameter: ReadonlyArray<TypeTermOrParenthesis>;
+  readonly name: Label;
+  readonly description: string;
+  readonly parameter: ReadonlyArray<TypeTermOrParenthesis>;
 };
 
 export type TypeBodyKernel = {
-  type: "kernel";
-  kernelType: KernelType;
+  readonly type: "kernel";
+  readonly kernelType: KernelType;
 };
 
 export type KernelType = "float64" | "string-uft16" | "array" | "function";
@@ -270,40 +273,56 @@ export type TypeTermOrParenthesis =
   | TypeTermRef;
 
 export type TypeTermParenthesisStart = {
-  type: "(";
+  readonly type: "(";
 };
 
 export type TypeTermParenthesisEnd = {
-  type: ")";
+  readonly type: ")";
 };
 
-export type TypeTermRef = { type: "ref"; typeId: TypeId };
+/**
+ * 定義された型を使う
+ */
+export type TypeTermRef = { readonly type: "ref"; readonly typeId: TypeId };
 
 export type PartDefSnapshot = {
-  hash: PartDefSnapshotHash;
-  name: Label;
-  description: string;
-  type: ReadonlyArray<TypeTermOrParenthesis>;
-  expr: {
+  /**
+   * パーツのID
+   */
+  readonly id: PartId;
+  /**
+   * パーツの名前
+   */
+  readonly name: Label;
+  /**
+   * パーツの説明
+   */
+  readonly description: string;
+  /**
+   * パーツの型
+   */
+  readonly type: ReadonlyArray<TypeTermOrParenthesis>;
+  readonly expr: {
     /**
      * 値を表すハッシュ値
      */
-    hash: ExprSnapshotHash;
+    readonly hash: ExprSnapshotHash;
     /**
      * ExprBody のJSONデータ
      */
-    body: string;
+    readonly body: string;
   };
 };
 
 /** 0～fで64文字 256bit SHA-256のハッシュ値 */
-export type PartDefSnapshotHash = string & { __partDefObjectBrand: never };
+export type PartDefSnapshotHash = string & { _partDefSnapshot: never };
 
 export type PartId = string & { __partIdBrand: never };
 
 /** 0～fで64文字 256bit SHA-256のハッシュ値 */
-export type ExprSnapshotHash = string & { __exprObjectHashBrand: never };
+export type ExprSnapshotHash = string & { _exprSnapshot: never };
 
+/** 式本体 */
 export type ExprBody = Array<TermOrParenthesis>;
 
 export type TermOrParenthesis =
@@ -314,13 +333,20 @@ export type TermOrParenthesis =
   | TermKernel;
 
 /** 式の開きカッコ */
-export type TermParenthesisStart = "(";
+export type TermParenthesisStart = { readonly type: "(" };
 /** 式の閉じカッコ */
-export type TermParenthesisEnd = ")";
+export type TermParenthesisEnd = { readonly type: ")" };
 /** float64 数値 */
-export type TermNumber = { type: "number"; value: number };
-/** パーツのID */
-export type TermPartRef = { type: "part"; partId: PartId };
-export type TermKernel = { type: "kernel"; value: KernelTerm };
+export type TermNumber = { readonly type: "number"; readonly value: number };
+/** パーツ */
+export type TermPartRef = {
+  readonly type: "part";
+  readonly partId: PartDefSnapshotHash;
+};
+/** Definy内部で定義されたパーツ */
+export type TermKernel = {
+  readonly type: "kernel";
+  readonly value: KernelTerm;
+};
 
 export type KernelTerm = "add" | "sub" | "mul" | "div";
