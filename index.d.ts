@@ -133,6 +133,10 @@ export type Branch = {
    */
   readonly name: Label;
   /**
+   * ブランチ所有者 (変わらない)
+   */
+  readonly ownerId: UserId;
+  /**
    * ブランチが所属しているプロジェクト (変わらない)
    */
   readonly projectId: ProjectId;
@@ -145,9 +149,52 @@ export type Branch = {
    */
   readonly headHash: CommitHash;
   /**
-   * ブランチ所有者 (変わらない)
+   * 下書きのコミット
    */
-  readonly ownerId: UserId;
+  readonly draftCommit: DraftCommitHash;
+};
+
+export type DraftCommitHash = string & { _draftCommitHash: never };
+
+/** ブランチに対して1つまで? indexともいう。他人のドラフトコミットは見れない。プロジェクト名を決めずにやれると速くて便利
+ * 作者はブランチの所有者と同じになるのでいらない
+ * ドキュメントサイズ最大 1,048,576byte
+ */
+export type DraftCommit = {
+  readonly hash: DraftCommitHash;
+  /** 作成日時 (この値を使ってハッシュ値を求めてしまうと編集していないのに変更したと判定されてしまう) */
+  readonly date: Date;
+  /** コミットの説明 最大1000文字 */
+  readonly description: string;
+  /** リリースとして公開する予定か */
+  readonly isRelease: boolean;
+  /** プロジェクト名 最大50文字 */
+  readonly projectName: string;
+  /** プロジェクトのアイコン */
+  readonly projectIcon: ImageHash;
+  /** プロジェクトの画像 */
+  readonly projectImage: ImageHash;
+  /** プロジェクトの簡潔な説明 最大150文字 */
+  readonly projectSummary: string;
+  /** プロジェクトの詳しい説明 最大1000文字 */
+  readonly projectDescription: string;
+  /** 直下以外のモジュール 最大3000こ */
+  readonly children: ReadonlyArray<{
+    id: ModuleId;
+    snapshot: ModuleSnapshot;
+  }>;
+  /** 直下の型定義 最大300こ */
+  readonly typeDefs: ReadonlyArray<{
+    id: TypeId;
+    snapshot: TypeDefSnapshot;
+  }>;
+  /** 直下のパーツ定義 最大5000こ */
+  readonly partDefs: ReadonlyArray<{
+    id: PartId;
+    snapshot: PartDefSnapshot;
+  }>;
+  /** 依存プロジェクト 最大1000こ */
+  dependencies: ReadonlyArray<CommitHash>;
 };
 
 /**
@@ -191,24 +238,24 @@ export type Commit = {
    */
   readonly projectDescription: string;
   /**
-   *
+   *  直下以外のモジュール 最大3000こ
    */
   readonly children: ReadonlyArray<{
     readonly id: ModuleId;
     readonly hash: ModuleSnapshotHash;
   }>;
+  /** 直下の型定義 最大300こ */
   readonly typeDefs: ReadonlyArray<{
     readonly id: TypeId;
     readonly hash: TypeDefSnapshotHash;
   }>;
+  /** 直下のパーツ定義 最大5000こ */
   readonly partDefs: ReadonlyArray<{
     readonly id: PartId;
     readonly hash: PartDefSnapshotHash;
   }>;
-  readonly dependencies: ReadonlyArray<{
-    readonly projectId: ProjectId;
-    readonly commitHash: CommitHash;
-  }>;
+  /** 依存プロジェクト 最大1000こ */
+  readonly dependencies: ReadonlyArray<CommitHash>;
 };
 
 /** 0～fで64文字 256bit SHA-256のハッシュ値 */
