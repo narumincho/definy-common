@@ -51,8 +51,9 @@ export type Label = string & { _Label: never };
 export type CommitHash = string & { _commitHash: never };
 
 export type LogInServiceAndId = {
-  service: SocialLoginService;
-  accountId: string;
+  readonly service: SocialLoginService;
+  /** サービス内でのアカウントID */
+  readonly accountId: string;
 };
 
 export type SocialLoginService = "google" | "gitHub" | "line";
@@ -264,20 +265,28 @@ export type ModuleSnapshotHash = string & { _moduleSnapshot: never };
 
 export type ModuleSnapshot = {
   hash: ModuleSnapshotHash;
+  /** モジュールの名前 */
   name: Label;
+  /**
+   *  下のモジュール 最大3000こ
+   */
   children: ReadonlyArray<{
     id: ModuleId;
     snapshot: ModuleSnapshot;
   }>;
+  /** 型定義 最大300こ */
   typeDefs: ReadonlyArray<{
     id: TypeId;
     snapshot: TypeDefSnapshot;
   }>;
+  /** パーツ定義 最大5000こ */
   partDefs: ReadonlyArray<{
     id: PartId;
     snapshot: PartDefSnapshot;
   }>;
+  /** モジュールの説明 */
   description: string;
+  /** 外部のプロジェクトに公開するかどうか */
   exposing: boolean;
 };
 
