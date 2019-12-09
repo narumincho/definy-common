@@ -264,7 +264,6 @@ export type Commit = {
 export type ModuleSnapshotHash = string & { _moduleSnapshot: never };
 
 export type ModuleSnapshot = {
-  hash: ModuleSnapshotHash;
   /** モジュールの名前 */
   name: Label;
   /**
