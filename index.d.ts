@@ -12,6 +12,7 @@ export type Firestore = {
   lineState: { doc: State; col: {} };
   branch: { doc: Branch; col: {} };
   commit: { doc: Commit; col: {} };
+  draftCommit: { doc: DraftCommit; col: {} };
   moduleSnapshot: { doc: ModuleSnapshot; col: {} };
   partDefSnapshot: { doc: PartDefSnapshot; col: {} };
   typeDefSnapshot: { doc: TypeDefSnapshot; col: {} };
