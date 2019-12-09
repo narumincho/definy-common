@@ -20,11 +20,11 @@ export type Firestore = {
 
 export type UserId = string & { _userId: never };
 /**
- *  画像のハッシュ値。
+ *  ファイルのハッシュ値
  *  gs://definy-lang.appspot.com/ハッシュ値
  *  に保存してある
  */
-export type ImageHash = string & { _imageHash: never };
+export type FileHash = string & { _fileHash: never };
 
 /**
  * アクセストークン。個人的なデータにアクセスするための鍵。
@@ -72,7 +72,7 @@ export type User = {
   /**
    * プロフィール画像
    */
-  readonly imageHash: ImageHash;
+  readonly imageHash: FileHash;
   /**
    * 自己紹介文。改行文字を含めることができる。
    *
@@ -173,9 +173,9 @@ export type DraftCommit = {
   /** プロジェクト名 最大50文字 */
   readonly projectName: string;
   /** プロジェクトのアイコン */
-  readonly projectIcon: ImageHash;
+  readonly projectIcon: FileHash;
   /** プロジェクトの画像 */
-  readonly projectImage: ImageHash;
+  readonly projectImage: FileHash;
   /** プロジェクトの簡潔な説明 最大150文字 */
   readonly projectSummary: string;
   /** プロジェクトの詳しい説明 最大1000文字 */
@@ -226,11 +226,11 @@ export type Commit = {
   /**
    * プロジェクトのアイコン画像
    */
-  readonly projectIconHash: ImageHash | null;
+  readonly projectIconHash: FileHash | null;
   /**
    * プロジェクトのカバー画像
    */
-  readonly projectImageHash: ImageHash | null;
+  readonly projectImageHash: FileHash | null;
   /**
    * プロジェクトの簡潔な説明 キャッチコピー
    */
