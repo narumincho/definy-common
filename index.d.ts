@@ -165,7 +165,7 @@ export type DraftCommitHash = string & { _draftCommitHash: never };
 export type DraftCommit = {
   readonly hash: DraftCommitHash;
   /** 作成日時 (この値を使ってハッシュ値を求めてしまうと編集していないのに変更したと判定されてしまう) */
-  readonly date: Date;
+  readonly date: firestore.Timestamp;
   /** コミットの説明 最大1000文字 */
   readonly description: string;
   /** リリースとして公開する予定か */
