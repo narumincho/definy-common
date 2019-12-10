@@ -5,6 +5,7 @@ import * as firestore from "@firebase/firestore-types";
  */
 export type Firestore = {
   user: { doc: User; col: {} };
+  userSecret: { doc: UserSecret; col: {} };
   accessToken: { doc: AccessTokenData; col: {} };
   project: { doc: Project; col: {} };
   googleState: { doc: State; col: {} };
