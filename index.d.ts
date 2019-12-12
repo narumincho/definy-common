@@ -98,15 +98,20 @@ export type UserSecret = {
   readonly lastAccessTokenHash: AccessTokenHash;
   /** ユーザーのログイン */
   readonly logInServiceAndId: LogInServiceAndId;
+  /** コルクボードに書いた式 */
+  readonly corkBoardParts: ReadonlyArray<PartDefSnapshot>;
 };
 
+/**
+ * アクセストークンに含まれるデータ
+ */
 export type AccessTokenData = {
   readonly userId: UserId;
   readonly issuedAt: firestore.Timestamp;
 };
 
 /**
- *
+ *  作品の単位。パッケージ化するしないとかはない
  */
 export type Project = {
   /** マスターブランチ、型チェックが通ったもののみコミットできる */
@@ -150,20 +155,22 @@ export type Branch = {
   /**
    * ブランチの最新のコミット
    */
-  readonly headHash: CommitHash;
+  readonly headCommitHash: CommitHash;
   /**
    * 下書きのコミット
    */
-  readonly draftCommit: DraftCommitHash;
+  readonly draftCommit: DraftCommitId;
 };
 
-export type DraftCommitHash = string & { _draftCommitHash: never };
+export type DraftCommitId = string & { _draftCommitId: never };
 
-/** ブランチに対して1つまで? indexともいう。他人のドラフトコミットは見れない。プロジェクト名を決めずにやれると速くて便利
+export type DraftCommitHash = string & { _draftCommitHash: never };
+/** ブランチに対して1つまで。indexともいう。ブランチ所有者以外ののドラフトコミットは見れない。
  * 作者はブランチの所有者と同じになるのでいらない
  * ドキュメントサイズ最大 1,048,576byte
  */
 export type DraftCommit = {
+  /** 比較するときに便利 */
   readonly hash: DraftCommitHash;
   /** 作成日時 (この値を使ってハッシュ値を求めてしまうと編集していないのに変更したと判定されてしまう) */
   readonly date: firestore.Timestamp;
@@ -197,7 +204,7 @@ export type DraftCommit = {
     snapshot: PartDefSnapshot;
   }>;
   /** 依存プロジェクト 最大1000こ */
-  dependencies: ReadonlyArray<CommitHash>;
+  readonly dependencies: ReadonlyArray<CommitHash>;
 };
 
 /**
@@ -227,11 +234,11 @@ export type Commit = {
   /**
    * プロジェクトのアイコン画像
    */
-  readonly projectIconHash: FileHash | null;
+  readonly projectIconHash: FileHash;
   /**
    * プロジェクトのカバー画像
    */
-  readonly projectImageHash: FileHash | null;
+  readonly projectImageHash: FileHash;
   /**
    * プロジェクトの簡潔な説明 キャッチコピー
    */
