@@ -3,7 +3,7 @@ import * as firestore from "@firebase/firestore-types";
 /**
  * firestoreのに保存する形式
  */
-export type Firestore = {
+type Firestore = {
   user: { doc: User; col: {} };
   userSecret: { doc: UserSecret; col: {} };
   accessToken: { doc: AccessTokenData; col: {} };
@@ -19,13 +19,13 @@ export type Firestore = {
   typeDefSnapshot: { doc: TypeDefSnapshot; col: {} };
 };
 
-export type UserId = string & { _userId: never };
+type UserId = string & { _userId: never };
 /**
  *  ファイルのハッシュ値
  *  gs://definy-lang.appspot.com/ハッシュ値
  *  に保存してある
  */
-export type FileHash = string & { _fileHash: never };
+type FileHash = string & { _fileHash: never };
 
 /**
  * アクセストークン。個人的なデータにアクセスするための鍵。
@@ -33,33 +33,33 @@ export type FileHash = string & { _fileHash: never };
  * 使う文字は0123456789abcdef。長さは48文字
  * functions内で生成してブラウザのindexed DBに保存する
  */
-export type AccessToken = string & { _accessToken: never };
+type AccessToken = string & { _accessToken: never };
 /**
  * アクセストークンのハッシュ値。
  * firestoreに保存して、functions内でブラウザから送られてきたアクセストークンのハッシュ値を求めて比較して秘密のリソースをブラウザに渡す
  */
-export type AccessTokenHash = string & { _accessTokenHash: never };
+type AccessTokenHash = string & { _accessTokenHash: never };
 
-export type ProjectId = string & { _projectId: never };
+type ProjectId = string & { _projectId: never };
 
-export type BranchId = string & { _accessTokenHash: never };
+type BranchId = string & { _accessTokenHash: never };
 
 /**
  * Definyでよく使う識別子 最初の1文字はアルファベット、それ以降は数字と大文字アルファベット、小文字のアルファベット。1文字以上63文字以下
  */
-export type Label = string & { _Label: never };
+type Label = string & { _Label: never };
 
-export type CommitHash = string & { _commitHash: never };
+type CommitHash = string & { _commitHash: never };
 
-export type LogInServiceAndId = {
+type LogInServiceAndId = {
   readonly service: SocialLoginService;
   /** サービス内でのアカウントID */
   readonly accountId: string;
 };
 
-export type SocialLoginService = "google" | "gitHub" | "line";
+type SocialLoginService = "google" | "gitHub" | "line";
 
-export type User = {
+type User = {
   /** ユーザー名
    * 表示される名前。他のユーザーとかぶっても良い。絵文字も使える
    * 全角英数は半角英数、半角カタカナは全角カタカナ、(株)の合字を分解するなどのNFKCの正規化がされる
@@ -91,7 +91,7 @@ export type User = {
 /**
  * 他のユーザーから読めない、ユーザーの隠された情報
  */
-export type UserSecret = {
+type UserSecret = {
   /** 他のユーザーから見られたくない、個人的なプロジェクトに対する いいね */
   readonly bookmarkedProjectIds: ReadonlyArray<ProjectId>;
   /** 最後にログインしたアクセストークンのハッシュ値 */
@@ -105,7 +105,7 @@ export type UserSecret = {
 /**
  * アクセストークンに含まれるデータ
  */
-export type AccessTokenData = {
+type AccessTokenData = {
   readonly userId: UserId;
   readonly issuedAt: firestore.Timestamp;
 };
@@ -113,7 +113,7 @@ export type AccessTokenData = {
 /**
  *  作品の単位。パッケージ化するしないとかはない
  */
-export type Project = {
+type Project = {
   /** マスターブランチ、型チェックが通ったもののみコミットできる */
   readonly masterBranch: BranchId;
   /** プロジェクトが持つブランチ */
@@ -128,14 +128,14 @@ export type Project = {
  * OpenId ConnectのState
  * リプレイアタックを防いだり、他のサーバーがDefinyのクライアントIDを使って発行してもDefinyのサーバーが発行したものと見比べて、Definyのサーバーが発行したものだけを有効にするために必要
  */
-export type State = {
+type State = {
   readonly createdAt: firestore.Timestamp;
 };
 
 /**
  * ブランチ。コミットの流れをまとめたもの
  */
-export type Branch = {
+type Branch = {
   /**
    * ブランチの名前
    */
@@ -162,14 +162,14 @@ export type Branch = {
   readonly draftCommit: DraftCommitId;
 };
 
-export type DraftCommitId = string & { _draftCommitId: never };
+type DraftCommitId = string & { _draftCommitId: never };
 
-export type DraftCommitHash = string & { _draftCommitHash: never };
+type DraftCommitHash = string & { _draftCommitHash: never };
 /** ブランチに対して1つまで。indexともいう。ブランチ所有者以外ののドラフトコミットは見れない。
  * 作者はブランチの所有者と同じになるのでいらない
  * ドキュメントサイズ最大 1,048,576byte
  */
-export type DraftCommit = {
+type DraftCommit = {
   /** 比較するときに便利 */
   readonly hash: DraftCommitHash;
   /** 作成日時 (この値を使ってハッシュ値を求めてしまうと編集していないのに変更したと判定されてしまう) */
@@ -210,7 +210,7 @@ export type DraftCommit = {
 /**
  * プロジェクトのデータのスナップショット。このデータは一度作ったら変えない
  */
-export type Commit = {
+type Commit = {
   /**
    * 前のコミットのコミット
    */
@@ -269,9 +269,9 @@ export type Commit = {
 };
 
 /** 0～fで64文字 256bit SHA-256のハッシュ値 */
-export type ModuleSnapshotHash = string & { _moduleSnapshot: never };
+type ModuleSnapshotHash = string & { _moduleSnapshot: never };
 
-export type ModuleSnapshot = {
+type ModuleSnapshot = {
   /** モジュールの名前 */
   readonly name: Label;
   /**
@@ -297,11 +297,11 @@ export type ModuleSnapshot = {
   readonly exposing: boolean;
 };
 
-export type ModuleId = string & { _moduleId: never };
+type ModuleId = string & { _moduleId: never };
 
-export type TypeId = string & { _typeId: never };
+type TypeId = string & { _typeId: never };
 
-export type TypeDefSnapshot = {
+type TypeDefSnapshot = {
   hash: TypeDefSnapshotHash;
   name: Label;
   description: string;
@@ -309,47 +309,47 @@ export type TypeDefSnapshot = {
 };
 
 /** 0～fで64文字 256bit SHA-256のハッシュ値 */
-export type TypeDefSnapshotHash = string & { _typeDefSnapshot: never };
+type TypeDefSnapshotHash = string & { _typeDefSnapshot: never };
 
-export type TypeBody = TypeBodyTags | TypeBodyKernel;
+type TypeBody = TypeBodyTags | TypeBodyKernel;
 
-export type TypeBodyTags = {
+type TypeBodyTags = {
   readonly type: "tag";
   readonly tags: ReadonlyArray<TypeBodyTag>;
 };
 
-export type TypeBodyTag = {
+type TypeBodyTag = {
   readonly name: Label;
   readonly description: string;
   readonly parameter: ReadonlyArray<TypeTermOrParenthesis>;
 };
 
-export type TypeBodyKernel = {
+type TypeBodyKernel = {
   readonly type: "kernel";
   readonly kernelType: KernelType;
 };
 
-export type KernelType = "float64" | "string" | "array" | "function";
+type KernelType = "float64" | "string" | "array" | "function";
 
-export type TypeTermOrParenthesis =
+type TypeTermOrParenthesis =
   | TypeTermParenthesisStart
   | TypeTermParenthesisEnd
   | TypeTermRef;
 
-export type TypeTermParenthesisStart = {
+type TypeTermParenthesisStart = {
   readonly type: "(";
 };
 
-export type TypeTermParenthesisEnd = {
+type TypeTermParenthesisEnd = {
   readonly type: ")";
 };
 
 /**
  * 定義された型を使う
  */
-export type TypeTermRef = { readonly type: "ref"; readonly typeId: TypeId };
+type TypeTermRef = { readonly type: "ref"; readonly typeId: TypeId };
 
-export type PartDefSnapshot = {
+type PartDefSnapshot = {
   /**
    * パーツのID
    */
@@ -379,17 +379,17 @@ export type PartDefSnapshot = {
 };
 
 /** 0～fで64文字 256bit SHA-256のハッシュ値 */
-export type PartDefSnapshotHash = string & { _partDefSnapshot: never };
+type PartDefSnapshotHash = string & { _partDefSnapshot: never };
 
-export type PartId = string & { __partIdBrand: never };
+type PartId = string & { __partIdBrand: never };
 
 /** 0～fで64文字 256bit SHA-256のハッシュ値 */
-export type ExprSnapshotHash = string & { _exprSnapshot: never };
+type ExprSnapshotHash = string & { _exprSnapshot: never };
 
 /** 式本体 */
-export type ExprBody = Array<TermOrParenthesis>;
+type ExprBody = Array<TermOrParenthesis>;
 
-export type TermOrParenthesis =
+type TermOrParenthesis =
   | TermParenthesisStart
   | TermParenthesisEnd
   | TermNumber
@@ -397,20 +397,20 @@ export type TermOrParenthesis =
   | TermKernel;
 
 /** 式の開きカッコ */
-export type TermParenthesisStart = { readonly type: "(" };
+type TermParenthesisStart = { readonly type: "(" };
 /** 式の閉じカッコ */
-export type TermParenthesisEnd = { readonly type: ")" };
+type TermParenthesisEnd = { readonly type: ")" };
 /** float64 数値 */
-export type TermNumber = { readonly type: "number"; readonly value: number };
+type TermNumber = { readonly type: "number"; readonly value: number };
 /** パーツ */
-export type TermPartRef = {
+type TermPartRef = {
   readonly type: "part";
   readonly partId: PartDefSnapshotHash;
 };
 /** Definy内部で定義されたパーツ */
-export type TermKernel = {
+type TermKernel = {
   readonly type: "kernel";
   readonly value: KernelTerm;
 };
 
-export type KernelTerm = "add" | "sub" | "mul" | "div";
+type KernelTerm = "add" | "sub" | "mul" | "div";
