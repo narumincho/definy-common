@@ -266,28 +266,28 @@ export type ModuleSnapshotHash = string & { _moduleSnapshot: never };
 
 export type ModuleSnapshot = {
   /** モジュールの名前 */
-  name: Label;
+  readonly name: Label;
   /**
    *  下のモジュール 最大3000こ
    */
-  children: ReadonlyArray<{
+  readonly children: ReadonlyArray<{
     id: ModuleId;
-    snapshot: ModuleSnapshot;
+    hash: ModuleSnapshotHash;
   }>;
   /** 型定義 最大300こ */
-  typeDefs: ReadonlyArray<{
+  readonly typeDefs: ReadonlyArray<{
     id: TypeId;
-    snapshot: TypeDefSnapshot;
+    hash: TypeDefSnapshotHash;
   }>;
   /** パーツ定義 最大5000こ */
-  partDefs: ReadonlyArray<{
+  readonly partDefs: ReadonlyArray<{
     id: PartId;
-    snapshot: PartDefSnapshot;
+    hash: PartDefSnapshotHash;
   }>;
   /** モジュールの説明 */
-  description: string;
+  readonly description: string;
   /** 外部のプロジェクトに公開するかどうか */
-  exposing: boolean;
+  readonly exposing: boolean;
 };
 
 export type ModuleId = string & { _moduleId: never };
