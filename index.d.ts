@@ -4,19 +4,35 @@ import * as firestore from "@firebase/firestore-types";
  * firestoreのに保存する形式
  */
 type Firestore = {
-  user: { doc: User; col: {} };
-  userSecret: { doc: UserSecret; col: {} };
-  accessToken: { doc: AccessTokenData; col: {} };
-  project: { doc: Project; col: {} };
-  googleState: { doc: State; col: {} };
-  gitHubState: { doc: State; col: {} };
-  lineState: { doc: State; col: {} };
-  branch: { doc: Branch; col: {} };
-  commit: { doc: Commit; col: {} };
-  draftCommit: { doc: DraftCommit; col: {} };
-  moduleSnapshot: { doc: ModuleSnapshot; col: {} };
-  partDefSnapshot: { doc: PartDefSnapshot; col: {} };
-  typeDefSnapshot: { doc: TypeDefSnapshot; col: {} };
+  user: { key: UserId; value: User; subCollections: {} };
+  userSecret: { key: UserId; value: UserSecret; subCollections: {} };
+  accessToken: {
+    key: AccessTokenHash;
+    value: AccessTokenData;
+    subCollections: {};
+  };
+  project: { key: ProjectId; value: Project; subCollections: {} };
+  googleState: { key: string; value: State; subCollections: {} };
+  gitHubState: { key: string; value: State; subCollections: {} };
+  lineState: { key: string; value: State; subCollections: {} };
+  branch: { key: BranchId; value: Branch; subCollections: {} };
+  commit: { key: CommitHash; value: Commit; subCollections: {} };
+  draftCommit: { key: DraftCommitId; value: DraftCommit; subCollections: {} };
+  moduleSnapshot: {
+    key: ModuleSnapshotHash;
+    value: ModuleSnapshot;
+    subCollections: {};
+  };
+  partDefSnapshot: {
+    key: PartDefSnapshotHash;
+    value: PartDefSnapshot;
+    subCollections: {};
+  };
+  typeDefSnapshot: {
+    key: TypeDefSnapshotHash;
+    value: TypeDefSnapshot;
+    subCollections: {};
+  };
 };
 
 type UserId = string & { _userId: never };
