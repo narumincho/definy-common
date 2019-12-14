@@ -67,13 +67,15 @@ type Label = string & { _Label: never };
 
 type CommitHash = string & { _commitHash: never };
 
-type LogInServiceAndId = {
-  readonly service: SocialLoginService;
-  /** サービス内でのアカウントID */
-  readonly accountId: string;
+/** ソーシャルログインに関する情報 */
+type OpenIdConnectProviderAndId = {
+  /** プロバイダー (例: LINE, Google, GitHub) */
+  readonly provider: OpenIdConnectProvider;
+  /** プロバイダー内でのアカウントID */
+  readonly idInProvider: string;
 };
 
-type SocialLoginService = "google" | "gitHub" | "line";
+type OpenIdConnectProvider = "google" | "gitHub" | "line";
 
 type User = {
   /** ユーザー名
@@ -113,7 +115,7 @@ type UserSecret = {
   /** 最後にログインしたアクセストークンのハッシュ値 */
   readonly lastAccessTokenHash: AccessTokenHash;
   /** ユーザーのログイン */
-  readonly logInServiceAndId: LogInServiceAndId;
+  readonly openIdConnect: OpenIdConnectProviderAndId;
   /** コルクボードに書いた式 */
   readonly corkBoardParts: ReadonlyArray<PartDefSnapshot>;
 };
