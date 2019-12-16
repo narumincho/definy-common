@@ -320,17 +320,31 @@ type ModuleId = string & { _moduleId: never };
 type TypeId = string & { _typeId: never };
 
 type TypeDefSnapshot = {
-  hash: TypeDefSnapshotHash;
-  name: Label;
-  description: string;
-  body: TypeBody;
+  /**
+   * 型のID
+   */
+  readonly id: TypeId;
+  /**
+   * 型の名前
+   */
+  readonly name: Label;
+  /**
+   * 型の説明
+   */
+  readonly description: string;
+  /**
+   * 型の本体
+   */
+  readonly body: TypeBody;
 };
 
 /** 0～fで64文字 256bit SHA-256のハッシュ値 */
 type TypeDefSnapshotHash = string & { _typeDefSnapshot: never };
 
+/** 型の本体 */
 type TypeBody = TypeBodyTags | TypeBodyKernel;
 
+/** タグによって構成された型 */
 type TypeBodyTags = {
   readonly type: "tag";
   readonly tags: ReadonlyArray<TypeBodyTag>;
@@ -342,6 +356,7 @@ type TypeBodyTag = {
   readonly parameter: ReadonlyArray<TypeTermOrParenthesis>;
 };
 
+/** 内部で定義された型 */
 type TypeBodyKernel = {
   readonly type: "kernel";
   readonly kernelType: KernelType;
