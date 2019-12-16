@@ -199,9 +199,9 @@ type DraftCommit = {
   /** プロジェクト名 最大50文字 */
   readonly projectName: string;
   /** プロジェクトのアイコン */
-  readonly projectIcon: FileHash;
+  readonly projectIconHash: FileHash;
   /** プロジェクトの画像 */
-  readonly projectImage: FileHash;
+  readonly projectImageHash: FileHash;
   /** プロジェクトの簡潔な説明 最大150文字 */
   readonly projectSummary: string;
   /** プロジェクトの詳しい説明 最大1000文字 */
@@ -209,17 +209,17 @@ type DraftCommit = {
   /** 直下以外のモジュール 最大3000こ */
   readonly children: ReadonlyArray<{
     id: ModuleId;
-    snapshot: ModuleSnapshot;
+    snapshot: ModuleSnapshotHash;
   }>;
   /** 直下の型定義 最大300こ */
   readonly typeDefs: ReadonlyArray<{
     id: TypeId;
-    snapshot: TypeDefSnapshot;
+    snapshot: TypeDefSnapshotHash;
   }>;
   /** 直下のパーツ定義 最大5000こ */
   readonly partDefs: ReadonlyArray<{
     id: PartId;
-    snapshot: PartDefSnapshot;
+    snapshot: PartDefSnapshotHash;
   }>;
   /** 依存プロジェクト 最大1000こ */
   readonly dependencies: ReadonlyArray<CommitHash>;

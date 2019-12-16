@@ -3,9 +3,6 @@
   "version": "0.0.15",
   "description": "",
   "types": "index.d.ts",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
   "author": "narumincho <narumincho.starfy@gmail.com> (https://narumincho.com)",
   "license": "MIT",
   "repository": {
