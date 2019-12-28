@@ -35,7 +35,12 @@ type Firestore = {
   };
 };
 
+/**
+ * ユーザーを識別するためのID
+ * 作成時から絶対に変わらない
+ */
 type UserId = string & { _userId: never };
+
 /**
  *  ファイルのハッシュ値
  *  gs://definy-lang.appspot.com/ハッシュ値
@@ -124,7 +129,9 @@ type UserSecret = {
  * アクセストークンに含まれるデータ
  */
 type AccessTokenData = {
+  /** アクセストークンを発行したユーザー */
   readonly userId: UserId;
+  /** 発行日時 */
   readonly issuedAt: firestore.Timestamp;
 };
 
