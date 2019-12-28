@@ -15,7 +15,11 @@ type Firestore = {
   googleState: { key: string; value: State; subCollections: {} };
   gitHubState: { key: string; value: State; subCollections: {} };
   lineState: { key: string; value: State; subCollections: {} };
-  branch: { key: BranchId; value: Branch; subCollections: {} };
+  featureBranch: {
+    key: FeatureBranchId;
+    value: FeatureBranch;
+    subCollections: {};
+  };
   commit: { key: CommitHash; value: Commit; subCollections: {} };
   draftCommit: { key: DraftCommitId; value: DraftCommit; subCollections: {} };
   moduleSnapshot: {
@@ -61,15 +65,24 @@ type AccessToken = string & { _accessToken: never };
  */
 type AccessTokenHash = string & { _accessTokenHash: never };
 
+/**
+ * プロジェクトを識別するためのID
+ */
 type ProjectId = string & { _projectId: never };
 
-type BranchId = string & { _accessTokenHash: never };
+/**
+ * ブランチを識別するためのID
+ */
+type FeatureBranchId = string & { _accessTokenHash: never };
 
 /**
  * Definyでよく使う識別子 最初の1文字はアルファベット、それ以降は数字と大文字アルファベット、小文字のアルファベット。1文字以上63文字以下
  */
 type Label = string & { _Label: never };
 
+/**
+ * コミットを識別するためのID
+ */
 type CommitHash = string & { _commitHash: never };
 
 /** ソーシャルログインに関する情報 */
@@ -82,6 +95,9 @@ type OpenIdConnectProviderAndId = {
 
 type OpenIdConnectProvider = "google" | "gitHub" | "line";
 
+/**
+ * 登録してくれたユーザー
+ */
 type User = {
   /** ユーザー名
    * 表示される名前。他のユーザーとかぶっても良い。絵文字も使える
@@ -104,7 +120,7 @@ type User = {
    */
   readonly introduction: string;
   /** 所有者になっているブランチ */
-  readonly branchIds: ReadonlyArray<BranchId>;
+  readonly branchIds: ReadonlyArray<FeatureBranchId>;
   /** ユーザーが作成された日時 */
   readonly createdAt: firestore.Timestamp;
   /** プロジェクトに対する いいね */
@@ -139,14 +155,34 @@ type AccessTokenData = {
  *  作品の単位。パッケージ化するしないとかはない
  */
 type Project = {
-  /** マスターブランチ、型チェックが通ったもののみコミットできる */
-  readonly masterBranch: BranchId;
+  /** リリースブランチ。外部から依存プロジェクトとして読み込める */
+  readonly releaseBranch: {
+    /** 先頭1000このコミットのハッシュ値 */
+    readonly head1000CommitHash: ReadonlyArray<CommitHash>;
+    /** それ以上過去のコミットのリスト */
+    readonly nextCommitHashList: CommitHashListId | null;
+  };
+  /** デベロップブランチ、型チェックが通ったもののみがフィーチャーブランチから入る */
+  readonly developBranch: {
+    /** 先頭1000このコミットのハッシュ値 */
+    readonly head1000CommitHash: ReadonlyArray<CommitHash>;
+    /** それ以上過去のコミットのリスト */
+    readonly nextCommitHashList: CommitHashListId | null;
+  };
   /** プロジェクトが持つブランチ */
-  readonly branches: ReadonlyArray<BranchId>;
-  /** 安定版としてリソースされたコミット */
-  readonly statableReleasedCommitHashes: ReadonlyArray<CommitHash>;
-  /** ベータ版としてリソースされたコミット */
-  readonly betaReleasedCommitHashes: ReadonlyArray<CommitHash>;
+  readonly featureBranches: ReadonlyArray<FeatureBranchId>;
+  /** プロジェクトの管理者。デベロップブランチへのPullやリリースブランチへのPullを許可したりできる */
+  readonly reviewers: ReadonlyArray<UserId>;
+};
+
+/** コミットのハッシュのリストが含まれたドキュメントへのID */
+type CommitHashListId = string & { _commitHashList: never };
+
+/** コミットのハッシュのリスト */
+type CommitHashList = {
+  /** 最大30,000 このコミットのリスト */
+  readonly commitHashList: ReadonlyArray<CommitHash>;
+  nextCommitHashList: CommitHashListId | null;
 };
 
 /**
@@ -164,29 +200,45 @@ type State = {
 };
 
 /**
- * ブランチ。コミットの流れをまとめたもの
+ * 機能追加、修正ブランチ。短期間で作り終わらせる。1つまたは複数のコミットをまとめたもの
  */
-type Branch = {
+type FeatureBranch = {
   /**
-   * ブランチの名前
+   * 追加する機能の目標
    */
-  readonly name: Label;
+  readonly goal: string;
   /**
    * ブランチ所有者 (変わらない)
    */
   readonly ownerId: UserId;
   /**
+   * ブランチが作成された日時
+   */
+  readonly createdAt: firestore.Timestamp;
+  /**
    * ブランチが所属しているプロジェクト (変わらない)
    */
   readonly projectId: ProjectId;
   /**
-   * ブランチの説明
+   * 追加する機能の詳細な説明、理由
    */
   readonly description: string;
   /**
-   * ブランチの最新のコミット
+   * コメント
    */
-  readonly headCommitHash: CommitHash;
+  readonly comments: ReadonlyArray<{
+    userId: UserId;
+    body: string;
+    createdAt: firestore.Timestamp;
+  }>;
+  /**
+   * 先頭1000このコミット
+   */
+  readonly latest1000CommitHash: ReadonlyArray<CommitHash>;
+  /**
+   * 次のコミットのハッシュのリスト
+   */
+  readonly nextCommitHashList: CommitHashListId | null;
   /**
    * 下書きのコミット
    */
@@ -249,7 +301,7 @@ type Commit = {
   /**
    * 作られていたときに所属していたブランチ
    */
-  readonly branchId: BranchId;
+  readonly branchId: FeatureBranchId;
   /**
    * 作成日時
    */
