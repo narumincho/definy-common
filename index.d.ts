@@ -147,7 +147,13 @@ type Project = {
  * リプレイアタックを防いだり、他のサーバーがDefinyのクライアントIDを使って発行してもDefinyのサーバーが発行したものと見比べて、Definyのサーバーが発行したものだけを有効にするために必要
  */
 type State = {
+  /** 作成日時 */
   readonly createdAt: firestore.Timestamp;
+  /**
+   * ログインする前に訪れたURLのパス。
+   * ログインボタンを押したページに戻れるようにするために保存しておく
+   */
+  readonly path: string;
 };
 
 /**
