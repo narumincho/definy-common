@@ -15,9 +15,9 @@ type Firestore = {
   googleState: { key: string; value: State; subCollections: {} };
   gitHubState: { key: string; value: State; subCollections: {} };
   lineState: { key: string; value: State; subCollections: {} };
-  featureBranch: {
-    key: FeatureBranchId;
-    value: FeatureBranch;
+  idea: {
+    key: IdeaId;
+    value: Idea;
     subCollections: {};
   };
   commit: { key: CommitHash; value: Commit; subCollections: {} };
@@ -73,7 +73,7 @@ type ProjectId = string & { _projectId: never };
 /**
  * ブランチを識別するためのID
  */
-type FeatureBranchId = string & { _accessTokenHash: never };
+type IdeaId = string & { _accessTokenHash: never };
 
 /**
  * Definyでよく使う識別子 最初の1文字はアルファベット、それ以降は数字と大文字アルファベット、小文字のアルファベット。1文字以上63文字以下
@@ -120,7 +120,7 @@ type User = {
    */
   readonly introduction: string;
   /** 所有者になっているブランチ */
-  readonly branchIds: ReadonlyArray<FeatureBranchId>;
+  readonly branchIds: ReadonlyArray<IdeaId>;
   /** ユーザーが作成された日時 */
   readonly createdAt: firestore.Timestamp;
   /** プロジェクトに対する いいね */
@@ -170,7 +170,7 @@ type Project = {
     readonly nextCommitHashList: CommitHashListId | null;
   };
   /** プロジェクトが持つブランチ */
-  readonly featureBranches: ReadonlyArray<FeatureBranchId>;
+  readonly ideaBranches: ReadonlyArray<IdeaId>;
   /** プロジェクトの管理者。デベロップブランチへのPullやリリースブランチへのPullを許可したりできる */
   readonly reviewers: ReadonlyArray<UserId>;
 };
@@ -202,7 +202,7 @@ type State = {
 /**
  * 機能追加、修正ブランチ。短期間で作り終わらせる。1つまたは複数のコミットをまとめたもの
  */
-type FeatureBranch = {
+type Idea = {
   /**
    * 追加する機能の目標
    */
@@ -301,7 +301,7 @@ type Commit = {
   /**
    * 作られていたときに所属していたブランチ
    */
-  readonly branchId: FeatureBranchId;
+  readonly branchId: IdeaId;
   /**
    * 作成日時
    */
