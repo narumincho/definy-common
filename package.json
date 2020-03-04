@@ -4,7 +4,7 @@
   "description": "Definy common logic and type definition",
   "types": "index.d.ts",
   "author": "narumincho <narumincho.starfy@gmail.com> (https://narumincho.com)",
-  "license": "MIT",
+  "license": "Apache-2.0",
   "repository": {
     "type": "git",
     "url": "https://github.com/narumincho/definy-firestore-type.git"
