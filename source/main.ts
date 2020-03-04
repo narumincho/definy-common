@@ -41,6 +41,8 @@ type DefinitionLocation = {
   moduleId: ModuleId;
 };
 
+export { data };
+
 /**
  * URLのパスを場所のデータに変換する
  * @param urlPathAsString `/project/580d8d6a54cf43e4452a0bba6694a4ed` のような`/`から始まるパス
