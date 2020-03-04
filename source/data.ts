@@ -14,7 +14,14 @@ export type Result<ok, error> =
 /**
  * DefinyWebアプリ内での場所を示すもの. URLから求められる. URLに変換できる
  */
-export type Location = "Home";
+export type Location =
+  | { _: "Home" }
+  | { _: "User"; userId: UserId }
+  | { _: "Project"; projectId: ProjectId };
+
+export type UserId = string & { _userId: never };
+
+export type ProjectId = string & { _projectId: never };
 
 /**
  *
@@ -47,6 +54,29 @@ export const resultOk = <ok, error>(ok: ok): Result<ok, error> => ({
 export const resultError = <ok, error>(error: error): Result<ok, error> => ({
   _: "Error",
   error: error
+});
+
+/**
+ * 最初のページ
+ */
+export const locationHome: Location = { _: "Home" };
+
+/**
+ * ユーザーの詳細ページ
+ *
+ */
+export const locationUser = (userId: UserId): Location => ({
+  _: "User",
+  userId: userId
+});
+
+/**
+ * プロジェクトの詳細ページ
+ *
+ */
+export const locationProject = (projectId: ProjectId): Location => ({
+  _: "Project",
+  projectId: projectId
 });
 
 /**
@@ -175,9 +205,15 @@ export const encodeHashOrAccessToken = (id: string): ReadonlyArray<number> => {
 export const encodeCustomLocation = (
   location: Location
 ): ReadonlyArray<number> => {
-  switch (location) {
+  switch (location._) {
     case "Home": {
       return [0];
+    }
+    case "User": {
+      return [1].concat(encodeId(location.userId));
+    }
+    case "Project": {
+      return [2].concat(encodeId(location.projectId));
     }
   }
 };
@@ -419,7 +455,27 @@ export const decodeCustomLocation = (
     binary
   );
   if (patternIndex.result === 0) {
-    return { result: "Home", nextIndex: patternIndex.nextIndex };
+    return { result: locationHome, nextIndex: patternIndex.nextIndex };
+  }
+  if (patternIndex.result === 1) {
+    const result: { result: UserId; nextIndex: number } = (decodeId as (
+      a: number,
+      b: Uint8Array
+    ) => { result: UserId; nextIndex: number })(patternIndex.nextIndex, binary);
+    return { result: locationUser(result.result), nextIndex: result.nextIndex };
+  }
+  if (patternIndex.result === 2) {
+    const result: { result: ProjectId; nextIndex: number } = (decodeId as (
+      a: number,
+      b: Uint8Array
+    ) => { result: ProjectId; nextIndex: number })(
+      patternIndex.nextIndex,
+      binary
+    );
+    return {
+      result: locationProject(result.result),
+      nextIndex: result.nextIndex
+    };
   }
   throw new Error("存在しないパターンを指定された 型を更新してください");
 };
