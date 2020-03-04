@@ -44,3 +44,7 @@ type DefinitionLocation = {
 export const compile = (): data.Maybe<number> => {
   return data.maybeJust(32);
 };
+
+export const urlToLocation = (urlAsString: string): data.Location => {
+  return "Home";
+};

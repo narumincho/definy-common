@@ -7,13 +7,23 @@ export type Maybe<T> = { _: "Just"; value: T } | { _: "Nothing" };
 /**
  * Result
  */
-export type Result<ok, error> = { _: "Ok"; ok: ok } | { _: "Error"; error: error };
+export type Result<ok, error> =
+  | { _: "Ok"; ok: ok }
+  | { _: "Error"; error: error };
+
+/**
+ * DefinyWebアプリ内での場所を示すもの. URLから求められる. URLに変換できる
+ */
+export type Location = "Home";
 
 /**
  *
  *
  */
-export const maybeJust = <T>(value: T): Maybe<T> => ({ _: "Just", value: value });
+export const maybeJust = <T>(value: T): Maybe<T> => ({
+  _: "Just",
+  value: value
+});
 
 /**
  *
@@ -25,13 +35,19 @@ export const maybeNothing = <T>(): Maybe<T> => ({ _: "Nothing" });
  *
  *
  */
-export const resultOk = <ok, error>(ok: ok): Result<ok, error> => ({ _: "Ok", ok: ok });
+export const resultOk = <ok, error>(ok: ok): Result<ok, error> => ({
+  _: "Ok",
+  ok: ok
+});
 
 /**
  *
  *
  */
-export const resultError = <ok, error>(error: error): Result<ok, error> => ({ _: "Error", error: error });
+export const resultError = <ok, error>(error: error): Result<ok, error> => ({
+  _: "Error",
+  error: error
+});
 
 /**
  * numberの32bit符号なし整数をUnsignedLeb128で表現されたバイナリに変換するコード
@@ -55,27 +71,35 @@ export const encodeUInt32 = (num: number): ReadonlyArray<number> => {
  * stringからバイナリに変換する. このコードはNode.js用なのでutilのTextDecoderを使う
  *
  */
-export const encodeString = (text: string): ReadonlyArray<number> => (Array["from"](new a.TextEncoder().encode(text)));
+export const encodeString = (text: string): ReadonlyArray<number> =>
+  Array["from"](new a.TextEncoder().encode(text));
 
 /**
  * boolからバイナリに変換する
  *
  */
-export const encodeBool = (value: boolean): ReadonlyArray<number> => [value?1:0];
+export const encodeBool = (value: boolean): ReadonlyArray<number> => [
+  value ? 1 : 0
+];
 
 /**
  *
  *
  */
-export const encodeDateTime = (dateTime: Date): ReadonlyArray<number> => (encodeUInt32(Math.floor(dateTime.getTime() / 1000)));
+export const encodeDateTime = (dateTime: Date): ReadonlyArray<number> =>
+  encodeUInt32(Math.floor(dateTime.getTime() / 1000));
 
 /**
  *
  *
  */
-export const encodeList = <T>(encodeFunction: (a: T) => ReadonlyArray<number>): (a: ReadonlyArray<T>) => ReadonlyArray<number> => (list: ReadonlyArray<T>): ReadonlyArray<number> => {
+export const encodeList = <T>(
+  encodeFunction: (a: T) => ReadonlyArray<number>
+): ((a: ReadonlyArray<T>) => ReadonlyArray<number>) => (
+  list: ReadonlyArray<T>
+): ReadonlyArray<number> => {
   let result: Array<number> = [];
-  for (const element of list){
+  for (const element of list) {
     result = result.concat(encodeFunction(element));
   }
   return result;
@@ -85,7 +109,11 @@ export const encodeList = <T>(encodeFunction: (a: T) => ReadonlyArray<number>): 
  *
  *
  */
-export const maybe = <T>(encodeFunction: (a: T) => ReadonlyArray<number>): (a: Maybe<T>) => ReadonlyArray<number> => (maybe: Maybe<T>): ReadonlyArray<number> => {
+export const maybe = <T>(
+  encodeFunction: (a: T) => ReadonlyArray<number>
+): ((a: Maybe<T>) => ReadonlyArray<number>) => (
+  maybe: Maybe<T>
+): ReadonlyArray<number> => {
   switch (maybe._) {
     case "Just": {
       return [0].concat(encodeFunction(maybe.value));
@@ -100,7 +128,12 @@ export const maybe = <T>(encodeFunction: (a: T) => ReadonlyArray<number>): (a: M
  *
  *
  */
-export const encodeResult = <ok, error>(okEncodeFunction: (a: ok) => ReadonlyArray<number>, errorEncodeFunction: (a: error) => ReadonlyArray<number>): (a: Result<ok, error>) => ReadonlyArray<number> => (result: Result<ok, error>): ReadonlyArray<number> => {
+export const encodeResult = <ok, error>(
+  okEncodeFunction: (a: ok) => ReadonlyArray<number>,
+  errorEncodeFunction: (a: error) => ReadonlyArray<number>
+): ((a: Result<ok, error>) => ReadonlyArray<number>) => (
+  result: Result<ok, error>
+): ReadonlyArray<number> => {
   switch (result._) {
     case "Ok": {
       return [0].concat(okEncodeFunction(result.ok));
@@ -117,7 +150,7 @@ export const encodeResult = <ok, error>(okEncodeFunction: (a: ok) => ReadonlyArr
  */
 export const encodeId = (id: string): ReadonlyArray<number> => {
   const result: Array<number> = [];
-  for (let i = 0; i < 16; i += 1){
+  for (let i = 0; i < 16; i += 1) {
     result[i] = Number.parseInt(id.slice(i * 2, i * 2 + 2), 16);
   }
   return result;
@@ -129,10 +162,24 @@ export const encodeId = (id: string): ReadonlyArray<number> => {
  */
 export const encodeHashOrAccessToken = (id: string): ReadonlyArray<number> => {
   const result: Array<number> = [];
-  for (let i = 0; i < 32; i += 1){
+  for (let i = 0; i < 32; i += 1) {
     result[i] = Number.parseInt(id.slice(i * 2, i * 2 + 2), 16);
   }
   return result;
+};
+
+/**
+ *
+ *
+ */
+export const encodeCustomLocation = (
+  location: Location
+): ReadonlyArray<number> => {
+  switch (location) {
+    case "Home": {
+      return [0];
+    }
+  }
 };
 
 /**
@@ -141,11 +188,14 @@ export const encodeHashOrAccessToken = (id: string): ReadonlyArray<number> => {
  * @param binary バイナリ
  *
  */
-export const decodeUInt32 = (index: number, binary: Uint8Array): { result: number; nextIndex: number } => {
+export const decodeUInt32 = (
+  index: number,
+  binary: Uint8Array
+): { result: number; nextIndex: number } => {
   let result: number = 0;
-  for (let i = 0; i < 5; i += 1){
+  for (let i = 0; i < 5; i += 1) {
     const b: number = binary[index + i];
-    result |= (b & 127) << 7 * i;
+    result |= (b & 127) << (7 * i);
     if ((b & 8) === 0 && 0 <= result && result < 4294967295) {
       return { result: result, nextIndex: index + i + 1 };
     }
@@ -159,9 +209,23 @@ export const decodeUInt32 = (index: number, binary: Uint8Array): { result: numbe
  * @param binary バイナリ
  *
  */
-export const decodeString = (index: number, binary: Uint8Array): { result: string; nextIndex: number } => {
-  const length: { result: number; nextIndex: number } = decodeUInt32(index, binary);
-  return { result: new a.TextDecoder().decode(binary.slice(index + length.nextIndex, index + length.nextIndex + length.result)), nextIndex: index + length.nextIndex + length.result };
+export const decodeString = (
+  index: number,
+  binary: Uint8Array
+): { result: string; nextIndex: number } => {
+  const length: { result: number; nextIndex: number } = decodeUInt32(
+    index,
+    binary
+  );
+  return {
+    result: new a.TextDecoder().decode(
+      binary.slice(
+        index + length.nextIndex,
+        index + length.nextIndex + length.result
+      )
+    ),
+    nextIndex: index + length.nextIndex + length.result
+  };
 };
 
 /**
@@ -170,7 +234,13 @@ export const decodeString = (index: number, binary: Uint8Array): { result: strin
  * @param binary バイナリ
  *
  */
-export const decodeBool = (index: number, binary: Uint8Array): { result: boolean; nextIndex: number } => ({ result: binary[index] !== 0, nextIndex: index + 1 });
+export const decodeBool = (
+  index: number,
+  binary: Uint8Array
+): { result: boolean; nextIndex: number } => ({
+  result: binary[index] !== 0,
+  nextIndex: index + 1
+});
 
 /**
  *
@@ -178,20 +248,40 @@ export const decodeBool = (index: number, binary: Uint8Array): { result: boolean
  * @param binary バイナリ
  *
  */
-export const decodeDateTime = (index: number, binary: Uint8Array): { result: Date; nextIndex: number } => {
-  const result: { result: number; nextIndex: number } = decodeUInt32(index, binary);
-  return { result: new Date(result.result * 1000), nextIndex: result.nextIndex };
+export const decodeDateTime = (
+  index: number,
+  binary: Uint8Array
+): { result: Date; nextIndex: number } => {
+  const result: { result: number; nextIndex: number } = decodeUInt32(
+    index,
+    binary
+  );
+  return {
+    result: new Date(result.result * 1000),
+    nextIndex: result.nextIndex
+  };
 };
 
 /**
  *
  *
  */
-export const decodeList = <T>(decodeFunction: (a: number, b: Uint8Array) => { result: T; nextIndex: number }): (a: number, b: Uint8Array) => { result: ReadonlyArray<T>; nextIndex: number } => (index: number, binary: Uint8Array): { result: ReadonlyArray<T>; nextIndex: number } => {
+export const decodeList = <T>(
+  decodeFunction: (a: number, b: Uint8Array) => { result: T; nextIndex: number }
+): ((
+  a: number,
+  b: Uint8Array
+) => { result: ReadonlyArray<T>; nextIndex: number }) => (
+  index: number,
+  binary: Uint8Array
+): { result: ReadonlyArray<T>; nextIndex: number } => {
   const length: number = binary[index];
   const result: Array<T> = [];
-  for (let i = 0; i < length; i += 1){
-    const resultAndNextIndex: { result: T; nextIndex: number } = decodeFunction(index, binary);
+  for (let i = 0; i < length; i += 1) {
+    const resultAndNextIndex: { result: T; nextIndex: number } = decodeFunction(
+      index,
+      binary
+    );
     result.push(resultAndNextIndex.result);
     index = resultAndNextIndex.nextIndex;
   }
@@ -202,33 +292,84 @@ export const decodeList = <T>(decodeFunction: (a: number, b: Uint8Array) => { re
  *
  *
  */
-export const decodeMaybe = <T>(decodeFunction: (a: number, b: Uint8Array) => { result: T; nextIndex: number }): (a: number, b: Uint8Array) => { result: Maybe<T>; nextIndex: number } => (index: number, binary: Uint8Array): { result: Maybe<T>; nextIndex: number } => {
-  const patternIndexAndNextIndex: { result: number; nextIndex: number } = decodeUInt32(index, binary);
+export const decodeMaybe = <T>(
+  decodeFunction: (a: number, b: Uint8Array) => { result: T; nextIndex: number }
+): ((a: number, b: Uint8Array) => { result: Maybe<T>; nextIndex: number }) => (
+  index: number,
+  binary: Uint8Array
+): { result: Maybe<T>; nextIndex: number } => {
+  const patternIndexAndNextIndex: {
+    result: number;
+    nextIndex: number;
+  } = decodeUInt32(index, binary);
   if (patternIndexAndNextIndex.result === 0) {
-    const valueAndNextIndex: { result: T; nextIndex: number } = decodeFunction(patternIndexAndNextIndex.nextIndex, binary);
-    return { result: maybeJust(valueAndNextIndex.result), nextIndex: valueAndNextIndex.nextIndex };
+    const valueAndNextIndex: { result: T; nextIndex: number } = decodeFunction(
+      patternIndexAndNextIndex.nextIndex,
+      binary
+    );
+    return {
+      result: maybeJust(valueAndNextIndex.result),
+      nextIndex: valueAndNextIndex.nextIndex
+    };
   }
   if (patternIndexAndNextIndex.result === 1) {
-    return { result: maybeNothing(), nextIndex: patternIndexAndNextIndex.nextIndex };
+    return {
+      result: maybeNothing(),
+      nextIndex: patternIndexAndNextIndex.nextIndex
+    };
   }
-  throw new Error("存在しないMaybeのパターンを受け取った. 型情報を更新してください");
+  throw new Error(
+    "存在しないMaybeのパターンを受け取った. 型情報を更新してください"
+  );
 };
 
 /**
  *
  *
  */
-export const decodeResult = <ok, error>(okDecodeFunction: (a: number, b: Uint8Array) => { result: ok; nextIndex: number }, errorDecodeFunction: (a: number, b: Uint8Array) => { result: error; nextIndex: number }): (a: number, b: Uint8Array) => { result: Result<ok, error>; nextIndex: number } => (index: number, binary: Uint8Array): { result: Result<ok, error>; nextIndex: number } => {
-  const patternIndexAndNextIndex: { result: number; nextIndex: number } = decodeUInt32(index, binary);
+export const decodeResult = <ok, error>(
+  okDecodeFunction: (
+    a: number,
+    b: Uint8Array
+  ) => { result: ok; nextIndex: number },
+  errorDecodeFunction: (
+    a: number,
+    b: Uint8Array
+  ) => { result: error; nextIndex: number }
+): ((
+  a: number,
+  b: Uint8Array
+) => { result: Result<ok, error>; nextIndex: number }) => (
+  index: number,
+  binary: Uint8Array
+): { result: Result<ok, error>; nextIndex: number } => {
+  const patternIndexAndNextIndex: {
+    result: number;
+    nextIndex: number;
+  } = decodeUInt32(index, binary);
   if (patternIndexAndNextIndex.result === 0) {
-    const okAndNextIndex: { result: ok; nextIndex: number } = okDecodeFunction(patternIndexAndNextIndex.nextIndex, binary);
-    return { result: resultOk(okAndNextIndex.result), nextIndex: okAndNextIndex.nextIndex };
+    const okAndNextIndex: { result: ok; nextIndex: number } = okDecodeFunction(
+      patternIndexAndNextIndex.nextIndex,
+      binary
+    );
+    return {
+      result: resultOk(okAndNextIndex.result),
+      nextIndex: okAndNextIndex.nextIndex
+    };
   }
   if (patternIndexAndNextIndex.result === 1) {
-    const errorAndNextIndex: { result: error; nextIndex: number } = errorDecodeFunction(patternIndexAndNextIndex.nextIndex, binary);
-    return { result: resultError(errorAndNextIndex.result), nextIndex: errorAndNextIndex.nextIndex };
+    const errorAndNextIndex: {
+      result: error;
+      nextIndex: number;
+    } = errorDecodeFunction(patternIndexAndNextIndex.nextIndex, binary);
+    return {
+      result: resultError(errorAndNextIndex.result),
+      nextIndex: errorAndNextIndex.nextIndex
+    };
   }
-  throw new Error("存在しないResultのパターンを受け取った. 型情報を更新してください");
+  throw new Error(
+    "存在しないResultのパターンを受け取った. 型情報を更新してください"
+  );
 };
 
 /**
@@ -237,7 +378,15 @@ export const decodeResult = <ok, error>(okDecodeFunction: (a: number, b: Uint8Ar
  * @param binary バイナリ
  *
  */
-export const decodeId = (index: number, binary: Uint8Array): { result: string; nextIndex: number } => ({ result: Array["from"](binary.slice(index, index + 16)).map((n: number): string => (n.toString(16).padStart(2, "0"))).join(""), nextIndex: index + 16 });
+export const decodeId = (
+  index: number,
+  binary: Uint8Array
+): { result: string; nextIndex: number } => ({
+  result: Array["from"](binary.slice(index, index + 16))
+    .map((n: number): string => n.toString(16).padStart(2, "0"))
+    .join(""),
+  nextIndex: index + 16
+});
 
 /**
  *
@@ -245,6 +394,32 @@ export const decodeId = (index: number, binary: Uint8Array): { result: string; n
  * @param binary バイナリ
  *
  */
-export const decodeHashOrAccessToken = (index: number, binary: Uint8Array): { result: string; nextIndex: number } => ({ result: Array["from"](binary.slice(index, index + 32)).map((n: number): string => (n.toString(16).padStart(2, "0"))).join(""), nextIndex: index + 32 });
+export const decodeHashOrAccessToken = (
+  index: number,
+  binary: Uint8Array
+): { result: string; nextIndex: number } => ({
+  result: Array["from"](binary.slice(index, index + 32))
+    .map((n: number): string => n.toString(16).padStart(2, "0"))
+    .join(""),
+  nextIndex: index + 32
+});
 
-
+/**
+ *
+ * @param index バイナリを読み込み開始位置
+ * @param binary バイナリ
+ *
+ */
+export const decodeCustomLocation = (
+  index: number,
+  binary: Uint8Array
+): { result: Location; nextIndex: number } => {
+  const patternIndex: { result: number; nextIndex: number } = decodeUInt32(
+    index,
+    binary
+  );
+  if (patternIndex.result === 0) {
+    return { result: "Home", nextIndex: patternIndex.nextIndex };
+  }
+  throw new Error("存在しないパターンを指定された 型を更新してください");
+};
