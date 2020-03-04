@@ -1,0 +1,52 @@
+name: npm publish
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  test:
+    name: test
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout repository
+        uses: actions/checkout@master
+      - name: setup Node.js
+        uses: actions/setup-node@master
+        with:
+          node-version: "12.x"
+      - name: Install npm dependencies (npm ci)
+        run: npm ci
+      - name: npm test (using jest)
+        run: npx jest --verbose false
+
+  npm-publish:
+    name: npm publish
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout repository
+        uses: actions/checkout@master
+      - name: setup Node.js
+        uses: actions/setup-node@master
+        with:
+          node-version: "12.x"
+      - name: Install npm dependencies (npm ci)
+        run: npm ci
+      - name: Transpile TypeScript (npx tsc)
+        run: npx tsc
+      - name: npm publish
+        id: publish
+        uses: JS-DevTools/npm-publish@v1
+        with:
+          token: ${{ secrets.NPM_AUTH_TOKEN }}
+      - name: create release tag
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: v${{ steps.publish.version }}
+          release_name: Release ${{ steps.publish.version }}
+          body: ""
+          draft: false
+          prerelease: false
