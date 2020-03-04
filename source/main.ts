@@ -47,26 +47,52 @@ export { data };
  * URLのパスを場所のデータに変換する
  * @param urlPathAsString `/project/580d8d6a54cf43e4452a0bba6694a4ed` のような`/`から始まるパス
  */
-export const urlToLocation = (
+export const urlToLanguageAndLocation = (
   urlPathAsString: string
-): data.Maybe<data.Location> => {
+): data.Maybe<data.LanguageAndLocation> => {
   const pathList = urlPathAsString.split("/");
-  switch (pathList[2]) {
-    case "":
-      return data.maybeJust(data.locationHome);
-    case "user": {
-      if (isIdString(pathList[3])) {
-        return data.maybeJust(data.locationUser(pathList[3] as data.UserId));
+  const language = languageFromIdString(pathList[1]);
+  switch (language._) {
+    case "Just":
+      switch (pathList[2]) {
+        case "":
+          return data.maybeJust({
+            language: language.value,
+            location: data.locationHome
+          });
+        case "user": {
+          if (isIdString(pathList[3])) {
+            return data.maybeJust({
+              language: language.value,
+              location: data.locationUser(pathList[3] as data.UserId)
+            });
+          }
+          return data.maybeNothing();
+        }
+        case "project":
+          if (isIdString(pathList[3])) {
+            return data.maybeJust({
+              language: language.value,
+              location: data.locationProject(pathList[3] as data.ProjectId)
+            });
+          }
+          return data.maybeNothing();
       }
-      return data.maybeNothing();
-    }
-    case "project":
-      if (isIdString(pathList[3])) {
-        return data.maybeJust(
-          data.locationProject(pathList[3] as data.ProjectId)
-        );
-      }
-      return data.maybeNothing();
+      break;
+  }
+  return data.maybeNothing();
+};
+
+const languageFromIdString = (
+  languageAsString: string
+): data.Maybe<data.Language> => {
+  switch (languageAsString) {
+    case "ja":
+      return data.maybeJust("Japanese");
+    case "en":
+      return data.maybeJust("English");
+    case "eo":
+      return data.maybeJust("Esperanto");
   }
   return data.maybeNothing();
 };

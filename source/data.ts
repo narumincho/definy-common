@@ -12,6 +12,16 @@ export type Result<ok, error> =
   | { _: "Error"; error: error };
 
 /**
+ * 言語と場所. URLとして表現される. Googleなどの検索エンジンの都合で,URLにページの言語のを入れて,言語ごとに別のURLである必要がある
+ */
+export type LanguageAndLocation = { language: Language; location: Location };
+
+/**
+ * 英語,日本語,エスペラント語などの言語
+ */
+export type Language = "Japanese" | "English" | "Esperanto";
+
+/**
  * DefinyWebアプリ内での場所を示すもの. URLから求められる. URLに変換できる
  */
 export type Location =
@@ -196,6 +206,37 @@ export const encodeHashOrAccessToken = (id: string): ReadonlyArray<number> => {
     result[i] = Number.parseInt(id.slice(i * 2, i * 2 + 2), 16);
   }
   return result;
+};
+
+/**
+ *
+ *
+ */
+export const encodeCustomLanguageAndLocation = (
+  languageAndLocation: LanguageAndLocation
+): ReadonlyArray<number> =>
+  encodeCustomLanguage(languageAndLocation.language).concat(
+    encodeCustomLocation(languageAndLocation.location)
+  );
+
+/**
+ *
+ *
+ */
+export const encodeCustomLanguage = (
+  language: Language
+): ReadonlyArray<number> => {
+  switch (language) {
+    case "Japanese": {
+      return [0];
+    }
+    case "English": {
+      return [1];
+    }
+    case "Esperanto": {
+      return [2];
+    }
+  }
 };
 
 /**
@@ -439,6 +480,59 @@ export const decodeHashOrAccessToken = (
     .join(""),
   nextIndex: index + 32
 });
+
+/**
+ *
+ * @param index バイナリを読み込み開始位置
+ * @param binary バイナリ
+ *
+ */
+export const decodeCustomLanguageAndLocation = (
+  index: number,
+  binary: Uint8Array
+): { result: LanguageAndLocation; nextIndex: number } => {
+  const languageAndNextIndex: {
+    result: Language;
+    nextIndex: number;
+  } = decodeCustomLanguage(index, binary);
+  const locationAndNextIndex: {
+    result: Location;
+    nextIndex: number;
+  } = decodeCustomLocation(languageAndNextIndex.nextIndex, binary);
+  return {
+    result: {
+      language: languageAndNextIndex.result,
+      location: locationAndNextIndex.result
+    },
+    nextIndex: locationAndNextIndex.nextIndex
+  };
+};
+
+/**
+ *
+ * @param index バイナリを読み込み開始位置
+ * @param binary バイナリ
+ *
+ */
+export const decodeCustomLanguage = (
+  index: number,
+  binary: Uint8Array
+): { result: Language; nextIndex: number } => {
+  const patternIndex: { result: number; nextIndex: number } = decodeUInt32(
+    index,
+    binary
+  );
+  if (patternIndex.result === 0) {
+    return { result: "Japanese", nextIndex: patternIndex.nextIndex };
+  }
+  if (patternIndex.result === 1) {
+    return { result: "English", nextIndex: patternIndex.nextIndex };
+  }
+  if (patternIndex.result === 2) {
+    return { result: "Esperanto", nextIndex: patternIndex.nextIndex };
+  }
+  throw new Error("存在しないパターンを指定された 型を更新してください");
+};
 
 /**
  *
