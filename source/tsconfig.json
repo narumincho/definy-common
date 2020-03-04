@@ -4,6 +4,8 @@
     "module": "CommonJS",
     "newLine": "LF",
     "strict": true,
-    "forceConsistentCasingInFileNames": true
+    "forceConsistentCasingInFileNames": true,
+    "declaration": true,
+    "outDir": "../distribution"
   }
 }
