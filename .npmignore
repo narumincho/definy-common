@@ -1,8 +1,5 @@
-src
+source
 node_modules
-tsconfig.json
 .npmignore
 .gitignore
-firebase.json
-firestore.indexes.json
-firestore.rules
+schema
