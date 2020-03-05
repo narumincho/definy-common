@@ -2,6 +2,23 @@ import * as nt from "@narumincho/type";
 import * as codeGen from "js-ts-code-generator";
 import * as fs from "fs";
 
+const requestLogInUrlRequestData: nt.type.CustomType = {
+  name: "RequestLogInUrlRequestData",
+  description: "ログインのURLを発行するために必要なデータ",
+  body: nt.type.customTypeBodyProduct([
+    {
+      name: "openIdConnectProvider",
+      description: "ログインに使用するプロバイダー",
+      memberType: nt.type.typeCustom("OpenIdConnectProvider")
+    },
+    {
+      name: "languageAndLocation",
+      description: "ログインした後に返ってくる場所と言語",
+      memberType: nt.type.typeCustom("LanguageAndLocation")
+    }
+  ])
+};
+
 const openIdConnectProvider: nt.type.CustomType = {
   name: "OpenIdConnectProvider",
   description: "プロバイダー (例: LINE, Google, GitHub)",
@@ -93,6 +110,7 @@ const code = codeGen.generateCodeAsString(
   nt.generateTypeScriptCode(
     {
       customTypeList: [
+        requestLogInUrlRequestData,
         openIdConnectProvider,
         languageAndLocation,
         language,

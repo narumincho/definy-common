@@ -12,6 +12,14 @@ export type Result<ok, error> =
   | { _: "Error"; error: error };
 
 /**
+ * ログインのURLを発行するために必要なデータ
+ */
+export type RequestLogInUrlRequestData = {
+  openIdConnectProvider: OpenIdConnectProvider;
+  languageAndLocation: LanguageAndLocation;
+};
+
+/**
  * プロバイダー (例: LINE, Google, GitHub)
  */
 export type OpenIdConnectProvider = "Google" | "GitHub" | "Line";
@@ -212,6 +220,21 @@ export const encodeHashOrAccessToken = (id: string): ReadonlyArray<number> => {
   }
   return result;
 };
+
+/**
+ *
+ *
+ */
+export const encodeCustomRequestLogInUrlRequestData = (
+  requestLogInUrlRequestData: RequestLogInUrlRequestData
+): ReadonlyArray<number> =>
+  encodeCustomOpenIdConnectProvider(
+    requestLogInUrlRequestData.openIdConnectProvider
+  ).concat(
+    encodeCustomLanguageAndLocation(
+      requestLogInUrlRequestData.languageAndLocation
+    )
+  );
 
 /**
  *
@@ -505,6 +528,36 @@ export const decodeHashOrAccessToken = (
     .join(""),
   nextIndex: index + 32
 });
+
+/**
+ *
+ * @param index バイナリを読み込み開始位置
+ * @param binary バイナリ
+ *
+ */
+export const decodeCustomRequestLogInUrlRequestData = (
+  index: number,
+  binary: Uint8Array
+): { result: RequestLogInUrlRequestData; nextIndex: number } => {
+  const openIdConnectProviderAndNextIndex: {
+    result: OpenIdConnectProvider;
+    nextIndex: number;
+  } = decodeCustomOpenIdConnectProvider(index, binary);
+  const languageAndLocationAndNextIndex: {
+    result: LanguageAndLocation;
+    nextIndex: number;
+  } = decodeCustomLanguageAndLocation(
+    openIdConnectProviderAndNextIndex.nextIndex,
+    binary
+  );
+  return {
+    result: {
+      openIdConnectProvider: openIdConnectProviderAndNextIndex.result,
+      languageAndLocation: languageAndLocationAndNextIndex.result
+    },
+    nextIndex: languageAndLocationAndNextIndex.nextIndex
+  };
+};
 
 /**
  *
