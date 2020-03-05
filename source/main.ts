@@ -2,16 +2,44 @@ import * as data from "./data";
 
 export { data };
 
-const origin = "https://definy.app";
+export const origin = "https://definy.app";
+
+export const defaultLanguageAndLocation: data.LanguageAndLocation = {
+  language: "English",
+  location: data.locationHome
+};
+
+export const languageAndLocationToUrl = (
+  languageAndLocation: data.LanguageAndLocation
+): string => {
+  return (
+    origin +
+    locationToPath(languageAndLocation.location) +
+    "?hl=" +
+    languageToIdString(languageAndLocation.language)
+  );
+};
+
+const locationToPath = (location: data.Location): string => {
+  switch (location._) {
+    case "Home":
+      return "/";
+    case "User":
+      return "/user/" + (location.userId as string);
+    case "Project":
+      return "/project/" + (location.projectId as string);
+  }
+};
+
 /**
  * URLのパスを場所のデータに変換する
  * @param urlAsString `https://definy.app/project/580d8d6a54cf43e4452a0bba6694a4ed?hl=ja` のようなURL
  */
 export const urlToLanguageAndLocation = (
   urlAsString: string
-): data.Maybe<data.LanguageAndLocation> => {
+): data.LanguageAndLocation => {
   if (!urlAsString.startsWith(origin)) {
-    return data.maybeNothing();
+    return defaultLanguageAndLocation;
   }
   const pathAndQuery = urlAsString.substring(origin.length).split("?");
   const path = pathAndQuery[0];
@@ -26,26 +54,23 @@ export const urlToLanguageAndLocation = (
   switch (locationTag) {
     case "user": {
       if (isIdString(locationParamter)) {
-        return data.maybeJust({
+        return {
           language: language,
           location: data.locationUser(locationParamter as data.UserId)
-        });
+        };
       }
-      return data.maybeNothing();
+      return defaultLanguageAndLocation;
     }
     case "project":
       if (isIdString(locationParamter)) {
-        return data.maybeJust({
+        return {
           language: language,
           location: data.locationProject(locationParamter as data.ProjectId)
-        });
+        };
       }
-      return data.maybeNothing();
+      return defaultLanguageAndLocation;
   }
-  return data.maybeJust({
-    language: language,
-    location: data.locationHome
-  });
+  return defaultLanguageAndLocation;
 };
 
 const queryStringToLanguage = (query: string): data.Language => {
@@ -66,6 +91,17 @@ const languageFromIdString = (languageAsString: string): data.Language => {
       return "Esperanto";
   }
   return "English";
+};
+
+const languageToIdString = (language: data.Language): string => {
+  switch (language) {
+    case "English":
+      return "en";
+    case "Japanese":
+      return "ja";
+    case "Esperanto":
+      return "eo";
+  }
 };
 
 const isIdString = (text: unknown): boolean => {
