@@ -1,107 +1,78 @@
 import * as data from "./data";
 
-type DefinyModule = {
-  typeDefinitionList: ReadonlyArray<typeDefinition>;
-};
-
-type TypeId = string & { _typeId: never };
-type TypeHash = string & { _typeHash: never };
-type ProjectId = string & { _projectId: never };
-type ModuleId = string & { _moduleId: never };
-
-type typeDefinition = {
-  id: TypeId;
-  hash: TypeHash;
-  name: string;
-  description: string;
-  body: TypeDefinitionBody;
-  definedAt: DefinitionLocation;
-};
-
-type TypeDefinitionBody =
-  | {
-      _: "Product";
-      productTypeDefinition: ProductTypeDefinition;
-    }
-  | {
-      _: "Sum";
-      sumTypeDefinition: SumTypeDefinition;
-    }
-  | {
-      _: "BuiltIn";
-      builtInType: BuiltInType;
-    };
-
-type ProductTypeDefinition = {};
-type SumTypeDefinition = {};
-type BuiltInType = "uint32";
-
-type DefinitionLocation = {
-  projectId: ProjectId;
-  moduleId: ModuleId;
-};
-
 export { data };
 
+const origin = "https://definy.app";
 /**
  * URLのパスを場所のデータに変換する
- * @param urlPathAsString `/project/580d8d6a54cf43e4452a0bba6694a4ed` のような`/`から始まるパス
+ * @param urlAsString `https://definy.app/project/580d8d6a54cf43e4452a0bba6694a4ed?hl=ja` のようなURL
  */
 export const urlToLanguageAndLocation = (
-  urlPathAsString: string
+  urlAsString: string
 ): data.Maybe<data.LanguageAndLocation> => {
-  const pathList = urlPathAsString.split("/");
-  const language = languageFromIdString(pathList[1]);
-  switch (language._) {
-    case "Just":
-      switch (pathList[2]) {
-        case "":
-          return data.maybeJust({
-            language: language.value,
-            location: data.locationHome
-          });
-        case "user": {
-          if (isIdString(pathList[3])) {
-            return data.maybeJust({
-              language: language.value,
-              location: data.locationUser(pathList[3] as data.UserId)
-            });
-          }
-          return data.maybeNothing();
-        }
-        case "project":
-          if (isIdString(pathList[3])) {
-            return data.maybeJust({
-              language: language.value,
-              location: data.locationProject(pathList[3] as data.ProjectId)
-            });
-          }
-          return data.maybeNothing();
-      }
-      break;
+  if (!urlAsString.startsWith(origin)) {
+    return data.maybeNothing();
   }
-  return data.maybeNothing();
+  const pathAndQuery = urlAsString.substring(origin.length).split("?");
+  const path = pathAndQuery[0];
+  const query: string | undefined = pathAndQuery[1];
+  const language: data.Language =
+    query === undefined ? "English" : queryStringToLanguage(query);
+
+  const pathList = path.split("/");
+  const locationTag: string | undefined = pathList[1];
+  const locationParamter: string | undefined = pathList[2];
+
+  switch (locationTag) {
+    case "user": {
+      if (isIdString(locationParamter)) {
+        return data.maybeJust({
+          language: language,
+          location: data.locationUser(locationParamter as data.UserId)
+        });
+      }
+      return data.maybeNothing();
+    }
+    case "project":
+      if (isIdString(locationParamter)) {
+        return data.maybeJust({
+          language: language,
+          location: data.locationProject(locationParamter as data.ProjectId)
+        });
+      }
+      return data.maybeNothing();
+  }
+  return data.maybeJust({
+    language: language,
+    location: data.locationHome
+  });
 };
 
-const languageFromIdString = (
-  languageAsString: string
-): data.Maybe<data.Language> => {
+const queryStringToLanguage = (query: string): data.Language => {
+  const mathResult = query.match(/hl=([a-z]+)/u);
+  if (mathResult === null) {
+    return "English";
+  }
+  return languageFromIdString(mathResult[1]);
+};
+
+const languageFromIdString = (languageAsString: string): data.Language => {
   switch (languageAsString) {
     case "ja":
-      return data.maybeJust("Japanese");
+      return "Japanese";
     case "en":
-      return data.maybeJust("English");
+      return "English";
     case "eo":
-      return data.maybeJust("Esperanto");
+      return "Esperanto";
   }
-  return data.maybeNothing();
+  return "English";
 };
 
-const isIdString = (text: string): boolean => {
+const isIdString = (text: unknown): boolean => {
   if (typeof text !== "string") {
     return false;
   }
-  if (text.length === 32) {
+  if (text.length !== 32) {
     return false;
   }
   for (const char of text) {
