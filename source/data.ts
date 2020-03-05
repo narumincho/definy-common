@@ -12,7 +12,12 @@ export type Result<ok, error> =
   | { _: "Error"; error: error };
 
 /**
- * 言語と場所. URLとして表現される. Googleなどの検索エンジンの都合で,URLにページの言語のを入れて,言語ごとに別のURLである必要がある
+ * プロバイダー (例: LINE, Google, GitHub)
+ */
+export type OpenIdConnectProvider = "Google" | "GitHub" | "Line";
+
+/**
+ * 言語と場所. URLとして表現される. Googleなどの検索エンジンの都合( https://support.google.com/webmasters/answer/182192?hl=ja )で,URLにページの言語のを入れて,言語ごとに別のURLである必要がある
  */
 export type LanguageAndLocation = { language: Language; location: Location };
 
@@ -206,6 +211,26 @@ export const encodeHashOrAccessToken = (id: string): ReadonlyArray<number> => {
     result[i] = Number.parseInt(id.slice(i * 2, i * 2 + 2), 16);
   }
   return result;
+};
+
+/**
+ *
+ *
+ */
+export const encodeCustomOpenIdConnectProvider = (
+  openIdConnectProvider: OpenIdConnectProvider
+): ReadonlyArray<number> => {
+  switch (openIdConnectProvider) {
+    case "Google": {
+      return [0];
+    }
+    case "GitHub": {
+      return [1];
+    }
+    case "Line": {
+      return [2];
+    }
+  }
 };
 
 /**
@@ -480,6 +505,32 @@ export const decodeHashOrAccessToken = (
     .join(""),
   nextIndex: index + 32
 });
+
+/**
+ *
+ * @param index バイナリを読み込み開始位置
+ * @param binary バイナリ
+ *
+ */
+export const decodeCustomOpenIdConnectProvider = (
+  index: number,
+  binary: Uint8Array
+): { result: OpenIdConnectProvider; nextIndex: number } => {
+  const patternIndex: { result: number; nextIndex: number } = decodeUInt32(
+    index,
+    binary
+  );
+  if (patternIndex.result === 0) {
+    return { result: "Google", nextIndex: patternIndex.nextIndex };
+  }
+  if (patternIndex.result === 1) {
+    return { result: "GitHub", nextIndex: patternIndex.nextIndex };
+  }
+  if (patternIndex.result === 2) {
+    return { result: "Line", nextIndex: patternIndex.nextIndex };
+  }
+  throw new Error("存在しないパターンを指定された 型を更新してください");
+};
 
 /**
  *

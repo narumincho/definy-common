@@ -2,10 +2,34 @@ import * as nt from "@narumincho/type";
 import * as codeGen from "js-ts-code-generator";
 import * as fs from "fs";
 
+const openIdConnectProvider: nt.type.CustomType = {
+  name: "OpenIdConnectProvider",
+  description: "プロバイダー (例: LINE, Google, GitHub)",
+  body: nt.type.customTypeBodySum([
+    {
+      name: "Google",
+      description:
+        "Google ( https://developers.google.com/identity/sign-in/web/ )",
+      parameter: nt.type.maybeNothing()
+    },
+    {
+      name: "GitHub",
+      description:
+        "GitHub ( https://developer.github.com/v3/guides/basics-of-authentication/ )",
+      parameter: nt.type.maybeNothing()
+    },
+    {
+      name: "Line",
+      description: "LINE ( https://developers.line.biz/ja/docs/line-login/ )",
+      parameter: nt.type.maybeNothing()
+    }
+  ])
+};
+
 const languageAndLocation: nt.type.CustomType = {
   name: "LanguageAndLocation",
   description:
-    "言語と場所. URLとして表現される. Googleなどの検索エンジンの都合で,URLにページの言語のを入れて,言語ごとに別のURLである必要がある",
+    "言語と場所. URLとして表現される. Googleなどの検索エンジンの都合( https://support.google.com/webmasters/answer/182192?hl=ja )で,URLにページの言語のを入れて,言語ごとに別のURLである必要がある",
   body: nt.type.customTypeBodyProduct([
     {
       name: "language",
@@ -68,7 +92,12 @@ const location: nt.type.CustomType = {
 const code = codeGen.generateCodeAsString(
   nt.generateTypeScriptCode(
     {
-      customTypeList: [languageAndLocation, language, location],
+      customTypeList: [
+        openIdConnectProvider,
+        languageAndLocation,
+        language,
+        location
+      ],
       idOrHashTypeNameList: ["UserId", "ProjectId"]
     },
     false
