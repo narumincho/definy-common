@@ -1,6 +1,6 @@
 {
   "name": "definy-common",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Definy common logic and type definition",
   "main": "distribution/main.js",
   "author": "narumincho <narumincho.starfy@gmail.com> (https://narumincho.com)",
