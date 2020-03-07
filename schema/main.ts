@@ -1,6 +1,7 @@
 import * as nt from "@narumincho/type";
 import * as codeGen from "js-ts-code-generator";
 import * as fs from "fs";
+import * as childProcess from "child_process";
 
 const requestLogInUrlRequestData: nt.type.CustomType = {
   name: "RequestLogInUrlRequestData",
@@ -106,21 +107,41 @@ const location: nt.type.CustomType = {
   ])
 };
 
+const schema: nt.type.Schema = {
+  customTypeList: [
+    requestLogInUrlRequestData,
+    openIdConnectProvider,
+    languageAndLocation,
+    language,
+    location
+  ],
+  idOrTokenTypeNameList: ["UserId", "ProjectId"]
+};
+
 const code = codeGen.generateCodeAsString(
-  nt.generateTypeScriptCode(
-    {
-      customTypeList: [
-        requestLogInUrlRequestData,
-        openIdConnectProvider,
-        languageAndLocation,
-        language,
-        location
-      ],
-      idOrHashTypeNameList: ["UserId", "ProjectId"]
-    },
-    false
-  ),
+  nt.generateTypeScriptCode(schema),
   "TypeScript"
 );
 
-fs.writeFileSync("source/data.ts", code);
+const typeScriptPath = "source/data.ts";
+fs.promises.writeFile(typeScriptPath, code).then(() => {
+  childProcess.exec(
+    "npx prettier " + typeScriptPath,
+    (error, standardOutput) => {
+      if (error !== null) {
+        throw new Error("TypeScript code error! " + error.toString());
+      }
+      fs.promises.writeFile(typeScriptPath, standardOutput);
+      console.log("output TypeScript code!");
+    }
+  );
+});
+const elmPath = "source/Data.elm";
+fs.promises.writeFile(elmPath, nt.elm.generateCode("Data", schema)).then(() => {
+  childProcess.exec("elm-format --yes " + elmPath, error => {
+    console.log("output Elm code!");
+    if (error !== null) {
+      throw new Error("elm code error! " + error.toString());
+    }
+  });
+});
