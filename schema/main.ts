@@ -136,7 +136,7 @@ fs.promises.writeFile(typeScriptPath, code).then(() => {
     }
   );
 });
-const elmPath = "source/Data.elm";
+const elmPath = "Data.elm";
 fs.promises.writeFile(elmPath, nt.elm.generateCode("Data", schema)).then(() => {
   childProcess.exec("elm-format --yes " + elmPath, error => {
     console.log("output Elm code!");

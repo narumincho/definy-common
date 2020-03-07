@@ -35,8 +35,6 @@ jobs:
         run: npm ci
       - name: Transpile TypeScript (npx tsc)
         run: npx tsc --project ./source/tsconfig.json
-      - name: Move Data.elm
-        run: mv ./source/Data.elm ./distribution
       - name: npm publish
         id: publish
         uses: JS-DevTools/npm-publish@v1
