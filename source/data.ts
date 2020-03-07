@@ -103,29 +103,34 @@ export const locationProject = (projectId: ProjectId): Location => ({
 });
 
 /**
- * numberの32bit符号なし整数をUnsignedLeb128で表現されたバイナリに変換するコード
+ * numberの32bit符号あり整数をSigned Leb128のバイナリに変換する
  *
  */
-export const encodeUInt32 = (num: number): ReadonlyArray<number> => {
-  num = Math.floor(Math.max(0, Math.min(num, 4294967295)));
-  const numberArray: Array<number> = [];
+export const encodeInt32 = (value: number): ReadonlyArray<number> => {
+  value |= 0;
+  const result: Array<number> = [];
   while (true) {
-    const b: number = num & 127;
-    num = num >>> 7;
-    if (num === 0) {
-      numberArray.push(b);
-      return numberArray;
+    const byte: number = value & 127;
+    value >>= 7;
+    if (
+      (value === 0 && (byte & 64) === 0) ||
+      (value === -1 && (byte & 4) !== 0)
+    ) {
+      result.push(byte);
+      return result;
     }
-    numberArray.push(b | 128);
+    result.push(byte | 128);
   }
 };
 
 /**
- * stringからバイナリに変換する. このコードはNode.js用なのでutilのTextDecoderを使う
+ * stringからバイナリに変換する.
  *
  */
 export const encodeString = (text: string): ReadonlyArray<number> =>
-  Array["from"](new a.TextEncoder().encode(text));
+  Array["from"](
+    new (process === undefined ? TextEncoder : a.TextEncoder)().encode(text)
+  );
 
 /**
  * boolからバイナリに変換する
@@ -134,13 +139,6 @@ export const encodeString = (text: string): ReadonlyArray<number> =>
 export const encodeBool = (value: boolean): ReadonlyArray<number> => [
   value ? 1 : 0
 ];
-
-/**
- *
- *
- */
-export const encodeDateTime = (dateTime: Date): ReadonlyArray<number> =>
-  encodeUInt32(Math.floor(dateTime.getTime() / 1000));
 
 /**
  *
@@ -308,28 +306,35 @@ export const encodeCustomLocation = (
 };
 
 /**
- * UnsignedLeb128で表現されたバイナリをnumberの32bit符号なし整数の範囲の数値にに変換するコード
+ * SignedLeb128で表現されたバイナリをnumberのビット演算ができる32bit符号付き整数の範囲の数値に変換するコード
  * @param index バイナリを読み込み開始位置
  * @param binary バイナリ
  *
  */
-export const decodeUInt32 = (
+export const decodeInt = (
   index: number,
   binary: Uint8Array
 ): { result: number; nextIndex: number } => {
   let result: number = 0;
-  for (let i = 0; i < 5; i += 1) {
-    const b: number = binary[index + i];
-    result |= (b & 127) << (7 * i);
-    if ((b & 8) === 0 && 0 <= result && result < 4294967295) {
-      return { result: result, nextIndex: index + i + 1 };
+  let offset: number = 0;
+  while (true) {
+    const byte: number = binary[index + offset];
+    result |= (byte & 127) << (offset * 7);
+    offset += 1;
+    if ((128 & byte) === 0) {
+      if (offset * 7 < 32 && (byte & 64) !== 0) {
+        return {
+          result: result | (~0 << (offset * 7)),
+          nextIndex: index + offset
+        };
+      }
+      return { result: result, nextIndex: index + offset };
     }
   }
-  throw new Error("larger than 32-bits");
 };
 
 /**
- * バイナリからstringに変換する.このコードはNode.js用でutilのTextDecoderを使う
+ * バイナリからstringに変換する.
  * @param index バイナリを読み込み開始位置
  * @param binary バイナリ
  *
@@ -338,12 +343,12 @@ export const decodeString = (
   index: number,
   binary: Uint8Array
 ): { result: string; nextIndex: number } => {
-  const length: { result: number; nextIndex: number } = decodeUInt32(
+  const length: { result: number; nextIndex: number } = decodeInt(
     index,
     binary
   );
   return {
-    result: new a.TextDecoder().decode(
+    result: new (process === undefined ? TextDecoder : a.TextDecoder)().decode(
       binary.slice(
         index + length.nextIndex,
         index + length.nextIndex + length.result
@@ -366,26 +371,6 @@ export const decodeBool = (
   result: binary[index] !== 0,
   nextIndex: index + 1
 });
-
-/**
- *
- * @param index バイナリを読み込み開始位置
- * @param binary バイナリ
- *
- */
-export const decodeDateTime = (
-  index: number,
-  binary: Uint8Array
-): { result: Date; nextIndex: number } => {
-  const result: { result: number; nextIndex: number } = decodeUInt32(
-    index,
-    binary
-  );
-  return {
-    result: new Date(result.result * 1000),
-    nextIndex: result.nextIndex
-  };
-};
 
 /**
  *
@@ -426,7 +411,7 @@ export const decodeMaybe = <T>(
   const patternIndexAndNextIndex: {
     result: number;
     nextIndex: number;
-  } = decodeUInt32(index, binary);
+  } = decodeInt(index, binary);
   if (patternIndexAndNextIndex.result === 0) {
     const valueAndNextIndex: { result: T; nextIndex: number } = decodeFunction(
       patternIndexAndNextIndex.nextIndex,
@@ -471,7 +456,7 @@ export const decodeResult = <ok, error>(
   const patternIndexAndNextIndex: {
     result: number;
     nextIndex: number;
-  } = decodeUInt32(index, binary);
+  } = decodeInt(index, binary);
   if (patternIndexAndNextIndex.result === 0) {
     const okAndNextIndex: { result: ok; nextIndex: number } = okDecodeFunction(
       patternIndexAndNextIndex.nextIndex,
@@ -569,7 +554,7 @@ export const decodeCustomOpenIdConnectProvider = (
   index: number,
   binary: Uint8Array
 ): { result: OpenIdConnectProvider; nextIndex: number } => {
-  const patternIndex: { result: number; nextIndex: number } = decodeUInt32(
+  const patternIndex: { result: number; nextIndex: number } = decodeInt(
     index,
     binary
   );
@@ -622,7 +607,7 @@ export const decodeCustomLanguage = (
   index: number,
   binary: Uint8Array
 ): { result: Language; nextIndex: number } => {
-  const patternIndex: { result: number; nextIndex: number } = decodeUInt32(
+  const patternIndex: { result: number; nextIndex: number } = decodeInt(
     index,
     binary
   );
@@ -648,7 +633,7 @@ export const decodeCustomLocation = (
   index: number,
   binary: Uint8Array
 ): { result: Location; nextIndex: number } => {
-  const patternIndex: { result: number; nextIndex: number } = decodeUInt32(
+  const patternIndex: { result: number; nextIndex: number } = decodeInt(
     index,
     binary
   );
