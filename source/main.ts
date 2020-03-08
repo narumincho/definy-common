@@ -1,22 +1,32 @@
 import * as data from "./data";
+import * as util from "./util";
 
 export { data };
 
-export const origin = "https://definy.app";
+export const releaseOrigin = "https://definy.app";
 
-export const defaultLanguageAndLocation: data.LanguageAndLocation = {
-  language: "English",
-  location: data.locationHome
+export const clientModeToOrigin = (clientMode: data.ClientMode): string => {
+  switch (clientMode._) {
+    case "DebugMode":
+      return "http://localhost:" + clientMode.int32.toString();
+    case "Release":
+      return releaseOrigin;
+  }
 };
 
-export const languageAndLocationToUrl = (
-  languageAndLocation: data.LanguageAndLocation
-): string => {
+export const defaultLanguage: data.Language = "English";
+
+export const urlDataToUrl = (urlData: data.UrlData): string => {
   return (
-    origin +
-    locationToPath(languageAndLocation.location) +
+    clientModeToOrigin(urlData.clientMode) +
+    locationToPath(urlData.location) +
     "?hl=" +
-    languageToIdString(languageAndLocation.language)
+    languageToIdString(urlData.language) +
+    util.maybeUnwrap(
+      urlData.accessToken,
+      accessToken => "#access-token=" + (accessToken as string),
+      ""
+    )
   );
 };
 
@@ -31,52 +41,54 @@ const locationToPath = (location: data.Location): string => {
   }
 };
 
-/**
- * URLのパスを場所のデータに変換する
- * @param urlAsString `https://definy.app/project/580d8d6a54cf43e4452a0bba6694a4ed?hl=ja` のようなURL
- */
-export const urlToLanguageAndLocation = (
-  urlAsString: string
-): data.LanguageAndLocation => {
-  if (!urlAsString.startsWith(origin)) {
-    return defaultLanguageAndLocation;
+const languageToIdString = (language: data.Language): string => {
+  switch (language) {
+    case "English":
+      return "en";
+    case "Japanese":
+      return "ja";
+    case "Esperanto":
+      return "eo";
   }
-  const pathAndQuery = urlAsString.substring(origin.length).split("?");
-  const path = pathAndQuery[0];
-  const query: string | undefined = pathAndQuery[1];
-  const language: data.Language =
-    query === undefined ? "English" : queryStringToLanguage(query);
-
-  const pathList = path.split("/");
-  const locationTag: string | undefined = pathList[1];
-  const locationParamter: string | undefined = pathList[2];
-
-  switch (locationTag) {
-    case "user": {
-      if (isIdString(locationParamter)) {
-        return {
-          language: language,
-          location: data.locationUser(locationParamter as data.UserId)
-        };
-      }
-      return defaultLanguageAndLocation;
-    }
-    case "project":
-      if (isIdString(locationParamter)) {
-        return {
-          language: language,
-          location: data.locationProject(locationParamter as data.ProjectId)
-        };
-      }
-      return defaultLanguageAndLocation;
-  }
-  return defaultLanguageAndLocation;
 };
 
-const queryStringToLanguage = (query: string): data.Language => {
-  const mathResult = query.match(/hl=([a-z]+)/u);
+/**
+ * URLのパスを場所のデータに変換する
+ * @param url `https://definy.app/project/580d8d6a54cf43e4452a0bba6694a4ed?hl=ja` のようなURL
+ */
+export const urlDataFromUrl = (url: string): data.UrlData => {
+  return {
+    clientMode: clientModeFromUrl(url),
+    location: locationFromUrl(url),
+    language: queryStringToLanguage(url),
+    accessToken: accessTokenFromUrl(url)
+  };
+};
+
+const clientModeFromUrl = (url: string): data.ClientMode => {
+  const debugOriginResult = url.match(/^http:\/\/localhost:(\d+)/u);
+  if (debugOriginResult !== null) {
+    return data.clientModeDebugMode(Number.parseInt(debugOriginResult[1]));
+  }
+  return data.clientModeRelease;
+};
+
+const locationFromUrl = (url: string): data.Location => {
+  const projectResult = url.match(/\/project\/([0-9a-f]{32})/u);
+  if (projectResult !== null) {
+    return data.locationProject(projectResult[1] as data.ProjectId);
+  }
+  const userResult = url.match(/\/user\/([0-9a-f]{32})/u);
+  if (userResult !== null) {
+    return data.locationUser(userResult[1] as data.UserId);
+  }
+  return data.locationHome;
+};
+
+const queryStringToLanguage = (url: string): data.Language => {
+  const mathResult = url.match(/hl=([a-z]+)/u);
   if (mathResult === null) {
-    return "English";
+    return defaultLanguage;
   }
   return languageFromIdString(mathResult[1]);
 };
@@ -90,18 +102,15 @@ const languageFromIdString = (languageAsString: string): data.Language => {
     case "eo":
       return "Esperanto";
   }
-  return "English";
+  return defaultLanguage;
 };
 
-const languageToIdString = (language: data.Language): string => {
-  switch (language) {
-    case "English":
-      return "en";
-    case "Japanese":
-      return "ja";
-    case "Esperanto":
-      return "eo";
+const accessTokenFromUrl = (url: string): data.Maybe<data.AccessToken> => {
+  const matchResult = url.match(/access-token=([0-9a-f]{64})/u);
+  if (matchResult === null) {
+    return data.maybeNothing();
   }
+  return data.maybeJust(matchResult[1] as data.AccessToken);
 };
 
 const isIdString = (text: unknown): boolean => {
