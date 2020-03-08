@@ -3,25 +3,33 @@ import * as codeGen from "js-ts-code-generator";
 import * as fs from "fs";
 import * as childProcess from "child_process";
 
+const accessTokenName = "AccessToken";
+const requestLogInUrlRequestDataName = "RequestLogInUrlRequestData";
+const openIdConnectProviderName = "OpenIdConnectProvider";
+const urlDataName = "UrlData";
+const clientModeName = "ClientMode";
+const locationName = "Location";
+const languageName = "Language";
+
 const requestLogInUrlRequestData: nt.type.CustomType = {
-  name: "RequestLogInUrlRequestData",
+  name: requestLogInUrlRequestDataName,
   description: "ログインのURLを発行するために必要なデータ",
   body: nt.type.customTypeBodyProduct([
     {
       name: "openIdConnectProvider",
       description: "ログインに使用するプロバイダー",
-      memberType: nt.type.typeCustom("OpenIdConnectProvider")
+      memberType: nt.type.typeCustom(openIdConnectProviderName)
     },
     {
-      name: "languageAndLocation",
-      description: "ログインした後に返ってくる場所と言語",
-      memberType: nt.type.typeCustom("LanguageAndLocation")
+      name: "urlData",
+      description: "ログインした後に返ってくるURLに必要なデータ",
+      memberType: nt.type.typeCustom(urlDataName)
     }
   ])
 };
 
 const openIdConnectProvider: nt.type.CustomType = {
-  name: "OpenIdConnectProvider",
+  name: openIdConnectProviderName,
   description: "プロバイダー (例: LINE, Google, GitHub)",
   body: nt.type.customTypeBodySum([
     {
@@ -44,48 +52,54 @@ const openIdConnectProvider: nt.type.CustomType = {
   ])
 };
 
-const languageAndLocation: nt.type.CustomType = {
-  name: "LanguageAndLocation",
+const urlData: nt.type.CustomType = {
+  name: urlDataName,
   description:
-    "言語と場所. URLとして表現される. Googleなどの検索エンジンの都合( https://support.google.com/webmasters/answer/182192?hl=ja )で,URLにページの言語のを入れて,言語ごとに別のURLである必要がある",
+    "デバッグモードかどうか,言語とページの場所. URLとして表現されるデータ. Googleなどの検索エンジンの都合( https://support.google.com/webmasters/answer/182192?hl=ja )で,URLにページの言語のを入れて,言語ごとに別のURLである必要がある. デバッグ時には http://localhost:2520 のオリジンになってしまう",
   body: nt.type.customTypeBodyProduct([
     {
-      name: "language",
-      description: "言語",
-      memberType: nt.type.typeCustom("Language")
+      name: "clientMode",
+      description: "クライアントモード",
+      memberType: nt.type.typeCustom(clientModeName)
     },
     {
       name: "location",
       description: "場所",
-      memberType: nt.type.typeCustom("Location")
+      memberType: nt.type.typeCustom(locationName)
+    },
+    {
+      name: "language",
+      description: "言語",
+      memberType: nt.type.typeCustom(languageName)
+    },
+    {
+      name: "accessToken",
+      description: "アクセストークン",
+      memberType: nt.type.typeMaybe(nt.type.typeToken(accessTokenName))
     }
   ])
 };
 
-const language: nt.type.CustomType = {
-  name: "Language",
-  description: "英語,日本語,エスペラント語などの言語",
+const clientMode: nt.type.CustomType = {
+  name: clientModeName,
+  description: "デバッグの状態と, デバッグ時ならアクセスしているポート番号",
   body: nt.type.customTypeBodySum([
     {
-      name: "Japanese",
-      description: "日本語",
-      parameter: nt.type.maybeNothing()
+      name: "DebugMode",
+      description:
+        "デバッグモード. ポート番号を保持する. オリジンは http://localhost:2520 のようなもの",
+      parameter: nt.type.maybeJust(nt.type.typeInt32)
     },
     {
-      name: "English",
-      description: "英語",
-      parameter: nt.type.maybeNothing()
-    },
-    {
-      name: "Esperanto",
-      description: "エスペラント語",
+      name: "Release",
+      description: "リリースモード. https://definy.app ",
       parameter: nt.type.maybeNothing()
     }
   ])
 };
 
 const location: nt.type.CustomType = {
-  name: "Location",
+  name: locationName,
   description:
     "DefinyWebアプリ内での場所を示すもの. URLから求められる. URLに変換できる",
   body: nt.type.customTypeBodySum([
@@ -107,15 +121,38 @@ const location: nt.type.CustomType = {
   ])
 };
 
+const language: nt.type.CustomType = {
+  name: languageName,
+  description: "英語,日本語,エスペラント語などの言語",
+  body: nt.type.customTypeBodySum([
+    {
+      name: "Japanese",
+      description: "日本語",
+      parameter: nt.type.maybeNothing()
+    },
+    {
+      name: "English",
+      description: "英語",
+      parameter: nt.type.maybeNothing()
+    },
+    {
+      name: "Esperanto",
+      description: "エスペラント語",
+      parameter: nt.type.maybeNothing()
+    }
+  ])
+};
+
 const schema: nt.type.Schema = {
   customTypeList: [
+    clientMode,
     requestLogInUrlRequestData,
     openIdConnectProvider,
-    languageAndLocation,
+    urlData,
     language,
     location
   ],
-  idOrTokenTypeNameList: ["UserId", "ProjectId"]
+  idOrTokenTypeNameList: [accessTokenName, "UserId", "ProjectId"]
 };
 
 const code = codeGen.generateCodeAsString(
