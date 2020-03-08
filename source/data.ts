@@ -12,11 +12,16 @@ export type Result<ok, error> =
   | { _: "Error"; error: error };
 
 /**
+ * デバッグの状態と, デバッグ時ならアクセスしているポート番号
+ */
+export type ClientMode = { _: "DebugMode"; int32: number } | { _: "Release" };
+
+/**
  * ログインのURLを発行するために必要なデータ
  */
 export type RequestLogInUrlRequestData = {
   openIdConnectProvider: OpenIdConnectProvider;
-  languageAndLocation: LanguageAndLocation;
+  urlData: UrlData;
 };
 
 /**
@@ -25,9 +30,14 @@ export type RequestLogInUrlRequestData = {
 export type OpenIdConnectProvider = "Google" | "GitHub" | "Line";
 
 /**
- * 言語と場所. URLとして表現される. Googleなどの検索エンジンの都合( https://support.google.com/webmasters/answer/182192?hl=ja )で,URLにページの言語のを入れて,言語ごとに別のURLである必要がある
+ * デバッグモードかどうか,言語とページの場所. URLとして表現されるデータ. Googleなどの検索エンジンの都合( https://support.google.com/webmasters/answer/182192?hl=ja )で,URLにページの言語のを入れて,言語ごとに別のURLである必要がある. デバッグ時には http://localhost:2520 のオリジンになってしまう
  */
-export type LanguageAndLocation = { language: Language; location: Location };
+export type UrlData = {
+  clientMode: ClientMode;
+  location: Location;
+  language: Language;
+  accessToken: Maybe<AccessToken>;
+};
 
 /**
  * 英語,日本語,エスペラント語などの言語
@@ -41,6 +51,8 @@ export type Location =
   | { _: "Home" }
   | { _: "User"; userId: UserId }
   | { _: "Project"; projectId: ProjectId };
+
+export type AccessToken = string & { _accessToken: never };
 
 export type UserId = string & { _userId: never };
 
@@ -78,6 +90,20 @@ export const resultError = <ok, error>(error: error): Result<ok, error> => ({
   _: "Error",
   error: error
 });
+
+/**
+ * デバッグモード. ポート番号を保持する. オリジンは http://localhost:2520 のようなもの
+ *
+ */
+export const clientModeDebugMode = (int32: number): ClientMode => ({
+  _: "DebugMode",
+  int32: int32
+});
+
+/**
+ * リリースモード. https://definy.app
+ */
+export const clientModeRelease: ClientMode = { _: "Release" };
 
 /**
  * 最初のページ
@@ -160,7 +186,7 @@ export const encodeList = <T>(
  *
  *
  */
-export const maybe = <T>(
+export const encodeMaybe = <T>(
   encodeFunction: (a: T) => ReadonlyArray<number>
 ): ((a: Maybe<T>) => ReadonlyArray<number>) => (
   maybe: Maybe<T>
@@ -223,22 +249,35 @@ export const encodeHashOrAccessToken = (id: string): ReadonlyArray<number> => {
  *
  *
  */
-export const encodeCustomRequestLogInUrlRequestData = (
-  requestLogInUrlRequestData: RequestLogInUrlRequestData
-): ReadonlyArray<number> =>
-  encodeCustomOpenIdConnectProvider(
-    requestLogInUrlRequestData.openIdConnectProvider
-  ).concat(
-    encodeCustomLanguageAndLocation(
-      requestLogInUrlRequestData.languageAndLocation
-    )
-  );
+export const encodeClientMode = (
+  clientMode: ClientMode
+): ReadonlyArray<number> => {
+  switch (clientMode._) {
+    case "DebugMode": {
+      return [0].concat(encodeInt32(clientMode.int32));
+    }
+    case "Release": {
+      return [1];
+    }
+  }
+};
 
 /**
  *
  *
  */
-export const encodeCustomOpenIdConnectProvider = (
+export const encodeRequestLogInUrlRequestData = (
+  requestLogInUrlRequestData: RequestLogInUrlRequestData
+): ReadonlyArray<number> =>
+  encodeOpenIdConnectProvider(
+    requestLogInUrlRequestData.openIdConnectProvider
+  ).concat(encodeUrlData(requestLogInUrlRequestData.urlData));
+
+/**
+ *
+ *
+ */
+export const encodeOpenIdConnectProvider = (
   openIdConnectProvider: OpenIdConnectProvider
 ): ReadonlyArray<number> => {
   switch (openIdConnectProvider) {
@@ -258,20 +297,17 @@ export const encodeCustomOpenIdConnectProvider = (
  *
  *
  */
-export const encodeCustomLanguageAndLocation = (
-  languageAndLocation: LanguageAndLocation
-): ReadonlyArray<number> =>
-  encodeCustomLanguage(languageAndLocation.language).concat(
-    encodeCustomLocation(languageAndLocation.location)
-  );
+export const encodeUrlData = (urlData: UrlData): ReadonlyArray<number> =>
+  encodeClientMode(urlData.clientMode)
+    .concat(encodeLocation(urlData.location))
+    .concat(encodeLanguage(urlData.language))
+    .concat(encodeMaybe(encodeHashOrAccessToken)(urlData.accessToken));
 
 /**
  *
  *
  */
-export const encodeCustomLanguage = (
-  language: Language
-): ReadonlyArray<number> => {
+export const encodeLanguage = (language: Language): ReadonlyArray<number> => {
   switch (language) {
     case "Japanese": {
       return [0];
@@ -289,9 +325,7 @@ export const encodeCustomLanguage = (
  *
  *
  */
-export const encodeCustomLocation = (
-  location: Location
-): ReadonlyArray<number> => {
+export const encodeLocation = (location: Location): ReadonlyArray<number> => {
   switch (location._) {
     case "Home": {
       return [0];
@@ -520,27 +554,54 @@ export const decodeHashOrAccessToken = (
  * @param binary バイナリ
  *
  */
-export const decodeCustomRequestLogInUrlRequestData = (
+export const decodeClientMode = (
+  index: number,
+  binary: Uint8Array
+): { result: ClientMode; nextIndex: number } => {
+  const patternIndex: { result: number; nextIndex: number } = decodeInt(
+    index,
+    binary
+  );
+  if (patternIndex.result === 0) {
+    const result: { result: number; nextIndex: number } = decodeInt(
+      patternIndex.nextIndex,
+      binary
+    );
+    return {
+      result: clientModeDebugMode(result.result),
+      nextIndex: result.nextIndex
+    };
+  }
+  if (patternIndex.result === 1) {
+    return { result: clientModeRelease, nextIndex: patternIndex.nextIndex };
+  }
+  throw new Error("存在しないパターンを指定された 型を更新してください");
+};
+
+/**
+ *
+ * @param index バイナリを読み込み開始位置
+ * @param binary バイナリ
+ *
+ */
+export const decodeRequestLogInUrlRequestData = (
   index: number,
   binary: Uint8Array
 ): { result: RequestLogInUrlRequestData; nextIndex: number } => {
   const openIdConnectProviderAndNextIndex: {
     result: OpenIdConnectProvider;
     nextIndex: number;
-  } = decodeCustomOpenIdConnectProvider(index, binary);
-  const languageAndLocationAndNextIndex: {
-    result: LanguageAndLocation;
+  } = decodeOpenIdConnectProvider(index, binary);
+  const urlDataAndNextIndex: {
+    result: UrlData;
     nextIndex: number;
-  } = decodeCustomLanguageAndLocation(
-    openIdConnectProviderAndNextIndex.nextIndex,
-    binary
-  );
+  } = decodeUrlData(openIdConnectProviderAndNextIndex.nextIndex, binary);
   return {
     result: {
       openIdConnectProvider: openIdConnectProviderAndNextIndex.result,
-      languageAndLocation: languageAndLocationAndNextIndex.result
+      urlData: urlDataAndNextIndex.result
     },
-    nextIndex: languageAndLocationAndNextIndex.nextIndex
+    nextIndex: urlDataAndNextIndex.nextIndex
   };
 };
 
@@ -550,7 +611,7 @@ export const decodeCustomRequestLogInUrlRequestData = (
  * @param binary バイナリ
  *
  */
-export const decodeCustomOpenIdConnectProvider = (
+export const decodeOpenIdConnectProvider = (
   index: number,
   binary: Uint8Array
 ): { result: OpenIdConnectProvider; nextIndex: number } => {
@@ -576,24 +637,39 @@ export const decodeCustomOpenIdConnectProvider = (
  * @param binary バイナリ
  *
  */
-export const decodeCustomLanguageAndLocation = (
+export const decodeUrlData = (
   index: number,
   binary: Uint8Array
-): { result: LanguageAndLocation; nextIndex: number } => {
-  const languageAndNextIndex: {
-    result: Language;
+): { result: UrlData; nextIndex: number } => {
+  const clientModeAndNextIndex: {
+    result: ClientMode;
     nextIndex: number;
-  } = decodeCustomLanguage(index, binary);
+  } = decodeClientMode(index, binary);
   const locationAndNextIndex: {
     result: Location;
     nextIndex: number;
-  } = decodeCustomLocation(languageAndNextIndex.nextIndex, binary);
+  } = decodeLocation(clientModeAndNextIndex.nextIndex, binary);
+  const languageAndNextIndex: {
+    result: Language;
+    nextIndex: number;
+  } = decodeLanguage(locationAndNextIndex.nextIndex, binary);
+  const accessTokenAndNextIndex: {
+    result: Maybe<AccessToken>;
+    nextIndex: number;
+  } = decodeMaybe(
+    decodeHashOrAccessToken as (
+      a: number,
+      b: Uint8Array
+    ) => { result: AccessToken; nextIndex: number }
+  )(languageAndNextIndex.nextIndex, binary);
   return {
     result: {
+      clientMode: clientModeAndNextIndex.result,
+      location: locationAndNextIndex.result,
       language: languageAndNextIndex.result,
-      location: locationAndNextIndex.result
+      accessToken: accessTokenAndNextIndex.result
     },
-    nextIndex: locationAndNextIndex.nextIndex
+    nextIndex: accessTokenAndNextIndex.nextIndex
   };
 };
 
@@ -603,7 +679,7 @@ export const decodeCustomLanguageAndLocation = (
  * @param binary バイナリ
  *
  */
-export const decodeCustomLanguage = (
+export const decodeLanguage = (
   index: number,
   binary: Uint8Array
 ): { result: Language; nextIndex: number } => {
@@ -629,7 +705,7 @@ export const decodeCustomLanguage = (
  * @param binary バイナリ
  *
  */
-export const decodeCustomLocation = (
+export const decodeLocation = (
   index: number,
   binary: Uint8Array
 ): { result: Location; nextIndex: number } => {
