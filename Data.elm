@@ -1,8 +1,14 @@
-module Data exposing (AccessToken(..), ClientMode(..), FileHash(..), Language(..), Location(..), OpenIdConnectProvider(..), ProjectId(..), RequestLogInUrlRequestData, UrlData, UserId(..), accessTokenJsonDecoder, accessTokenToJsonValue, clientModeJsonDecoder, clientModeToJsonValue, fileHashJsonDecoder, fileHashToJsonValue, languageJsonDecoder, languageToJsonValue, locationJsonDecoder, locationToJsonValue, maybeJsonDecoder, maybeToJsonValue, openIdConnectProviderJsonDecoder, openIdConnectProviderToJsonValue, projectIdJsonDecoder, projectIdToJsonValue, requestLogInUrlRequestDataJsonDecoder, requestLogInUrlRequestDataToJsonValue, resultJsonDecoder, resultToJsonValue, urlDataJsonDecoder, urlDataToJsonValue, userIdJsonDecoder, userIdToJsonValue)
+module Data exposing (AccessToken(..), ClientMode(..), DateTime, FileHash(..), Language(..), Location(..), OpenIdConnectProvider(..), ProjectId(..), RequestLogInUrlRequestData, UrlData, UserId(..), accessTokenJsonDecoder, accessTokenToJsonValue, clientModeJsonDecoder, clientModeToJsonValue, dateTimeJsonDecoder, dateTimeToJsonValue, fileHashJsonDecoder, fileHashToJsonValue, languageJsonDecoder, languageToJsonValue, locationJsonDecoder, locationToJsonValue, maybeJsonDecoder, maybeToJsonValue, openIdConnectProviderJsonDecoder, openIdConnectProviderToJsonValue, projectIdJsonDecoder, projectIdToJsonValue, requestLogInUrlRequestDataJsonDecoder, requestLogInUrlRequestDataToJsonValue, resultJsonDecoder, resultToJsonValue, urlDataJsonDecoder, urlDataToJsonValue, userIdJsonDecoder, userIdToJsonValue)
 
 import Json.Decode as Jd
 import Json.Decode.Pipeline as Jdp
 import Json.Encode as Je
+
+
+{-| 日時 最小単位は秒
+-}
+type alias DateTime =
+    { year : Int, month : Int, day : Int, hour : Int, minute : Int, second : Int }
 
 
 {-| デバッグの状態と, デバッグ時ならアクセスしているポート番号
@@ -102,6 +108,20 @@ projectIdToJsonValue (ProjectId string) =
 fileHashToJsonValue : FileHash -> Je.Value
 fileHashToJsonValue (FileHash string) =
     Je.string string
+
+
+{-| DateTimeのJSONへのエンコーダ
+-}
+dateTimeToJsonValue : DateTime -> Je.Value
+dateTimeToJsonValue dateTime =
+    Je.object
+        [ ( "year", Je.int dateTime.year )
+        , ( "month", Je.int dateTime.month )
+        , ( "day", Je.int dateTime.day )
+        , ( "hour", Je.int dateTime.hour )
+        , ( "minute", Je.int dateTime.minute )
+        , ( "second", Je.int dateTime.second )
+        ]
 
 
 {-| ClientModeのJSONへのエンコーダ
@@ -235,6 +255,28 @@ projectIdJsonDecoder =
 fileHashJsonDecoder : Jd.Decoder FileHash
 fileHashJsonDecoder =
     Jd.map FileHash Jd.string
+
+
+{-| DateTimeのJSON Decoder
+-}
+dateTimeJsonDecoder : Jd.Decoder DateTime
+dateTimeJsonDecoder =
+    Jd.succeed
+        (\year month day hour minute second ->
+            { year = year
+            , month = month
+            , day = day
+            , hour = hour
+            , minute = minute
+            , second = second
+            }
+        )
+        |> Jdp.required "year" Jd.int
+        |> Jdp.required "month" Jd.int
+        |> Jdp.required "day" Jd.int
+        |> Jdp.required "hour" Jd.int
+        |> Jdp.required "minute" Jd.int
+        |> Jdp.required "second" Jd.int
 
 
 {-| ClientModeのJSON Decoder

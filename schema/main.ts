@@ -7,12 +7,51 @@ const accessTokenName = "AccessToken";
 const userIdName = "UserId";
 const projectIdName = "ProjectId";
 const fileHashName = "FileHash";
+
+const dateTimeName = "DateTime";
 const requestLogInUrlRequestDataName = "RequestLogInUrlRequestData";
 const openIdConnectProviderName = "OpenIdConnectProvider";
 const urlDataName = "UrlData";
 const clientModeName = "ClientMode";
 const locationName = "Location";
 const languageName = "Language";
+
+const dateTime: nt.type.CustomType = {
+  name: dateTimeName,
+  description: "日時 最小単位は秒",
+  body: nt.type.customTypeBodyProduct([
+    {
+      name: "year",
+      description: "年. 人類紀元. 西暦に10000を足したもの Human Era",
+      memberType: nt.type.typeInt32
+    },
+    {
+      name: "month",
+      description: "月. 1月～12月. 最大値は月や年によって決まる",
+      memberType: nt.type.typeInt32
+    },
+    {
+      name: "day",
+      description: "日",
+      memberType: nt.type.typeInt32
+    },
+    {
+      name: "hour",
+      description: "時. 0時～23時",
+      memberType: nt.type.typeInt32
+    },
+    {
+      name: "minute",
+      description: "分",
+      memberType: nt.type.typeInt32
+    },
+    {
+      name: "second",
+      description: "秒",
+      memberType: nt.type.typeInt32
+    }
+  ])
+};
 
 const requestLogInUrlRequestData: nt.type.CustomType = {
   name: requestLogInUrlRequestDataName,
@@ -148,6 +187,7 @@ const language: nt.type.CustomType = {
 
 const schema: nt.type.Schema = {
   customTypeList: [
+    dateTime,
     clientMode,
     requestLogInUrlRequestData,
     openIdConnectProvider,

@@ -12,6 +12,18 @@ export type Result<ok, error> =
   | { _: "Error"; error: error };
 
 /**
+ * 日時 最小単位は秒
+ */
+export type DateTime = {
+  year: number;
+  month: number;
+  day: number;
+  hour: number;
+  minute: number;
+  second: number;
+};
+
+/**
  * デバッグの状態と, デバッグ時ならアクセスしているポート番号
  */
 export type ClientMode = { _: "DebugMode"; int32: number } | { _: "Release" };
@@ -250,6 +262,18 @@ export const encodeHashOrAccessToken = (id: string): ReadonlyArray<number> => {
   }
   return result;
 };
+
+/**
+ *
+ *
+ */
+export const encodeDateTime = (dateTime: DateTime): ReadonlyArray<number> =>
+  encodeInt32(dateTime.year)
+    .concat(encodeInt32(dateTime.month))
+    .concat(encodeInt32(dateTime.day))
+    .concat(encodeInt32(dateTime.hour))
+    .concat(encodeInt32(dateTime.minute))
+    .concat(encodeInt32(dateTime.second));
 
 /**
  *
@@ -561,6 +585,53 @@ export const decodeHashOrAccessToken = (
     .join(""),
   nextIndex: index + 32
 });
+
+/**
+ *
+ * @param index バイナリを読み込み開始位置
+ * @param binary バイナリ
+ *
+ */
+export const decodeDateTime = (
+  index: number,
+  binary: Uint8Array
+): { result: DateTime; nextIndex: number } => {
+  const yearAndNextIndex: { result: number; nextIndex: number } = decodeInt(
+    index,
+    binary
+  );
+  const monthAndNextIndex: { result: number; nextIndex: number } = decodeInt(
+    yearAndNextIndex.nextIndex,
+    binary
+  );
+  const dayAndNextIndex: { result: number; nextIndex: number } = decodeInt(
+    monthAndNextIndex.nextIndex,
+    binary
+  );
+  const hourAndNextIndex: { result: number; nextIndex: number } = decodeInt(
+    dayAndNextIndex.nextIndex,
+    binary
+  );
+  const minuteAndNextIndex: { result: number; nextIndex: number } = decodeInt(
+    hourAndNextIndex.nextIndex,
+    binary
+  );
+  const secondAndNextIndex: { result: number; nextIndex: number } = decodeInt(
+    minuteAndNextIndex.nextIndex,
+    binary
+  );
+  return {
+    result: {
+      year: yearAndNextIndex.result,
+      month: monthAndNextIndex.result,
+      day: dayAndNextIndex.result,
+      hour: hourAndNextIndex.result,
+      minute: minuteAndNextIndex.result,
+      second: secondAndNextIndex.result
+    },
+    nextIndex: secondAndNextIndex.nextIndex
+  };
+};
 
 /**
  *
