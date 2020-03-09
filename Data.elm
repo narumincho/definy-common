@@ -293,7 +293,7 @@ urlDataJsonDecoder =
         |> Jdp.required "clientMode" clientModeJsonDecoder
         |> Jdp.required "location" locationJsonDecoder
         |> Jdp.required "language" languageJsonDecoder
-        |> Jdp.required "accessToken" (maybeToJsonValue accessTokenJsonDecoder)
+        |> Jdp.required "accessToken" (maybeJsonDecoder accessTokenJsonDecoder)
 
 
 {-| LanguageのJSON Decoder
