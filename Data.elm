@@ -1,4 +1,4 @@
-module Data exposing (AccessToken(..), ClientMode(..), DateTime, FileHash(..), Language(..), Location(..), OpenIdConnectProvider(..), ProjectId(..), RequestLogInUrlRequestData, UrlData, UserId(..), accessTokenJsonDecoder, accessTokenToJsonValue, clientModeJsonDecoder, clientModeToJsonValue, dateTimeJsonDecoder, dateTimeToJsonValue, fileHashJsonDecoder, fileHashToJsonValue, languageJsonDecoder, languageToJsonValue, locationJsonDecoder, locationToJsonValue, maybeJsonDecoder, maybeToJsonValue, openIdConnectProviderJsonDecoder, openIdConnectProviderToJsonValue, projectIdJsonDecoder, projectIdToJsonValue, requestLogInUrlRequestDataJsonDecoder, requestLogInUrlRequestDataToJsonValue, resultJsonDecoder, resultToJsonValue, urlDataJsonDecoder, urlDataToJsonValue, userIdJsonDecoder, userIdToJsonValue)
+module Data exposing (AccessToken(..), ClientMode(..), DateTime, FileHash(..), IdeaId(..), Language(..), Location(..), OpenIdConnectProvider(..), ProjectId(..), RequestLogInUrlRequestData, UrlData, UserId(..), UserPublic, accessTokenJsonDecoder, accessTokenToJsonValue, clientModeJsonDecoder, clientModeToJsonValue, dateTimeJsonDecoder, dateTimeToJsonValue, fileHashJsonDecoder, fileHashToJsonValue, ideaIdJsonDecoder, ideaIdToJsonValue, languageJsonDecoder, languageToJsonValue, locationJsonDecoder, locationToJsonValue, maybeJsonDecoder, maybeToJsonValue, openIdConnectProviderJsonDecoder, openIdConnectProviderToJsonValue, projectIdJsonDecoder, projectIdToJsonValue, requestLogInUrlRequestDataJsonDecoder, requestLogInUrlRequestDataToJsonValue, resultJsonDecoder, resultToJsonValue, urlDataJsonDecoder, urlDataToJsonValue, userIdJsonDecoder, userIdToJsonValue, userPublicJsonDecoder, userPublicToJsonValue)
 
 import Json.Decode as Jd
 import Json.Decode.Pipeline as Jdp
@@ -54,6 +54,12 @@ type Location
     | Project ProjectId
 
 
+{-| ユーザーが公開している情報
+-}
+type alias UserPublic =
+    { name : String, imageHash : FileHash, introduction : String, createdAt : DateTime, likedProjectIdList : List ProjectId, developedProjectIdList : List ProjectId, commentedIdeaIdList : List IdeaId }
+
+
 type AccessToken
     = AccessToken String
 
@@ -64,6 +70,10 @@ type UserId
 
 type ProjectId
     = ProjectId String
+
+
+type IdeaId
+    = IdeaId String
 
 
 type FileHash
@@ -102,6 +112,11 @@ userIdToJsonValue (UserId string) =
 
 projectIdToJsonValue : ProjectId -> Je.Value
 projectIdToJsonValue (ProjectId string) =
+    Je.string string
+
+
+ideaIdToJsonValue : IdeaId -> Je.Value
+ideaIdToJsonValue (IdeaId string) =
     Je.string string
 
 
@@ -203,6 +218,21 @@ locationToJsonValue location =
             Je.object [ ( "_", Je.string "Project" ), ( "projectId", projectIdToJsonValue parameter ) ]
 
 
+{-| UserPublicのJSONへのエンコーダ
+-}
+userPublicToJsonValue : UserPublic -> Je.Value
+userPublicToJsonValue userPublic =
+    Je.object
+        [ ( "name", Je.string userPublic.name )
+        , ( "imageHash", fileHashToJsonValue userPublic.imageHash )
+        , ( "introduction", Je.string userPublic.introduction )
+        , ( "createdAt", dateTimeToJsonValue userPublic.createdAt )
+        , ( "likedProjectIdList", Je.list projectIdToJsonValue userPublic.likedProjectIdList )
+        , ( "developedProjectIdList", Je.list projectIdToJsonValue userPublic.developedProjectIdList )
+        , ( "commentedIdeaIdList", Je.list ideaIdToJsonValue userPublic.commentedIdeaIdList )
+        ]
+
+
 maybeJsonDecoder : Jd.Decoder a -> Jd.Decoder (Maybe a)
 maybeJsonDecoder decoder =
     Jd.field "_" Jd.string
@@ -250,6 +280,11 @@ userIdJsonDecoder =
 projectIdJsonDecoder : Jd.Decoder ProjectId
 projectIdJsonDecoder =
     Jd.map ProjectId Jd.string
+
+
+ideaIdJsonDecoder : Jd.Decoder IdeaId
+ideaIdJsonDecoder =
+    Jd.map IdeaId Jd.string
 
 
 fileHashJsonDecoder : Jd.Decoder FileHash
@@ -394,3 +429,27 @@ locationJsonDecoder =
                     _ ->
                         Jd.fail ("Locationで不明なタグを受けたとった tag=" ++ tag)
             )
+
+
+{-| UserPublicのJSON Decoder
+-}
+userPublicJsonDecoder : Jd.Decoder UserPublic
+userPublicJsonDecoder =
+    Jd.succeed
+        (\name imageHash introduction createdAt likedProjectIdList developedProjectIdList commentedIdeaIdList ->
+            { name = name
+            , imageHash = imageHash
+            , introduction = introduction
+            , createdAt = createdAt
+            , likedProjectIdList = likedProjectIdList
+            , developedProjectIdList = developedProjectIdList
+            , commentedIdeaIdList = commentedIdeaIdList
+            }
+        )
+        |> Jdp.required "name" Jd.string
+        |> Jdp.required "imageHash" fileHashJsonDecoder
+        |> Jdp.required "introduction" Jd.string
+        |> Jdp.required "createdAt" dateTimeJsonDecoder
+        |> Jdp.required "likedProjectIdList" (Jd.list projectIdJsonDecoder)
+        |> Jdp.required "developedProjectIdList" (Jd.list projectIdJsonDecoder)
+        |> Jdp.required "commentedIdeaIdList" (Jd.list ideaIdJsonDecoder)

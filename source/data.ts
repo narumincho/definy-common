@@ -64,11 +64,26 @@ export type Location =
   | { _: "User"; userId: UserId }
   | { _: "Project"; projectId: ProjectId };
 
+/**
+ * ユーザーが公開している情報
+ */
+export type UserPublic = {
+  name: string;
+  imageHash: FileHash;
+  introduction: string;
+  createdAt: DateTime;
+  likedProjectIdList: ReadonlyArray<ProjectId>;
+  developedProjectIdList: ReadonlyArray<ProjectId>;
+  commentedIdeaIdList: ReadonlyArray<IdeaId>;
+};
+
 export type AccessToken = string & { _accessToken: never };
 
 export type UserId = string & { _userId: never };
 
 export type ProjectId = string & { _projectId: never };
+
+export type IdeaId = string & { _ideaId: never };
 
 export type FileHash = string & { _fileHash: never };
 
@@ -193,7 +208,7 @@ export const encodeList = <T>(
 ): ((a: ReadonlyArray<T>) => ReadonlyArray<number>) => (
   list: ReadonlyArray<T>
 ): ReadonlyArray<number> => {
-  let result: Array<number> = [].concat(encodeInt32(list.length));
+  let result: Array<number> = encodeInt32(list.length) as Array<number>;
   for (const element of list) {
     result = result.concat(encodeFunction(element));
   }
@@ -368,6 +383,21 @@ export const encodeLocation = (location: Location): ReadonlyArray<number> => {
     }
   }
 };
+
+/**
+ *
+ *
+ */
+export const encodeUserPublic = (
+  userPublic: UserPublic
+): ReadonlyArray<number> =>
+  encodeString(userPublic.name)
+    .concat(encodeHashOrAccessToken(userPublic.imageHash))
+    .concat(encodeString(userPublic.introduction))
+    .concat(encodeDateTime(userPublic.createdAt))
+    .concat(encodeList(encodeId)(userPublic.likedProjectIdList))
+    .concat(encodeList(encodeId)(userPublic.developedProjectIdList))
+    .concat(encodeList(encodeId)(userPublic.commentedIdeaIdList));
 
 /**
  * SignedLeb128で表現されたバイナリをnumberのビット演算ができる32bit符号付き整数の範囲の数値に変換するコード
@@ -822,4 +852,77 @@ export const decodeLocation = (
     };
   }
   throw new Error("存在しないパターンを指定された 型を更新してください");
+};
+
+/**
+ *
+ * @param index バイナリを読み込み開始位置
+ * @param binary バイナリ
+ *
+ */
+export const decodeUserPublic = (
+  index: number,
+  binary: Uint8Array
+): { result: UserPublic; nextIndex: number } => {
+  const nameAndNextIndex: { result: string; nextIndex: number } = decodeString(
+    index,
+    binary
+  );
+  const imageHashAndNextIndex: {
+    result: FileHash;
+    nextIndex: number;
+  } = (decodeHashOrAccessToken as (
+    a: number,
+    b: Uint8Array
+  ) => { result: FileHash; nextIndex: number })(
+    nameAndNextIndex.nextIndex,
+    binary
+  );
+  const introductionAndNextIndex: {
+    result: string;
+    nextIndex: number;
+  } = decodeString(imageHashAndNextIndex.nextIndex, binary);
+  const createdAtAndNextIndex: {
+    result: DateTime;
+    nextIndex: number;
+  } = decodeDateTime(introductionAndNextIndex.nextIndex, binary);
+  const likedProjectIdListAndNextIndex: {
+    result: ReadonlyArray<ProjectId>;
+    nextIndex: number;
+  } = decodeList(
+    decodeId as (
+      a: number,
+      b: Uint8Array
+    ) => { result: ProjectId; nextIndex: number }
+  )(createdAtAndNextIndex.nextIndex, binary);
+  const developedProjectIdListAndNextIndex: {
+    result: ReadonlyArray<ProjectId>;
+    nextIndex: number;
+  } = decodeList(
+    decodeId as (
+      a: number,
+      b: Uint8Array
+    ) => { result: ProjectId; nextIndex: number }
+  )(likedProjectIdListAndNextIndex.nextIndex, binary);
+  const commentedIdeaIdListAndNextIndex: {
+    result: ReadonlyArray<IdeaId>;
+    nextIndex: number;
+  } = decodeList(
+    decodeId as (
+      a: number,
+      b: Uint8Array
+    ) => { result: IdeaId; nextIndex: number }
+  )(developedProjectIdListAndNextIndex.nextIndex, binary);
+  return {
+    result: {
+      name: nameAndNextIndex.result,
+      imageHash: imageHashAndNextIndex.result,
+      introduction: introductionAndNextIndex.result,
+      createdAt: createdAtAndNextIndex.result,
+      likedProjectIdList: likedProjectIdListAndNextIndex.result,
+      developedProjectIdList: developedProjectIdListAndNextIndex.result,
+      commentedIdeaIdList: commentedIdeaIdListAndNextIndex.result
+    },
+    nextIndex: commentedIdeaIdListAndNextIndex.nextIndex
+  };
 };

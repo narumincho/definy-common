@@ -6,6 +6,7 @@ import * as childProcess from "child_process";
 const accessTokenName = "AccessToken";
 const userIdName = "UserId";
 const projectIdName = "ProjectId";
+const ideaIdName = "IdeaId";
 const fileHashName = "FileHash";
 
 const dateTimeName = "DateTime";
@@ -15,6 +16,7 @@ const urlDataName = "UrlData";
 const clientModeName = "ClientMode";
 const locationName = "Location";
 const languageName = "Language";
+const userPublicName = "UserPublic";
 
 const dateTime: nt.type.CustomType = {
   name: dateTimeName,
@@ -185,6 +187,50 @@ const language: nt.type.CustomType = {
   ])
 };
 
+const userPublic: nt.type.CustomType = {
+  name: userPublicName,
+  description: "ユーザーが公開している情報",
+  body: nt.type.customTypeBodyProduct([
+    {
+      name: "name",
+      description:
+        "ユーザー名. 表示される名前。他のユーザーとかぶっても良い. 絵文字も使える. 全角英数は半角英数,半角カタカナは全角カタカナ, (株)の合字を分解するなどのNFKCの正規化がされる. U+0000-U+0019 と U+007F-U+00A0 の範囲の文字は入らない. 前後に空白を含められない. 間の空白は2文字以上連続しない. 文字数のカウント方法は正規化されたあとのCodePoint単位. Twitterと同じ、1文字以上50文字以下",
+      memberType: nt.type.typeString
+    },
+    {
+      name: "imageHash",
+      description: "プロフィール画像",
+      memberType: nt.type.typeToken(fileHashName)
+    },
+    {
+      name: "introduction",
+      description:
+        "自己紹介文. 改行文字を含めることができる. Twitterと同じ 0～160文字",
+      memberType: nt.type.typeString
+    },
+    {
+      name: "createdAt",
+      description: "ユーザーが作成された日時",
+      memberType: nt.type.typeCustom(dateTimeName)
+    },
+    {
+      name: "likedProjectIdList",
+      description: "プロジェクトに対する いいね",
+      memberType: nt.type.typeList(nt.type.typeId(projectIdName))
+    },
+    {
+      name: "developedProjectIdList",
+      description: "開発に参加した (書いたコードが使われた) プロジェクト",
+      memberType: nt.type.typeList(nt.type.typeId(projectIdName))
+    },
+    {
+      name: "commentedIdeaIdList",
+      description: "コメントをしたアイデア",
+      memberType: nt.type.typeList(nt.type.typeId(ideaIdName))
+    }
+  ])
+};
+
 const schema: nt.type.Schema = {
   customTypeList: [
     dateTime,
@@ -193,12 +239,14 @@ const schema: nt.type.Schema = {
     openIdConnectProvider,
     urlData,
     language,
-    location
+    location,
+    userPublic
   ],
   idOrTokenTypeNameList: [
     accessTokenName,
     userIdName,
     projectIdName,
+    ideaIdName,
     fileHashName
   ]
 };
