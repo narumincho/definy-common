@@ -1,4 +1,4 @@
-module Data exposing (AccessToken(..), ClientMode(..), Language(..), Location(..), OpenIdConnectProvider(..), ProjectId(..), RequestLogInUrlRequestData, UrlData, UserId(..), accessTokenJsonDecoder, accessTokenToJsonValue, clientModeJsonDecoder, clientModeToJsonValue, languageJsonDecoder, languageToJsonValue, locationJsonDecoder, locationToJsonValue, maybeJsonDecoder, maybeToJsonValue, openIdConnectProviderJsonDecoder, openIdConnectProviderToJsonValue, projectIdJsonDecoder, projectIdToJsonValue, requestLogInUrlRequestDataJsonDecoder, requestLogInUrlRequestDataToJsonValue, resultJsonDecoder, resultToJsonValue, urlDataJsonDecoder, urlDataToJsonValue, userIdJsonDecoder, userIdToJsonValue)
+module Data exposing (AccessToken(..), ClientMode(..), FileHash(..), Language(..), Location(..), OpenIdConnectProvider(..), ProjectId(..), RequestLogInUrlRequestData, UrlData, UserId(..), accessTokenJsonDecoder, accessTokenToJsonValue, clientModeJsonDecoder, clientModeToJsonValue, fileHashJsonDecoder, fileHashToJsonValue, languageJsonDecoder, languageToJsonValue, locationJsonDecoder, locationToJsonValue, maybeJsonDecoder, maybeToJsonValue, openIdConnectProviderJsonDecoder, openIdConnectProviderToJsonValue, projectIdJsonDecoder, projectIdToJsonValue, requestLogInUrlRequestDataJsonDecoder, requestLogInUrlRequestDataToJsonValue, resultJsonDecoder, resultToJsonValue, urlDataJsonDecoder, urlDataToJsonValue, userIdJsonDecoder, userIdToJsonValue)
 
 import Json.Decode as Jd
 import Json.Decode.Pipeline as Jdp
@@ -60,6 +60,10 @@ type ProjectId
     = ProjectId String
 
 
+type FileHash
+    = FileHash String
+
+
 maybeToJsonValue : (a -> Je.Value) -> Maybe a -> Je.Value
 maybeToJsonValue toJsonValueFunction maybe =
     case maybe of
@@ -92,6 +96,11 @@ userIdToJsonValue (UserId string) =
 
 projectIdToJsonValue : ProjectId -> Je.Value
 projectIdToJsonValue (ProjectId string) =
+    Je.string string
+
+
+fileHashToJsonValue : FileHash -> Je.Value
+fileHashToJsonValue (FileHash string) =
     Je.string string
 
 
@@ -221,6 +230,11 @@ userIdJsonDecoder =
 projectIdJsonDecoder : Jd.Decoder ProjectId
 projectIdJsonDecoder =
     Jd.map ProjectId Jd.string
+
+
+fileHashJsonDecoder : Jd.Decoder FileHash
+fileHashJsonDecoder =
+    Jd.map FileHash Jd.string
 
 
 {-| ClientModeのJSON Decoder

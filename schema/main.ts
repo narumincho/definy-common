@@ -4,6 +4,9 @@ import * as fs from "fs";
 import * as childProcess from "child_process";
 
 const accessTokenName = "AccessToken";
+const userIdName = "UserId";
+const projectIdName = "ProjectId";
+const fileHashName = "FileHash";
 const requestLogInUrlRequestDataName = "RequestLogInUrlRequestData";
 const openIdConnectProviderName = "OpenIdConnectProvider";
 const urlDataName = "UrlData";
@@ -152,7 +155,12 @@ const schema: nt.type.Schema = {
     language,
     location
   ],
-  idOrTokenTypeNameList: [accessTokenName, "UserId", "ProjectId"]
+  idOrTokenTypeNameList: [
+    accessTokenName,
+    userIdName,
+    projectIdName,
+    fileHashName
+  ]
 };
 
 const code = codeGen.generateCodeAsString(

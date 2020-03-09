@@ -58,6 +58,8 @@ export type UserId = string & { _userId: never };
 
 export type ProjectId = string & { _projectId: never };
 
+export type FileHash = string & { _fileHash: never };
+
 /**
  *
  *
