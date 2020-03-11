@@ -347,7 +347,7 @@ requestLogInUrlRequestDataJsonDecoder =
 -}
 openIdConnectProviderJsonDecoder : Jd.Decoder OpenIdConnectProvider
 openIdConnectProviderJsonDecoder =
-    Jd.field "_" Jd.string
+    Jd.string
         |> Jd.andThen
             (\tag ->
                 case tag of
@@ -384,7 +384,7 @@ urlDataJsonDecoder =
 -}
 languageJsonDecoder : Jd.Decoder Language
 languageJsonDecoder =
-    Jd.field "_" Jd.string
+    Jd.string
         |> Jd.andThen
             (\tag ->
                 case tag of

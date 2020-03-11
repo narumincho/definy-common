@@ -169,7 +169,7 @@ export const encodeInt32 = (value: number): ReadonlyArray<number> => {
     value >>= 7;
     if (
       (value === 0 && (byte & 64) === 0) ||
-      (value === -1 && (byte & 4) !== 0)
+      (value === -1 && (byte & 64) !== 0)
     ) {
       result.push(byte);
       return result;
@@ -402,7 +402,7 @@ export const encodeUserPublic = (
  * @param binary バイナリ
  *
  */
-export const decodeInt = (
+export const decodeInt32 = (
   index: number,
   binary: Uint8Array
 ): { result: number; nextIndex: number } => {
@@ -434,15 +434,12 @@ export const decodeString = (
   index: number,
   binary: Uint8Array
 ): { result: string; nextIndex: number } => {
-  const length: { result: number; nextIndex: number } = decodeInt(
+  const length: { result: number; nextIndex: number } = decodeInt32(
     index,
     binary
   );
-  const nextIndex: number = index + length.nextIndex + length.result;
-  const textBinary: Uint8Array = binary.slice(
-    index + length.nextIndex,
-    nextIndex
-  );
+  const nextIndex: number = length.nextIndex + length.result;
+  const textBinary: Uint8Array = binary.slice(length.nextIndex, nextIndex);
   const isBrowser: boolean =
     process === undefined || process.title === "browser";
   if (isBrowser) {
@@ -484,9 +481,13 @@ export const decodeList = <T>(
   index: number,
   binary: Uint8Array
 ): { result: ReadonlyArray<T>; nextIndex: number } => {
-  const length: number = binary[index];
+  const lengthResult: { result: number; nextIndex: number } = decodeInt32(
+    index,
+    binary
+  );
+  index = lengthResult.nextIndex;
   const result: Array<T> = [];
-  for (let i = 0; i < length; i += 1) {
+  for (let i = 0; i < lengthResult.result; i += 1) {
     const resultAndNextIndex: { result: T; nextIndex: number } = decodeFunction(
       index,
       binary
@@ -510,7 +511,7 @@ export const decodeMaybe = <T>(
   const patternIndexAndNextIndex: {
     result: number;
     nextIndex: number;
-  } = decodeInt(index, binary);
+  } = decodeInt32(index, binary);
   if (patternIndexAndNextIndex.result === 0) {
     const valueAndNextIndex: { result: T; nextIndex: number } = decodeFunction(
       patternIndexAndNextIndex.nextIndex,
@@ -555,7 +556,7 @@ export const decodeResult = <ok, error>(
   const patternIndexAndNextIndex: {
     result: number;
     nextIndex: number;
-  } = decodeInt(index, binary);
+  } = decodeInt32(index, binary);
   if (patternIndexAndNextIndex.result === 0) {
     const okAndNextIndex: { result: ok; nextIndex: number } = okDecodeFunction(
       patternIndexAndNextIndex.nextIndex,
@@ -623,27 +624,27 @@ export const decodeDateTime = (
   index: number,
   binary: Uint8Array
 ): { result: DateTime; nextIndex: number } => {
-  const yearAndNextIndex: { result: number; nextIndex: number } = decodeInt(
+  const yearAndNextIndex: { result: number; nextIndex: number } = decodeInt32(
     index,
     binary
   );
-  const monthAndNextIndex: { result: number; nextIndex: number } = decodeInt(
+  const monthAndNextIndex: { result: number; nextIndex: number } = decodeInt32(
     yearAndNextIndex.nextIndex,
     binary
   );
-  const dayAndNextIndex: { result: number; nextIndex: number } = decodeInt(
+  const dayAndNextIndex: { result: number; nextIndex: number } = decodeInt32(
     monthAndNextIndex.nextIndex,
     binary
   );
-  const hourAndNextIndex: { result: number; nextIndex: number } = decodeInt(
+  const hourAndNextIndex: { result: number; nextIndex: number } = decodeInt32(
     dayAndNextIndex.nextIndex,
     binary
   );
-  const minuteAndNextIndex: { result: number; nextIndex: number } = decodeInt(
+  const minuteAndNextIndex: { result: number; nextIndex: number } = decodeInt32(
     hourAndNextIndex.nextIndex,
     binary
   );
-  const secondAndNextIndex: { result: number; nextIndex: number } = decodeInt(
+  const secondAndNextIndex: { result: number; nextIndex: number } = decodeInt32(
     minuteAndNextIndex.nextIndex,
     binary
   );
@@ -670,12 +671,12 @@ export const decodeClientMode = (
   index: number,
   binary: Uint8Array
 ): { result: ClientMode; nextIndex: number } => {
-  const patternIndex: { result: number; nextIndex: number } = decodeInt(
+  const patternIndex: { result: number; nextIndex: number } = decodeInt32(
     index,
     binary
   );
   if (patternIndex.result === 0) {
-    const result: { result: number; nextIndex: number } = decodeInt(
+    const result: { result: number; nextIndex: number } = decodeInt32(
       patternIndex.nextIndex,
       binary
     );
@@ -727,7 +728,7 @@ export const decodeOpenIdConnectProvider = (
   index: number,
   binary: Uint8Array
 ): { result: OpenIdConnectProvider; nextIndex: number } => {
-  const patternIndex: { result: number; nextIndex: number } = decodeInt(
+  const patternIndex: { result: number; nextIndex: number } = decodeInt32(
     index,
     binary
   );
@@ -792,7 +793,7 @@ export const decodeLanguage = (
   index: number,
   binary: Uint8Array
 ): { result: Language; nextIndex: number } => {
-  const patternIndex: { result: number; nextIndex: number } = decodeInt(
+  const patternIndex: { result: number; nextIndex: number } = decodeInt32(
     index,
     binary
   );
@@ -818,7 +819,7 @@ export const decodeLocation = (
   index: number,
   binary: Uint8Array
 ): { result: Location; nextIndex: number } => {
-  const patternIndex: { result: number; nextIndex: number } = decodeInt(
+  const patternIndex: { result: number; nextIndex: number } = decodeInt32(
     index,
     binary
   );
