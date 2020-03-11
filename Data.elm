@@ -29,7 +29,6 @@ type alias RequestLogInUrlRequestData =
 type OpenIdConnectProvider
     = Google
     | GitHub
-    | Line
 
 
 {-| デバッグモードかどうか,言語とページの場所. URLとして表現されるデータ. Googleなどの検索エンジンの都合( <https://support.google.com/webmasters/answer/182192?hl=ja> )で,URLにページの言語のを入れて,言語ごとに別のURLである必要がある. デバッグ時には <http://localhost:2520> のオリジンになってしまう
@@ -171,9 +170,6 @@ openIdConnectProviderToJsonValue openIdConnectProvider =
 
         GitHub ->
             Je.string "GitHub"
-
-        Line ->
-            Je.string "Line"
 
 
 {-| UrlDataのJSONへのエンコーダ
@@ -360,9 +356,6 @@ openIdConnectProviderJsonDecoder =
 
                     "GitHub" ->
                         Jd.succeed GitHub
-
-                    "Line" ->
-                        Jd.succeed Line
 
                     _ ->
                         Jd.fail ("OpenIdConnectProviderで不明なタグを受けたとった tag=" ++ tag)

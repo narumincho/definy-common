@@ -87,11 +87,6 @@ const openIdConnectProvider: nt.type.CustomType = {
       description:
         "GitHub ( https://developer.github.com/v3/guides/basics-of-authentication/ )",
       parameter: nt.type.maybeNothing()
-    },
-    {
-      name: "Line",
-      description: "LINE ( https://developers.line.biz/ja/docs/line-login/ )",
-      parameter: nt.type.maybeNothing()
     }
   ])
 };

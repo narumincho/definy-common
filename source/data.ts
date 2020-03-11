@@ -39,7 +39,7 @@ export type RequestLogInUrlRequestData = {
 /**
  * プロバイダー (例: LINE, Google, GitHub)
  */
-export type OpenIdConnectProvider = "Google" | "GitHub" | "Line";
+export type OpenIdConnectProvider = "Google" | "GitHub";
 
 /**
  * デバッグモードかどうか,言語とページの場所. URLとして表現されるデータ. Googleなどの検索エンジンの都合( https://support.google.com/webmasters/answer/182192?hl=ja )で,URLにページの言語のを入れて,言語ごとに別のURLである必要がある. デバッグ時には http://localhost:2520 のオリジンになってしまう
@@ -331,9 +331,6 @@ export const encodeOpenIdConnectProvider = (
     }
     case "GitHub": {
       return [1];
-    }
-    case "Line": {
-      return [2];
     }
   }
 };
@@ -739,9 +736,6 @@ export const decodeOpenIdConnectProvider = (
   }
   if (patternIndex.result === 1) {
     return { result: "GitHub", nextIndex: patternIndex.nextIndex };
-  }
-  if (patternIndex.result === 2) {
-    return { result: "Line", nextIndex: patternIndex.nextIndex };
   }
   throw new Error("存在しないパターンを指定された 型を更新してください");
 };
