@@ -385,12 +385,12 @@ const projectSnapshot: nt.type.CustomType = {
     {
       name: "typeList",
       description: "直下の型",
-      memberType: nt.type.typeList(nt.type.typeToken(typeSnapshotName))
+      memberType: nt.type.typeList(nt.type.typeToken(typeHashName))
     },
     {
       name: "partList",
       description: "直下のパーツ",
-      memberType: nt.type.typeList(nt.type.typeToken(partSnapshotName))
+      memberType: nt.type.typeList(nt.type.typeToken(partHashName))
     }
   ])
 };
@@ -422,12 +422,12 @@ const moduleSnapshot: nt.type.CustomType = {
     {
       name: "typeList",
       description: "型",
-      memberType: nt.type.typeList(nt.type.typeToken(typeSnapshotName))
+      memberType: nt.type.typeList(nt.type.typeToken(typeHashName))
     },
     {
       name: "partList",
       description: "パーツ",
-      memberType: nt.type.typeList(nt.type.typeToken(partSnapshotName))
+      memberType: nt.type.typeList(nt.type.typeToken(partHashName))
     }
   ])
 };

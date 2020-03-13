@@ -87,13 +87,13 @@ type alias IdeaCommentMessage =
 {-| プロジェクトのスナップショット. Gitでいうコミット
 -}
 type alias ProjectSnapshot =
-    { createdAt : DateTime, description : String, projectName : String, projectIcon : FileHash, projectImage : FileHash, projectDescription : String, moduleList : List ModuleHash, typeList : List TypeSnapshot, partList : List PartSnapshot }
+    { createdAt : DateTime, description : String, projectName : String, projectIcon : FileHash, projectImage : FileHash, projectDescription : String, moduleList : List ModuleHash, typeList : List TypeHash, partList : List PartHash }
 
 
 {-| モジュールのスナップショット
 -}
 type alias ModuleSnapshot =
-    { name : String, description : String, export : Bool, children : List ModuleHash, typeList : List TypeSnapshot, partList : List PartSnapshot }
+    { name : String, description : String, export : Bool, children : List ModuleHash, typeList : List TypeHash, partList : List PartHash }
 
 
 {-| 型のスナップショット
@@ -375,8 +375,8 @@ projectSnapshotToJsonValue projectSnapshot =
         , ( "projectImage", fileHashToJsonValue projectSnapshot.projectImage )
         , ( "projectDescription", Je.string projectSnapshot.projectDescription )
         , ( "moduleList", Je.list moduleHashToJsonValue projectSnapshot.moduleList )
-        , ( "typeList", Je.list typeSnapshotToJsonValue projectSnapshot.typeList )
-        , ( "partList", Je.list partSnapshotToJsonValue projectSnapshot.partList )
+        , ( "typeList", Je.list typeHashToJsonValue projectSnapshot.typeList )
+        , ( "partList", Je.list partHashToJsonValue projectSnapshot.partList )
         ]
 
 
@@ -389,8 +389,8 @@ moduleSnapshotToJsonValue moduleSnapshot =
         , ( "description", Je.string moduleSnapshot.description )
         , ( "export", Je.bool moduleSnapshot.export )
         , ( "children", Je.list moduleHashToJsonValue moduleSnapshot.children )
-        , ( "typeList", Je.list typeSnapshotToJsonValue moduleSnapshot.typeList )
-        , ( "partList", Je.list partSnapshotToJsonValue moduleSnapshot.partList )
+        , ( "typeList", Je.list typeHashToJsonValue moduleSnapshot.typeList )
+        , ( "partList", Je.list partHashToJsonValue moduleSnapshot.partList )
         ]
 
 
@@ -754,8 +754,8 @@ projectSnapshotJsonDecoder =
         |> Jdp.required "projectImage" fileHashJsonDecoder
         |> Jdp.required "projectDescription" Jd.string
         |> Jdp.required "moduleList" (Jd.list moduleHashJsonDecoder)
-        |> Jdp.required "typeList" (Jd.list typeSnapshotJsonDecoder)
-        |> Jdp.required "partList" (Jd.list partSnapshotJsonDecoder)
+        |> Jdp.required "typeList" (Jd.list typeHashJsonDecoder)
+        |> Jdp.required "partList" (Jd.list partHashJsonDecoder)
 
 
 {-| ModuleSnapshotのJSON Decoder
@@ -776,8 +776,8 @@ moduleSnapshotJsonDecoder =
         |> Jdp.required "description" Jd.string
         |> Jdp.required "export" Jd.bool
         |> Jdp.required "children" (Jd.list moduleHashJsonDecoder)
-        |> Jdp.required "typeList" (Jd.list typeSnapshotJsonDecoder)
-        |> Jdp.required "partList" (Jd.list partSnapshotJsonDecoder)
+        |> Jdp.required "typeList" (Jd.list typeHashJsonDecoder)
+        |> Jdp.required "partList" (Jd.list partHashJsonDecoder)
 
 
 {-| TypeSnapshotのJSON Decoder

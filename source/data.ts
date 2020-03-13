@@ -125,8 +125,8 @@ export type ProjectSnapshot = {
   projectImage: FileHash;
   projectDescription: string;
   moduleList: ReadonlyArray<ModuleHash>;
-  typeList: ReadonlyArray<TypeSnapshot>;
-  partList: ReadonlyArray<PartSnapshot>;
+  typeList: ReadonlyArray<TypeHash>;
+  partList: ReadonlyArray<PartHash>;
 };
 
 /**
@@ -137,8 +137,8 @@ export type ModuleSnapshot = {
   description: string;
   export: boolean;
   children: ReadonlyArray<ModuleHash>;
-  typeList: ReadonlyArray<TypeSnapshot>;
-  partList: ReadonlyArray<PartSnapshot>;
+  typeList: ReadonlyArray<TypeHash>;
+  partList: ReadonlyArray<PartHash>;
 };
 
 /**
@@ -1213,22 +1213,22 @@ export const decodeProjectSnapshot = (
     ) => { result: ModuleHash; nextIndex: number }
   )(projectDescriptionAndNextIndex.nextIndex, binary);
   const typeListAndNextIndex: {
-    result: ReadonlyArray<TypeSnapshot>;
+    result: ReadonlyArray<TypeHash>;
     nextIndex: number;
   } = decodeList(
     decodeToken as (
       a: number,
       b: Uint8Array
-    ) => { result: TypeSnapshot; nextIndex: number }
+    ) => { result: TypeHash; nextIndex: number }
   )(moduleListAndNextIndex.nextIndex, binary);
   const partListAndNextIndex: {
-    result: ReadonlyArray<PartSnapshot>;
+    result: ReadonlyArray<PartHash>;
     nextIndex: number;
   } = decodeList(
     decodeToken as (
       a: number,
       b: Uint8Array
-    ) => { result: PartSnapshot; nextIndex: number }
+    ) => { result: PartHash; nextIndex: number }
   )(typeListAndNextIndex.nextIndex, binary);
   return {
     result: {
@@ -1276,22 +1276,22 @@ export const decodeModuleSnapshot = (
     ) => { result: ModuleHash; nextIndex: number }
   )(exportAndNextIndex.nextIndex, binary);
   const typeListAndNextIndex: {
-    result: ReadonlyArray<TypeSnapshot>;
+    result: ReadonlyArray<TypeHash>;
     nextIndex: number;
   } = decodeList(
     decodeToken as (
       a: number,
       b: Uint8Array
-    ) => { result: TypeSnapshot; nextIndex: number }
+    ) => { result: TypeHash; nextIndex: number }
   )(childrenAndNextIndex.nextIndex, binary);
   const partListAndNextIndex: {
-    result: ReadonlyArray<PartSnapshot>;
+    result: ReadonlyArray<PartHash>;
     nextIndex: number;
   } = decodeList(
     decodeToken as (
       a: number,
       b: Uint8Array
-    ) => { result: PartSnapshot; nextIndex: number }
+    ) => { result: PartHash; nextIndex: number }
   )(typeListAndNextIndex.nextIndex, binary);
   return {
     result: {
