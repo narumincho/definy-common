@@ -9,3 +9,4 @@ schema
 schemaJs
 generateCode.js
 *.ts
+!*.d.ts
