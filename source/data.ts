@@ -1,4 +1,3 @@
-import * as a from "util";
 /**
  * Maybe
  */
@@ -42,7 +41,7 @@ export type RequestLogInUrlRequestData = {
 export type OpenIdConnectProvider = "Google" | "GitHub";
 
 /**
- * デバッグモードかどうか,言語とページの場所. URLとして表現されるデータ. Googleなどの検索エンジンの都合( https://support.google.com/webmasters/answer/182192?hl=ja )で,URLにページの言語のを入れて,言語ごとに別のURLである必要がある. デバッグ時には http://localhost:2520 などのオリジンになる
+ * デバッグモードかどうか,言語とページの場所. URLとして表現されるデータ. Googleなどの検索エンジンの都合( https://support.google.com/webmasters/answer/182192?hl=ja )で,URLにページの言語のを入れて,言語ごとに別のURLである必要がある. デバッグ時のホスト名は http://[::1] になる
  */
 export type UrlData = {
   clientMode: ClientMode;
@@ -184,9 +183,7 @@ export const encodeInt32 = (value: number): ReadonlyArray<number> => {
  */
 export const encodeString = (text: string): ReadonlyArray<number> => {
   const result: ReadonlyArray<number> = Array["from"](
-    new (process === undefined || process.title === "browser"
-      ? TextEncoder
-      : a.TextEncoder)().encode(text)
+    new TextEncoder().encode(text)
   );
   return encodeInt32(result.length).concat(result);
 };
@@ -439,17 +436,8 @@ export const decodeString = (
     binary
   );
   const nextIndex: number = length.nextIndex + length.result;
-  const textBinary: Uint8Array = binary.slice(length.nextIndex, nextIndex);
-  const isBrowser: boolean =
-    process === undefined || process.title === "browser";
-  if (isBrowser) {
-    return {
-      result: new TextDecoder().decode(textBinary),
-      nextIndex: nextIndex
-    };
-  }
   return {
-    result: new a.TextDecoder().decode(textBinary),
+    result: new TextDecoder().decode(binary.slice(length.nextIndex, nextIndex)),
     nextIndex: nextIndex
   };
 };
