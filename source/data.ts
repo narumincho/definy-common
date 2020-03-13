@@ -270,7 +270,7 @@ export const encodeId = (id: string): ReadonlyArray<number> => {
  *
  *
  */
-export const encodeHashOrAccessToken = (id: string): ReadonlyArray<number> => {
+export const encodeToken = (id: string): ReadonlyArray<number> => {
   const result: Array<number> = [];
   for (let i = 0; i < 32; i += 1) {
     result[i] = Number.parseInt(id.slice(i * 2, i * 2 + 2), 16);
@@ -343,7 +343,7 @@ export const encodeUrlData = (urlData: UrlData): ReadonlyArray<number> =>
   encodeClientMode(urlData.clientMode)
     .concat(encodeLocation(urlData.location))
     .concat(encodeLanguage(urlData.language))
-    .concat(encodeMaybe(encodeHashOrAccessToken)(urlData.accessToken));
+    .concat(encodeMaybe(encodeToken)(urlData.accessToken));
 
 /**
  *
@@ -389,7 +389,7 @@ export const encodeUserPublic = (
   userPublic: UserPublic
 ): ReadonlyArray<number> =>
   encodeString(userPublic.name)
-    .concat(encodeHashOrAccessToken(userPublic.imageHash))
+    .concat(encodeToken(userPublic.imageHash))
     .concat(encodeString(userPublic.introduction))
     .concat(encodeDateTime(userPublic.createdAt))
     .concat(encodeList(encodeId)(userPublic.likedProjectIdList))
@@ -604,7 +604,7 @@ export const decodeId = (
  * @param binary バイナリ
  *
  */
-export const decodeHashOrAccessToken = (
+export const decodeToken = (
   index: number,
   binary: Uint8Array
 ): { result: string; nextIndex: number } => ({
@@ -767,7 +767,7 @@ export const decodeUrlData = (
     result: Maybe<AccessToken>;
     nextIndex: number;
   } = decodeMaybe(
-    decodeHashOrAccessToken as (
+    decodeToken as (
       a: number,
       b: Uint8Array
     ) => { result: AccessToken; nextIndex: number }
@@ -866,7 +866,7 @@ export const decodeUserPublic = (
   const imageHashAndNextIndex: {
     result: FileHash;
     nextIndex: number;
-  } = (decodeHashOrAccessToken as (
+  } = (decodeToken as (
     a: number,
     b: Uint8Array
   ) => { result: FileHash; nextIndex: number })(

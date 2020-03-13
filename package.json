@@ -14,7 +14,7 @@
   },
   "dependencies": {},
   "devDependencies": {
-    "@narumincho/type": "^0.3.0",
+    "@narumincho/type": "^0.3.1",
     "@types/jest": "^25.1.4",
     "@types/node": "^13.9.0",
     "@typescript-eslint/eslint-plugin": "^2.23.0",
