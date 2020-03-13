@@ -8,6 +8,10 @@ const userIdName = "UserId";
 const projectIdName = "ProjectId";
 const ideaIdName = "IdeaId";
 const fileHashName = "FileHash";
+const projectHashName = "ProjectHash";
+const moduleHashName = "ModuleHash";
+const typeHashName = "TypeHash";
+const partHashName = "PartHash";
 
 const dateTimeName = "DateTime";
 const requestLogInUrlRequestDataName = "RequestLogInUrlRequestData";
@@ -17,6 +21,14 @@ const clientModeName = "ClientMode";
 const locationName = "Location";
 const languageName = "Language";
 const userPublicName = "UserPublic";
+const projectName = "Project";
+const ideaName = "Idea";
+const ideaCommentName = "IdeaComment";
+const ideaCommentMessageName = "IdeaCommentMessage";
+const projectSnapshotName = "ProjectSnapshot";
+const moduleSnapshotName = "ModuleSnapshot";
+const typeSnapshotName = "TypeSnapshot";
+const partSnapshotName = "PartSnapshot";
 
 const dateTime: nt.type.CustomType = {
   name: dateTimeName,
@@ -227,6 +239,243 @@ const userPublic: nt.type.CustomType = {
   ])
 };
 
+const project: nt.type.CustomType = {
+  name: projectName,
+  description: "プロジェクト",
+  body: nt.type.customTypeBodyProduct([
+    {
+      name: "name",
+      description: "プロジェクト名",
+      memberType: nt.type.typeString
+    },
+    {
+      name: "icon",
+      description: "プロジェクトのアイコン画像",
+      memberType: nt.type.typeToken(fileHashName)
+    },
+    {
+      name: "image",
+      description: "プロジェクトのカバー画像",
+      memberType: nt.type.typeToken(fileHashName)
+    },
+    {
+      name: "releaseBranchCommitHashList",
+      description:
+        "リリースブランチ. 外部から依存プロジェクトとして読み込める.",
+      memberType: nt.type.typeList(nt.type.typeToken(projectHashName))
+    },
+    {
+      name: "developBranchCommitHashList",
+      description: "デベロップブランチ. ",
+      memberType: nt.type.typeList(nt.type.typeToken(projectHashName))
+    },
+    {
+      name: "createdAt",
+      description: "作成日時",
+      memberType: nt.type.typeCustom(dateTimeName)
+    }
+  ])
+};
+
+const idea: nt.type.CustomType = {
+  name: ideaName,
+  description: "アイデア",
+  body: nt.type.customTypeBodyProduct([
+    {
+      name: "name",
+      description: "プロジェクト名",
+      memberType: nt.type.typeString
+    },
+    {
+      name: "createdAt",
+      description: "作成日時",
+      memberType: nt.type.typeCustom(dateTimeName)
+    },
+    {
+      name: "commentList",
+      description: "コメント",
+      memberType: nt.type.typeList(nt.type.typeCustom(ideaCommentName))
+    },
+    {
+      name: "draftCommitIdList",
+      description: "下書きのコミット",
+      memberType: nt.type.typeList(nt.type.typeCustom(projectSnapshotName))
+    }
+  ])
+};
+
+const ideaComment: nt.type.CustomType = {
+  name: ideaCommentName,
+  description: "アイデアのコメント",
+  body: nt.type.customTypeBodySum([
+    {
+      name: "CommentByMessage",
+      description: "文章でのコメント",
+      parameter: nt.type.maybeJust(nt.type.typeCustom(ideaCommentMessageName))
+    },
+    {
+      name: "CommentByCommit",
+      description: "編集提案をする",
+      parameter: nt.type.maybeJust(nt.type.typeCustom(projectSnapshotName))
+    }
+  ])
+};
+
+const ideaCommentMessage: nt.type.CustomType = {
+  name: ideaCommentMessageName,
+  description: "文章でのコメント",
+  body: nt.type.customTypeBodyProduct([
+    {
+      name: "body",
+      description: "本文",
+      memberType: nt.type.typeString
+    },
+    {
+      name: "createdBy",
+      description: "作成者",
+      memberType: nt.type.typeId(userIdName)
+    },
+    {
+      name: "createdAt",
+      description: "作成日時",
+      memberType: nt.type.typeCustom(dateTimeName)
+    }
+  ])
+};
+
+const projectSnapshot: nt.type.CustomType = {
+  name: projectSnapshotName,
+  description: "プロジェクトのスナップショット. Gitでいうコミット",
+  body: nt.type.customTypeBodyProduct([
+    {
+      name: "createdAt",
+      description: "アイデアに投稿した日時",
+      memberType: nt.type.typeCustom(dateTimeName)
+    },
+    {
+      name: "description",
+      description: "どんな変更をしたのかの説明",
+      memberType: nt.type.typeString
+    },
+    {
+      name: "projectName",
+      description: "プロジェクト名",
+      memberType: nt.type.typeString
+    },
+    {
+      name: "projectIcon",
+      description: "プロジェクトのアイコン画像",
+      memberType: nt.type.typeToken(fileHashName)
+    },
+    {
+      name: "projectImage",
+      description: "プロジェクトのカバー画像",
+      memberType: nt.type.typeToken(fileHashName)
+    },
+    {
+      name: "projectDescription",
+      description: "プロジェクトの詳しい説明",
+      memberType: nt.type.typeString
+    },
+    {
+      name: "moduleList",
+      description: "直下以外のモジュール",
+      memberType: nt.type.typeList(nt.type.typeToken(moduleHashName))
+    },
+    {
+      name: "typeList",
+      description: "直下の型",
+      memberType: nt.type.typeList(nt.type.typeToken(typeSnapshotName))
+    },
+    {
+      name: "partList",
+      description: "直下のパーツ",
+      memberType: nt.type.typeList(nt.type.typeToken(partSnapshotName))
+    }
+  ])
+};
+
+const moduleSnapshot: nt.type.CustomType = {
+  name: moduleSnapshotName,
+  description: "モジュールのスナップショット",
+  body: nt.type.customTypeBodyProduct([
+    {
+      name: "name",
+      description: "モジュール名",
+      memberType: nt.type.typeString
+    },
+    {
+      name: "description",
+      description: "モジュールの説明",
+      memberType: nt.type.typeString
+    },
+    {
+      name: "export",
+      description: "外部のプロジェクトに公開するかどうか",
+      memberType: nt.type.typeBool
+    },
+    {
+      name: "children",
+      description: "子のモジュール",
+      memberType: nt.type.typeList(nt.type.typeToken(moduleHashName))
+    },
+    {
+      name: "typeList",
+      description: "型",
+      memberType: nt.type.typeList(nt.type.typeToken(typeSnapshotName))
+    },
+    {
+      name: "partList",
+      description: "パーツ",
+      memberType: nt.type.typeList(nt.type.typeToken(partSnapshotName))
+    }
+  ])
+};
+
+const typeSnapshot: nt.type.CustomType = {
+  name: typeSnapshotName,
+  description: "型のスナップショット",
+  body: nt.type.customTypeBodyProduct([
+    {
+      name: "name",
+      description: "型の名前",
+      memberType: nt.type.typeString
+    },
+    {
+      name: "parentList",
+      description: "この型の元",
+      memberType: nt.type.typeList(nt.type.typeToken(partHashName))
+    },
+    {
+      name: "description",
+      description: "型の説明",
+      memberType: nt.type.typeString
+    }
+  ])
+};
+
+const partSnapshot: nt.type.CustomType = {
+  name: partSnapshotName,
+  description: "パーツのスナップショット",
+  body: nt.type.customTypeBodyProduct([
+    {
+      name: "name",
+      description: "パーツの名前",
+      memberType: nt.type.typeString
+    },
+    {
+      name: "parentList",
+      description: "このパーツの元",
+      memberType: nt.type.typeList(nt.type.typeToken(partHashName))
+    },
+    {
+      name: "description",
+      description: "パーツの説明",
+      memberType: nt.type.typeString
+    }
+  ])
+};
+
 const schema: nt.type.Schema = {
   customTypeList: [
     dateTime,
@@ -236,14 +485,26 @@ const schema: nt.type.Schema = {
     urlData,
     language,
     location,
-    userPublic
+    userPublic,
+    project,
+    idea,
+    ideaComment,
+    ideaCommentMessage,
+    projectSnapshot,
+    moduleSnapshot,
+    typeSnapshot,
+    partSnapshot
   ],
   idOrTokenTypeNameList: [
     accessTokenName,
     userIdName,
     projectIdName,
     ideaIdName,
-    fileHashName
+    fileHashName,
+    projectHashName,
+    moduleHashName,
+    typeHashName,
+    partHashName
   ]
 };
 

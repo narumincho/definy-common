@@ -76,6 +76,89 @@ export type UserPublic = {
   commentedIdeaIdList: ReadonlyArray<IdeaId>;
 };
 
+/**
+ * プロジェクト
+ */
+export type Project = {
+  name: string;
+  icon: FileHash;
+  image: FileHash;
+  releaseBranchCommitHashList: ReadonlyArray<ProjectHash>;
+  developBranchCommitHashList: ReadonlyArray<ProjectHash>;
+  createdAt: DateTime;
+};
+
+/**
+ * アイデア
+ */
+export type Idea = {
+  name: string;
+  createdAt: DateTime;
+  commentList: ReadonlyArray<IdeaComment>;
+  draftCommitIdList: ReadonlyArray<ProjectSnapshot>;
+};
+
+/**
+ * アイデアのコメント
+ */
+export type IdeaComment =
+  | { _: "CommentByMessage"; ideaCommentMessage: IdeaCommentMessage }
+  | { _: "CommentByCommit"; projectSnapshot: ProjectSnapshot };
+
+/**
+ * 文章でのコメント
+ */
+export type IdeaCommentMessage = {
+  body: string;
+  createdBy: UserId;
+  createdAt: DateTime;
+};
+
+/**
+ * プロジェクトのスナップショット. Gitでいうコミット
+ */
+export type ProjectSnapshot = {
+  createdAt: DateTime;
+  description: string;
+  projectName: string;
+  projectIcon: FileHash;
+  projectImage: FileHash;
+  projectDescription: string;
+  moduleList: ReadonlyArray<ModuleHash>;
+  typeList: ReadonlyArray<TypeSnapshot>;
+  partList: ReadonlyArray<PartSnapshot>;
+};
+
+/**
+ * モジュールのスナップショット
+ */
+export type ModuleSnapshot = {
+  name: string;
+  description: string;
+  export: boolean;
+  children: ReadonlyArray<ModuleHash>;
+  typeList: ReadonlyArray<TypeSnapshot>;
+  partList: ReadonlyArray<PartSnapshot>;
+};
+
+/**
+ * 型のスナップショット
+ */
+export type TypeSnapshot = {
+  name: string;
+  parentList: ReadonlyArray<PartHash>;
+  description: string;
+};
+
+/**
+ * パーツのスナップショット
+ */
+export type PartSnapshot = {
+  name: string;
+  parentList: ReadonlyArray<PartHash>;
+  description: string;
+};
+
 export type AccessToken = string & { _accessToken: never };
 
 export type UserId = string & { _userId: never };
@@ -85,6 +168,14 @@ export type ProjectId = string & { _projectId: never };
 export type IdeaId = string & { _ideaId: never };
 
 export type FileHash = string & { _fileHash: never };
+
+export type ProjectHash = string & { _projectHash: never };
+
+export type ModuleHash = string & { _moduleHash: never };
+
+export type TypeHash = string & { _typeHash: never };
+
+export type PartHash = string & { _partHash: never };
 
 export const maybeJust = <T>(value: T): Maybe<T> => ({
   _: "Just",
@@ -136,6 +227,23 @@ export const locationProject = (projectId: ProjectId): Location => ({
   _: "Project",
   projectId: projectId
 });
+
+/**
+ * 文章でのコメント
+ */
+export const ideaCommentCommentByMessage = (
+  ideaCommentMessage: IdeaCommentMessage
+): IdeaComment => ({
+  _: "CommentByMessage",
+  ideaCommentMessage: ideaCommentMessage
+});
+
+/**
+ * 編集提案をする
+ */
+export const ideaCommentCommentByCommit = (
+  projectSnapshot: ProjectSnapshot
+): IdeaComment => ({ _: "CommentByCommit", projectSnapshot: projectSnapshot });
 
 /**
  * numberの32bit符号あり整数をSigned Leb128のバイナリに変換する
@@ -318,6 +426,79 @@ export const encodeUserPublic = (
     .concat(encodeList(encodeId)(userPublic.likedProjectIdList))
     .concat(encodeList(encodeId)(userPublic.developedProjectIdList))
     .concat(encodeList(encodeId)(userPublic.commentedIdeaIdList));
+
+export const encodeProject = (project: Project): ReadonlyArray<number> =>
+  encodeString(project.name)
+    .concat(encodeToken(project.icon))
+    .concat(encodeToken(project.image))
+    .concat(encodeList(encodeToken)(project.releaseBranchCommitHashList))
+    .concat(encodeList(encodeToken)(project.developBranchCommitHashList))
+    .concat(encodeDateTime(project.createdAt));
+
+export const encodeIdea = (idea: Idea): ReadonlyArray<number> =>
+  encodeString(idea.name)
+    .concat(encodeDateTime(idea.createdAt))
+    .concat(encodeList(encodeIdeaComment)(idea.commentList))
+    .concat(encodeList(encodeProjectSnapshot)(idea.draftCommitIdList));
+
+export const encodeIdeaComment = (
+  ideaComment: IdeaComment
+): ReadonlyArray<number> => {
+  switch (ideaComment._) {
+    case "CommentByMessage": {
+      return [0].concat(
+        encodeIdeaCommentMessage(ideaComment.ideaCommentMessage)
+      );
+    }
+    case "CommentByCommit": {
+      return [1].concat(encodeProjectSnapshot(ideaComment.projectSnapshot));
+    }
+  }
+};
+
+export const encodeIdeaCommentMessage = (
+  ideaCommentMessage: IdeaCommentMessage
+): ReadonlyArray<number> =>
+  encodeString(ideaCommentMessage.body)
+    .concat(encodeId(ideaCommentMessage.createdBy))
+    .concat(encodeDateTime(ideaCommentMessage.createdAt));
+
+export const encodeProjectSnapshot = (
+  projectSnapshot: ProjectSnapshot
+): ReadonlyArray<number> =>
+  encodeDateTime(projectSnapshot.createdAt)
+    .concat(encodeString(projectSnapshot.description))
+    .concat(encodeString(projectSnapshot.projectName))
+    .concat(encodeToken(projectSnapshot.projectIcon))
+    .concat(encodeToken(projectSnapshot.projectImage))
+    .concat(encodeString(projectSnapshot.projectDescription))
+    .concat(encodeList(encodeToken)(projectSnapshot.moduleList))
+    .concat(encodeList(encodeToken)(projectSnapshot.typeList))
+    .concat(encodeList(encodeToken)(projectSnapshot.partList));
+
+export const encodeModuleSnapshot = (
+  moduleSnapshot: ModuleSnapshot
+): ReadonlyArray<number> =>
+  encodeString(moduleSnapshot.name)
+    .concat(encodeString(moduleSnapshot.description))
+    .concat(encodeBool(moduleSnapshot["export"]))
+    .concat(encodeList(encodeToken)(moduleSnapshot.children))
+    .concat(encodeList(encodeToken)(moduleSnapshot.typeList))
+    .concat(encodeList(encodeToken)(moduleSnapshot.partList));
+
+export const encodeTypeSnapshot = (
+  typeSnapshot: TypeSnapshot
+): ReadonlyArray<number> =>
+  encodeString(typeSnapshot.name)
+    .concat(encodeList(encodeToken)(typeSnapshot.parentList))
+    .concat(encodeString(typeSnapshot.description));
+
+export const encodePartSnapshot = (
+  partSnapshot: PartSnapshot
+): ReadonlyArray<number> =>
+  encodeString(partSnapshot.name)
+    .concat(encodeList(encodeToken)(partSnapshot.parentList))
+    .concat(encodeString(partSnapshot.description));
 
 /**
  * SignedLeb128で表現されたバイナリをnumberのビット演算ができる32bit符号付き整数の範囲の数値に変換するコード
@@ -797,5 +978,400 @@ export const decodeUserPublic = (
       commentedIdeaIdList: commentedIdeaIdListAndNextIndex.result
     },
     nextIndex: commentedIdeaIdListAndNextIndex.nextIndex
+  };
+};
+
+/**
+ * @param index バイナリを読み込み開始位置
+ * @param binary バイナリ
+ */
+export const decodeProject = (
+  index: number,
+  binary: Uint8Array
+): { result: Project; nextIndex: number } => {
+  const nameAndNextIndex: { result: string; nextIndex: number } = decodeString(
+    index,
+    binary
+  );
+  const iconAndNextIndex: {
+    result: FileHash;
+    nextIndex: number;
+  } = (decodeToken as (
+    a: number,
+    b: Uint8Array
+  ) => { result: FileHash; nextIndex: number })(
+    nameAndNextIndex.nextIndex,
+    binary
+  );
+  const imageAndNextIndex: {
+    result: FileHash;
+    nextIndex: number;
+  } = (decodeToken as (
+    a: number,
+    b: Uint8Array
+  ) => { result: FileHash; nextIndex: number })(
+    iconAndNextIndex.nextIndex,
+    binary
+  );
+  const releaseBranchCommitHashListAndNextIndex: {
+    result: ReadonlyArray<ProjectHash>;
+    nextIndex: number;
+  } = decodeList(
+    decodeToken as (
+      a: number,
+      b: Uint8Array
+    ) => { result: ProjectHash; nextIndex: number }
+  )(imageAndNextIndex.nextIndex, binary);
+  const developBranchCommitHashListAndNextIndex: {
+    result: ReadonlyArray<ProjectHash>;
+    nextIndex: number;
+  } = decodeList(
+    decodeToken as (
+      a: number,
+      b: Uint8Array
+    ) => { result: ProjectHash; nextIndex: number }
+  )(releaseBranchCommitHashListAndNextIndex.nextIndex, binary);
+  const createdAtAndNextIndex: {
+    result: DateTime;
+    nextIndex: number;
+  } = decodeDateTime(developBranchCommitHashListAndNextIndex.nextIndex, binary);
+  return {
+    result: {
+      name: nameAndNextIndex.result,
+      icon: iconAndNextIndex.result,
+      image: imageAndNextIndex.result,
+      releaseBranchCommitHashList:
+        releaseBranchCommitHashListAndNextIndex.result,
+      developBranchCommitHashList:
+        developBranchCommitHashListAndNextIndex.result,
+      createdAt: createdAtAndNextIndex.result
+    },
+    nextIndex: createdAtAndNextIndex.nextIndex
+  };
+};
+
+/**
+ * @param index バイナリを読み込み開始位置
+ * @param binary バイナリ
+ */
+export const decodeIdea = (
+  index: number,
+  binary: Uint8Array
+): { result: Idea; nextIndex: number } => {
+  const nameAndNextIndex: { result: string; nextIndex: number } = decodeString(
+    index,
+    binary
+  );
+  const createdAtAndNextIndex: {
+    result: DateTime;
+    nextIndex: number;
+  } = decodeDateTime(nameAndNextIndex.nextIndex, binary);
+  const commentListAndNextIndex: {
+    result: ReadonlyArray<IdeaComment>;
+    nextIndex: number;
+  } = decodeList(decodeIdeaComment)(createdAtAndNextIndex.nextIndex, binary);
+  const draftCommitIdListAndNextIndex: {
+    result: ReadonlyArray<ProjectSnapshot>;
+    nextIndex: number;
+  } = decodeList(decodeProjectSnapshot)(
+    commentListAndNextIndex.nextIndex,
+    binary
+  );
+  return {
+    result: {
+      name: nameAndNextIndex.result,
+      createdAt: createdAtAndNextIndex.result,
+      commentList: commentListAndNextIndex.result,
+      draftCommitIdList: draftCommitIdListAndNextIndex.result
+    },
+    nextIndex: draftCommitIdListAndNextIndex.nextIndex
+  };
+};
+
+/**
+ * @param index バイナリを読み込み開始位置
+ * @param binary バイナリ
+ */
+export const decodeIdeaComment = (
+  index: number,
+  binary: Uint8Array
+): { result: IdeaComment; nextIndex: number } => {
+  const patternIndex: { result: number; nextIndex: number } = decodeInt32(
+    index,
+    binary
+  );
+  if (patternIndex.result === 0) {
+    const result: {
+      result: IdeaCommentMessage;
+      nextIndex: number;
+    } = decodeIdeaCommentMessage(patternIndex.nextIndex, binary);
+    return {
+      result: ideaCommentCommentByMessage(result.result),
+      nextIndex: result.nextIndex
+    };
+  }
+  if (patternIndex.result === 1) {
+    const result: {
+      result: ProjectSnapshot;
+      nextIndex: number;
+    } = decodeProjectSnapshot(patternIndex.nextIndex, binary);
+    return {
+      result: ideaCommentCommentByCommit(result.result),
+      nextIndex: result.nextIndex
+    };
+  }
+  throw new Error("存在しないパターンを指定された 型を更新してください");
+};
+
+/**
+ * @param index バイナリを読み込み開始位置
+ * @param binary バイナリ
+ */
+export const decodeIdeaCommentMessage = (
+  index: number,
+  binary: Uint8Array
+): { result: IdeaCommentMessage; nextIndex: number } => {
+  const bodyAndNextIndex: { result: string; nextIndex: number } = decodeString(
+    index,
+    binary
+  );
+  const createdByAndNextIndex: {
+    result: UserId;
+    nextIndex: number;
+  } = (decodeId as (
+    a: number,
+    b: Uint8Array
+  ) => { result: UserId; nextIndex: number })(
+    bodyAndNextIndex.nextIndex,
+    binary
+  );
+  const createdAtAndNextIndex: {
+    result: DateTime;
+    nextIndex: number;
+  } = decodeDateTime(createdByAndNextIndex.nextIndex, binary);
+  return {
+    result: {
+      body: bodyAndNextIndex.result,
+      createdBy: createdByAndNextIndex.result,
+      createdAt: createdAtAndNextIndex.result
+    },
+    nextIndex: createdAtAndNextIndex.nextIndex
+  };
+};
+
+/**
+ * @param index バイナリを読み込み開始位置
+ * @param binary バイナリ
+ */
+export const decodeProjectSnapshot = (
+  index: number,
+  binary: Uint8Array
+): { result: ProjectSnapshot; nextIndex: number } => {
+  const createdAtAndNextIndex: {
+    result: DateTime;
+    nextIndex: number;
+  } = decodeDateTime(index, binary);
+  const descriptionAndNextIndex: {
+    result: string;
+    nextIndex: number;
+  } = decodeString(createdAtAndNextIndex.nextIndex, binary);
+  const projectNameAndNextIndex: {
+    result: string;
+    nextIndex: number;
+  } = decodeString(descriptionAndNextIndex.nextIndex, binary);
+  const projectIconAndNextIndex: {
+    result: FileHash;
+    nextIndex: number;
+  } = (decodeToken as (
+    a: number,
+    b: Uint8Array
+  ) => { result: FileHash; nextIndex: number })(
+    projectNameAndNextIndex.nextIndex,
+    binary
+  );
+  const projectImageAndNextIndex: {
+    result: FileHash;
+    nextIndex: number;
+  } = (decodeToken as (
+    a: number,
+    b: Uint8Array
+  ) => { result: FileHash; nextIndex: number })(
+    projectIconAndNextIndex.nextIndex,
+    binary
+  );
+  const projectDescriptionAndNextIndex: {
+    result: string;
+    nextIndex: number;
+  } = decodeString(projectImageAndNextIndex.nextIndex, binary);
+  const moduleListAndNextIndex: {
+    result: ReadonlyArray<ModuleHash>;
+    nextIndex: number;
+  } = decodeList(
+    decodeToken as (
+      a: number,
+      b: Uint8Array
+    ) => { result: ModuleHash; nextIndex: number }
+  )(projectDescriptionAndNextIndex.nextIndex, binary);
+  const typeListAndNextIndex: {
+    result: ReadonlyArray<TypeSnapshot>;
+    nextIndex: number;
+  } = decodeList(
+    decodeToken as (
+      a: number,
+      b: Uint8Array
+    ) => { result: TypeSnapshot; nextIndex: number }
+  )(moduleListAndNextIndex.nextIndex, binary);
+  const partListAndNextIndex: {
+    result: ReadonlyArray<PartSnapshot>;
+    nextIndex: number;
+  } = decodeList(
+    decodeToken as (
+      a: number,
+      b: Uint8Array
+    ) => { result: PartSnapshot; nextIndex: number }
+  )(typeListAndNextIndex.nextIndex, binary);
+  return {
+    result: {
+      createdAt: createdAtAndNextIndex.result,
+      description: descriptionAndNextIndex.result,
+      projectName: projectNameAndNextIndex.result,
+      projectIcon: projectIconAndNextIndex.result,
+      projectImage: projectImageAndNextIndex.result,
+      projectDescription: projectDescriptionAndNextIndex.result,
+      moduleList: moduleListAndNextIndex.result,
+      typeList: typeListAndNextIndex.result,
+      partList: partListAndNextIndex.result
+    },
+    nextIndex: partListAndNextIndex.nextIndex
+  };
+};
+
+/**
+ * @param index バイナリを読み込み開始位置
+ * @param binary バイナリ
+ */
+export const decodeModuleSnapshot = (
+  index: number,
+  binary: Uint8Array
+): { result: ModuleSnapshot; nextIndex: number } => {
+  const nameAndNextIndex: { result: string; nextIndex: number } = decodeString(
+    index,
+    binary
+  );
+  const descriptionAndNextIndex: {
+    result: string;
+    nextIndex: number;
+  } = decodeString(nameAndNextIndex.nextIndex, binary);
+  const exportAndNextIndex: { result: boolean; nextIndex: number } = decodeBool(
+    descriptionAndNextIndex.nextIndex,
+    binary
+  );
+  const childrenAndNextIndex: {
+    result: ReadonlyArray<ModuleHash>;
+    nextIndex: number;
+  } = decodeList(
+    decodeToken as (
+      a: number,
+      b: Uint8Array
+    ) => { result: ModuleHash; nextIndex: number }
+  )(exportAndNextIndex.nextIndex, binary);
+  const typeListAndNextIndex: {
+    result: ReadonlyArray<TypeSnapshot>;
+    nextIndex: number;
+  } = decodeList(
+    decodeToken as (
+      a: number,
+      b: Uint8Array
+    ) => { result: TypeSnapshot; nextIndex: number }
+  )(childrenAndNextIndex.nextIndex, binary);
+  const partListAndNextIndex: {
+    result: ReadonlyArray<PartSnapshot>;
+    nextIndex: number;
+  } = decodeList(
+    decodeToken as (
+      a: number,
+      b: Uint8Array
+    ) => { result: PartSnapshot; nextIndex: number }
+  )(typeListAndNextIndex.nextIndex, binary);
+  return {
+    result: {
+      name: nameAndNextIndex.result,
+      description: descriptionAndNextIndex.result,
+      export: exportAndNextIndex.result,
+      children: childrenAndNextIndex.result,
+      typeList: typeListAndNextIndex.result,
+      partList: partListAndNextIndex.result
+    },
+    nextIndex: partListAndNextIndex.nextIndex
+  };
+};
+
+/**
+ * @param index バイナリを読み込み開始位置
+ * @param binary バイナリ
+ */
+export const decodeTypeSnapshot = (
+  index: number,
+  binary: Uint8Array
+): { result: TypeSnapshot; nextIndex: number } => {
+  const nameAndNextIndex: { result: string; nextIndex: number } = decodeString(
+    index,
+    binary
+  );
+  const parentListAndNextIndex: {
+    result: ReadonlyArray<PartHash>;
+    nextIndex: number;
+  } = decodeList(
+    decodeToken as (
+      a: number,
+      b: Uint8Array
+    ) => { result: PartHash; nextIndex: number }
+  )(nameAndNextIndex.nextIndex, binary);
+  const descriptionAndNextIndex: {
+    result: string;
+    nextIndex: number;
+  } = decodeString(parentListAndNextIndex.nextIndex, binary);
+  return {
+    result: {
+      name: nameAndNextIndex.result,
+      parentList: parentListAndNextIndex.result,
+      description: descriptionAndNextIndex.result
+    },
+    nextIndex: descriptionAndNextIndex.nextIndex
+  };
+};
+
+/**
+ * @param index バイナリを読み込み開始位置
+ * @param binary バイナリ
+ */
+export const decodePartSnapshot = (
+  index: number,
+  binary: Uint8Array
+): { result: PartSnapshot; nextIndex: number } => {
+  const nameAndNextIndex: { result: string; nextIndex: number } = decodeString(
+    index,
+    binary
+  );
+  const parentListAndNextIndex: {
+    result: ReadonlyArray<PartHash>;
+    nextIndex: number;
+  } = decodeList(
+    decodeToken as (
+      a: number,
+      b: Uint8Array
+    ) => { result: PartHash; nextIndex: number }
+  )(nameAndNextIndex.nextIndex, binary);
+  const descriptionAndNextIndex: {
+    result: string;
+    nextIndex: number;
+  } = decodeString(parentListAndNextIndex.nextIndex, binary);
+  return {
+    result: {
+      name: nameAndNextIndex.result,
+      parentList: parentListAndNextIndex.result,
+      description: descriptionAndNextIndex.result
+    },
+    nextIndex: descriptionAndNextIndex.nextIndex
   };
 };
