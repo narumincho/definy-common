@@ -13,7 +13,7 @@
     "sourceType": "module",
     "project": [
       "./schema/tsconfig.json",
-      "./source/tsconfig.json",
+      "./tsconfig.json",
       "./test/tsconfig.json"
     ]
   },
