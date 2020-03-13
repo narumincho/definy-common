@@ -2,6 +2,7 @@ import * as data from "./data";
 import * as util from "./util";
 
 export { data };
+export { util };
 
 export const releaseOrigin = "https://definy.app";
 
