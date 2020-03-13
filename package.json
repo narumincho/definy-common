@@ -2,7 +2,7 @@
   "name": "definy-common",
   "version": "0.1.11",
   "description": "Definy common logic and type definition",
-  "main": "distribution/main.js",
+  "main": "source/main.js",
   "author": "narumincho <narumincho.starfy@gmail.com> (https://narumincho.com)",
   "license": "Apache-2.0",
   "scripts": {
@@ -39,7 +39,7 @@
     },
     "globals": {
       "ts-jest": {
-        "tsConfig": "./tsconfig.json"
+        "tsConfig": "./source/tsconfig.json"
       }
     },
     "testMatch": [
