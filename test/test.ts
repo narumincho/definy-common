@@ -3,7 +3,9 @@ import { data } from "../source/main";
 
 describe("test", () => {
   it("https://definy.app/ is Home in English", () => {
-    expect(main.urlDataFromUrl("https://definy.app/")).toEqual<data.UrlData>({
+    expect(main.urlDataFromUrl(new URL("https://definy.app/"))).toEqual<
+      data.UrlData
+    >({
       clientMode: data.clientModeRelease,
       location: data.locationHome,
       language: "English",
@@ -13,7 +15,9 @@ describe("test", () => {
   it("project url", () => {
     expect(
       main.urlDataFromUrl(
-        "https://definy.app/project/580d8d6a54cf43e4452a0bba6694a4ed?hl=ja"
+        new URL(
+          "https://definy.app/project/580d8d6a54cf43e4452a0bba6694a4ed?hl=ja"
+        )
       )
     ).toEqual<data.UrlData>({
       clientMode: data.clientModeRelease,
@@ -27,7 +31,9 @@ describe("test", () => {
   it("local host and accessToken", () => {
     expect(
       main.urlDataFromUrl(
-        "http://localhost:2520/user/580d8d6a54cf43e4452a0bba6694a4ed?hl=eo#access-token=f81919b78537257302b50f776b77a90b984cc3d75fa899f9f460ff972dcc8cb0"
+        new URL(
+          "http://[::1]:2520/user/580d8d6a54cf43e4452a0bba6694a4ed?hl=eo#access-token=f81919b78537257302b50f776b77a90b984cc3d75fa899f9f460ff972dcc8cb0"
+        )
       )
     ).toEqual<data.UrlData>({
       clientMode: data.clientModeDebugMode(2520),
@@ -49,7 +55,7 @@ describe("test", () => {
       language: "Esperanto",
       accessToken: data.maybeNothing()
     };
-    const url: string = main.urlDataToUrl(languageAndLocation);
+    const url = main.urlDataToUrl(languageAndLocation);
     const decodedLanguageAndLocation: data.UrlData = main.urlDataFromUrl(url);
     expect(languageAndLocation).toEqual(decodedLanguageAndLocation);
   });

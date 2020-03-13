@@ -6,29 +6,32 @@ export { util };
 
 export const releaseOrigin = "https://definy.app";
 
-export const clientModeToOrigin = (clientMode: data.ClientMode): string => {
+export const clientModeToOriginUrl = (clientMode: data.ClientMode): URL => {
   switch (clientMode._) {
-    case "DebugMode":
-      return "http://localhost:" + clientMode.int32.toString();
+    case "DebugMode": {
+      const originUrl = new URL("http://[::1]");
+      originUrl.port = clientMode.int32.toString();
+      return originUrl;
+    }
     case "Release":
-      return releaseOrigin;
+      return new URL(releaseOrigin);
   }
 };
 
+const languageQueryKey = "hl";
 export const defaultLanguage: data.Language = "English";
 
-export const urlDataToUrl = (urlData: data.UrlData): string => {
-  return (
-    clientModeToOrigin(urlData.clientMode) +
-    locationToPath(urlData.location) +
-    "?hl=" +
-    languageToIdString(urlData.language) +
-    util.maybeUnwrap(
-      urlData.accessToken,
-      accessToken => "#access-token=" + (accessToken as string),
-      ""
-    )
+export const urlDataToUrl = (urlData: data.UrlData): URL => {
+  const url = clientModeToOriginUrl(urlData.clientMode);
+  url.pathname = locationToPath(urlData.location);
+  url.searchParams.append(
+    languageQueryKey,
+    languageToIdString(urlData.language)
   );
+  if (urlData.accessToken._ === "Just") {
+    url.hash = "access-token=" + (urlData.accessToken.value as string);
+  }
+  return url;
 };
 
 const locationToPath = (location: data.Location): string => {
@@ -57,41 +60,39 @@ const languageToIdString = (language: data.Language): string => {
  * URLのパスを場所のデータに変換する
  * @param url `https://definy.app/project/580d8d6a54cf43e4452a0bba6694a4ed?hl=ja` のようなURL
  */
-export const urlDataFromUrl = (url: string): data.UrlData => {
+export const urlDataFromUrl = (url: URL): data.UrlData => {
+  const languageId = url.searchParams.get(languageQueryKey);
+  const language: data.Language =
+    languageId === null ? defaultLanguage : languageFromIdString(languageId);
   return {
-    clientMode: clientModeFromUrl(url),
-    location: locationFromUrl(url),
-    language: queryStringToLanguage(url),
-    accessToken: accessTokenFromUrl(url)
+    clientMode: clientModeFromUrl(url.hostname, url.port),
+    location: locationFromUrl(url.pathname),
+    language: language,
+    accessToken: accessTokenFromUrl(url.hash)
   };
 };
 
-const clientModeFromUrl = (url: string): data.ClientMode => {
-  const debugOriginResult = url.match(/^http:\/\/localhost:(\d+)/u);
-  if (debugOriginResult !== null) {
-    return data.clientModeDebugMode(Number.parseInt(debugOriginResult[1]));
+const clientModeFromUrl = (
+  hostName: string,
+  portAsString: string
+): data.ClientMode => {
+  if (hostName === "[::1]") {
+    const portNumber = Number.parseInt(portAsString);
+    return data.clientModeDebugMode(isNaN(portNumber) ? 443 : portNumber);
   }
   return data.clientModeRelease;
 };
 
-const locationFromUrl = (url: string): data.Location => {
-  const projectResult = url.match(/\/project\/([0-9a-f]{32})/u);
+const locationFromUrl = (pathName: string): data.Location => {
+  const projectResult = pathName.match(/^\/project\/([0-9a-f]{32})$/u);
   if (projectResult !== null) {
     return data.locationProject(projectResult[1] as data.ProjectId);
   }
-  const userResult = url.match(/\/user\/([0-9a-f]{32})/u);
+  const userResult = pathName.match(/^\/user\/([0-9a-f]{32})$/u);
   if (userResult !== null) {
     return data.locationUser(userResult[1] as data.UserId);
   }
   return data.locationHome;
-};
-
-const queryStringToLanguage = (url: string): data.Language => {
-  const mathResult = url.match(/hl=([a-z]+)/u);
-  if (mathResult === null) {
-    return defaultLanguage;
-  }
-  return languageFromIdString(mathResult[1]);
 };
 
 const languageFromIdString = (languageAsString: string): data.Language => {
@@ -106,25 +107,10 @@ const languageFromIdString = (languageAsString: string): data.Language => {
   return defaultLanguage;
 };
 
-const accessTokenFromUrl = (url: string): data.Maybe<data.AccessToken> => {
-  const matchResult = url.match(/access-token=([0-9a-f]{64})/u);
+const accessTokenFromUrl = (hash: string): data.Maybe<data.AccessToken> => {
+  const matchResult = hash.match(/access-token=([0-9a-f]{64})/u);
   if (matchResult === null) {
     return data.maybeNothing();
   }
   return data.maybeJust(matchResult[1] as data.AccessToken);
-};
-
-const isIdString = (text: unknown): boolean => {
-  if (typeof text !== "string") {
-    return false;
-  }
-  if (text.length !== 32) {
-    return false;
-  }
-  for (const char of text) {
-    if (!"0123456789abcdef".includes(char)) {
-      return false;
-    }
-  }
-  return true;
 };

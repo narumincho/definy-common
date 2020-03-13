@@ -13,7 +13,6 @@ const dateTimeName = "DateTime";
 const requestLogInUrlRequestDataName = "RequestLogInUrlRequestData";
 const openIdConnectProviderName = "OpenIdConnectProvider";
 const urlDataName = "UrlData";
-const urlWithLogInDataName = "UrlWithLogInData";
 const clientModeName = "ClientMode";
 const locationName = "Location";
 const languageName = "Language";
@@ -95,7 +94,7 @@ const openIdConnectProvider: nt.type.CustomType = {
 const urlData: nt.type.CustomType = {
   name: urlDataName,
   description:
-    "デバッグモードかどうか,言語とページの場所. URLとして表現されるデータ. Googleなどの検索エンジンの都合( https://support.google.com/webmasters/answer/182192?hl=ja )で,URLにページの言語のを入れて,言語ごとに別のURLである必要がある. デバッグ時には http://localhost:2520 などのオリジンになる",
+    "デバッグモードかどうか,言語とページの場所. URLとして表現されるデータ. Googleなどの検索エンジンの都合( https://support.google.com/webmasters/answer/182192?hl=ja )で,URLにページの言語のを入れて,言語ごとに別のURLである必要がある. デバッグ時のホスト名は http://[::1] になる",
   body: nt.type.customTypeBodyProduct([
     {
       name: "clientMode",
@@ -111,28 +110,12 @@ const urlData: nt.type.CustomType = {
       name: "language",
       description: "言語",
       memberType: nt.type.typeCustom(languageName)
-    }
-  ])
-};
-
-const urlWithLogInData: nt.type.CustomType = {
-  name: urlWithLogInDataName,
-  description: "",
-  body: nt.type.customTypeBodyProduct([
-    {
-      name: "urlData",
-      description: "通常のURLのデータ",
-      memberType: nt.type.typeCustom(urlDataName)
     },
     {
       name: "accessToken",
-      description: "アクセストークン",
-      memberType: nt.type.typeToken(accessTokenName)
-    },
-    {
-      name: "userPublic",
-      description: "ログインしたユーザーのデータ",
-      memberType: nt.type.typeCustom(userPublicName)
+      description:
+        "アクセストークン. ログインした後のリダイレクト先としてサーバーから渡される",
+      memberType: nt.type.typeMaybe(nt.type.typeToken(accessTokenName))
     }
   ])
 };
@@ -144,7 +127,7 @@ const clientMode: nt.type.CustomType = {
     {
       name: "DebugMode",
       description:
-        "デバッグモード. ポート番号を保持する. オリジンは http://localhost:2520 のようなもの",
+        "デバッグモード. ポート番号を保持する. オリジンは http://[::1]:2520 のようなもの",
       parameter: nt.type.maybeJust(nt.type.typeInt32)
     },
     {
@@ -251,7 +234,6 @@ const schema: nt.type.Schema = {
     requestLogInUrlRequestData,
     openIdConnectProvider,
     urlData,
-    urlWithLogInData,
     language,
     location,
     userPublic
