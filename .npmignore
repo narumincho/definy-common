@@ -6,4 +6,5 @@ node_modules
 .vscode
 test
 schema
-generateCode.ps1
+schemaJs
+generateCode.js
