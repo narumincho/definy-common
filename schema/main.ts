@@ -13,6 +13,7 @@ const dateTimeName = "DateTime";
 const requestLogInUrlRequestDataName = "RequestLogInUrlRequestData";
 const openIdConnectProviderName = "OpenIdConnectProvider";
 const urlDataName = "UrlData";
+const urlWithLogInDataName = "UrlWithLogInData";
 const clientModeName = "ClientMode";
 const locationName = "Location";
 const languageName = "Language";
@@ -94,7 +95,7 @@ const openIdConnectProvider: nt.type.CustomType = {
 const urlData: nt.type.CustomType = {
   name: urlDataName,
   description:
-    "デバッグモードかどうか,言語とページの場所. URLとして表現されるデータ. Googleなどの検索エンジンの都合( https://support.google.com/webmasters/answer/182192?hl=ja )で,URLにページの言語のを入れて,言語ごとに別のURLである必要がある. デバッグ時には http://localhost:2520 のオリジンになってしまう",
+    "デバッグモードかどうか,言語とページの場所. URLとして表現されるデータ. Googleなどの検索エンジンの都合( https://support.google.com/webmasters/answer/182192?hl=ja )で,URLにページの言語のを入れて,言語ごとに別のURLである必要がある. デバッグ時には http://localhost:2520 などのオリジンになる",
   body: nt.type.customTypeBodyProduct([
     {
       name: "clientMode",
@@ -110,11 +111,28 @@ const urlData: nt.type.CustomType = {
       name: "language",
       description: "言語",
       memberType: nt.type.typeCustom(languageName)
+    }
+  ])
+};
+
+const urlWithLogInData: nt.type.CustomType = {
+  name: urlWithLogInDataName,
+  description: "",
+  body: nt.type.customTypeBodyProduct([
+    {
+      name: "urlData",
+      description: "通常のURLのデータ",
+      memberType: nt.type.typeCustom(urlDataName)
     },
     {
       name: "accessToken",
       description: "アクセストークン",
-      memberType: nt.type.typeMaybe(nt.type.typeToken(accessTokenName))
+      memberType: nt.type.typeToken(accessTokenName)
+    },
+    {
+      name: "userPublic",
+      description: "ログインしたユーザーのデータ",
+      memberType: nt.type.typeCustom(userPublicName)
     }
   ])
 };
@@ -233,6 +251,7 @@ const schema: nt.type.Schema = {
     requestLogInUrlRequestData,
     openIdConnectProvider,
     urlData,
+    urlWithLogInData,
     language,
     location,
     userPublic

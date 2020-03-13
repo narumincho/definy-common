@@ -42,13 +42,18 @@ export type RequestLogInUrlRequestData = {
 export type OpenIdConnectProvider = "Google" | "GitHub";
 
 /**
- * デバッグモードかどうか,言語とページの場所. URLとして表現されるデータ. Googleなどの検索エンジンの都合( https://support.google.com/webmasters/answer/182192?hl=ja )で,URLにページの言語のを入れて,言語ごとに別のURLである必要がある. デバッグ時には http://localhost:2520 のオリジンになってしまう
+ * デバッグモードかどうか,言語とページの場所. URLとして表現されるデータ. Googleなどの検索エンジンの都合( https://support.google.com/webmasters/answer/182192?hl=ja )で,URLにページの言語のを入れて,言語ごとに別のURLである必要がある. デバッグ時には http://localhost:2520 などのオリジンになる
  */
 export type UrlData = {
   clientMode: ClientMode;
   location: Location;
   language: Language;
-  accessToken: Maybe<AccessToken>;
+};
+
+export type UrlWithLogInData = {
+  urlData: UrlData;
+  accessToken: AccessToken;
+  userPublic: UserPublic;
 };
 
 /**
@@ -342,8 +347,18 @@ export const encodeOpenIdConnectProvider = (
 export const encodeUrlData = (urlData: UrlData): ReadonlyArray<number> =>
   encodeClientMode(urlData.clientMode)
     .concat(encodeLocation(urlData.location))
-    .concat(encodeLanguage(urlData.language))
-    .concat(encodeMaybe(encodeToken)(urlData.accessToken));
+    .concat(encodeLanguage(urlData.language));
+
+/**
+ *
+ *
+ */
+export const encodeUrlWithLogInData = (
+  urlWithLogInData: UrlWithLogInData
+): ReadonlyArray<number> =>
+  encodeUrlData(urlWithLogInData.urlData)
+    .concat(encodeToken(urlWithLogInData.accessToken))
+    .concat(encodeUserPublic(urlWithLogInData.userPublic));
 
 /**
  *
@@ -763,23 +778,51 @@ export const decodeUrlData = (
     result: Language;
     nextIndex: number;
   } = decodeLanguage(locationAndNextIndex.nextIndex, binary);
-  const accessTokenAndNextIndex: {
-    result: Maybe<AccessToken>;
-    nextIndex: number;
-  } = decodeMaybe(
-    decodeToken as (
-      a: number,
-      b: Uint8Array
-    ) => { result: AccessToken; nextIndex: number }
-  )(languageAndNextIndex.nextIndex, binary);
   return {
     result: {
       clientMode: clientModeAndNextIndex.result,
       location: locationAndNextIndex.result,
-      language: languageAndNextIndex.result,
-      accessToken: accessTokenAndNextIndex.result
+      language: languageAndNextIndex.result
     },
-    nextIndex: accessTokenAndNextIndex.nextIndex
+    nextIndex: languageAndNextIndex.nextIndex
+  };
+};
+
+/**
+ *
+ * @param index バイナリを読み込み開始位置
+ * @param binary バイナリ
+ *
+ */
+export const decodeUrlWithLogInData = (
+  index: number,
+  binary: Uint8Array
+): { result: UrlWithLogInData; nextIndex: number } => {
+  const urlDataAndNextIndex: {
+    result: UrlData;
+    nextIndex: number;
+  } = decodeUrlData(index, binary);
+  const accessTokenAndNextIndex: {
+    result: AccessToken;
+    nextIndex: number;
+  } = (decodeToken as (
+    a: number,
+    b: Uint8Array
+  ) => { result: AccessToken; nextIndex: number })(
+    urlDataAndNextIndex.nextIndex,
+    binary
+  );
+  const userPublicAndNextIndex: {
+    result: UserPublic;
+    nextIndex: number;
+  } = decodeUserPublic(accessTokenAndNextIndex.nextIndex, binary);
+  return {
+    result: {
+      urlData: urlDataAndNextIndex.result,
+      accessToken: accessTokenAndNextIndex.result,
+      userPublic: userPublicAndNextIndex.result
+    },
+    nextIndex: userPublicAndNextIndex.nextIndex
   };
 };
 

@@ -1,4 +1,4 @@
-module Data exposing (AccessToken(..), ClientMode(..), DateTime, FileHash(..), IdeaId(..), Language(..), Location(..), OpenIdConnectProvider(..), ProjectId(..), RequestLogInUrlRequestData, UrlData, UserId(..), UserPublic, accessTokenJsonDecoder, accessTokenToJsonValue, clientModeJsonDecoder, clientModeToJsonValue, dateTimeJsonDecoder, dateTimeToJsonValue, fileHashJsonDecoder, fileHashToJsonValue, ideaIdJsonDecoder, ideaIdToJsonValue, languageJsonDecoder, languageToJsonValue, locationJsonDecoder, locationToJsonValue, maybeJsonDecoder, maybeToJsonValue, openIdConnectProviderJsonDecoder, openIdConnectProviderToJsonValue, projectIdJsonDecoder, projectIdToJsonValue, requestLogInUrlRequestDataJsonDecoder, requestLogInUrlRequestDataToJsonValue, resultJsonDecoder, resultToJsonValue, urlDataJsonDecoder, urlDataToJsonValue, userIdJsonDecoder, userIdToJsonValue, userPublicJsonDecoder, userPublicToJsonValue)
+module Data exposing (AccessToken(..), ClientMode(..), DateTime, FileHash(..), IdeaId(..), Language(..), Location(..), OpenIdConnectProvider(..), ProjectId(..), RequestLogInUrlRequestData, UrlData, UrlWithLogInData, UserId(..), UserPublic, accessTokenJsonDecoder, accessTokenToJsonValue, clientModeJsonDecoder, clientModeToJsonValue, dateTimeJsonDecoder, dateTimeToJsonValue, fileHashJsonDecoder, fileHashToJsonValue, ideaIdJsonDecoder, ideaIdToJsonValue, languageJsonDecoder, languageToJsonValue, locationJsonDecoder, locationToJsonValue, maybeJsonDecoder, maybeToJsonValue, openIdConnectProviderJsonDecoder, openIdConnectProviderToJsonValue, projectIdJsonDecoder, projectIdToJsonValue, requestLogInUrlRequestDataJsonDecoder, requestLogInUrlRequestDataToJsonValue, resultJsonDecoder, resultToJsonValue, urlDataJsonDecoder, urlDataToJsonValue, urlWithLogInDataJsonDecoder, urlWithLogInDataToJsonValue, userIdJsonDecoder, userIdToJsonValue, userPublicJsonDecoder, userPublicToJsonValue)
 
 import Json.Decode as Jd
 import Json.Decode.Pipeline as Jdp
@@ -31,10 +31,14 @@ type OpenIdConnectProvider
     | GitHub
 
 
-{-| デバッグモードかどうか,言語とページの場所. URLとして表現されるデータ. Googleなどの検索エンジンの都合( <https://support.google.com/webmasters/answer/182192?hl=ja> )で,URLにページの言語のを入れて,言語ごとに別のURLである必要がある. デバッグ時には <http://localhost:2520> のオリジンになってしまう
+{-| デバッグモードかどうか,言語とページの場所. URLとして表現されるデータ. Googleなどの検索エンジンの都合( <https://support.google.com/webmasters/answer/182192?hl=ja> )で,URLにページの言語のを入れて,言語ごとに別のURLである必要がある. デバッグ時には <http://localhost:2520> などのオリジンになる
 -}
 type alias UrlData =
-    { clientMode : ClientMode, location : Location, language : Language, accessToken : Maybe AccessToken }
+    { clientMode : ClientMode, location : Location, language : Language }
+
+
+type alias UrlWithLogInData =
+    { urlData : UrlData, accessToken : AccessToken, userPublic : UserPublic }
 
 
 {-| 英語,日本語,エスペラント語などの言語
@@ -180,7 +184,17 @@ urlDataToJsonValue urlData =
         [ ( "clientMode", clientModeToJsonValue urlData.clientMode )
         , ( "location", locationToJsonValue urlData.location )
         , ( "language", languageToJsonValue urlData.language )
-        , ( "accessToken", maybeToJsonValue accessTokenToJsonValue urlData.accessToken )
+        ]
+
+
+{-| UrlWithLogInDataのJSONへのエンコーダ
+-}
+urlWithLogInDataToJsonValue : UrlWithLogInData -> Je.Value
+urlWithLogInDataToJsonValue urlWithLogInData =
+    Je.object
+        [ ( "urlData", urlDataToJsonValue urlWithLogInData.urlData )
+        , ( "accessToken", accessTokenToJsonValue urlWithLogInData.accessToken )
+        , ( "userPublic", userPublicToJsonValue urlWithLogInData.userPublic )
         ]
 
 
@@ -367,17 +381,31 @@ openIdConnectProviderJsonDecoder =
 urlDataJsonDecoder : Jd.Decoder UrlData
 urlDataJsonDecoder =
     Jd.succeed
-        (\clientMode location language accessToken ->
+        (\clientMode location language ->
             { clientMode = clientMode
             , location = location
             , language = language
-            , accessToken = accessToken
             }
         )
         |> Jdp.required "clientMode" clientModeJsonDecoder
         |> Jdp.required "location" locationJsonDecoder
         |> Jdp.required "language" languageJsonDecoder
-        |> Jdp.required "accessToken" (maybeJsonDecoder accessTokenJsonDecoder)
+
+
+{-| UrlWithLogInDataのJSON Decoder
+-}
+urlWithLogInDataJsonDecoder : Jd.Decoder UrlWithLogInData
+urlWithLogInDataJsonDecoder =
+    Jd.succeed
+        (\urlData accessToken userPublic ->
+            { urlData = urlData
+            , accessToken = accessToken
+            , userPublic = userPublic
+            }
+        )
+        |> Jdp.required "urlData" urlDataJsonDecoder
+        |> Jdp.required "accessToken" accessTokenJsonDecoder
+        |> Jdp.required "userPublic" userPublicJsonDecoder
 
 
 {-| LanguageのJSON Decoder
