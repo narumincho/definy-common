@@ -86,34 +86,18 @@ export type IdeaId = string & { _ideaId: never };
 
 export type FileHash = string & { _fileHash: never };
 
-/**
- *
- *
- */
 export const maybeJust = <T>(value: T): Maybe<T> => ({
   _: "Just",
   value: value
 });
 
-/**
- *
- *
- */
 export const maybeNothing = <T>(): Maybe<T> => ({ _: "Nothing" });
 
-/**
- *
- *
- */
 export const resultOk = <ok, error>(ok: ok): Result<ok, error> => ({
   _: "Ok",
   ok: ok
 });
 
-/**
- *
- *
- */
 export const resultError = <ok, error>(error: error): Result<ok, error> => ({
   _: "Error",
   error: error
@@ -121,7 +105,6 @@ export const resultError = <ok, error>(error: error): Result<ok, error> => ({
 
 /**
  * デバッグモード. ポート番号を保持する. オリジンは http://[::1]:2520 のようなもの
- *
  */
 export const clientModeDebugMode = (int32: number): ClientMode => ({
   _: "DebugMode",
@@ -140,7 +123,6 @@ export const locationHome: Location = { _: "Home" };
 
 /**
  * ユーザーの詳細ページ
- *
  */
 export const locationUser = (userId: UserId): Location => ({
   _: "User",
@@ -149,7 +131,6 @@ export const locationUser = (userId: UserId): Location => ({
 
 /**
  * プロジェクトの詳細ページ
- *
  */
 export const locationProject = (projectId: ProjectId): Location => ({
   _: "Project",
@@ -158,7 +139,6 @@ export const locationProject = (projectId: ProjectId): Location => ({
 
 /**
  * numberの32bit符号あり整数をSigned Leb128のバイナリに変換する
- *
  */
 export const encodeInt32 = (value: number): ReadonlyArray<number> => {
   value |= 0;
@@ -179,7 +159,6 @@ export const encodeInt32 = (value: number): ReadonlyArray<number> => {
 
 /**
  * stringからバイナリに変換する.
- *
  */
 export const encodeString = (text: string): ReadonlyArray<number> => {
   const result: ReadonlyArray<number> = Array["from"](
@@ -190,16 +169,11 @@ export const encodeString = (text: string): ReadonlyArray<number> => {
 
 /**
  * boolからバイナリに変換する
- *
  */
 export const encodeBool = (value: boolean): ReadonlyArray<number> => [
   value ? 1 : 0
 ];
 
-/**
- *
- *
- */
 export const encodeList = <T>(
   encodeFunction: (a: T) => ReadonlyArray<number>
 ): ((a: ReadonlyArray<T>) => ReadonlyArray<number>) => (
@@ -212,10 +186,6 @@ export const encodeList = <T>(
   return result;
 };
 
-/**
- *
- *
- */
 export const encodeMaybe = <T>(
   encodeFunction: (a: T) => ReadonlyArray<number>
 ): ((a: Maybe<T>) => ReadonlyArray<number>) => (
@@ -231,10 +201,6 @@ export const encodeMaybe = <T>(
   }
 };
 
-/**
- *
- *
- */
 export const encodeResult = <ok, error>(
   okEncodeFunction: (a: ok) => ReadonlyArray<number>,
   errorEncodeFunction: (a: error) => ReadonlyArray<number>
@@ -251,10 +217,6 @@ export const encodeResult = <ok, error>(
   }
 };
 
-/**
- *
- *
- */
 export const encodeId = (id: string): ReadonlyArray<number> => {
   const result: Array<number> = [];
   for (let i = 0; i < 16; i += 1) {
@@ -263,10 +225,6 @@ export const encodeId = (id: string): ReadonlyArray<number> => {
   return result;
 };
 
-/**
- *
- *
- */
 export const encodeToken = (id: string): ReadonlyArray<number> => {
   const result: Array<number> = [];
   for (let i = 0; i < 32; i += 1) {
@@ -275,10 +233,6 @@ export const encodeToken = (id: string): ReadonlyArray<number> => {
   return result;
 };
 
-/**
- *
- *
- */
 export const encodeDateTime = (dateTime: DateTime): ReadonlyArray<number> =>
   encodeInt32(dateTime.year)
     .concat(encodeInt32(dateTime.month))
@@ -287,10 +241,6 @@ export const encodeDateTime = (dateTime: DateTime): ReadonlyArray<number> =>
     .concat(encodeInt32(dateTime.minute))
     .concat(encodeInt32(dateTime.second));
 
-/**
- *
- *
- */
 export const encodeClientMode = (
   clientMode: ClientMode
 ): ReadonlyArray<number> => {
@@ -304,10 +254,6 @@ export const encodeClientMode = (
   }
 };
 
-/**
- *
- *
- */
 export const encodeRequestLogInUrlRequestData = (
   requestLogInUrlRequestData: RequestLogInUrlRequestData
 ): ReadonlyArray<number> =>
@@ -315,10 +261,6 @@ export const encodeRequestLogInUrlRequestData = (
     requestLogInUrlRequestData.openIdConnectProvider
   ).concat(encodeUrlData(requestLogInUrlRequestData.urlData));
 
-/**
- *
- *
- */
 export const encodeOpenIdConnectProvider = (
   openIdConnectProvider: OpenIdConnectProvider
 ): ReadonlyArray<number> => {
@@ -332,20 +274,12 @@ export const encodeOpenIdConnectProvider = (
   }
 };
 
-/**
- *
- *
- */
 export const encodeUrlData = (urlData: UrlData): ReadonlyArray<number> =>
   encodeClientMode(urlData.clientMode)
     .concat(encodeLocation(urlData.location))
     .concat(encodeLanguage(urlData.language))
     .concat(encodeMaybe(encodeToken)(urlData.accessToken));
 
-/**
- *
- *
- */
 export const encodeLanguage = (language: Language): ReadonlyArray<number> => {
   switch (language) {
     case "Japanese": {
@@ -360,10 +294,6 @@ export const encodeLanguage = (language: Language): ReadonlyArray<number> => {
   }
 };
 
-/**
- *
- *
- */
 export const encodeLocation = (location: Location): ReadonlyArray<number> => {
   switch (location._) {
     case "Home": {
@@ -378,10 +308,6 @@ export const encodeLocation = (location: Location): ReadonlyArray<number> => {
   }
 };
 
-/**
- *
- *
- */
 export const encodeUserPublic = (
   userPublic: UserPublic
 ): ReadonlyArray<number> =>
@@ -397,7 +323,6 @@ export const encodeUserPublic = (
  * SignedLeb128で表現されたバイナリをnumberのビット演算ができる32bit符号付き整数の範囲の数値に変換するコード
  * @param index バイナリを読み込み開始位置
  * @param binary バイナリ
- *
  */
 export const decodeInt32 = (
   index: number,
@@ -425,7 +350,6 @@ export const decodeInt32 = (
  * バイナリからstringに変換する.
  * @param index バイナリを読み込み開始位置
  * @param binary バイナリ
- *
  */
 export const decodeString = (
   index: number,
@@ -443,10 +367,8 @@ export const decodeString = (
 };
 
 /**
- *
  * @param index バイナリを読み込み開始位置
  * @param binary バイナリ
- *
  */
 export const decodeBool = (
   index: number,
@@ -456,10 +378,6 @@ export const decodeBool = (
   nextIndex: index + 1
 });
 
-/**
- *
- *
- */
 export const decodeList = <T>(
   decodeFunction: (a: number, b: Uint8Array) => { result: T; nextIndex: number }
 ): ((
@@ -486,10 +404,6 @@ export const decodeList = <T>(
   return { result: result, nextIndex: index };
 };
 
-/**
- *
- *
- */
 export const decodeMaybe = <T>(
   decodeFunction: (a: number, b: Uint8Array) => { result: T; nextIndex: number }
 ): ((a: number, b: Uint8Array) => { result: Maybe<T>; nextIndex: number }) => (
@@ -521,10 +435,6 @@ export const decodeMaybe = <T>(
   );
 };
 
-/**
- *
- *
- */
 export const decodeResult = <ok, error>(
   okDecodeFunction: (
     a: number,
@@ -571,10 +481,8 @@ export const decodeResult = <ok, error>(
 };
 
 /**
- *
  * @param index バイナリを読み込み開始位置
  * @param binary バイナリ
- *
  */
 export const decodeId = (
   index: number,
@@ -587,10 +495,8 @@ export const decodeId = (
 });
 
 /**
- *
  * @param index バイナリを読み込み開始位置
  * @param binary バイナリ
- *
  */
 export const decodeToken = (
   index: number,
@@ -603,10 +509,8 @@ export const decodeToken = (
 });
 
 /**
- *
  * @param index バイナリを読み込み開始位置
  * @param binary バイナリ
- *
  */
 export const decodeDateTime = (
   index: number,
@@ -650,10 +554,8 @@ export const decodeDateTime = (
 };
 
 /**
- *
  * @param index バイナリを読み込み開始位置
  * @param binary バイナリ
- *
  */
 export const decodeClientMode = (
   index: number,
@@ -680,10 +582,8 @@ export const decodeClientMode = (
 };
 
 /**
- *
  * @param index バイナリを読み込み開始位置
  * @param binary バイナリ
- *
  */
 export const decodeRequestLogInUrlRequestData = (
   index: number,
@@ -707,10 +607,8 @@ export const decodeRequestLogInUrlRequestData = (
 };
 
 /**
- *
  * @param index バイナリを読み込み開始位置
  * @param binary バイナリ
- *
  */
 export const decodeOpenIdConnectProvider = (
   index: number,
@@ -730,10 +628,8 @@ export const decodeOpenIdConnectProvider = (
 };
 
 /**
- *
  * @param index バイナリを読み込み開始位置
  * @param binary バイナリ
- *
  */
 export const decodeUrlData = (
   index: number,
@@ -772,10 +668,8 @@ export const decodeUrlData = (
 };
 
 /**
- *
  * @param index バイナリを読み込み開始位置
  * @param binary バイナリ
- *
  */
 export const decodeLanguage = (
   index: number,
@@ -798,10 +692,8 @@ export const decodeLanguage = (
 };
 
 /**
- *
  * @param index バイナリを読み込み開始位置
  * @param binary バイナリ
- *
  */
 export const decodeLocation = (
   index: number,
@@ -838,10 +730,8 @@ export const decodeLocation = (
 };
 
 /**
- *
  * @param index バイナリを読み込み開始位置
  * @param binary バイナリ
- *
  */
 export const decodeUserPublic = (
   index: number,
