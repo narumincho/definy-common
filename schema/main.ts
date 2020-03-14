@@ -1,17 +1,18 @@
 import * as nt from "@narumincho/type";
+import { type } from "@narumincho/type";
 import * as codeGen from "js-ts-code-generator";
 import * as fs from "fs";
 import * as childProcess from "child_process";
 
-const accessToken = nt.type.typeToken("AccessToken");
-const userId = nt.type.typeId("UserId");
-const projectId = nt.type.typeId("ProjectId");
-const ideaId = nt.type.typeId("IdeaId");
-const fileHash = nt.type.typeToken("FileHash");
-const projectHash = nt.type.typeToken("ProjectHash");
-const moduleHash = nt.type.typeToken("ModuleHash");
-const typeHash = nt.type.typeToken("TypeHash");
-const partHash = nt.type.typeToken("PartHash");
+const accessToken = type.typeToken("AccessToken");
+const userId = type.typeId("UserId");
+const projectId = type.typeId("ProjectId");
+const ideaId = type.typeId("IdeaId");
+const fileHash = type.typeToken("FileHash");
+const projectHash = type.typeToken("ProjectHash");
+const moduleHash = type.typeToken("ModuleHash");
+const typeHash = type.typeToken("TypeHash");
+const partHash = type.typeToken("PartHash");
 
 const dateTimeName = "DateTime";
 const requestLogInUrlRequestDataName = "RequestLogInUrlRequestData";
@@ -30,180 +31,180 @@ const moduleSnapshotName = "ModuleSnapshot";
 const typeSnapshotName = "TypeSnapshot";
 const partSnapshotName = "PartSnapshot";
 
-const dateTime: nt.type.CustomType = {
+const dateTime: type.CustomType = {
   name: dateTimeName,
   description: "日時 最小単位は秒",
-  body: nt.type.customTypeBodyProduct([
+  body: type.customTypeBodyProduct([
     {
       name: "year",
       description: "年. 人類紀元. 西暦に10000を足したもの Human Era",
-      memberType: nt.type.typeInt32
+      memberType: type.typeInt32
     },
     {
       name: "month",
       description: "月. 1月～12月. 最大値は月や年によって決まる",
-      memberType: nt.type.typeInt32
+      memberType: type.typeInt32
     },
     {
       name: "day",
       description: "日",
-      memberType: nt.type.typeInt32
+      memberType: type.typeInt32
     },
     {
       name: "hour",
       description: "時. 0時～23時",
-      memberType: nt.type.typeInt32
+      memberType: type.typeInt32
     },
     {
       name: "minute",
       description: "分",
-      memberType: nt.type.typeInt32
+      memberType: type.typeInt32
     },
     {
       name: "second",
       description: "秒",
-      memberType: nt.type.typeInt32
+      memberType: type.typeInt32
     }
   ])
 };
 
-const requestLogInUrlRequestData: nt.type.CustomType = {
+const requestLogInUrlRequestData: type.CustomType = {
   name: requestLogInUrlRequestDataName,
   description: "ログインのURLを発行するために必要なデータ",
-  body: nt.type.customTypeBodyProduct([
+  body: type.customTypeBodyProduct([
     {
       name: "openIdConnectProvider",
       description: "ログインに使用するプロバイダー",
-      memberType: nt.type.typeCustom(openIdConnectProviderName)
+      memberType: type.typeCustom(openIdConnectProviderName)
     },
     {
       name: "urlData",
       description: "ログインした後に返ってくるURLに必要なデータ",
-      memberType: nt.type.typeCustom(urlDataName)
+      memberType: type.typeCustom(urlDataName)
     }
   ])
 };
 
-const openIdConnectProvider: nt.type.CustomType = {
+const openIdConnectProvider: type.CustomType = {
   name: openIdConnectProviderName,
   description: "プロバイダー (例: LINE, Google, GitHub)",
-  body: nt.type.customTypeBodySum([
+  body: type.customTypeBodySum([
     {
       name: "Google",
       description:
         "Google ( https://developers.google.com/identity/sign-in/web/ )",
-      parameter: nt.type.maybeNothing()
+      parameter: type.maybeNothing()
     },
     {
       name: "GitHub",
       description:
         "GitHub ( https://developer.github.com/v3/guides/basics-of-authentication/ )",
-      parameter: nt.type.maybeNothing()
+      parameter: type.maybeNothing()
     }
   ])
 };
 
-const urlData: nt.type.CustomType = {
+const urlData: type.CustomType = {
   name: urlDataName,
   description:
     "デバッグモードかどうか,言語とページの場所. URLとして表現されるデータ. Googleなどの検索エンジンの都合( https://support.google.com/webmasters/answer/182192?hl=ja )で,URLにページの言語のを入れて,言語ごとに別のURLである必要がある. デバッグ時のホスト名は http://[::1] になる",
-  body: nt.type.customTypeBodyProduct([
+  body: type.customTypeBodyProduct([
     {
       name: "clientMode",
       description: "クライアントモード",
-      memberType: nt.type.typeCustom(clientModeName)
+      memberType: type.typeCustom(clientModeName)
     },
     {
       name: "location",
       description: "場所",
-      memberType: nt.type.typeCustom(locationName)
+      memberType: type.typeCustom(locationName)
     },
     {
       name: "language",
       description: "言語",
-      memberType: nt.type.typeCustom(languageName)
+      memberType: type.typeCustom(languageName)
     },
     {
       name: "accessToken",
       description:
         "アクセストークン. ログインした後のリダイレクト先としてサーバーから渡される",
-      memberType: nt.type.typeMaybe(accessToken)
+      memberType: type.typeMaybe(accessToken)
     }
   ])
 };
 
-const clientMode: nt.type.CustomType = {
+const clientMode: type.CustomType = {
   name: clientModeName,
   description: "デバッグの状態と, デバッグ時ならアクセスしているポート番号",
-  body: nt.type.customTypeBodySum([
+  body: type.customTypeBodySum([
     {
       name: "DebugMode",
       description:
         "デバッグモード. ポート番号を保持する. オリジンは http://[::1]:2520 のようなもの",
-      parameter: nt.type.maybeJust(nt.type.typeInt32)
+      parameter: type.maybeJust(type.typeInt32)
     },
     {
       name: "Release",
       description: "リリースモード. https://definy.app ",
-      parameter: nt.type.maybeNothing()
+      parameter: type.maybeNothing()
     }
   ])
 };
 
-const location: nt.type.CustomType = {
+const location: type.CustomType = {
   name: locationName,
   description:
     "DefinyWebアプリ内での場所を示すもの. URLから求められる. URLに変換できる",
-  body: nt.type.customTypeBodySum([
+  body: type.customTypeBodySum([
     {
       name: "Home",
       description: "最初のページ",
-      parameter: nt.type.maybeNothing()
+      parameter: type.maybeNothing()
     },
     {
       name: "User",
       description: "ユーザーの詳細ページ",
-      parameter: nt.type.maybeJust(nt.type.typeId("UserId"))
+      parameter: type.maybeJust(type.typeId("UserId"))
     },
     {
       name: "Project",
       description: "プロジェクトの詳細ページ",
-      parameter: nt.type.maybeJust(nt.type.typeId("ProjectId"))
+      parameter: type.maybeJust(type.typeId("ProjectId"))
     }
   ])
 };
 
-const language: nt.type.CustomType = {
+const language: type.CustomType = {
   name: languageName,
   description: "英語,日本語,エスペラント語などの言語",
-  body: nt.type.customTypeBodySum([
+  body: type.customTypeBodySum([
     {
       name: "Japanese",
       description: "日本語",
-      parameter: nt.type.maybeNothing()
+      parameter: type.maybeNothing()
     },
     {
       name: "English",
       description: "英語",
-      parameter: nt.type.maybeNothing()
+      parameter: type.maybeNothing()
     },
     {
       name: "Esperanto",
       description: "エスペラント語",
-      parameter: nt.type.maybeNothing()
+      parameter: type.maybeNothing()
     }
   ])
 };
 
-const userPublic: nt.type.CustomType = {
+const userPublic: type.CustomType = {
   name: userPublicName,
   description: "ユーザーが公開している情報",
-  body: nt.type.customTypeBodyProduct([
+  body: type.customTypeBodyProduct([
     {
       name: "name",
       description:
         "ユーザー名. 表示される名前。他のユーザーとかぶっても良い. 絵文字も使える. 全角英数は半角英数,半角カタカナは全角カタカナ, (株)の合字を分解するなどのNFKCの正規化がされる. U+0000-U+0019 と U+007F-U+00A0 の範囲の文字は入らない. 前後に空白を含められない. 間の空白は2文字以上連続しない. 文字数のカウント方法は正規化されたあとのCodePoint単位. Twitterと同じ、1文字以上50文字以下",
-      memberType: nt.type.typeString
+      memberType: type.typeString
     },
     {
       name: "imageHash",
@@ -214,39 +215,39 @@ const userPublic: nt.type.CustomType = {
       name: "introduction",
       description:
         "自己紹介文. 改行文字を含めることができる. Twitterと同じ 0～160文字",
-      memberType: nt.type.typeString
+      memberType: type.typeString
     },
     {
       name: "createdAt",
       description: "ユーザーが作成された日時",
-      memberType: nt.type.typeCustom(dateTimeName)
+      memberType: type.typeCustom(dateTimeName)
     },
     {
       name: "likedProjectIdList",
       description: "プロジェクトに対する いいね",
-      memberType: nt.type.typeList(projectId)
+      memberType: type.typeList(projectId)
     },
     {
       name: "developedProjectIdList",
       description: "開発に参加した (書いたコードが使われた) プロジェクト",
-      memberType: nt.type.typeList(projectId)
+      memberType: type.typeList(projectId)
     },
     {
       name: "commentedIdeaIdList",
       description: "コメントをしたアイデア",
-      memberType: nt.type.typeList(ideaId)
+      memberType: type.typeList(ideaId)
     }
   ])
 };
 
-const project: nt.type.CustomType = {
+const project: type.CustomType = {
   name: projectName,
   description: "プロジェクト",
-  body: nt.type.customTypeBodyProduct([
+  body: type.customTypeBodyProduct([
     {
       name: "name",
       description: "プロジェクト名",
-      memberType: nt.type.typeString
+      memberType: type.typeString
     },
     {
       name: "icon",
@@ -262,73 +263,73 @@ const project: nt.type.CustomType = {
       name: "releaseBranchCommitHashList",
       description:
         "リリースブランチ. 外部から依存プロジェクトとして読み込める.",
-      memberType: nt.type.typeList(projectHash)
+      memberType: type.typeList(projectHash)
     },
     {
       name: "developBranchCommitHashList",
       description: "デベロップブランチ. ",
-      memberType: nt.type.typeList(projectHash)
+      memberType: type.typeList(projectHash)
     },
     {
       name: "createdAt",
       description: "作成日時",
-      memberType: nt.type.typeCustom(dateTimeName)
+      memberType: type.typeCustom(dateTimeName)
     }
   ])
 };
 
-const idea: nt.type.CustomType = {
+const idea: type.CustomType = {
   name: ideaName,
   description: "アイデア",
-  body: nt.type.customTypeBodyProduct([
+  body: type.customTypeBodyProduct([
     {
       name: "name",
       description: "プロジェクト名",
-      memberType: nt.type.typeString
+      memberType: type.typeString
     },
     {
       name: "createdAt",
       description: "作成日時",
-      memberType: nt.type.typeCustom(dateTimeName)
+      memberType: type.typeCustom(dateTimeName)
     },
     {
       name: "commentList",
       description: "コメント",
-      memberType: nt.type.typeList(nt.type.typeCustom(ideaCommentName))
+      memberType: type.typeList(type.typeCustom(ideaCommentName))
     },
     {
       name: "draftCommitIdList",
       description: "下書きのコミット",
-      memberType: nt.type.typeList(nt.type.typeCustom(projectSnapshotName))
+      memberType: type.typeList(type.typeCustom(projectSnapshotName))
     }
   ])
 };
 
-const ideaComment: nt.type.CustomType = {
+const ideaComment: type.CustomType = {
   name: ideaCommentName,
   description: "アイデアのコメント",
-  body: nt.type.customTypeBodySum([
+  body: type.customTypeBodySum([
     {
       name: "CommentByMessage",
       description: "文章でのコメント",
-      parameter: nt.type.maybeJust(nt.type.typeCustom(ideaCommentMessageName))
+      parameter: type.maybeJust(type.typeCustom(ideaCommentMessageName))
     },
     {
       name: "CommentByCommit",
       description: "編集提案をする",
-      parameter: nt.type.maybeJust(nt.type.typeCustom(projectSnapshotName))
+      parameter: type.maybeJust(type.typeCustom(projectSnapshotName))
     }
   ])
 };
 
-const ideaCommentMessage: nt.type.CustomType = {
+const ideaCommentMessage: type.CustomType = {
   name: ideaCommentMessageName,
   description: "文章でのコメント",
-  body: nt.type.customTypeBodyProduct([
+  body: type.customTypeBodyProduct([
     {
       name: "body",
       description: "本文",
-      memberType: nt.type.typeString
+      memberType: type.typeString
     },
     {
       name: "createdBy",
@@ -338,29 +339,29 @@ const ideaCommentMessage: nt.type.CustomType = {
     {
       name: "createdAt",
       description: "作成日時",
-      memberType: nt.type.typeCustom(dateTimeName)
+      memberType: type.typeCustom(dateTimeName)
     }
   ])
 };
 
-const projectSnapshot: nt.type.CustomType = {
+const projectSnapshot: type.CustomType = {
   name: projectSnapshotName,
   description: "プロジェクトのスナップショット. Gitでいうコミット",
-  body: nt.type.customTypeBodyProduct([
+  body: type.customTypeBodyProduct([
     {
       name: "createdAt",
       description: "アイデアに投稿した日時",
-      memberType: nt.type.typeCustom(dateTimeName)
+      memberType: type.typeCustom(dateTimeName)
     },
     {
       name: "description",
       description: "どんな変更をしたのかの説明",
-      memberType: nt.type.typeString
+      memberType: type.typeString
     },
     {
       name: "projectName",
       description: "プロジェクト名",
-      memberType: nt.type.typeString
+      memberType: type.typeString
     },
     {
       name: "projectIcon",
@@ -375,108 +376,108 @@ const projectSnapshot: nt.type.CustomType = {
     {
       name: "projectDescription",
       description: "プロジェクトの詳しい説明",
-      memberType: nt.type.typeString
+      memberType: type.typeString
     },
     {
       name: "moduleList",
       description: "直下以外のモジュール",
-      memberType: nt.type.typeList(moduleHash)
+      memberType: type.typeList(moduleHash)
     },
     {
       name: "typeList",
       description: "直下の型",
-      memberType: nt.type.typeList(typeHash)
+      memberType: type.typeList(typeHash)
     },
     {
       name: "partList",
       description: "直下のパーツ",
-      memberType: nt.type.typeList(partHash)
+      memberType: type.typeList(partHash)
     }
   ])
 };
 
-const moduleSnapshot: nt.type.CustomType = {
+const moduleSnapshot: type.CustomType = {
   name: moduleSnapshotName,
   description: "モジュールのスナップショット",
-  body: nt.type.customTypeBodyProduct([
+  body: type.customTypeBodyProduct([
     {
       name: "name",
       description: "モジュール名",
-      memberType: nt.type.typeString
+      memberType: type.typeString
     },
     {
       name: "description",
       description: "モジュールの説明",
-      memberType: nt.type.typeString
+      memberType: type.typeString
     },
     {
       name: "export",
       description: "外部のプロジェクトに公開するかどうか",
-      memberType: nt.type.typeBool
+      memberType: type.typeBool
     },
     {
       name: "children",
       description: "子のモジュール",
-      memberType: nt.type.typeList(moduleHash)
+      memberType: type.typeList(moduleHash)
     },
     {
       name: "typeList",
       description: "型",
-      memberType: nt.type.typeList(typeHash)
+      memberType: type.typeList(typeHash)
     },
     {
       name: "partList",
       description: "パーツ",
-      memberType: nt.type.typeList(partHash)
+      memberType: type.typeList(partHash)
     }
   ])
 };
 
-const typeSnapshot: nt.type.CustomType = {
+const typeSnapshot: type.CustomType = {
   name: typeSnapshotName,
   description: "型のスナップショット",
-  body: nt.type.customTypeBodyProduct([
+  body: type.customTypeBodyProduct([
     {
       name: "name",
       description: "型の名前",
-      memberType: nt.type.typeString
+      memberType: type.typeString
     },
     {
       name: "parentList",
       description: "この型の元",
-      memberType: nt.type.typeList(partHash)
+      memberType: type.typeList(partHash)
     },
     {
       name: "description",
       description: "型の説明",
-      memberType: nt.type.typeString
+      memberType: type.typeString
     }
   ])
 };
 
-const partSnapshot: nt.type.CustomType = {
+const partSnapshot: type.CustomType = {
   name: partSnapshotName,
   description: "パーツのスナップショット",
-  body: nt.type.customTypeBodyProduct([
+  body: type.customTypeBodyProduct([
     {
       name: "name",
       description: "パーツの名前",
-      memberType: nt.type.typeString
+      memberType: type.typeString
     },
     {
       name: "parentList",
       description: "このパーツの元",
-      memberType: nt.type.typeList(partHash)
+      memberType: type.typeList(partHash)
     },
     {
       name: "description",
       description: "パーツの説明",
-      memberType: nt.type.typeString
+      memberType: type.typeString
     }
   ])
 };
 
-const listCustomType: ReadonlyArray<nt.type.CustomType> = [
+const listCustomType: ReadonlyArray<type.CustomType> = [
   dateTime,
   clientMode,
   requestLogInUrlRequestData,
