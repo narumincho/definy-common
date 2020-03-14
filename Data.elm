@@ -14,8 +14,8 @@ type alias DateTime =
 {-| デバッグの状態と, デバッグ時ならアクセスしているポート番号
 -}
 type ClientMode
-    = DebugMode Int
-    | Release
+    = ClientModeDebugMode Int
+    | ClientModeRelease
 
 
 {-| ログインのURLを発行するために必要なデータ
@@ -27,8 +27,8 @@ type alias RequestLogInUrlRequestData =
 {-| プロバイダー (例: LINE, Google, GitHub)
 -}
 type OpenIdConnectProvider
-    = Google
-    | GitHub
+    = OpenIdConnectProviderGoogle
+    | OpenIdConnectProviderGitHub
 
 
 {-| デバッグモードかどうか,言語とページの場所. URLとして表現されるデータ. Googleなどの検索エンジンの都合( <https://support.google.com/webmasters/answer/182192?hl=ja> )で,URLにページの言語のを入れて,言語ごとに別のURLである必要がある. デバッグ時のホスト名は <http://[::1]> になる
@@ -40,17 +40,17 @@ type alias UrlData =
 {-| 英語,日本語,エスペラント語などの言語
 -}
 type Language
-    = Japanese
-    | English
-    | Esperanto
+    = LanguageJapanese
+    | LanguageEnglish
+    | LanguageEsperanto
 
 
 {-| DefinyWebアプリ内での場所を示すもの. URLから求められる. URLに変換できる
 -}
 type Location
-    = Home
-    | User UserId
-    | Project ProjectId
+    = LocationHome
+    | LocationUser UserId
+    | LocationProject ProjectId
 
 
 {-| ユーザーが公開している情報
@@ -80,8 +80,8 @@ type alias Idea =
 {-| アイデアのコメント
 -}
 type IdeaComment
-    = CommentByMessage IdeaCommentMessage
-    | CommentByCommit ProjectSnapshot
+    = IdeaCommentCommentByMessage IdeaCommentMessage
+    | IdeaCommentCommentByCommit ProjectSnapshot
 
 
 {-| 文章でのコメント
