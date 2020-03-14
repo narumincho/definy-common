@@ -234,10 +234,10 @@ dateTimeToJsonValue dateTime =
 clientModeToJsonValue : ClientMode -> Je.Value
 clientModeToJsonValue clientMode =
     case clientMode of
-        DebugMode parameter ->
+        ClientModeDebugMode parameter ->
             Je.object [ ( "_", Je.string "DebugMode" ), ( "int32", Je.int parameter ) ]
 
-        Release ->
+        ClientModeRelease ->
             Je.object [ ( "_", Je.string "Release" ) ]
 
 
@@ -256,10 +256,10 @@ requestLogInUrlRequestDataToJsonValue requestLogInUrlRequestData =
 openIdConnectProviderToJsonValue : OpenIdConnectProvider -> Je.Value
 openIdConnectProviderToJsonValue openIdConnectProvider =
     case openIdConnectProvider of
-        Google ->
+        OpenIdConnectProviderGoogle ->
             Je.string "Google"
 
-        GitHub ->
+        OpenIdConnectProviderGitHub ->
             Je.string "GitHub"
 
 
@@ -280,13 +280,13 @@ urlDataToJsonValue urlData =
 languageToJsonValue : Language -> Je.Value
 languageToJsonValue language =
     case language of
-        Japanese ->
+        LanguageJapanese ->
             Je.string "Japanese"
 
-        English ->
+        LanguageEnglish ->
             Je.string "English"
 
-        Esperanto ->
+        LanguageEsperanto ->
             Je.string "Esperanto"
 
 
@@ -295,13 +295,13 @@ languageToJsonValue language =
 locationToJsonValue : Location -> Je.Value
 locationToJsonValue location =
     case location of
-        Home ->
+        LocationHome ->
             Je.object [ ( "_", Je.string "Home" ) ]
 
-        User parameter ->
+        LocationUser parameter ->
             Je.object [ ( "_", Je.string "User" ), ( "userId", userIdToJsonValue parameter ) ]
 
-        Project parameter ->
+        LocationProject parameter ->
             Je.object [ ( "_", Je.string "Project" ), ( "projectId", projectIdToJsonValue parameter ) ]
 
 
@@ -361,10 +361,10 @@ ideaToJsonValue idea =
 ideaCommentToJsonValue : IdeaComment -> Je.Value
 ideaCommentToJsonValue ideaComment =
     case ideaComment of
-        CommentByMessage parameter ->
+        IdeaCommentCommentByMessage parameter ->
             Je.object [ ( "_", Je.string "CommentByMessage" ), ( "ideaCommentMessage", ideaCommentMessageToJsonValue parameter ) ]
 
-        CommentByCommit parameter ->
+        IdeaCommentCommentByCommit parameter ->
             Je.object [ ( "_", Je.string "CommentByCommit" ), ( "projectSnapshot", projectSnapshotToJsonValue parameter ) ]
 
 
@@ -542,10 +542,10 @@ clientModeJsonDecoder =
             (\tag ->
                 case tag of
                     "DebugMode" ->
-                        Jd.field "int32" Jd.int |> Jd.map DebugMode
+                        Jd.field "int32" Jd.int |> Jd.map ClientModeDebugMode
 
                     "Release" ->
-                        Jd.succeed Release
+                        Jd.succeed ClientModeRelease
 
                     _ ->
                         Jd.fail ("ClientModeで不明なタグを受けたとった tag=" ++ tag)
@@ -575,10 +575,10 @@ openIdConnectProviderJsonDecoder =
             (\tag ->
                 case tag of
                     "Google" ->
-                        Jd.succeed Google
+                        Jd.succeed OpenIdConnectProviderGoogle
 
                     "GitHub" ->
-                        Jd.succeed GitHub
+                        Jd.succeed OpenIdConnectProviderGitHub
 
                     _ ->
                         Jd.fail ("OpenIdConnectProviderで不明なタグを受けたとった tag=" ++ tag)
@@ -612,13 +612,13 @@ languageJsonDecoder =
             (\tag ->
                 case tag of
                     "Japanese" ->
-                        Jd.succeed Japanese
+                        Jd.succeed LanguageJapanese
 
                     "English" ->
-                        Jd.succeed English
+                        Jd.succeed LanguageEnglish
 
                     "Esperanto" ->
-                        Jd.succeed Esperanto
+                        Jd.succeed LanguageEsperanto
 
                     _ ->
                         Jd.fail ("Languageで不明なタグを受けたとった tag=" ++ tag)
@@ -634,13 +634,13 @@ locationJsonDecoder =
             (\tag ->
                 case tag of
                     "Home" ->
-                        Jd.succeed Home
+                        Jd.succeed LocationHome
 
                     "User" ->
-                        Jd.field "userId" userIdJsonDecoder |> Jd.map User
+                        Jd.field "userId" userIdJsonDecoder |> Jd.map LocationUser
 
                     "Project" ->
-                        Jd.field "projectId" projectIdJsonDecoder |> Jd.map Project
+                        Jd.field "projectId" projectIdJsonDecoder |> Jd.map LocationProject
 
                     _ ->
                         Jd.fail ("Locationで不明なタグを受けたとった tag=" ++ tag)
@@ -734,10 +734,10 @@ ideaCommentJsonDecoder =
             (\tag ->
                 case tag of
                     "CommentByMessage" ->
-                        Jd.field "ideaCommentMessage" ideaCommentMessageJsonDecoder |> Jd.map CommentByMessage
+                        Jd.field "ideaCommentMessage" ideaCommentMessageJsonDecoder |> Jd.map IdeaCommentCommentByMessage
 
                     "CommentByCommit" ->
-                        Jd.field "projectSnapshot" projectSnapshotJsonDecoder |> Jd.map CommentByCommit
+                        Jd.field "projectSnapshot" projectSnapshotJsonDecoder |> Jd.map IdeaCommentCommentByCommit
 
                     _ ->
                         Jd.fail ("IdeaCommentで不明なタグを受けたとった tag=" ++ tag)
