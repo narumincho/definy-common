@@ -1,4 +1,4 @@
-module Data exposing (AccessToken(..), ClientMode(..), DateTime, FileHash(..), Idea, IdeaComment(..), IdeaCommentMessage, IdeaId(..), Language(..), Location(..), ModuleHash(..), ModuleSnapshot, OpenIdConnectProvider(..), PartHash(..), PartSnapshot, Project, ProjectHash(..), ProjectId(..), ProjectSnapshot, RequestLogInUrlRequestData, TypeHash(..), TypeSnapshot, UrlData, UserId(..), UserPublic, accessTokenJsonDecoder, accessTokenToJsonValue, clientModeJsonDecoder, clientModeToJsonValue, dateTimeJsonDecoder, dateTimeToJsonValue, fileHashJsonDecoder, fileHashToJsonValue, ideaCommentJsonDecoder, ideaCommentMessageJsonDecoder, ideaCommentMessageToJsonValue, ideaCommentToJsonValue, ideaIdJsonDecoder, ideaIdToJsonValue, ideaJsonDecoder, ideaToJsonValue, languageJsonDecoder, languageToJsonValue, locationJsonDecoder, locationToJsonValue, maybeJsonDecoder, maybeToJsonValue, moduleHashJsonDecoder, moduleHashToJsonValue, moduleSnapshotJsonDecoder, moduleSnapshotToJsonValue, openIdConnectProviderJsonDecoder, openIdConnectProviderToJsonValue, partHashJsonDecoder, partHashToJsonValue, partSnapshotJsonDecoder, partSnapshotToJsonValue, projectHashJsonDecoder, projectHashToJsonValue, projectIdJsonDecoder, projectIdToJsonValue, projectJsonDecoder, projectSnapshotJsonDecoder, projectSnapshotToJsonValue, projectToJsonValue, requestLogInUrlRequestDataJsonDecoder, requestLogInUrlRequestDataToJsonValue, resultJsonDecoder, resultToJsonValue, typeHashJsonDecoder, typeHashToJsonValue, typeSnapshotJsonDecoder, typeSnapshotToJsonValue, urlDataJsonDecoder, urlDataToJsonValue, userIdJsonDecoder, userIdToJsonValue, userPublicJsonDecoder, userPublicToJsonValue)
+module Data exposing (AccessToken(..), ClientMode(..), DateTime, FileHash(..), Idea, IdeaComment(..), IdeaCommentMessage, IdeaId(..), Language(..), Location(..), ModuleHash(..), ModuleSnapshot, OpenIdConnectProvider(..), PartHash(..), PartSnapshot, Project, ProjectHash(..), ProjectId(..), ProjectSnapshot, RequestLogInUrlRequestData, TypeHash(..), TypeSnapshot, UrlData, UserId(..), UserPublic, UserPublicAndUserId, accessTokenJsonDecoder, accessTokenToJsonValue, clientModeJsonDecoder, clientModeToJsonValue, dateTimeJsonDecoder, dateTimeToJsonValue, fileHashJsonDecoder, fileHashToJsonValue, ideaCommentJsonDecoder, ideaCommentMessageJsonDecoder, ideaCommentMessageToJsonValue, ideaCommentToJsonValue, ideaIdJsonDecoder, ideaIdToJsonValue, ideaJsonDecoder, ideaToJsonValue, languageJsonDecoder, languageToJsonValue, locationJsonDecoder, locationToJsonValue, maybeJsonDecoder, maybeToJsonValue, moduleHashJsonDecoder, moduleHashToJsonValue, moduleSnapshotJsonDecoder, moduleSnapshotToJsonValue, openIdConnectProviderJsonDecoder, openIdConnectProviderToJsonValue, partHashJsonDecoder, partHashToJsonValue, partSnapshotJsonDecoder, partSnapshotToJsonValue, projectHashJsonDecoder, projectHashToJsonValue, projectIdJsonDecoder, projectIdToJsonValue, projectJsonDecoder, projectSnapshotJsonDecoder, projectSnapshotToJsonValue, projectToJsonValue, requestLogInUrlRequestDataJsonDecoder, requestLogInUrlRequestDataToJsonValue, resultJsonDecoder, resultToJsonValue, typeHashJsonDecoder, typeHashToJsonValue, typeSnapshotJsonDecoder, typeSnapshotToJsonValue, urlDataJsonDecoder, urlDataToJsonValue, userIdJsonDecoder, userIdToJsonValue, userPublicAndUserIdJsonDecoder, userPublicAndUserIdToJsonValue, userPublicJsonDecoder, userPublicToJsonValue)
 
 import Json.Decode as Jd
 import Json.Decode.Pipeline as Jdp
@@ -57,6 +57,12 @@ type Location
 -}
 type alias UserPublic =
     { name : String, imageHash : FileHash, introduction : String, createdAt : DateTime, likedProjectIdList : List ProjectId, developedProjectIdList : List ProjectId, commentedIdeaIdList : List IdeaId }
+
+
+{-| 最初に自分の情報を得るときに返ってくるデータ
+-}
+type alias UserPublicAndUserId =
+    { userId : UserId, userPublic : UserPublic }
 
 
 {-| プロジェクト
@@ -311,6 +317,16 @@ userPublicToJsonValue userPublic =
         , ( "likedProjectIdList", Je.list projectIdToJsonValue userPublic.likedProjectIdList )
         , ( "developedProjectIdList", Je.list projectIdToJsonValue userPublic.developedProjectIdList )
         , ( "commentedIdeaIdList", Je.list ideaIdToJsonValue userPublic.commentedIdeaIdList )
+        ]
+
+
+{-| UserPublicAndUserIdのJSONへのエンコーダ
+-}
+userPublicAndUserIdToJsonValue : UserPublicAndUserId -> Je.Value
+userPublicAndUserIdToJsonValue userPublicAndUserId =
+    Je.object
+        [ ( "userId", userIdToJsonValue userPublicAndUserId.userId )
+        , ( "userPublic", userPublicToJsonValue userPublicAndUserId.userPublic )
         ]
 
 
@@ -653,6 +669,20 @@ userPublicJsonDecoder =
         |> Jdp.required "likedProjectIdList" (Jd.list projectIdJsonDecoder)
         |> Jdp.required "developedProjectIdList" (Jd.list projectIdJsonDecoder)
         |> Jdp.required "commentedIdeaIdList" (Jd.list ideaIdJsonDecoder)
+
+
+{-| UserPublicAndUserIdのJSON Decoder
+-}
+userPublicAndUserIdJsonDecoder : Jd.Decoder UserPublicAndUserId
+userPublicAndUserIdJsonDecoder =
+    Jd.succeed
+        (\userId userPublic ->
+            { userId = userId
+            , userPublic = userPublic
+            }
+        )
+        |> Jdp.required "userId" userIdJsonDecoder
+        |> Jdp.required "userPublic" userPublicJsonDecoder
 
 
 {-| ProjectのJSON Decoder

@@ -22,6 +22,7 @@ const clientModeName = "ClientMode";
 const locationName = "Location";
 const languageName = "Language";
 const userPublicName = "UserPublic";
+const userPublicAndUserIdName = "UserPublicAndUserId";
 const projectName = "Project";
 const ideaName = "Idea";
 const ideaCommentName = "IdeaComment";
@@ -236,6 +237,23 @@ const userPublic: type.CustomType = {
       name: "commentedIdeaIdList",
       description: "コメントをしたアイデア",
       memberType: type.typeList(ideaId)
+    }
+  ])
+};
+
+const userPublicAndUserId: type.CustomType = {
+  name: userPublicAndUserIdName,
+  description: "最初に自分の情報を得るときに返ってくるデータ",
+  body: type.customTypeBodyProduct([
+    {
+      name: "userId",
+      description: "ユーザーID",
+      memberType: userId
+    },
+    {
+      name: "userPublic",
+      description: "ユーザーのデータ",
+      memberType: type.typeCustom(userPublicName)
     }
   ])
 };
@@ -486,6 +504,7 @@ const listCustomType: ReadonlyArray<type.CustomType> = [
   language,
   location,
   userPublic,
+  userPublicAndUserId,
   project,
   idea,
   ideaComment,
