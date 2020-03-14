@@ -3,15 +3,15 @@ import * as codeGen from "js-ts-code-generator";
 import * as fs from "fs";
 import * as childProcess from "child_process";
 
-const accessTokenName = "AccessToken";
-const userIdName = "UserId";
-const projectIdName = "ProjectId";
-const ideaIdName = "IdeaId";
-const fileHashName = "FileHash";
-const projectHashName = "ProjectHash";
-const moduleHashName = "ModuleHash";
-const typeHashName = "TypeHash";
-const partHashName = "PartHash";
+const accessToken = nt.type.typeToken("AccessToken");
+const userId = nt.type.typeId("UserId");
+const projectId = nt.type.typeId("ProjectId");
+const ideaId = nt.type.typeId("IdeaId");
+const fileHash = nt.type.typeToken("FileHash");
+const projectHash = nt.type.typeToken("ProjectHash");
+const moduleHash = nt.type.typeToken("ModuleHash");
+const typeHash = nt.type.typeToken("TypeHash");
+const partHash = nt.type.typeToken("PartHash");
 
 const dateTimeName = "DateTime";
 const requestLogInUrlRequestDataName = "RequestLogInUrlRequestData";
@@ -127,7 +127,7 @@ const urlData: nt.type.CustomType = {
       name: "accessToken",
       description:
         "アクセストークン. ログインした後のリダイレクト先としてサーバーから渡される",
-      memberType: nt.type.typeMaybe(nt.type.typeToken(accessTokenName))
+      memberType: nt.type.typeMaybe(accessToken)
     }
   ])
 };
@@ -208,7 +208,7 @@ const userPublic: nt.type.CustomType = {
     {
       name: "imageHash",
       description: "プロフィール画像",
-      memberType: nt.type.typeToken(fileHashName)
+      memberType: fileHash
     },
     {
       name: "introduction",
@@ -224,17 +224,17 @@ const userPublic: nt.type.CustomType = {
     {
       name: "likedProjectIdList",
       description: "プロジェクトに対する いいね",
-      memberType: nt.type.typeList(nt.type.typeId(projectIdName))
+      memberType: nt.type.typeList(projectId)
     },
     {
       name: "developedProjectIdList",
       description: "開発に参加した (書いたコードが使われた) プロジェクト",
-      memberType: nt.type.typeList(nt.type.typeId(projectIdName))
+      memberType: nt.type.typeList(projectId)
     },
     {
       name: "commentedIdeaIdList",
       description: "コメントをしたアイデア",
-      memberType: nt.type.typeList(nt.type.typeId(ideaIdName))
+      memberType: nt.type.typeList(ideaId)
     }
   ])
 };
@@ -251,23 +251,23 @@ const project: nt.type.CustomType = {
     {
       name: "icon",
       description: "プロジェクトのアイコン画像",
-      memberType: nt.type.typeToken(fileHashName)
+      memberType: fileHash
     },
     {
       name: "image",
       description: "プロジェクトのカバー画像",
-      memberType: nt.type.typeToken(fileHashName)
+      memberType: fileHash
     },
     {
       name: "releaseBranchCommitHashList",
       description:
         "リリースブランチ. 外部から依存プロジェクトとして読み込める.",
-      memberType: nt.type.typeList(nt.type.typeToken(projectHashName))
+      memberType: nt.type.typeList(projectHash)
     },
     {
       name: "developBranchCommitHashList",
       description: "デベロップブランチ. ",
-      memberType: nt.type.typeList(nt.type.typeToken(projectHashName))
+      memberType: nt.type.typeList(projectHash)
     },
     {
       name: "createdAt",
@@ -333,7 +333,7 @@ const ideaCommentMessage: nt.type.CustomType = {
     {
       name: "createdBy",
       description: "作成者",
-      memberType: nt.type.typeId(userIdName)
+      memberType: userId
     },
     {
       name: "createdAt",
@@ -365,12 +365,12 @@ const projectSnapshot: nt.type.CustomType = {
     {
       name: "projectIcon",
       description: "プロジェクトのアイコン画像",
-      memberType: nt.type.typeToken(fileHashName)
+      memberType: fileHash
     },
     {
       name: "projectImage",
       description: "プロジェクトのカバー画像",
-      memberType: nt.type.typeToken(fileHashName)
+      memberType: fileHash
     },
     {
       name: "projectDescription",
@@ -380,17 +380,17 @@ const projectSnapshot: nt.type.CustomType = {
     {
       name: "moduleList",
       description: "直下以外のモジュール",
-      memberType: nt.type.typeList(nt.type.typeToken(moduleHashName))
+      memberType: nt.type.typeList(moduleHash)
     },
     {
       name: "typeList",
       description: "直下の型",
-      memberType: nt.type.typeList(nt.type.typeToken(typeHashName))
+      memberType: nt.type.typeList(typeHash)
     },
     {
       name: "partList",
       description: "直下のパーツ",
-      memberType: nt.type.typeList(nt.type.typeToken(partHashName))
+      memberType: nt.type.typeList(partHash)
     }
   ])
 };
@@ -417,17 +417,17 @@ const moduleSnapshot: nt.type.CustomType = {
     {
       name: "children",
       description: "子のモジュール",
-      memberType: nt.type.typeList(nt.type.typeToken(moduleHashName))
+      memberType: nt.type.typeList(moduleHash)
     },
     {
       name: "typeList",
       description: "型",
-      memberType: nt.type.typeList(nt.type.typeToken(typeHashName))
+      memberType: nt.type.typeList(typeHash)
     },
     {
       name: "partList",
       description: "パーツ",
-      memberType: nt.type.typeList(nt.type.typeToken(partHashName))
+      memberType: nt.type.typeList(partHash)
     }
   ])
 };
@@ -444,7 +444,7 @@ const typeSnapshot: nt.type.CustomType = {
     {
       name: "parentList",
       description: "この型の元",
-      memberType: nt.type.typeList(nt.type.typeToken(partHashName))
+      memberType: nt.type.typeList(partHash)
     },
     {
       name: "description",
@@ -466,7 +466,7 @@ const partSnapshot: nt.type.CustomType = {
     {
       name: "parentList",
       description: "このパーツの元",
-      memberType: nt.type.typeList(nt.type.typeToken(partHashName))
+      memberType: nt.type.typeList(partHash)
     },
     {
       name: "description",
@@ -476,40 +476,27 @@ const partSnapshot: nt.type.CustomType = {
   ])
 };
 
-const schema: nt.type.Schema = {
-  customTypeList: [
-    dateTime,
-    clientMode,
-    requestLogInUrlRequestData,
-    openIdConnectProvider,
-    urlData,
-    language,
-    location,
-    userPublic,
-    project,
-    idea,
-    ideaComment,
-    ideaCommentMessage,
-    projectSnapshot,
-    moduleSnapshot,
-    typeSnapshot,
-    partSnapshot
-  ],
-  idOrTokenTypeNameList: [
-    accessTokenName,
-    userIdName,
-    projectIdName,
-    ideaIdName,
-    fileHashName,
-    projectHashName,
-    moduleHashName,
-    typeHashName,
-    partHashName
-  ]
-};
+const listCustomType: ReadonlyArray<nt.type.CustomType> = [
+  dateTime,
+  clientMode,
+  requestLogInUrlRequestData,
+  openIdConnectProvider,
+  urlData,
+  language,
+  location,
+  userPublic,
+  project,
+  idea,
+  ideaComment,
+  ideaCommentMessage,
+  projectSnapshot,
+  moduleSnapshot,
+  typeSnapshot,
+  partSnapshot
+];
 
 const code = codeGen.generateCodeAsString(
-  nt.generateTypeScriptCode(schema),
+  nt.generateTypeScriptCode(listCustomType),
   "TypeScript"
 );
 
@@ -527,11 +514,13 @@ fs.promises.writeFile(typeScriptPath, code).then(() => {
   );
 });
 const elmPath = "Data.elm";
-fs.promises.writeFile(elmPath, nt.elm.generateCode("Data", schema)).then(() => {
-  childProcess.exec("elm-format --yes " + elmPath, error => {
-    console.log("output Elm code!");
-    if (error !== null) {
-      throw new Error("elm code error! " + error.toString());
-    }
+fs.promises
+  .writeFile(elmPath, nt.generateElmCode("Data", listCustomType))
+  .then(() => {
+    childProcess.exec("elm-format --yes " + elmPath, error => {
+      console.log("output Elm code!");
+      if (error !== null) {
+        throw new Error("elm code error! " + error.toString());
+      }
+    });
   });
-});

@@ -1,3 +1,4 @@
+import * as a from "util";
 /**
  * Maybe
  */
@@ -165,9 +166,9 @@ export type UserId = string & { _userId: never };
 
 export type ProjectId = string & { _projectId: never };
 
-export type IdeaId = string & { _ideaId: never };
-
 export type FileHash = string & { _fileHash: never };
+
+export type IdeaId = string & { _ideaId: never };
 
 export type ProjectHash = string & { _projectHash: never };
 
@@ -270,7 +271,9 @@ export const encodeInt32 = (value: number): ReadonlyArray<number> => {
  */
 export const encodeString = (text: string): ReadonlyArray<number> => {
   const result: ReadonlyArray<number> = Array["from"](
-    new TextEncoder().encode(text)
+    new (process === undefined || process.title === "browser"
+      ? TextEncoder
+      : a.TextEncoder)().encode(text)
   );
   return encodeInt32(result.length).concat(result);
 };
@@ -541,8 +544,17 @@ export const decodeString = (
     binary
   );
   const nextIndex: number = length.nextIndex + length.result;
+  const textBinary: Uint8Array = binary.slice(length.nextIndex, nextIndex);
+  const isBrowser: boolean =
+    process === undefined || process.title === "browser";
+  if (isBrowser) {
+    return {
+      result: new TextDecoder().decode(textBinary),
+      nextIndex: nextIndex
+    };
+  }
   return {
-    result: new TextDecoder().decode(binary.slice(length.nextIndex, nextIndex)),
+    result: new a.TextDecoder().decode(textBinary),
     nextIndex: nextIndex
   };
 };

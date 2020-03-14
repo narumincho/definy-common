@@ -120,12 +120,12 @@ type ProjectId
     = ProjectId String
 
 
-type IdeaId
-    = IdeaId String
-
-
 type FileHash
     = FileHash String
+
+
+type IdeaId
+    = IdeaId String
 
 
 type ProjectHash
@@ -179,13 +179,13 @@ projectIdToJsonValue (ProjectId string) =
     Je.string string
 
 
-ideaIdToJsonValue : IdeaId -> Je.Value
-ideaIdToJsonValue (IdeaId string) =
+fileHashToJsonValue : FileHash -> Je.Value
+fileHashToJsonValue (FileHash string) =
     Je.string string
 
 
-fileHashToJsonValue : FileHash -> Je.Value
-fileHashToJsonValue (FileHash string) =
+ideaIdToJsonValue : IdeaId -> Je.Value
+ideaIdToJsonValue (IdeaId string) =
     Je.string string
 
 
@@ -465,14 +465,14 @@ projectIdJsonDecoder =
     Jd.map ProjectId Jd.string
 
 
-ideaIdJsonDecoder : Jd.Decoder IdeaId
-ideaIdJsonDecoder =
-    Jd.map IdeaId Jd.string
-
-
 fileHashJsonDecoder : Jd.Decoder FileHash
 fileHashJsonDecoder =
     Jd.map FileHash Jd.string
+
+
+ideaIdJsonDecoder : Jd.Decoder IdeaId
+ideaIdJsonDecoder =
+    Jd.map IdeaId Jd.string
 
 
 projectHashJsonDecoder : Jd.Decoder ProjectHash
