@@ -26,7 +26,7 @@ const userPublicAndUserIdName = "UserPublicAndUserId";
 const projectName = "Project";
 const ideaName = "Idea";
 const ideaCommentName = "IdeaComment";
-const ideaCommentMessageName = "IdeaCommentMessage";
+const ideaCommentTextName = "IdeaCommentText";
 const projectSnapshotName = "ProjectSnapshot";
 const moduleSnapshotName = "ModuleSnapshot";
 const typeSnapshotName = "TypeSnapshot";
@@ -328,20 +328,20 @@ const ideaComment: type.CustomType = {
   description: "アイデアのコメント",
   body: type.customTypeBodySum([
     {
-      name: "CommentByMessage",
+      name: "Text",
       description: "文章でのコメント",
-      parameter: type.maybeJust(type.typeCustom(ideaCommentMessageName))
+      parameter: type.maybeJust(type.typeCustom(ideaCommentTextName))
     },
     {
-      name: "CommentByCommit",
+      name: "ProjectSnapshot",
       description: "編集提案をする",
       parameter: type.maybeJust(type.typeCustom(projectSnapshotName))
     }
   ])
 };
 
-const ideaCommentMessage: type.CustomType = {
-  name: ideaCommentMessageName,
+const ideaCommentText: type.CustomType = {
+  name: ideaCommentTextName,
   description: "文章でのコメント",
   body: type.customTypeBodyProduct([
     {
@@ -508,7 +508,7 @@ const listCustomType: ReadonlyArray<type.CustomType> = [
   project,
   idea,
   ideaComment,
-  ideaCommentMessage,
+  ideaCommentText,
   projectSnapshot,
   moduleSnapshot,
   typeSnapshot,

@@ -108,13 +108,13 @@ export type Idea = {
  * アイデアのコメント
  */
 export type IdeaComment =
-  | { _: "CommentByMessage"; ideaCommentMessage: IdeaCommentMessage }
-  | { _: "CommentByCommit"; projectSnapshot: ProjectSnapshot };
+  | { _: "Text"; ideaCommentText: IdeaCommentText }
+  | { _: "ProjectSnapshot"; projectSnapshot: ProjectSnapshot };
 
 /**
  * 文章でのコメント
  */
-export type IdeaCommentMessage = {
+export type IdeaCommentText = {
   body: string;
   createdBy: UserId;
   createdAt: DateTime;
@@ -237,19 +237,16 @@ export const locationProject = (projectId: ProjectId): Location => ({
 /**
  * 文章でのコメント
  */
-export const ideaCommentCommentByMessage = (
-  ideaCommentMessage: IdeaCommentMessage
-): IdeaComment => ({
-  _: "CommentByMessage",
-  ideaCommentMessage: ideaCommentMessage
-});
+export const ideaCommentText = (
+  ideaCommentText: IdeaCommentText
+): IdeaComment => ({ _: "Text", ideaCommentText: ideaCommentText });
 
 /**
  * 編集提案をする
  */
-export const ideaCommentCommentByCommit = (
+export const ideaCommentProjectSnapshot = (
   projectSnapshot: ProjectSnapshot
-): IdeaComment => ({ _: "CommentByCommit", projectSnapshot: projectSnapshot });
+): IdeaComment => ({ _: "ProjectSnapshot", projectSnapshot: projectSnapshot });
 
 /**
  * numberの32bit符号あり整数をSigned Leb128のバイナリに変換する
@@ -463,23 +460,21 @@ export const encodeIdeaComment = (
   ideaComment: IdeaComment
 ): ReadonlyArray<number> => {
   switch (ideaComment._) {
-    case "CommentByMessage": {
-      return [0].concat(
-        encodeIdeaCommentMessage(ideaComment.ideaCommentMessage)
-      );
+    case "Text": {
+      return [0].concat(encodeIdeaCommentText(ideaComment.ideaCommentText));
     }
-    case "CommentByCommit": {
+    case "ProjectSnapshot": {
       return [1].concat(encodeProjectSnapshot(ideaComment.projectSnapshot));
     }
   }
 };
 
-export const encodeIdeaCommentMessage = (
-  ideaCommentMessage: IdeaCommentMessage
+export const encodeIdeaCommentText = (
+  ideaCommentText: IdeaCommentText
 ): ReadonlyArray<number> =>
-  encodeString(ideaCommentMessage.body)
-    .concat(encodeId(ideaCommentMessage.createdBy))
-    .concat(encodeDateTime(ideaCommentMessage.createdAt));
+  encodeString(ideaCommentText.body)
+    .concat(encodeId(ideaCommentText.createdBy))
+    .concat(encodeDateTime(ideaCommentText.createdAt));
 
 export const encodeProjectSnapshot = (
   projectSnapshot: ProjectSnapshot
@@ -1176,11 +1171,11 @@ export const decodeIdeaComment = (
   );
   if (patternIndex.result === 0) {
     const result: {
-      result: IdeaCommentMessage;
+      result: IdeaCommentText;
       nextIndex: number;
-    } = decodeIdeaCommentMessage(patternIndex.nextIndex, binary);
+    } = decodeIdeaCommentText(patternIndex.nextIndex, binary);
     return {
-      result: ideaCommentCommentByMessage(result.result),
+      result: ideaCommentText(result.result),
       nextIndex: result.nextIndex
     };
   }
@@ -1190,7 +1185,7 @@ export const decodeIdeaComment = (
       nextIndex: number;
     } = decodeProjectSnapshot(patternIndex.nextIndex, binary);
     return {
-      result: ideaCommentCommentByCommit(result.result),
+      result: ideaCommentProjectSnapshot(result.result),
       nextIndex: result.nextIndex
     };
   }
@@ -1201,10 +1196,10 @@ export const decodeIdeaComment = (
  * @param index バイナリを読み込み開始位置
  * @param binary バイナリ
  */
-export const decodeIdeaCommentMessage = (
+export const decodeIdeaCommentText = (
   index: number,
   binary: Uint8Array
-): { result: IdeaCommentMessage; nextIndex: number } => {
+): { result: IdeaCommentText; nextIndex: number } => {
   const bodyAndNextIndex: { result: string; nextIndex: number } = decodeString(
     index,
     binary

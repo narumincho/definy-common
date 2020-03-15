@@ -1,4 +1,4 @@
-module Data exposing (AccessToken(..), ClientMode(..), DateTime, FileHash(..), Idea, IdeaComment(..), IdeaCommentMessage, IdeaId(..), Language(..), Location(..), ModuleHash(..), ModuleSnapshot, OpenIdConnectProvider(..), PartHash(..), PartSnapshot, Project, ProjectHash(..), ProjectId(..), ProjectSnapshot, RequestLogInUrlRequestData, TypeHash(..), TypeSnapshot, UrlData, UserId(..), UserPublic, UserPublicAndUserId, accessTokenJsonDecoder, accessTokenToJsonValue, clientModeJsonDecoder, clientModeToJsonValue, dateTimeJsonDecoder, dateTimeToJsonValue, fileHashJsonDecoder, fileHashToJsonValue, ideaCommentJsonDecoder, ideaCommentMessageJsonDecoder, ideaCommentMessageToJsonValue, ideaCommentToJsonValue, ideaIdJsonDecoder, ideaIdToJsonValue, ideaJsonDecoder, ideaToJsonValue, languageJsonDecoder, languageToJsonValue, locationJsonDecoder, locationToJsonValue, maybeJsonDecoder, maybeToJsonValue, moduleHashJsonDecoder, moduleHashToJsonValue, moduleSnapshotJsonDecoder, moduleSnapshotToJsonValue, openIdConnectProviderJsonDecoder, openIdConnectProviderToJsonValue, partHashJsonDecoder, partHashToJsonValue, partSnapshotJsonDecoder, partSnapshotToJsonValue, projectHashJsonDecoder, projectHashToJsonValue, projectIdJsonDecoder, projectIdToJsonValue, projectJsonDecoder, projectSnapshotJsonDecoder, projectSnapshotToJsonValue, projectToJsonValue, requestLogInUrlRequestDataJsonDecoder, requestLogInUrlRequestDataToJsonValue, resultJsonDecoder, resultToJsonValue, typeHashJsonDecoder, typeHashToJsonValue, typeSnapshotJsonDecoder, typeSnapshotToJsonValue, urlDataJsonDecoder, urlDataToJsonValue, userIdJsonDecoder, userIdToJsonValue, userPublicAndUserIdJsonDecoder, userPublicAndUserIdToJsonValue, userPublicJsonDecoder, userPublicToJsonValue)
+module Data exposing (AccessToken(..), ClientMode(..), DateTime, FileHash(..), Idea, IdeaComment(..), IdeaCommentText, IdeaId(..), Language(..), Location(..), ModuleHash(..), ModuleSnapshot, OpenIdConnectProvider(..), PartHash(..), PartSnapshot, Project, ProjectHash(..), ProjectId(..), ProjectSnapshot, RequestLogInUrlRequestData, TypeHash(..), TypeSnapshot, UrlData, UserId(..), UserPublic, UserPublicAndUserId, accessTokenJsonDecoder, accessTokenToJsonValue, clientModeJsonDecoder, clientModeToJsonValue, dateTimeJsonDecoder, dateTimeToJsonValue, fileHashJsonDecoder, fileHashToJsonValue, ideaCommentJsonDecoder, ideaCommentTextJsonDecoder, ideaCommentTextToJsonValue, ideaCommentToJsonValue, ideaIdJsonDecoder, ideaIdToJsonValue, ideaJsonDecoder, ideaToJsonValue, languageJsonDecoder, languageToJsonValue, locationJsonDecoder, locationToJsonValue, maybeJsonDecoder, maybeToJsonValue, moduleHashJsonDecoder, moduleHashToJsonValue, moduleSnapshotJsonDecoder, moduleSnapshotToJsonValue, openIdConnectProviderJsonDecoder, openIdConnectProviderToJsonValue, partHashJsonDecoder, partHashToJsonValue, partSnapshotJsonDecoder, partSnapshotToJsonValue, projectHashJsonDecoder, projectHashToJsonValue, projectIdJsonDecoder, projectIdToJsonValue, projectJsonDecoder, projectSnapshotJsonDecoder, projectSnapshotToJsonValue, projectToJsonValue, requestLogInUrlRequestDataJsonDecoder, requestLogInUrlRequestDataToJsonValue, resultJsonDecoder, resultToJsonValue, typeHashJsonDecoder, typeHashToJsonValue, typeSnapshotJsonDecoder, typeSnapshotToJsonValue, urlDataJsonDecoder, urlDataToJsonValue, userIdJsonDecoder, userIdToJsonValue, userPublicAndUserIdJsonDecoder, userPublicAndUserIdToJsonValue, userPublicJsonDecoder, userPublicToJsonValue)
 
 import Json.Decode as Jd
 import Json.Decode.Pipeline as Jdp
@@ -80,13 +80,13 @@ type alias Idea =
 {-| アイデアのコメント
 -}
 type IdeaComment
-    = IdeaCommentCommentByMessage IdeaCommentMessage
-    | IdeaCommentCommentByCommit ProjectSnapshot
+    = IdeaCommentText IdeaCommentText
+    | IdeaCommentProjectSnapshot ProjectSnapshot
 
 
 {-| 文章でのコメント
 -}
-type alias IdeaCommentMessage =
+type alias IdeaCommentText =
     { body : String, createdBy : UserId, createdAt : DateTime }
 
 
@@ -361,21 +361,21 @@ ideaToJsonValue idea =
 ideaCommentToJsonValue : IdeaComment -> Je.Value
 ideaCommentToJsonValue ideaComment =
     case ideaComment of
-        IdeaCommentCommentByMessage parameter ->
-            Je.object [ ( "_", Je.string "CommentByMessage" ), ( "ideaCommentMessage", ideaCommentMessageToJsonValue parameter ) ]
+        IdeaCommentText parameter ->
+            Je.object [ ( "_", Je.string "Text" ), ( "ideaCommentText", ideaCommentTextToJsonValue parameter ) ]
 
-        IdeaCommentCommentByCommit parameter ->
-            Je.object [ ( "_", Je.string "CommentByCommit" ), ( "projectSnapshot", projectSnapshotToJsonValue parameter ) ]
+        IdeaCommentProjectSnapshot parameter ->
+            Je.object [ ( "_", Je.string "ProjectSnapshot" ), ( "projectSnapshot", projectSnapshotToJsonValue parameter ) ]
 
 
-{-| IdeaCommentMessageのJSONへのエンコーダ
+{-| IdeaCommentTextのJSONへのエンコーダ
 -}
-ideaCommentMessageToJsonValue : IdeaCommentMessage -> Je.Value
-ideaCommentMessageToJsonValue ideaCommentMessage =
+ideaCommentTextToJsonValue : IdeaCommentText -> Je.Value
+ideaCommentTextToJsonValue ideaCommentText =
     Je.object
-        [ ( "body", Je.string ideaCommentMessage.body )
-        , ( "createdBy", userIdToJsonValue ideaCommentMessage.createdBy )
-        , ( "createdAt", dateTimeToJsonValue ideaCommentMessage.createdAt )
+        [ ( "body", Je.string ideaCommentText.body )
+        , ( "createdBy", userIdToJsonValue ideaCommentText.createdBy )
+        , ( "createdAt", dateTimeToJsonValue ideaCommentText.createdAt )
         ]
 
 
@@ -733,21 +733,21 @@ ideaCommentJsonDecoder =
         |> Jd.andThen
             (\tag ->
                 case tag of
-                    "CommentByMessage" ->
-                        Jd.field "ideaCommentMessage" ideaCommentMessageJsonDecoder |> Jd.map IdeaCommentCommentByMessage
+                    "Text" ->
+                        Jd.field "ideaCommentText" ideaCommentTextJsonDecoder |> Jd.map IdeaCommentText
 
-                    "CommentByCommit" ->
-                        Jd.field "projectSnapshot" projectSnapshotJsonDecoder |> Jd.map IdeaCommentCommentByCommit
+                    "ProjectSnapshot" ->
+                        Jd.field "projectSnapshot" projectSnapshotJsonDecoder |> Jd.map IdeaCommentProjectSnapshot
 
                     _ ->
                         Jd.fail ("IdeaCommentで不明なタグを受けたとった tag=" ++ tag)
             )
 
 
-{-| IdeaCommentMessageのJSON Decoder
+{-| IdeaCommentTextのJSON Decoder
 -}
-ideaCommentMessageJsonDecoder : Jd.Decoder IdeaCommentMessage
-ideaCommentMessageJsonDecoder =
+ideaCommentTextJsonDecoder : Jd.Decoder IdeaCommentText
+ideaCommentTextJsonDecoder =
     Jd.succeed
         (\body createdBy createdAt ->
             { body = body
