@@ -1,4 +1,4 @@
-module Data exposing (AccessToken(..), ClientMode(..), DateTime, FileHash(..), Idea, IdeaComment(..), IdeaCommentText, IdeaId(..), Language(..), Location(..), ModuleHash(..), ModuleSnapshot, OpenIdConnectProvider(..), PartHash(..), PartSnapshot, Project, ProjectHash(..), ProjectId(..), ProjectSnapshot, RequestLogInUrlRequestData, TypeHash(..), TypeSnapshot, UrlData, UserId(..), UserPublic, UserPublicAndUserId, accessTokenJsonDecoder, accessTokenToJsonValue, clientModeJsonDecoder, clientModeToJsonValue, dateTimeJsonDecoder, dateTimeToJsonValue, fileHashJsonDecoder, fileHashToJsonValue, ideaCommentJsonDecoder, ideaCommentTextJsonDecoder, ideaCommentTextToJsonValue, ideaCommentToJsonValue, ideaIdJsonDecoder, ideaIdToJsonValue, ideaJsonDecoder, ideaToJsonValue, languageJsonDecoder, languageToJsonValue, locationJsonDecoder, locationToJsonValue, maybeJsonDecoder, maybeToJsonValue, moduleHashJsonDecoder, moduleHashToJsonValue, moduleSnapshotJsonDecoder, moduleSnapshotToJsonValue, openIdConnectProviderJsonDecoder, openIdConnectProviderToJsonValue, partHashJsonDecoder, partHashToJsonValue, partSnapshotJsonDecoder, partSnapshotToJsonValue, projectHashJsonDecoder, projectHashToJsonValue, projectIdJsonDecoder, projectIdToJsonValue, projectJsonDecoder, projectSnapshotJsonDecoder, projectSnapshotToJsonValue, projectToJsonValue, requestLogInUrlRequestDataJsonDecoder, requestLogInUrlRequestDataToJsonValue, resultJsonDecoder, resultToJsonValue, typeHashJsonDecoder, typeHashToJsonValue, typeSnapshotJsonDecoder, typeSnapshotToJsonValue, urlDataJsonDecoder, urlDataToJsonValue, userIdJsonDecoder, userIdToJsonValue, userPublicAndUserIdJsonDecoder, userPublicAndUserIdToJsonValue, userPublicJsonDecoder, userPublicToJsonValue)
+module Data exposing (AccessToken(..), Change(..), ClientMode(..), DateTime, FileHash(..), Idea, IdeaComment(..), IdeaCommentText, IdeaId(..), Language(..), Location(..), ModuleSnapshot, OpenIdConnectProvider(..), PartId(..), PartSnapshot, Project, ProjectId(..), RequestLogInUrlRequestData, Suggestion, TypeSnapshot, UrlData, UserId(..), UserPublic, UserPublicAndUserId, accessTokenJsonDecoder, accessTokenToJsonValue, changeJsonDecoder, changeToJsonValue, clientModeJsonDecoder, clientModeToJsonValue, dateTimeJsonDecoder, dateTimeToJsonValue, fileHashJsonDecoder, fileHashToJsonValue, ideaCommentJsonDecoder, ideaCommentTextJsonDecoder, ideaCommentTextToJsonValue, ideaCommentToJsonValue, ideaIdJsonDecoder, ideaIdToJsonValue, ideaJsonDecoder, ideaToJsonValue, languageJsonDecoder, languageToJsonValue, locationJsonDecoder, locationToJsonValue, maybeJsonDecoder, maybeToJsonValue, moduleSnapshotJsonDecoder, moduleSnapshotToJsonValue, openIdConnectProviderJsonDecoder, openIdConnectProviderToJsonValue, partIdJsonDecoder, partIdToJsonValue, partSnapshotJsonDecoder, partSnapshotToJsonValue, projectIdJsonDecoder, projectIdToJsonValue, projectJsonDecoder, projectToJsonValue, requestLogInUrlRequestDataJsonDecoder, requestLogInUrlRequestDataToJsonValue, resultJsonDecoder, resultToJsonValue, suggestionJsonDecoder, suggestionToJsonValue, typeSnapshotJsonDecoder, typeSnapshotToJsonValue, urlDataJsonDecoder, urlDataToJsonValue, userIdJsonDecoder, userIdToJsonValue, userPublicAndUserIdJsonDecoder, userPublicAndUserIdToJsonValue, userPublicJsonDecoder, userPublicToJsonValue)
 
 import Json.Decode as Jd
 import Json.Decode.Pipeline as Jdp
@@ -68,20 +68,20 @@ type alias UserPublicAndUserId =
 {-| プロジェクト
 -}
 type alias Project =
-    { name : String, icon : FileHash, image : FileHash, releaseBranchCommitHashList : List ProjectHash, developBranchCommitHashList : List ProjectHash, createdAt : DateTime }
+    { name : String, icon : FileHash, image : FileHash, createdAt : DateTime }
 
 
 {-| アイデア
 -}
 type alias Idea =
-    { name : String, createdAt : DateTime, commentList : List IdeaComment, draftCommitIdList : List ProjectSnapshot }
+    { name : String, createdAt : DateTime, commentList : List IdeaComment, draftCommitIdList : List Suggestion }
 
 
 {-| アイデアのコメント
 -}
 type IdeaComment
     = IdeaCommentText IdeaCommentText
-    | IdeaCommentProjectSnapshot ProjectSnapshot
+    | IdeaCommentSuggestion Suggestion
 
 
 {-| 文章でのコメント
@@ -90,28 +90,34 @@ type alias IdeaCommentText =
     { body : String, createdBy : UserId, createdAt : DateTime }
 
 
-{-| プロジェクトのスナップショット. Gitでいうコミット
+{-| 編集提案
 -}
-type alias ProjectSnapshot =
-    { createdAt : DateTime, description : String, projectName : String, projectIcon : FileHash, projectImage : FileHash, projectDescription : String, moduleList : List ModuleHash, typeList : List TypeHash, partList : List PartHash }
+type alias Suggestion =
+    { createdAt : DateTime, description : String, change : Change }
+
+
+{-| 変更点
+-}
+type Change
+    = ChangeProjectName String
 
 
 {-| モジュールのスナップショット
 -}
 type alias ModuleSnapshot =
-    { name : String, description : String, export : Bool, children : List ModuleHash, typeList : List TypeHash, partList : List PartHash }
+    { name : List String, description : String, export : Bool }
 
 
 {-| 型のスナップショット
 -}
 type alias TypeSnapshot =
-    { name : String, parentList : List PartHash, description : String }
+    { name : String, parentList : List PartId, description : String }
 
 
 {-| パーツのスナップショット
 -}
 type alias PartSnapshot =
-    { name : String, parentList : List PartHash, description : String }
+    { name : String, parentList : List PartId, description : String }
 
 
 type AccessToken
@@ -134,20 +140,8 @@ type IdeaId
     = IdeaId String
 
 
-type ProjectHash
-    = ProjectHash String
-
-
-type ModuleHash
-    = ModuleHash String
-
-
-type TypeHash
-    = TypeHash String
-
-
-type PartHash
-    = PartHash String
+type PartId
+    = PartId String
 
 
 maybeToJsonValue : (a -> Je.Value) -> Maybe a -> Je.Value
@@ -195,23 +189,8 @@ ideaIdToJsonValue (IdeaId string) =
     Je.string string
 
 
-projectHashToJsonValue : ProjectHash -> Je.Value
-projectHashToJsonValue (ProjectHash string) =
-    Je.string string
-
-
-moduleHashToJsonValue : ModuleHash -> Je.Value
-moduleHashToJsonValue (ModuleHash string) =
-    Je.string string
-
-
-typeHashToJsonValue : TypeHash -> Je.Value
-typeHashToJsonValue (TypeHash string) =
-    Je.string string
-
-
-partHashToJsonValue : PartHash -> Je.Value
-partHashToJsonValue (PartHash string) =
+partIdToJsonValue : PartId -> Je.Value
+partIdToJsonValue (PartId string) =
     Je.string string
 
 
@@ -338,8 +317,6 @@ projectToJsonValue project =
         [ ( "name", Je.string project.name )
         , ( "icon", fileHashToJsonValue project.icon )
         , ( "image", fileHashToJsonValue project.image )
-        , ( "releaseBranchCommitHashList", Je.list projectHashToJsonValue project.releaseBranchCommitHashList )
-        , ( "developBranchCommitHashList", Je.list projectHashToJsonValue project.developBranchCommitHashList )
         , ( "createdAt", dateTimeToJsonValue project.createdAt )
         ]
 
@@ -352,7 +329,7 @@ ideaToJsonValue idea =
         [ ( "name", Je.string idea.name )
         , ( "createdAt", dateTimeToJsonValue idea.createdAt )
         , ( "commentList", Je.list ideaCommentToJsonValue idea.commentList )
-        , ( "draftCommitIdList", Je.list projectSnapshotToJsonValue idea.draftCommitIdList )
+        , ( "draftCommitIdList", Je.list suggestionToJsonValue idea.draftCommitIdList )
         ]
 
 
@@ -364,8 +341,8 @@ ideaCommentToJsonValue ideaComment =
         IdeaCommentText parameter ->
             Je.object [ ( "_", Je.string "Text" ), ( "ideaCommentText", ideaCommentTextToJsonValue parameter ) ]
 
-        IdeaCommentProjectSnapshot parameter ->
-            Je.object [ ( "_", Je.string "ProjectSnapshot" ), ( "projectSnapshot", projectSnapshotToJsonValue parameter ) ]
+        IdeaCommentSuggestion parameter ->
+            Je.object [ ( "_", Je.string "Suggestion" ), ( "suggestion", suggestionToJsonValue parameter ) ]
 
 
 {-| IdeaCommentTextのJSONへのエンコーダ
@@ -379,21 +356,24 @@ ideaCommentTextToJsonValue ideaCommentText =
         ]
 
 
-{-| ProjectSnapshotのJSONへのエンコーダ
+{-| SuggestionのJSONへのエンコーダ
 -}
-projectSnapshotToJsonValue : ProjectSnapshot -> Je.Value
-projectSnapshotToJsonValue projectSnapshot =
+suggestionToJsonValue : Suggestion -> Je.Value
+suggestionToJsonValue suggestion =
     Je.object
-        [ ( "createdAt", dateTimeToJsonValue projectSnapshot.createdAt )
-        , ( "description", Je.string projectSnapshot.description )
-        , ( "projectName", Je.string projectSnapshot.projectName )
-        , ( "projectIcon", fileHashToJsonValue projectSnapshot.projectIcon )
-        , ( "projectImage", fileHashToJsonValue projectSnapshot.projectImage )
-        , ( "projectDescription", Je.string projectSnapshot.projectDescription )
-        , ( "moduleList", Je.list moduleHashToJsonValue projectSnapshot.moduleList )
-        , ( "typeList", Je.list typeHashToJsonValue projectSnapshot.typeList )
-        , ( "partList", Je.list partHashToJsonValue projectSnapshot.partList )
+        [ ( "createdAt", dateTimeToJsonValue suggestion.createdAt )
+        , ( "description", Je.string suggestion.description )
+        , ( "change", changeToJsonValue suggestion.change )
         ]
+
+
+{-| ChangeのJSONへのエンコーダ
+-}
+changeToJsonValue : Change -> Je.Value
+changeToJsonValue change =
+    case change of
+        ChangeProjectName parameter ->
+            Je.object [ ( "_", Je.string "ProjectName" ), ( "string_", Je.string parameter ) ]
 
 
 {-| ModuleSnapshotのJSONへのエンコーダ
@@ -401,12 +381,9 @@ projectSnapshotToJsonValue projectSnapshot =
 moduleSnapshotToJsonValue : ModuleSnapshot -> Je.Value
 moduleSnapshotToJsonValue moduleSnapshot =
     Je.object
-        [ ( "name", Je.string moduleSnapshot.name )
+        [ ( "name", Je.list Je.string moduleSnapshot.name )
         , ( "description", Je.string moduleSnapshot.description )
         , ( "export", Je.bool moduleSnapshot.export )
-        , ( "children", Je.list moduleHashToJsonValue moduleSnapshot.children )
-        , ( "typeList", Je.list typeHashToJsonValue moduleSnapshot.typeList )
-        , ( "partList", Je.list partHashToJsonValue moduleSnapshot.partList )
         ]
 
 
@@ -416,7 +393,7 @@ typeSnapshotToJsonValue : TypeSnapshot -> Je.Value
 typeSnapshotToJsonValue typeSnapshot =
     Je.object
         [ ( "name", Je.string typeSnapshot.name )
-        , ( "parentList", Je.list partHashToJsonValue typeSnapshot.parentList )
+        , ( "parentList", Je.list partIdToJsonValue typeSnapshot.parentList )
         , ( "description", Je.string typeSnapshot.description )
         ]
 
@@ -427,7 +404,7 @@ partSnapshotToJsonValue : PartSnapshot -> Je.Value
 partSnapshotToJsonValue partSnapshot =
     Je.object
         [ ( "name", Je.string partSnapshot.name )
-        , ( "parentList", Je.list partHashToJsonValue partSnapshot.parentList )
+        , ( "parentList", Je.list partIdToJsonValue partSnapshot.parentList )
         , ( "description", Je.string partSnapshot.description )
         ]
 
@@ -491,24 +468,9 @@ ideaIdJsonDecoder =
     Jd.map IdeaId Jd.string
 
 
-projectHashJsonDecoder : Jd.Decoder ProjectHash
-projectHashJsonDecoder =
-    Jd.map ProjectHash Jd.string
-
-
-moduleHashJsonDecoder : Jd.Decoder ModuleHash
-moduleHashJsonDecoder =
-    Jd.map ModuleHash Jd.string
-
-
-typeHashJsonDecoder : Jd.Decoder TypeHash
-typeHashJsonDecoder =
-    Jd.map TypeHash Jd.string
-
-
-partHashJsonDecoder : Jd.Decoder PartHash
-partHashJsonDecoder =
-    Jd.map PartHash Jd.string
+partIdJsonDecoder : Jd.Decoder PartId
+partIdJsonDecoder =
+    Jd.map PartId Jd.string
 
 
 {-| DateTimeのJSON Decoder
@@ -690,20 +652,16 @@ userPublicAndUserIdJsonDecoder =
 projectJsonDecoder : Jd.Decoder Project
 projectJsonDecoder =
     Jd.succeed
-        (\name icon image releaseBranchCommitHashList developBranchCommitHashList createdAt ->
+        (\name icon image createdAt ->
             { name = name
             , icon = icon
             , image = image
-            , releaseBranchCommitHashList = releaseBranchCommitHashList
-            , developBranchCommitHashList = developBranchCommitHashList
             , createdAt = createdAt
             }
         )
         |> Jdp.required "name" Jd.string
         |> Jdp.required "icon" fileHashJsonDecoder
         |> Jdp.required "image" fileHashJsonDecoder
-        |> Jdp.required "releaseBranchCommitHashList" (Jd.list projectHashJsonDecoder)
-        |> Jdp.required "developBranchCommitHashList" (Jd.list projectHashJsonDecoder)
         |> Jdp.required "createdAt" dateTimeJsonDecoder
 
 
@@ -722,7 +680,7 @@ ideaJsonDecoder =
         |> Jdp.required "name" Jd.string
         |> Jdp.required "createdAt" dateTimeJsonDecoder
         |> Jdp.required "commentList" (Jd.list ideaCommentJsonDecoder)
-        |> Jdp.required "draftCommitIdList" (Jd.list projectSnapshotJsonDecoder)
+        |> Jdp.required "draftCommitIdList" (Jd.list suggestionJsonDecoder)
 
 
 {-| IdeaCommentのJSON Decoder
@@ -736,8 +694,8 @@ ideaCommentJsonDecoder =
                     "Text" ->
                         Jd.field "ideaCommentText" ideaCommentTextJsonDecoder |> Jd.map IdeaCommentText
 
-                    "ProjectSnapshot" ->
-                        Jd.field "projectSnapshot" projectSnapshotJsonDecoder |> Jd.map IdeaCommentProjectSnapshot
+                    "Suggestion" ->
+                        Jd.field "suggestion" suggestionJsonDecoder |> Jd.map IdeaCommentSuggestion
 
                     _ ->
                         Jd.fail ("IdeaCommentで不明なタグを受けたとった tag=" ++ tag)
@@ -760,32 +718,36 @@ ideaCommentTextJsonDecoder =
         |> Jdp.required "createdAt" dateTimeJsonDecoder
 
 
-{-| ProjectSnapshotのJSON Decoder
+{-| SuggestionのJSON Decoder
 -}
-projectSnapshotJsonDecoder : Jd.Decoder ProjectSnapshot
-projectSnapshotJsonDecoder =
+suggestionJsonDecoder : Jd.Decoder Suggestion
+suggestionJsonDecoder =
     Jd.succeed
-        (\createdAt description projectName projectIcon projectImage projectDescription moduleList typeList partList ->
+        (\createdAt description change ->
             { createdAt = createdAt
             , description = description
-            , projectName = projectName
-            , projectIcon = projectIcon
-            , projectImage = projectImage
-            , projectDescription = projectDescription
-            , moduleList = moduleList
-            , typeList = typeList
-            , partList = partList
+            , change = change
             }
         )
         |> Jdp.required "createdAt" dateTimeJsonDecoder
         |> Jdp.required "description" Jd.string
-        |> Jdp.required "projectName" Jd.string
-        |> Jdp.required "projectIcon" fileHashJsonDecoder
-        |> Jdp.required "projectImage" fileHashJsonDecoder
-        |> Jdp.required "projectDescription" Jd.string
-        |> Jdp.required "moduleList" (Jd.list moduleHashJsonDecoder)
-        |> Jdp.required "typeList" (Jd.list typeHashJsonDecoder)
-        |> Jdp.required "partList" (Jd.list partHashJsonDecoder)
+        |> Jdp.required "change" changeJsonDecoder
+
+
+{-| ChangeのJSON Decoder
+-}
+changeJsonDecoder : Jd.Decoder Change
+changeJsonDecoder =
+    Jd.field "_" Jd.string
+        |> Jd.andThen
+            (\tag ->
+                case tag of
+                    "ProjectName" ->
+                        Jd.field "string_" Jd.string |> Jd.map ChangeProjectName
+
+                    _ ->
+                        Jd.fail ("Changeで不明なタグを受けたとった tag=" ++ tag)
+            )
 
 
 {-| ModuleSnapshotのJSON Decoder
@@ -793,21 +755,15 @@ projectSnapshotJsonDecoder =
 moduleSnapshotJsonDecoder : Jd.Decoder ModuleSnapshot
 moduleSnapshotJsonDecoder =
     Jd.succeed
-        (\name description export children typeList partList ->
+        (\name description export ->
             { name = name
             , description = description
             , export = export
-            , children = children
-            , typeList = typeList
-            , partList = partList
             }
         )
-        |> Jdp.required "name" Jd.string
+        |> Jdp.required "name" (Jd.list Jd.string)
         |> Jdp.required "description" Jd.string
         |> Jdp.required "export" Jd.bool
-        |> Jdp.required "children" (Jd.list moduleHashJsonDecoder)
-        |> Jdp.required "typeList" (Jd.list typeHashJsonDecoder)
-        |> Jdp.required "partList" (Jd.list partHashJsonDecoder)
 
 
 {-| TypeSnapshotのJSON Decoder
@@ -822,7 +778,7 @@ typeSnapshotJsonDecoder =
             }
         )
         |> Jdp.required "name" Jd.string
-        |> Jdp.required "parentList" (Jd.list partHashJsonDecoder)
+        |> Jdp.required "parentList" (Jd.list partIdJsonDecoder)
         |> Jdp.required "description" Jd.string
 
 
@@ -838,5 +794,5 @@ partSnapshotJsonDecoder =
             }
         )
         |> Jdp.required "name" Jd.string
-        |> Jdp.required "parentList" (Jd.list partHashJsonDecoder)
+        |> Jdp.required "parentList" (Jd.list partIdJsonDecoder)
         |> Jdp.required "description" Jd.string

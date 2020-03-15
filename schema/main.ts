@@ -9,10 +9,9 @@ const userId = type.typeId("UserId");
 const projectId = type.typeId("ProjectId");
 const ideaId = type.typeId("IdeaId");
 const fileHash = type.typeToken("FileHash");
-const projectHash = type.typeToken("ProjectHash");
-const moduleHash = type.typeToken("ModuleHash");
-const typeHash = type.typeToken("TypeHash");
-const partHash = type.typeToken("PartHash");
+const moduleId = type.typeId("ModuleId");
+const typeId = type.typeId("TypeId");
+const partId = type.typeId("PartId");
 
 const dateTimeName = "DateTime";
 const requestLogInUrlRequestDataName = "RequestLogInUrlRequestData";
@@ -27,7 +26,8 @@ const projectName = "Project";
 const ideaName = "Idea";
 const ideaCommentName = "IdeaComment";
 const ideaCommentTextName = "IdeaCommentText";
-const projectSnapshotName = "ProjectSnapshot";
+const suggestionName = "Suggestion";
+const changeName = "Change";
 const moduleSnapshotName = "ModuleSnapshot";
 const typeSnapshotName = "TypeSnapshot";
 const partSnapshotName = "PartSnapshot";
@@ -278,17 +278,6 @@ const project: type.CustomType = {
       memberType: fileHash
     },
     {
-      name: "releaseBranchCommitHashList",
-      description:
-        "リリースブランチ. 外部から依存プロジェクトとして読み込める.",
-      memberType: type.typeList(projectHash)
-    },
-    {
-      name: "developBranchCommitHashList",
-      description: "デベロップブランチ. ",
-      memberType: type.typeList(projectHash)
-    },
-    {
       name: "createdAt",
       description: "作成日時",
       memberType: type.typeCustom(dateTimeName)
@@ -318,7 +307,7 @@ const idea: type.CustomType = {
     {
       name: "draftCommitIdList",
       description: "下書きのコミット",
-      memberType: type.typeList(type.typeCustom(projectSnapshotName))
+      memberType: type.typeList(type.typeCustom(suggestionName))
     }
   ])
 };
@@ -333,9 +322,9 @@ const ideaComment: type.CustomType = {
       parameter: type.maybeJust(type.typeCustom(ideaCommentTextName))
     },
     {
-      name: "ProjectSnapshot",
+      name: "Suggestion",
       description: "編集提案をする",
-      parameter: type.maybeJust(type.typeCustom(projectSnapshotName))
+      parameter: type.maybeJust(type.typeCustom(suggestionName))
     }
   ])
 };
@@ -362,9 +351,9 @@ const ideaCommentText: type.CustomType = {
   ])
 };
 
-const projectSnapshot: type.CustomType = {
-  name: projectSnapshotName,
-  description: "プロジェクトのスナップショット. Gitでいうコミット",
+const suggestion: type.CustomType = {
+  name: suggestionName,
+  description: "編集提案",
   body: type.customTypeBodyProduct([
     {
       name: "createdAt",
@@ -373,43 +362,25 @@ const projectSnapshot: type.CustomType = {
     },
     {
       name: "description",
-      description: "どんな変更をしたのかの説明",
+      description: "なぜ,どんな変更をしたのかの説明",
       memberType: type.typeString
     },
     {
-      name: "projectName",
-      description: "プロジェクト名",
-      memberType: type.typeString
-    },
+      name: "change",
+      description: "変更点",
+      memberType: type.typeCustom(changeName)
+    }
+  ])
+};
+
+const change: type.CustomType = {
+  name: changeName,
+  description: "変更点",
+  body: type.customTypeBodySum([
     {
-      name: "projectIcon",
-      description: "プロジェクトのアイコン画像",
-      memberType: fileHash
-    },
-    {
-      name: "projectImage",
-      description: "プロジェクトのカバー画像",
-      memberType: fileHash
-    },
-    {
-      name: "projectDescription",
-      description: "プロジェクトの詳しい説明",
-      memberType: type.typeString
-    },
-    {
-      name: "moduleList",
-      description: "直下以外のモジュール",
-      memberType: type.typeList(moduleHash)
-    },
-    {
-      name: "typeList",
-      description: "直下の型",
-      memberType: type.typeList(typeHash)
-    },
-    {
-      name: "partList",
-      description: "直下のパーツ",
-      memberType: type.typeList(partHash)
+      name: "ProjectName",
+      description: "プロジェクト名の変更",
+      parameter: type.maybeJust(type.typeString)
     }
   ])
 };
@@ -421,7 +392,7 @@ const moduleSnapshot: type.CustomType = {
     {
       name: "name",
       description: "モジュール名",
-      memberType: type.typeString
+      memberType: type.typeList(type.typeString)
     },
     {
       name: "description",
@@ -432,21 +403,6 @@ const moduleSnapshot: type.CustomType = {
       name: "export",
       description: "外部のプロジェクトに公開するかどうか",
       memberType: type.typeBool
-    },
-    {
-      name: "children",
-      description: "子のモジュール",
-      memberType: type.typeList(moduleHash)
-    },
-    {
-      name: "typeList",
-      description: "型",
-      memberType: type.typeList(typeHash)
-    },
-    {
-      name: "partList",
-      description: "パーツ",
-      memberType: type.typeList(partHash)
     }
   ])
 };
@@ -463,7 +419,7 @@ const typeSnapshot: type.CustomType = {
     {
       name: "parentList",
       description: "この型の元",
-      memberType: type.typeList(partHash)
+      memberType: type.typeList(partId)
     },
     {
       name: "description",
@@ -485,7 +441,7 @@ const partSnapshot: type.CustomType = {
     {
       name: "parentList",
       description: "このパーツの元",
-      memberType: type.typeList(partHash)
+      memberType: type.typeList(partId)
     },
     {
       name: "description",
@@ -509,7 +465,8 @@ const listCustomType: ReadonlyArray<type.CustomType> = [
   idea,
   ideaComment,
   ideaCommentText,
-  projectSnapshot,
+  suggestion,
+  change,
   moduleSnapshot,
   typeSnapshot,
   partSnapshot
