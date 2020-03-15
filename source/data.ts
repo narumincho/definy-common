@@ -97,26 +97,23 @@ export type Project = {
  */
 export type Idea = {
   name: string;
+  createdBy: UserId;
+  description: string;
   createdAt: DateTime;
-  commentList: ReadonlyArray<IdeaComment>;
-  draftCommitIdList: ReadonlyArray<Suggestion>;
+  itemList: ReadonlyArray<IdeaItem>;
 };
 
 /**
  * アイデアのコメント
  */
-export type IdeaComment =
-  | { _: "Text"; ideaCommentText: IdeaCommentText }
+export type IdeaItem =
+  | { _: "Comment"; comment: Comment }
   | { _: "Suggestion"; suggestion: Suggestion };
 
 /**
  * 文章でのコメント
  */
-export type IdeaCommentText = {
-  body: string;
-  createdBy: UserId;
-  createdAt: DateTime;
-};
+export type Comment = { body: string; createdBy: UserId; createdAt: DateTime };
 
 /**
  * 編集提案
@@ -225,14 +222,15 @@ export const locationProject = (projectId: ProjectId): Location => ({
 /**
  * 文章でのコメント
  */
-export const ideaCommentText = (
-  ideaCommentText: IdeaCommentText
-): IdeaComment => ({ _: "Text", ideaCommentText: ideaCommentText });
+export const ideaItemComment = (comment: Comment): IdeaItem => ({
+  _: "Comment",
+  comment: comment
+});
 
 /**
  * 編集提案をする
  */
-export const ideaCommentSuggestion = (suggestion: Suggestion): IdeaComment => ({
+export const ideaItemSuggestion = (suggestion: Suggestion): IdeaItem => ({
   _: "Suggestion",
   suggestion: suggestion
 });
@@ -447,29 +445,26 @@ export const encodeProject = (project: Project): ReadonlyArray<number> =>
 
 export const encodeIdea = (idea: Idea): ReadonlyArray<number> =>
   encodeString(idea.name)
+    .concat(encodeId(idea.createdBy))
+    .concat(encodeString(idea.description))
     .concat(encodeDateTime(idea.createdAt))
-    .concat(encodeList(encodeIdeaComment)(idea.commentList))
-    .concat(encodeList(encodeSuggestion)(idea.draftCommitIdList));
+    .concat(encodeList(encodeIdeaItem)(idea.itemList));
 
-export const encodeIdeaComment = (
-  ideaComment: IdeaComment
-): ReadonlyArray<number> => {
-  switch (ideaComment._) {
-    case "Text": {
-      return [0].concat(encodeIdeaCommentText(ideaComment.ideaCommentText));
+export const encodeIdeaItem = (ideaItem: IdeaItem): ReadonlyArray<number> => {
+  switch (ideaItem._) {
+    case "Comment": {
+      return [0].concat(encodeComment(ideaItem.comment));
     }
     case "Suggestion": {
-      return [1].concat(encodeSuggestion(ideaComment.suggestion));
+      return [1].concat(encodeSuggestion(ideaItem.suggestion));
     }
   }
 };
 
-export const encodeIdeaCommentText = (
-  ideaCommentText: IdeaCommentText
-): ReadonlyArray<number> =>
-  encodeString(ideaCommentText.body)
-    .concat(encodeId(ideaCommentText.createdBy))
-    .concat(encodeDateTime(ideaCommentText.createdAt));
+export const encodeComment = (comment: Comment): ReadonlyArray<number> =>
+  encodeString(comment.body)
+    .concat(encodeId(comment.createdBy))
+    .concat(encodeDateTime(comment.createdAt));
 
 export const encodeSuggestion = (
   suggestion: Suggestion
@@ -1103,26 +1098,37 @@ export const decodeIdea = (
     index,
     binary
   );
+  const createdByAndNextIndex: {
+    result: UserId;
+    nextIndex: number;
+  } = (decodeId as (
+    a: number,
+    b: Uint8Array
+  ) => { result: UserId; nextIndex: number })(
+    nameAndNextIndex.nextIndex,
+    binary
+  );
+  const descriptionAndNextIndex: {
+    result: string;
+    nextIndex: number;
+  } = decodeString(createdByAndNextIndex.nextIndex, binary);
   const createdAtAndNextIndex: {
     result: DateTime;
     nextIndex: number;
-  } = decodeDateTime(nameAndNextIndex.nextIndex, binary);
-  const commentListAndNextIndex: {
-    result: ReadonlyArray<IdeaComment>;
+  } = decodeDateTime(descriptionAndNextIndex.nextIndex, binary);
+  const itemListAndNextIndex: {
+    result: ReadonlyArray<IdeaItem>;
     nextIndex: number;
-  } = decodeList(decodeIdeaComment)(createdAtAndNextIndex.nextIndex, binary);
-  const draftCommitIdListAndNextIndex: {
-    result: ReadonlyArray<Suggestion>;
-    nextIndex: number;
-  } = decodeList(decodeSuggestion)(commentListAndNextIndex.nextIndex, binary);
+  } = decodeList(decodeIdeaItem)(createdAtAndNextIndex.nextIndex, binary);
   return {
     result: {
       name: nameAndNextIndex.result,
+      createdBy: createdByAndNextIndex.result,
+      description: descriptionAndNextIndex.result,
       createdAt: createdAtAndNextIndex.result,
-      commentList: commentListAndNextIndex.result,
-      draftCommitIdList: draftCommitIdListAndNextIndex.result
+      itemList: itemListAndNextIndex.result
     },
-    nextIndex: draftCommitIdListAndNextIndex.nextIndex
+    nextIndex: itemListAndNextIndex.nextIndex
   };
 };
 
@@ -1130,21 +1136,21 @@ export const decodeIdea = (
  * @param index バイナリを読み込み開始位置
  * @param binary バイナリ
  */
-export const decodeIdeaComment = (
+export const decodeIdeaItem = (
   index: number,
   binary: Uint8Array
-): { result: IdeaComment; nextIndex: number } => {
+): { result: IdeaItem; nextIndex: number } => {
   const patternIndex: { result: number; nextIndex: number } = decodeInt32(
     index,
     binary
   );
   if (patternIndex.result === 0) {
-    const result: {
-      result: IdeaCommentText;
-      nextIndex: number;
-    } = decodeIdeaCommentText(patternIndex.nextIndex, binary);
+    const result: { result: Comment; nextIndex: number } = decodeComment(
+      patternIndex.nextIndex,
+      binary
+    );
     return {
-      result: ideaCommentText(result.result),
+      result: ideaItemComment(result.result),
       nextIndex: result.nextIndex
     };
   }
@@ -1154,7 +1160,7 @@ export const decodeIdeaComment = (
       binary
     );
     return {
-      result: ideaCommentSuggestion(result.result),
+      result: ideaItemSuggestion(result.result),
       nextIndex: result.nextIndex
     };
   }
@@ -1165,10 +1171,10 @@ export const decodeIdeaComment = (
  * @param index バイナリを読み込み開始位置
  * @param binary バイナリ
  */
-export const decodeIdeaCommentText = (
+export const decodeComment = (
   index: number,
   binary: Uint8Array
-): { result: IdeaCommentText; nextIndex: number } => {
+): { result: Comment; nextIndex: number } => {
   const bodyAndNextIndex: { result: string; nextIndex: number } = decodeString(
     index,
     binary

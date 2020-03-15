@@ -24,8 +24,8 @@ const userPublicName = "UserPublic";
 const userPublicAndUserIdName = "UserPublicAndUserId";
 const projectName = "Project";
 const ideaName = "Idea";
-const ideaCommentName = "IdeaComment";
-const ideaCommentTextName = "IdeaCommentText";
+const ideaItemName = "IdeaItem";
+const commentName = "Comment";
 const suggestionName = "Suggestion";
 const changeName = "Change";
 const moduleSnapshotName = "ModuleSnapshot";
@@ -291,7 +291,17 @@ const idea: type.CustomType = {
   body: type.customTypeBodyProduct([
     {
       name: "name",
-      description: "プロジェクト名",
+      description: "アイデア名",
+      memberType: type.typeString
+    },
+    {
+      name: "createdBy",
+      description: "言い出しっぺ",
+      memberType: userId
+    },
+    {
+      name: "description",
+      description: "アイデアの説明",
       memberType: type.typeString
     },
     {
@@ -300,26 +310,21 @@ const idea: type.CustomType = {
       memberType: type.typeCustom(dateTimeName)
     },
     {
-      name: "commentList",
-      description: "コメント",
-      memberType: type.typeList(type.typeCustom(ideaCommentName))
-    },
-    {
-      name: "draftCommitIdList",
-      description: "下書きのコミット",
-      memberType: type.typeList(type.typeCustom(suggestionName))
+      name: "itemList",
+      description: "アイデアの要素",
+      memberType: type.typeList(type.typeCustom(ideaItemName))
     }
   ])
 };
 
-const ideaComment: type.CustomType = {
-  name: ideaCommentName,
+const ideaItem: type.CustomType = {
+  name: ideaItemName,
   description: "アイデアのコメント",
   body: type.customTypeBodySum([
     {
-      name: "Text",
+      name: "Comment",
       description: "文章でのコメント",
-      parameter: type.maybeJust(type.typeCustom(ideaCommentTextName))
+      parameter: type.maybeJust(type.typeCustom(commentName))
     },
     {
       name: "Suggestion",
@@ -330,7 +335,7 @@ const ideaComment: type.CustomType = {
 };
 
 const ideaCommentText: type.CustomType = {
-  name: ideaCommentTextName,
+  name: commentName,
   description: "文章でのコメント",
   body: type.customTypeBodyProduct([
     {
@@ -463,7 +468,7 @@ const listCustomType: ReadonlyArray<type.CustomType> = [
   userPublicAndUserId,
   project,
   idea,
-  ideaComment,
+  ideaItem,
   ideaCommentText,
   suggestion,
   change,
