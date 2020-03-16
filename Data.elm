@@ -1,4 +1,4 @@
-module Data exposing (AccessToken(..), Change(..), ClientMode(..), Comment, Condition(..), DateTime, Expr(..), FileHash(..), FileHashAndIsThumbnail, FunctionCall, Idea, IdeaId(..), IdeaItem(..), KernelExpr(..), LambdaBranch, Language(..), Location(..), ModuleSnapshot, OpenIdConnectProvider(..), PartId(..), PartSnapshot, Project, ProjectId(..), RequestLogInUrlRequestData, Suggestion, TypeBody(..), TypeBodyKernel(..), TypeBodyProductMember, TypeBodySumPattern, TypeId(..), TypeSnapshot, UrlData, UserId(..), UserPublic, UserPublicAndUserId, accessTokenJsonDecoder, accessTokenToJsonValue, changeJsonDecoder, changeToJsonValue, clientModeJsonDecoder, clientModeToJsonValue, commentJsonDecoder, commentToJsonValue, conditionJsonDecoder, conditionToJsonValue, dateTimeJsonDecoder, dateTimeToJsonValue, exprJsonDecoder, exprToJsonValue, fileHashAndIsThumbnailJsonDecoder, fileHashAndIsThumbnailToJsonValue, fileHashJsonDecoder, fileHashToJsonValue, functionCallJsonDecoder, functionCallToJsonValue, ideaIdJsonDecoder, ideaIdToJsonValue, ideaItemJsonDecoder, ideaItemToJsonValue, ideaJsonDecoder, ideaToJsonValue, kernelExprJsonDecoder, kernelExprToJsonValue, lambdaBranchJsonDecoder, lambdaBranchToJsonValue, languageJsonDecoder, languageToJsonValue, locationJsonDecoder, locationToJsonValue, maybeJsonDecoder, maybeToJsonValue, moduleSnapshotJsonDecoder, moduleSnapshotToJsonValue, openIdConnectProviderJsonDecoder, openIdConnectProviderToJsonValue, partIdJsonDecoder, partIdToJsonValue, partSnapshotJsonDecoder, partSnapshotToJsonValue, projectIdJsonDecoder, projectIdToJsonValue, projectJsonDecoder, projectToJsonValue, requestLogInUrlRequestDataJsonDecoder, requestLogInUrlRequestDataToJsonValue, resultJsonDecoder, resultToJsonValue, suggestionJsonDecoder, suggestionToJsonValue, typeBodyJsonDecoder, typeBodyKernelJsonDecoder, typeBodyKernelToJsonValue, typeBodyProductMemberJsonDecoder, typeBodyProductMemberToJsonValue, typeBodySumPatternJsonDecoder, typeBodySumPatternToJsonValue, typeBodyToJsonValue, typeIdJsonDecoder, typeIdToJsonValue, typeSnapshotJsonDecoder, typeSnapshotToJsonValue, urlDataJsonDecoder, urlDataToJsonValue, userIdJsonDecoder, userIdToJsonValue, userPublicAndUserIdJsonDecoder, userPublicAndUserIdToJsonValue, userPublicJsonDecoder, userPublicToJsonValue)
+module Data exposing (AccessToken(..), CapturePartId(..), Change(..), ClientMode(..), Comment, Condition(..), ConditionCapture, ConditionTag, DateTime, Expr(..), FileHash(..), FileHashAndIsThumbnail, FunctionCall, Idea, IdeaId(..), IdeaItem(..), KernelExpr(..), LambdaBranch, Language(..), Location(..), ModuleSnapshot, OpenIdConnectProvider(..), PartId(..), PartSnapshot, Project, ProjectId(..), RequestLogInUrlRequestData, Suggestion, TagId(..), TypeBody(..), TypeBodyKernel(..), TypeBodyProductMember, TypeBodySumPattern, TypeId(..), TypeSnapshot, UrlData, UserId(..), UserPublic, UserPublicAndUserId, accessTokenJsonDecoder, accessTokenToJsonValue, capturePartIdJsonDecoder, capturePartIdToJsonValue, changeJsonDecoder, changeToJsonValue, clientModeJsonDecoder, clientModeToJsonValue, commentJsonDecoder, commentToJsonValue, conditionCaptureJsonDecoder, conditionCaptureToJsonValue, conditionJsonDecoder, conditionTagJsonDecoder, conditionTagToJsonValue, conditionToJsonValue, dateTimeJsonDecoder, dateTimeToJsonValue, exprJsonDecoder, exprToJsonValue, fileHashAndIsThumbnailJsonDecoder, fileHashAndIsThumbnailToJsonValue, fileHashJsonDecoder, fileHashToJsonValue, functionCallJsonDecoder, functionCallToJsonValue, ideaIdJsonDecoder, ideaIdToJsonValue, ideaItemJsonDecoder, ideaItemToJsonValue, ideaJsonDecoder, ideaToJsonValue, kernelExprJsonDecoder, kernelExprToJsonValue, lambdaBranchJsonDecoder, lambdaBranchToJsonValue, languageJsonDecoder, languageToJsonValue, locationJsonDecoder, locationToJsonValue, maybeJsonDecoder, maybeToJsonValue, moduleSnapshotJsonDecoder, moduleSnapshotToJsonValue, openIdConnectProviderJsonDecoder, openIdConnectProviderToJsonValue, partIdJsonDecoder, partIdToJsonValue, partSnapshotJsonDecoder, partSnapshotToJsonValue, projectIdJsonDecoder, projectIdToJsonValue, projectJsonDecoder, projectToJsonValue, requestLogInUrlRequestDataJsonDecoder, requestLogInUrlRequestDataToJsonValue, resultJsonDecoder, resultToJsonValue, suggestionJsonDecoder, suggestionToJsonValue, tagIdJsonDecoder, tagIdToJsonValue, typeBodyJsonDecoder, typeBodyKernelJsonDecoder, typeBodyKernelToJsonValue, typeBodyProductMemberJsonDecoder, typeBodyProductMemberToJsonValue, typeBodySumPatternJsonDecoder, typeBodySumPatternToJsonValue, typeBodyToJsonValue, typeIdJsonDecoder, typeIdToJsonValue, typeSnapshotJsonDecoder, typeSnapshotToJsonValue, urlDataJsonDecoder, urlDataToJsonValue, userIdJsonDecoder, userIdToJsonValue, userPublicAndUserIdJsonDecoder, userPublicAndUserIdToJsonValue, userPublicJsonDecoder, userPublicToJsonValue)
 
 import Json.Decode as Jd
 import Json.Decode.Pipeline as Jdp
@@ -154,6 +154,8 @@ type Expr
     = ExprKernel KernelExpr
     | ExprInt32Literal Int
     | ExprPartReference PartId
+    | ExprCapturePartReference CapturePartId
+    | ExprTagReference TagId
     | ExprFunctionCall FunctionCall
     | ExprLambda (List LambdaBranch)
 
@@ -181,7 +183,22 @@ type alias LambdaBranch =
 {-| ブランチの式を使う条件
 -}
 type Condition
-    = ConditionInt32 Int
+    = ConditionTag ConditionTag
+    | ConditionCapture ConditionCapture
+    | ConditionAny
+    | ConditionInt32 Int
+
+
+{-| タグによる条件
+-}
+type alias ConditionTag =
+    { tag : TagId, parameter : Maybe Condition }
+
+
+{-| キャプチャパーツへのキャプチャ
+-}
+type alias ConditionCapture =
+    { name : String, capturePartId : CapturePartId }
 
 
 {-| getImageに必要なパラメーター
@@ -216,6 +233,14 @@ type PartId
 
 type TypeId
     = TypeId String
+
+
+type CapturePartId
+    = CapturePartId String
+
+
+type TagId
+    = TagId String
 
 
 maybeToJsonValue : (a -> Je.Value) -> Maybe a -> Je.Value
@@ -270,6 +295,16 @@ partIdToJsonValue (PartId string) =
 
 typeIdToJsonValue : TypeId -> Je.Value
 typeIdToJsonValue (TypeId string) =
+    Je.string string
+
+
+capturePartIdToJsonValue : CapturePartId -> Je.Value
+capturePartIdToJsonValue (CapturePartId string) =
+    Je.string string
+
+
+tagIdToJsonValue : TagId -> Je.Value
+tagIdToJsonValue (TagId string) =
     Je.string string
 
 
@@ -556,6 +591,12 @@ exprToJsonValue expr =
         ExprPartReference parameter ->
             Je.object [ ( "_", Je.string "PartReference" ), ( "partId", partIdToJsonValue parameter ) ]
 
+        ExprCapturePartReference parameter ->
+            Je.object [ ( "_", Je.string "CapturePartReference" ), ( "capturePartId", capturePartIdToJsonValue parameter ) ]
+
+        ExprTagReference parameter ->
+            Je.object [ ( "_", Je.string "TagReference" ), ( "tagId", tagIdToJsonValue parameter ) ]
+
         ExprFunctionCall parameter ->
             Je.object [ ( "_", Je.string "FunctionCall" ), ( "functionCall", functionCallToJsonValue parameter ) ]
 
@@ -604,8 +645,37 @@ lambdaBranchToJsonValue lambdaBranch =
 conditionToJsonValue : Condition -> Je.Value
 conditionToJsonValue condition =
     case condition of
+        ConditionTag parameter ->
+            Je.object [ ( "_", Je.string "Tag" ), ( "conditionTag", conditionTagToJsonValue parameter ) ]
+
+        ConditionCapture parameter ->
+            Je.object [ ( "_", Je.string "Capture" ), ( "conditionCapture", conditionCaptureToJsonValue parameter ) ]
+
+        ConditionAny ->
+            Je.object [ ( "_", Je.string "Any" ) ]
+
         ConditionInt32 parameter ->
             Je.object [ ( "_", Je.string "Int32" ), ( "int32", Je.int parameter ) ]
+
+
+{-| ConditionTagのJSONへのエンコーダ
+-}
+conditionTagToJsonValue : ConditionTag -> Je.Value
+conditionTagToJsonValue conditionTag =
+    Je.object
+        [ ( "tag", tagIdToJsonValue conditionTag.tag )
+        , ( "parameter", maybeToJsonValue conditionToJsonValue conditionTag.parameter )
+        ]
+
+
+{-| ConditionCaptureのJSONへのエンコーダ
+-}
+conditionCaptureToJsonValue : ConditionCapture -> Je.Value
+conditionCaptureToJsonValue conditionCapture =
+    Je.object
+        [ ( "name", Je.string conditionCapture.name )
+        , ( "capturePartId", capturePartIdToJsonValue conditionCapture.capturePartId )
+        ]
 
 
 {-| FileHashAndIsThumbnailのJSONへのエンコーダ
@@ -685,6 +755,16 @@ partIdJsonDecoder =
 typeIdJsonDecoder : Jd.Decoder TypeId
 typeIdJsonDecoder =
     Jd.map TypeId Jd.string
+
+
+capturePartIdJsonDecoder : Jd.Decoder CapturePartId
+capturePartIdJsonDecoder =
+    Jd.map CapturePartId Jd.string
+
+
+tagIdJsonDecoder : Jd.Decoder TagId
+tagIdJsonDecoder =
+    Jd.map TagId Jd.string
 
 
 {-| DateTimeのJSON Decoder
@@ -1109,6 +1189,12 @@ exprJsonDecoder =
                     "PartReference" ->
                         Jd.field "partId" partIdJsonDecoder |> Jd.map ExprPartReference
 
+                    "CapturePartReference" ->
+                        Jd.field "capturePartId" capturePartIdJsonDecoder |> Jd.map ExprCapturePartReference
+
+                    "TagReference" ->
+                        Jd.field "tagId" tagIdJsonDecoder |> Jd.map ExprTagReference
+
                     "FunctionCall" ->
                         Jd.field "functionCall" functionCallJsonDecoder |> Jd.map ExprFunctionCall
 
@@ -1180,12 +1266,49 @@ conditionJsonDecoder =
         |> Jd.andThen
             (\tag ->
                 case tag of
+                    "Tag" ->
+                        Jd.field "conditionTag" conditionTagJsonDecoder |> Jd.map ConditionTag
+
+                    "Capture" ->
+                        Jd.field "conditionCapture" conditionCaptureJsonDecoder |> Jd.map ConditionCapture
+
+                    "Any" ->
+                        Jd.succeed ConditionAny
+
                     "Int32" ->
                         Jd.field "int32" Jd.int |> Jd.map ConditionInt32
 
                     _ ->
                         Jd.fail ("Conditionで不明なタグを受けたとった tag=" ++ tag)
             )
+
+
+{-| ConditionTagのJSON Decoder
+-}
+conditionTagJsonDecoder : Jd.Decoder ConditionTag
+conditionTagJsonDecoder =
+    Jd.succeed
+        (\tag parameter ->
+            { tag = tag
+            , parameter = parameter
+            }
+        )
+        |> Jdp.required "tag" tagIdJsonDecoder
+        |> Jdp.required "parameter" (maybeJsonDecoder conditionJsonDecoder)
+
+
+{-| ConditionCaptureのJSON Decoder
+-}
+conditionCaptureJsonDecoder : Jd.Decoder ConditionCapture
+conditionCaptureJsonDecoder =
+    Jd.succeed
+        (\name capturePartId ->
+            { name = name
+            , capturePartId = capturePartId
+            }
+        )
+        |> Jdp.required "name" Jd.string
+        |> Jdp.required "capturePartId" capturePartIdJsonDecoder
 
 
 {-| FileHashAndIsThumbnailのJSON Decoder

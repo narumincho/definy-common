@@ -198,6 +198,8 @@ export type Expr =
   | { _: "Kernel"; kernelExpr: KernelExpr }
   | { _: "Int32Literal"; int32: number }
   | { _: "PartReference"; partId: PartId }
+  | { _: "CapturePartReference"; capturePartId: CapturePartId }
+  | { _: "TagReference"; tagId: TagId }
   | { _: "FunctionCall"; functionCall: FunctionCall }
   | { _: "Lambda"; lambdaBranchList: ReadonlyArray<LambdaBranch> };
 
@@ -223,7 +225,21 @@ export type LambdaBranch = {
 /**
  * ブランチの式を使う条件
  */
-export type Condition = { _: "Int32"; int32: number };
+export type Condition =
+  | { _: "Tag"; conditionTag: ConditionTag }
+  | { _: "Capture"; conditionCapture: ConditionCapture }
+  | { _: "Any" }
+  | { _: "Int32"; int32: number };
+
+/**
+ * タグによる条件
+ */
+export type ConditionTag = { tag: TagId; parameter: Maybe<Condition> };
+
+/**
+ * キャプチャパーツへのキャプチャ
+ */
+export type ConditionCapture = { name: string; capturePartId: CapturePartId };
 
 /**
  * getImageに必要なパラメーター
@@ -246,6 +262,10 @@ export type IdeaId = string & { _ideaId: never };
 export type PartId = string & { _partId: never };
 
 export type TypeId = string & { _typeId: never };
+
+export type CapturePartId = string & { _capturePartId: never };
+
+export type TagId = string & { _tagId: never };
 
 export const maybeJust = <T>(value: T): Maybe<T> => ({
   _: "Just",
@@ -372,6 +392,21 @@ export const exprPartReference = (partId: PartId): Expr => ({
 });
 
 /**
+ * キャプチャパーツの参照
+ */
+export const exprCapturePartReference = (
+  capturePartId: CapturePartId
+): Expr => ({ _: "CapturePartReference", capturePartId: capturePartId });
+
+/**
+ * タグを参照
+ */
+export const exprTagReference = (tagId: TagId): Expr => ({
+  _: "TagReference",
+  tagId: tagId
+});
+
+/**
  * 関数呼び出し
  */
 export const exprFunctionCall = (functionCall: FunctionCall): Expr => ({
@@ -385,6 +420,26 @@ export const exprFunctionCall = (functionCall: FunctionCall): Expr => ({
 export const exprLambda = (
   lambdaBranchList: ReadonlyArray<LambdaBranch>
 ): Expr => ({ _: "Lambda", lambdaBranchList: lambdaBranchList });
+
+/**
+ * タグ
+ */
+export const conditionTag = (conditionTag: ConditionTag): Condition => ({
+  _: "Tag",
+  conditionTag: conditionTag
+});
+
+/**
+ * キャプチャパーツへのキャプチャ
+ */
+export const conditionCapture = (
+  conditionCapture: ConditionCapture
+): Condition => ({ _: "Capture", conditionCapture: conditionCapture });
+
+/**
+ * _ すべてのパターンを通すもの
+ */
+export const conditionAny: Condition = { _: "Any" };
 
 /**
  * 32bit整数の完全一致
@@ -715,11 +770,17 @@ export const encodeExpr = (expr: Expr): ReadonlyArray<number> => {
     case "PartReference": {
       return [2].concat(encodeId(expr.partId));
     }
+    case "CapturePartReference": {
+      return [3].concat(encodeId(expr.capturePartId));
+    }
+    case "TagReference": {
+      return [4].concat(encodeId(expr.tagId));
+    }
     case "FunctionCall": {
-      return [3].concat(encodeFunctionCall(expr.functionCall));
+      return [5].concat(encodeFunctionCall(expr.functionCall));
     }
     case "Lambda": {
-      return [4].concat(encodeList(encodeLambdaBranch)(expr.lambdaBranchList));
+      return [6].concat(encodeList(encodeLambdaBranch)(expr.lambdaBranchList));
     }
   }
 };
@@ -758,11 +819,34 @@ export const encodeCondition = (
   condition: Condition
 ): ReadonlyArray<number> => {
   switch (condition._) {
+    case "Tag": {
+      return [0].concat(encodeConditionTag(condition.conditionTag));
+    }
+    case "Capture": {
+      return [1].concat(encodeConditionCapture(condition.conditionCapture));
+    }
+    case "Any": {
+      return [2];
+    }
     case "Int32": {
-      return [0].concat(encodeInt32(condition.int32));
+      return [3].concat(encodeInt32(condition.int32));
     }
   }
 };
+
+export const encodeConditionTag = (
+  conditionTag: ConditionTag
+): ReadonlyArray<number> =>
+  encodeId(conditionTag.tag).concat(
+    encodeMaybe(encodeCondition)(conditionTag.parameter)
+  );
+
+export const encodeConditionCapture = (
+  conditionCapture: ConditionCapture
+): ReadonlyArray<number> =>
+  encodeString(conditionCapture.name).concat(
+    encodeId(conditionCapture.capturePartId)
+  );
 
 export const encodeFileHashAndIsThumbnail = (
   fileHashAndIsThumbnail: FileHashAndIsThumbnail
@@ -1809,6 +1893,29 @@ export const decodeExpr = (
     };
   }
   if (patternIndex.result === 3) {
+    const result: { result: CapturePartId; nextIndex: number } = (decodeId as (
+      a: number,
+      b: Uint8Array
+    ) => { result: CapturePartId; nextIndex: number })(
+      patternIndex.nextIndex,
+      binary
+    );
+    return {
+      result: exprCapturePartReference(result.result),
+      nextIndex: result.nextIndex
+    };
+  }
+  if (patternIndex.result === 4) {
+    const result: { result: TagId; nextIndex: number } = (decodeId as (
+      a: number,
+      b: Uint8Array
+    ) => { result: TagId; nextIndex: number })(patternIndex.nextIndex, binary);
+    return {
+      result: exprTagReference(result.result),
+      nextIndex: result.nextIndex
+    };
+  }
+  if (patternIndex.result === 5) {
     const result: {
       result: FunctionCall;
       nextIndex: number;
@@ -1818,7 +1925,7 @@ export const decodeExpr = (
       nextIndex: result.nextIndex
     };
   }
-  if (patternIndex.result === 4) {
+  if (patternIndex.result === 6) {
     const result: {
       result: ReadonlyArray<LambdaBranch>;
       nextIndex: number;
@@ -1920,6 +2027,26 @@ export const decodeCondition = (
     binary
   );
   if (patternIndex.result === 0) {
+    const result: {
+      result: ConditionTag;
+      nextIndex: number;
+    } = decodeConditionTag(patternIndex.nextIndex, binary);
+    return { result: conditionTag(result.result), nextIndex: result.nextIndex };
+  }
+  if (patternIndex.result === 1) {
+    const result: {
+      result: ConditionCapture;
+      nextIndex: number;
+    } = decodeConditionCapture(patternIndex.nextIndex, binary);
+    return {
+      result: conditionCapture(result.result),
+      nextIndex: result.nextIndex
+    };
+  }
+  if (patternIndex.result === 2) {
+    return { result: conditionAny, nextIndex: patternIndex.nextIndex };
+  }
+  if (patternIndex.result === 3) {
     const result: { result: number; nextIndex: number } = decodeInt32(
       patternIndex.nextIndex,
       binary
@@ -1930,6 +2057,62 @@ export const decodeCondition = (
     };
   }
   throw new Error("存在しないパターンを指定された 型を更新してください");
+};
+
+/**
+ * @param index バイナリを読み込み開始位置
+ * @param binary バイナリ
+ */
+export const decodeConditionTag = (
+  index: number,
+  binary: Uint8Array
+): { result: ConditionTag; nextIndex: number } => {
+  const tagAndNextIndex: { result: TagId; nextIndex: number } = (decodeId as (
+    a: number,
+    b: Uint8Array
+  ) => { result: TagId; nextIndex: number })(index, binary);
+  const parameterAndNextIndex: {
+    result: Maybe<Condition>;
+    nextIndex: number;
+  } = decodeMaybe(decodeCondition)(tagAndNextIndex.nextIndex, binary);
+  return {
+    result: {
+      tag: tagAndNextIndex.result,
+      parameter: parameterAndNextIndex.result
+    },
+    nextIndex: parameterAndNextIndex.nextIndex
+  };
+};
+
+/**
+ * @param index バイナリを読み込み開始位置
+ * @param binary バイナリ
+ */
+export const decodeConditionCapture = (
+  index: number,
+  binary: Uint8Array
+): { result: ConditionCapture; nextIndex: number } => {
+  const nameAndNextIndex: { result: string; nextIndex: number } = decodeString(
+    index,
+    binary
+  );
+  const capturePartIdAndNextIndex: {
+    result: CapturePartId;
+    nextIndex: number;
+  } = (decodeId as (
+    a: number,
+    b: Uint8Array
+  ) => { result: CapturePartId; nextIndex: number })(
+    nameAndNextIndex.nextIndex,
+    binary
+  );
+  return {
+    result: {
+      name: nameAndNextIndex.result,
+      capturePartId: capturePartIdAndNextIndex.result
+    },
+    nextIndex: capturePartIdAndNextIndex.nextIndex
+  };
 };
 
 /**

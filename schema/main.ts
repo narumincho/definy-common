@@ -11,7 +11,9 @@ const ideaId = type.typeId("IdeaId");
 const fileHash = type.typeToken("FileHash");
 const moduleId = type.typeId("ModuleId");
 const typeId = type.typeId("TypeId");
+const tagId = type.typeId("TagId");
 const partId = type.typeId("PartId");
+const capturePartId = type.typeId("CapturePartId");
 
 const dateTimeName = "DateTime";
 const requestLogInUrlRequestDataName = "RequestLogInUrlRequestData";
@@ -42,6 +44,7 @@ const functionCallName = "FunctionCall";
 const lambdaBranchName = "LambdaBranch";
 const conditionName = "Condition";
 const conditionTagName = "ConditionTag";
+const conditionCaptureName = "ConditionCapture";
 
 const dateTime: type.CustomType = {
   name: dateTimeName,
@@ -602,6 +605,16 @@ const expr: type.CustomType = {
       parameter: type.maybeJust(partId)
     },
     {
+      name: "CapturePartReference",
+      description: "キャプチャパーツの参照",
+      parameter: type.maybeJust(capturePartId)
+    },
+    {
+      name: "TagReference",
+      description: "タグを参照",
+      parameter: type.maybeJust(tagId)
+    },
+    {
       name: "FunctionCall",
       description: "関数呼び出し",
       parameter: type.maybeJust(type.typeCustom(functionCallName))
@@ -682,9 +695,58 @@ const condition: type.CustomType = {
   description: "ブランチの式を使う条件",
   body: type.customTypeBodySum([
     {
+      name: "Tag",
+      description: "タグ",
+      parameter: type.maybeJust(type.typeCustom(conditionTagName))
+    },
+    {
+      name: "Capture",
+      description: "キャプチャパーツへのキャプチャ",
+      parameter: type.maybeJust(type.typeCustom(conditionCaptureName))
+    },
+    {
+      name: "Any",
+      description: "_ すべてのパターンを通すもの",
+      parameter: type.maybeNothing()
+    },
+    {
       name: "Int32",
       description: "32bit整数の完全一致",
       parameter: type.maybeJust(type.typeInt32)
+    }
+  ])
+};
+
+const conditionTag: type.CustomType = {
+  name: conditionTagName,
+  description: "タグによる条件",
+  body: type.customTypeBodyProduct([
+    {
+      name: "tag",
+      description: "タグ",
+      memberType: tagId
+    },
+    {
+      name: "parameter",
+      description: "パラメーター",
+      memberType: type.typeMaybe(type.typeCustom(conditionName))
+    }
+  ])
+};
+
+const conditionCapture: type.CustomType = {
+  name: conditionCaptureName,
+  description: "キャプチャパーツへのキャプチャ",
+  body: type.customTypeBodyProduct([
+    {
+      name: "name",
+      description: "キャプチャパーツの名前",
+      memberType: type.typeString
+    },
+    {
+      name: "capturePartId",
+      description: "キャプチャId",
+      memberType: capturePartId
     }
   ])
 };
@@ -717,6 +779,8 @@ const listCustomType: ReadonlyArray<type.CustomType> = [
   functionCall,
   lambdaBranch,
   condition,
+  conditionTag,
+  conditionCapture,
   fileHashAndIsThumbnail
 ];
 
