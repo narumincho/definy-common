@@ -114,3 +114,68 @@ const accessTokenFromUrl = (hash: string): data.Maybe<data.AccessToken> => {
   }
   return data.maybeJust(matchResult[1] as data.AccessToken);
 };
+
+export const dynamicEvaluate = (part: data.PartSnapshot): string => {
+  switch (part.expr._) {
+    case "Just": {
+      const result = evaluateExpr(part.expr.value);
+      if (result === null) {
+        return part.name + "の評価はできなかった";
+      }
+      return part.name + "の評価結果は " + result.toString();
+    }
+    case "Nothing":
+      return part.name + "は式の定義が空だったため評価できなかった!";
+  }
+};
+
+const evaluateExpr = (expr: data.Expr): number | null => {
+  switch (expr._) {
+    case "Kernel":
+      return null;
+    case "Int32Literal":
+      return expr.int32;
+    case "PartReference":
+      return null;
+    case "CapturePartReference":
+      return null;
+    case "TagReference":
+      return null;
+    case "FunctionCall":
+      return evaluateFunctionCall(expr.functionCall);
+    case "Lambda":
+      return null;
+  }
+};
+
+const evaluateFunctionCall = (
+  functionCall: data.FunctionCall
+): number | null => {
+  const parameterB = evaluateExpr(functionCall.parameter);
+  if (parameterB === null) {
+    return null;
+  }
+  switch (functionCall.function._) {
+    case "FunctionCall": {
+      const parameterA = evaluateExpr(
+        functionCall.function.functionCall.parameter
+      );
+      if (parameterA === null) {
+        return null;
+      }
+      switch (functionCall.function.functionCall.function._) {
+        case "Kernel": {
+          switch (functionCall.function.functionCall.function.kernelExpr) {
+            case "Int32Add":
+              return parameterA + parameterB;
+            case "Int32Sub":
+              return parameterA - parameterB;
+            case "Int32Mul":
+              return parameterA * parameterB;
+          }
+        }
+      }
+    }
+  }
+  return null;
+};

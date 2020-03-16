@@ -59,4 +59,23 @@ describe("test", () => {
     const decodedLanguageAndLocation: data.UrlData = main.urlDataFromUrl(url);
     expect(languageAndLocation).toEqual(decodedLanguageAndLocation);
   });
+  it("dynamic Evaluation", () => {
+    console.log(
+      main.dynamicEvaluate({
+        name: "sample",
+        description: "サンプル",
+        parentList: [],
+        expr: main.data.maybeJust(
+          data.exprFunctionCall({
+            function: data.exprFunctionCall({
+              function: data.exprKernel("Int32Add"),
+              parameter: data.exprInt32Literal(32)
+            }),
+            parameter: data.exprInt32Literal(100)
+          })
+        )
+      })
+    );
+    expect("").toBe("");
+  });
 });
