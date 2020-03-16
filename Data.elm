@@ -1,4 +1,4 @@
-module Data exposing (AccessToken(..), Change(..), ClientMode(..), Comment, DateTime, FileHash(..), Idea, IdeaId(..), IdeaItem(..), Language(..), Location(..), ModuleSnapshot, OpenIdConnectProvider(..), PartId(..), PartSnapshot, Project, ProjectId(..), RequestLogInUrlRequestData, Suggestion, TypeSnapshot, UrlData, UserId(..), UserPublic, UserPublicAndUserId, accessTokenJsonDecoder, accessTokenToJsonValue, changeJsonDecoder, changeToJsonValue, clientModeJsonDecoder, clientModeToJsonValue, commentJsonDecoder, commentToJsonValue, dateTimeJsonDecoder, dateTimeToJsonValue, fileHashJsonDecoder, fileHashToJsonValue, ideaIdJsonDecoder, ideaIdToJsonValue, ideaItemJsonDecoder, ideaItemToJsonValue, ideaJsonDecoder, ideaToJsonValue, languageJsonDecoder, languageToJsonValue, locationJsonDecoder, locationToJsonValue, maybeJsonDecoder, maybeToJsonValue, moduleSnapshotJsonDecoder, moduleSnapshotToJsonValue, openIdConnectProviderJsonDecoder, openIdConnectProviderToJsonValue, partIdJsonDecoder, partIdToJsonValue, partSnapshotJsonDecoder, partSnapshotToJsonValue, projectIdJsonDecoder, projectIdToJsonValue, projectJsonDecoder, projectToJsonValue, requestLogInUrlRequestDataJsonDecoder, requestLogInUrlRequestDataToJsonValue, resultJsonDecoder, resultToJsonValue, suggestionJsonDecoder, suggestionToJsonValue, typeSnapshotJsonDecoder, typeSnapshotToJsonValue, urlDataJsonDecoder, urlDataToJsonValue, userIdJsonDecoder, userIdToJsonValue, userPublicAndUserIdJsonDecoder, userPublicAndUserIdToJsonValue, userPublicJsonDecoder, userPublicToJsonValue)
+module Data exposing (AccessToken(..), Change(..), ClientMode(..), Comment, DateTime, FileHash(..), FileHashAndIsThumbnail, Idea, IdeaId(..), IdeaItem(..), Language(..), Location(..), ModuleSnapshot, OpenIdConnectProvider(..), PartId(..), PartSnapshot, Project, ProjectId(..), RequestLogInUrlRequestData, Suggestion, TypeSnapshot, UrlData, UserId(..), UserPublic, UserPublicAndUserId, accessTokenJsonDecoder, accessTokenToJsonValue, changeJsonDecoder, changeToJsonValue, clientModeJsonDecoder, clientModeToJsonValue, commentJsonDecoder, commentToJsonValue, dateTimeJsonDecoder, dateTimeToJsonValue, fileHashAndIsThumbnailJsonDecoder, fileHashAndIsThumbnailToJsonValue, fileHashJsonDecoder, fileHashToJsonValue, ideaIdJsonDecoder, ideaIdToJsonValue, ideaItemJsonDecoder, ideaItemToJsonValue, ideaJsonDecoder, ideaToJsonValue, languageJsonDecoder, languageToJsonValue, locationJsonDecoder, locationToJsonValue, maybeJsonDecoder, maybeToJsonValue, moduleSnapshotJsonDecoder, moduleSnapshotToJsonValue, openIdConnectProviderJsonDecoder, openIdConnectProviderToJsonValue, partIdJsonDecoder, partIdToJsonValue, partSnapshotJsonDecoder, partSnapshotToJsonValue, projectIdJsonDecoder, projectIdToJsonValue, projectJsonDecoder, projectToJsonValue, requestLogInUrlRequestDataJsonDecoder, requestLogInUrlRequestDataToJsonValue, resultJsonDecoder, resultToJsonValue, suggestionJsonDecoder, suggestionToJsonValue, typeSnapshotJsonDecoder, typeSnapshotToJsonValue, urlDataJsonDecoder, urlDataToJsonValue, userIdJsonDecoder, userIdToJsonValue, userPublicAndUserIdJsonDecoder, userPublicAndUserIdToJsonValue, userPublicJsonDecoder, userPublicToJsonValue)
 
 import Json.Decode as Jd
 import Json.Decode.Pipeline as Jdp
@@ -118,6 +118,12 @@ type alias TypeSnapshot =
 -}
 type alias PartSnapshot =
     { name : String, parentList : List PartId, description : String }
+
+
+{-| getImageに必要なパラメーター
+-}
+type alias FileHashAndIsThumbnail =
+    { fileHash : FileHash, isThumbnail : Bool }
 
 
 type AccessToken
@@ -407,6 +413,16 @@ partSnapshotToJsonValue partSnapshot =
         [ ( "name", Je.string partSnapshot.name )
         , ( "parentList", Je.list partIdToJsonValue partSnapshot.parentList )
         , ( "description", Je.string partSnapshot.description )
+        ]
+
+
+{-| FileHashAndIsThumbnailのJSONへのエンコーダ
+-}
+fileHashAndIsThumbnailToJsonValue : FileHashAndIsThumbnail -> Je.Value
+fileHashAndIsThumbnailToJsonValue fileHashAndIsThumbnail =
+    Je.object
+        [ ( "fileHash", fileHashToJsonValue fileHashAndIsThumbnail.fileHash )
+        , ( "isThumbnail", Je.bool fileHashAndIsThumbnail.isThumbnail )
         ]
 
 
@@ -799,3 +815,17 @@ partSnapshotJsonDecoder =
         |> Jdp.required "name" Jd.string
         |> Jdp.required "parentList" (Jd.list partIdJsonDecoder)
         |> Jdp.required "description" Jd.string
+
+
+{-| FileHashAndIsThumbnailのJSON Decoder
+-}
+fileHashAndIsThumbnailJsonDecoder : Jd.Decoder FileHashAndIsThumbnail
+fileHashAndIsThumbnailJsonDecoder =
+    Jd.succeed
+        (\fileHash isThumbnail ->
+            { fileHash = fileHash
+            , isThumbnail = isThumbnail
+            }
+        )
+        |> Jdp.required "fileHash" fileHashJsonDecoder
+        |> Jdp.required "isThumbnail" Jd.bool

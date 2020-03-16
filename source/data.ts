@@ -156,6 +156,14 @@ export type PartSnapshot = {
   description: string;
 };
 
+/**
+ * getImageに必要なパラメーター
+ */
+export type FileHashAndIsThumbnail = {
+  fileHash: FileHash;
+  isThumbnail: boolean;
+};
+
 export type AccessToken = string & { _accessToken: never };
 
 export type UserId = string & { _userId: never };
@@ -501,6 +509,13 @@ export const encodePartSnapshot = (
   encodeString(partSnapshot.name)
     .concat(encodeList(encodeId)(partSnapshot.parentList))
     .concat(encodeString(partSnapshot.description));
+
+export const encodeFileHashAndIsThumbnail = (
+  fileHashAndIsThumbnail: FileHashAndIsThumbnail
+): ReadonlyArray<number> =>
+  encodeToken(fileHashAndIsThumbnail.fileHash).concat(
+    encodeBool(fileHashAndIsThumbnail.isThumbnail)
+  );
 
 /**
  * SignedLeb128で表現されたバイナリをnumberのビット演算ができる32bit符号付き整数の範囲の数値に変換するコード
@@ -1355,5 +1370,33 @@ export const decodePartSnapshot = (
       description: descriptionAndNextIndex.result
     },
     nextIndex: descriptionAndNextIndex.nextIndex
+  };
+};
+
+/**
+ * @param index バイナリを読み込み開始位置
+ * @param binary バイナリ
+ */
+export const decodeFileHashAndIsThumbnail = (
+  index: number,
+  binary: Uint8Array
+): { result: FileHashAndIsThumbnail; nextIndex: number } => {
+  const fileHashAndNextIndex: {
+    result: FileHash;
+    nextIndex: number;
+  } = (decodeToken as (
+    a: number,
+    b: Uint8Array
+  ) => { result: FileHash; nextIndex: number })(index, binary);
+  const isThumbnailAndNextIndex: {
+    result: boolean;
+    nextIndex: number;
+  } = decodeBool(fileHashAndNextIndex.nextIndex, binary);
+  return {
+    result: {
+      fileHash: fileHashAndNextIndex.result,
+      isThumbnail: isThumbnailAndNextIndex.result
+    },
+    nextIndex: isThumbnailAndNextIndex.nextIndex
   };
 };

@@ -31,6 +31,7 @@ const changeName = "Change";
 const moduleSnapshotName = "ModuleSnapshot";
 const typeSnapshotName = "TypeSnapshot";
 const partSnapshotName = "PartSnapshot";
+const fileHashAndIsThumbnailName = "FileHashAndIsThumbnail";
 
 const dateTime: type.CustomType = {
   name: dateTimeName,
@@ -456,6 +457,24 @@ const partSnapshot: type.CustomType = {
   ])
 };
 
+const fileHashAndIsThumbnail: type.CustomType = {
+  name: fileHashAndIsThumbnailName,
+  description: "getImageに必要なパラメーター",
+  body: type.customTypeBodyProduct([
+    {
+      name: "fileHash",
+      description: "ファイルハッシュ (オリジナルの画像)",
+      memberType: fileHash
+    },
+    {
+      name: "isThumbnail",
+      description:
+        "取得したいのは,サイズが小さくて速くデータを受け取れるサムネイル画像かどうか",
+      memberType: type.typeBool
+    }
+  ])
+};
+
 const listCustomType: ReadonlyArray<type.CustomType> = [
   dateTime,
   clientMode,
@@ -474,7 +493,8 @@ const listCustomType: ReadonlyArray<type.CustomType> = [
   change,
   moduleSnapshot,
   typeSnapshot,
-  partSnapshot
+  partSnapshot,
+  fileHashAndIsThumbnail
 ];
 
 const code = codeGen.generateCodeAsString(
