@@ -188,7 +188,42 @@ export type PartSnapshot = {
   name: string;
   parentList: ReadonlyArray<PartId>;
   description: string;
+  expr: Maybe<Expr>;
 };
+
+/**
+ * 式
+ */
+export type Expr =
+  | { _: "Kernel"; kernelExpr: KernelExpr }
+  | { _: "Int32Literal"; int32: number }
+  | { _: "PartReference"; partId: PartId }
+  | { _: "FunctionCall"; functionCall: FunctionCall }
+  | { _: "Lambda"; lambdaBranchList: ReadonlyArray<LambdaBranch> };
+
+/**
+ * Definyだけでは表現できない式
+ */
+export type KernelExpr = "Int32Add" | "Int32Sub" | "Int32Mul";
+
+/**
+ * 関数呼び出し
+ */
+export type FunctionCall = { function: Expr; parameter: Expr };
+
+/**
+ * ラムダのブランチ. Just x -> data x のようなところ
+ */
+export type LambdaBranch = {
+  condition: Condition;
+  description: string;
+  expr: Maybe<Expr>;
+};
+
+/**
+ * ブランチの式を使う条件
+ */
+export type Condition = { _: "Int32"; int32: number };
 
 /**
  * getImageに必要なパラメーター
@@ -310,6 +345,53 @@ export const typeBodySum = (
 export const typeBodyKernel = (typeBodyKernel: TypeBodyKernel): TypeBody => ({
   _: "Kernel",
   typeBodyKernel: typeBodyKernel
+});
+
+/**
+ * Definyだけでは表現できない式
+ */
+export const exprKernel = (kernelExpr: KernelExpr): Expr => ({
+  _: "Kernel",
+  kernelExpr: kernelExpr
+});
+
+/**
+ * 32bit整数
+ */
+export const exprInt32Literal = (int32: number): Expr => ({
+  _: "Int32Literal",
+  int32: int32
+});
+
+/**
+ * パーツの値を参照
+ */
+export const exprPartReference = (partId: PartId): Expr => ({
+  _: "PartReference",
+  partId: partId
+});
+
+/**
+ * 関数呼び出し
+ */
+export const exprFunctionCall = (functionCall: FunctionCall): Expr => ({
+  _: "FunctionCall",
+  functionCall: functionCall
+});
+
+/**
+ * ラムダ
+ */
+export const exprLambda = (
+  lambdaBranchList: ReadonlyArray<LambdaBranch>
+): Expr => ({ _: "Lambda", lambdaBranchList: lambdaBranchList });
+
+/**
+ * 32bit整数の完全一致
+ */
+export const conditionInt32 = (int32: number): Condition => ({
+  _: "Int32",
+  int32: int32
 });
 
 /**
@@ -619,7 +701,68 @@ export const encodePartSnapshot = (
 ): ReadonlyArray<number> =>
   encodeString(partSnapshot.name)
     .concat(encodeList(encodeId)(partSnapshot.parentList))
-    .concat(encodeString(partSnapshot.description));
+    .concat(encodeString(partSnapshot.description))
+    .concat(encodeMaybe(encodeExpr)(partSnapshot.expr));
+
+export const encodeExpr = (expr: Expr): ReadonlyArray<number> => {
+  switch (expr._) {
+    case "Kernel": {
+      return [0].concat(encodeKernelExpr(expr.kernelExpr));
+    }
+    case "Int32Literal": {
+      return [1].concat(encodeInt32(expr.int32));
+    }
+    case "PartReference": {
+      return [2].concat(encodeId(expr.partId));
+    }
+    case "FunctionCall": {
+      return [3].concat(encodeFunctionCall(expr.functionCall));
+    }
+    case "Lambda": {
+      return [4].concat(encodeList(encodeLambdaBranch)(expr.lambdaBranchList));
+    }
+  }
+};
+
+export const encodeKernelExpr = (
+  kernelExpr: KernelExpr
+): ReadonlyArray<number> => {
+  switch (kernelExpr) {
+    case "Int32Add": {
+      return [0];
+    }
+    case "Int32Sub": {
+      return [1];
+    }
+    case "Int32Mul": {
+      return [2];
+    }
+  }
+};
+
+export const encodeFunctionCall = (
+  functionCall: FunctionCall
+): ReadonlyArray<number> =>
+  encodeExpr(functionCall["function"]).concat(
+    encodeExpr(functionCall.parameter)
+  );
+
+export const encodeLambdaBranch = (
+  lambdaBranch: LambdaBranch
+): ReadonlyArray<number> =>
+  encodeCondition(lambdaBranch.condition)
+    .concat(encodeString(lambdaBranch.description))
+    .concat(encodeMaybe(encodeExpr)(lambdaBranch.expr));
+
+export const encodeCondition = (
+  condition: Condition
+): ReadonlyArray<number> => {
+  switch (condition._) {
+    case "Int32": {
+      return [0].concat(encodeInt32(condition.int32));
+    }
+  }
+};
 
 export const encodeFileHashAndIsThumbnail = (
   fileHashAndIsThumbnail: FileHashAndIsThumbnail
@@ -1611,14 +1754,182 @@ export const decodePartSnapshot = (
     result: string;
     nextIndex: number;
   } = decodeString(parentListAndNextIndex.nextIndex, binary);
+  const exprAndNextIndex: {
+    result: Maybe<Expr>;
+    nextIndex: number;
+  } = decodeMaybe(decodeExpr)(descriptionAndNextIndex.nextIndex, binary);
   return {
     result: {
       name: nameAndNextIndex.result,
       parentList: parentListAndNextIndex.result,
-      description: descriptionAndNextIndex.result
+      description: descriptionAndNextIndex.result,
+      expr: exprAndNextIndex.result
     },
-    nextIndex: descriptionAndNextIndex.nextIndex
+    nextIndex: exprAndNextIndex.nextIndex
   };
+};
+
+/**
+ * @param index バイナリを読み込み開始位置
+ * @param binary バイナリ
+ */
+export const decodeExpr = (
+  index: number,
+  binary: Uint8Array
+): { result: Expr; nextIndex: number } => {
+  const patternIndex: { result: number; nextIndex: number } = decodeInt32(
+    index,
+    binary
+  );
+  if (patternIndex.result === 0) {
+    const result: { result: KernelExpr; nextIndex: number } = decodeKernelExpr(
+      patternIndex.nextIndex,
+      binary
+    );
+    return { result: exprKernel(result.result), nextIndex: result.nextIndex };
+  }
+  if (patternIndex.result === 1) {
+    const result: { result: number; nextIndex: number } = decodeInt32(
+      patternIndex.nextIndex,
+      binary
+    );
+    return {
+      result: exprInt32Literal(result.result),
+      nextIndex: result.nextIndex
+    };
+  }
+  if (patternIndex.result === 2) {
+    const result: { result: PartId; nextIndex: number } = (decodeId as (
+      a: number,
+      b: Uint8Array
+    ) => { result: PartId; nextIndex: number })(patternIndex.nextIndex, binary);
+    return {
+      result: exprPartReference(result.result),
+      nextIndex: result.nextIndex
+    };
+  }
+  if (patternIndex.result === 3) {
+    const result: {
+      result: FunctionCall;
+      nextIndex: number;
+    } = decodeFunctionCall(patternIndex.nextIndex, binary);
+    return {
+      result: exprFunctionCall(result.result),
+      nextIndex: result.nextIndex
+    };
+  }
+  if (patternIndex.result === 4) {
+    const result: {
+      result: ReadonlyArray<LambdaBranch>;
+      nextIndex: number;
+    } = decodeList(decodeLambdaBranch)(patternIndex.nextIndex, binary);
+    return { result: exprLambda(result.result), nextIndex: result.nextIndex };
+  }
+  throw new Error("存在しないパターンを指定された 型を更新してください");
+};
+
+/**
+ * @param index バイナリを読み込み開始位置
+ * @param binary バイナリ
+ */
+export const decodeKernelExpr = (
+  index: number,
+  binary: Uint8Array
+): { result: KernelExpr; nextIndex: number } => {
+  const patternIndex: { result: number; nextIndex: number } = decodeInt32(
+    index,
+    binary
+  );
+  if (patternIndex.result === 0) {
+    return { result: "Int32Add", nextIndex: patternIndex.nextIndex };
+  }
+  if (patternIndex.result === 1) {
+    return { result: "Int32Sub", nextIndex: patternIndex.nextIndex };
+  }
+  if (patternIndex.result === 2) {
+    return { result: "Int32Mul", nextIndex: patternIndex.nextIndex };
+  }
+  throw new Error("存在しないパターンを指定された 型を更新してください");
+};
+
+/**
+ * @param index バイナリを読み込み開始位置
+ * @param binary バイナリ
+ */
+export const decodeFunctionCall = (
+  index: number,
+  binary: Uint8Array
+): { result: FunctionCall; nextIndex: number } => {
+  const functionAndNextIndex: { result: Expr; nextIndex: number } = decodeExpr(
+    index,
+    binary
+  );
+  const parameterAndNextIndex: { result: Expr; nextIndex: number } = decodeExpr(
+    functionAndNextIndex.nextIndex,
+    binary
+  );
+  return {
+    result: {
+      function: functionAndNextIndex.result,
+      parameter: parameterAndNextIndex.result
+    },
+    nextIndex: parameterAndNextIndex.nextIndex
+  };
+};
+
+/**
+ * @param index バイナリを読み込み開始位置
+ * @param binary バイナリ
+ */
+export const decodeLambdaBranch = (
+  index: number,
+  binary: Uint8Array
+): { result: LambdaBranch; nextIndex: number } => {
+  const conditionAndNextIndex: {
+    result: Condition;
+    nextIndex: number;
+  } = decodeCondition(index, binary);
+  const descriptionAndNextIndex: {
+    result: string;
+    nextIndex: number;
+  } = decodeString(conditionAndNextIndex.nextIndex, binary);
+  const exprAndNextIndex: {
+    result: Maybe<Expr>;
+    nextIndex: number;
+  } = decodeMaybe(decodeExpr)(descriptionAndNextIndex.nextIndex, binary);
+  return {
+    result: {
+      condition: conditionAndNextIndex.result,
+      description: descriptionAndNextIndex.result,
+      expr: exprAndNextIndex.result
+    },
+    nextIndex: exprAndNextIndex.nextIndex
+  };
+};
+
+/**
+ * @param index バイナリを読み込み開始位置
+ * @param binary バイナリ
+ */
+export const decodeCondition = (
+  index: number,
+  binary: Uint8Array
+): { result: Condition; nextIndex: number } => {
+  const patternIndex: { result: number; nextIndex: number } = decodeInt32(
+    index,
+    binary
+  );
+  if (patternIndex.result === 0) {
+    const result: { result: number; nextIndex: number } = decodeInt32(
+      patternIndex.nextIndex,
+      binary
+    );
+    return {
+      result: conditionInt32(result.result),
+      nextIndex: result.nextIndex
+    };
+  }
+  throw new Error("存在しないパターンを指定された 型を更新してください");
 };
 
 /**

@@ -1,4 +1,4 @@
-module Data exposing (AccessToken(..), Change(..), ClientMode(..), Comment, DateTime, FileHash(..), FileHashAndIsThumbnail, Idea, IdeaId(..), IdeaItem(..), Language(..), Location(..), ModuleSnapshot, OpenIdConnectProvider(..), PartId(..), PartSnapshot, Project, ProjectId(..), RequestLogInUrlRequestData, Suggestion, TypeBody(..), TypeBodyKernel(..), TypeBodyProductMember, TypeBodySumPattern, TypeId(..), TypeSnapshot, UrlData, UserId(..), UserPublic, UserPublicAndUserId, accessTokenJsonDecoder, accessTokenToJsonValue, changeJsonDecoder, changeToJsonValue, clientModeJsonDecoder, clientModeToJsonValue, commentJsonDecoder, commentToJsonValue, dateTimeJsonDecoder, dateTimeToJsonValue, fileHashAndIsThumbnailJsonDecoder, fileHashAndIsThumbnailToJsonValue, fileHashJsonDecoder, fileHashToJsonValue, ideaIdJsonDecoder, ideaIdToJsonValue, ideaItemJsonDecoder, ideaItemToJsonValue, ideaJsonDecoder, ideaToJsonValue, languageJsonDecoder, languageToJsonValue, locationJsonDecoder, locationToJsonValue, maybeJsonDecoder, maybeToJsonValue, moduleSnapshotJsonDecoder, moduleSnapshotToJsonValue, openIdConnectProviderJsonDecoder, openIdConnectProviderToJsonValue, partIdJsonDecoder, partIdToJsonValue, partSnapshotJsonDecoder, partSnapshotToJsonValue, projectIdJsonDecoder, projectIdToJsonValue, projectJsonDecoder, projectToJsonValue, requestLogInUrlRequestDataJsonDecoder, requestLogInUrlRequestDataToJsonValue, resultJsonDecoder, resultToJsonValue, suggestionJsonDecoder, suggestionToJsonValue, typeBodyJsonDecoder, typeBodyKernelJsonDecoder, typeBodyKernelToJsonValue, typeBodyProductMemberJsonDecoder, typeBodyProductMemberToJsonValue, typeBodySumPatternJsonDecoder, typeBodySumPatternToJsonValue, typeBodyToJsonValue, typeIdJsonDecoder, typeIdToJsonValue, typeSnapshotJsonDecoder, typeSnapshotToJsonValue, urlDataJsonDecoder, urlDataToJsonValue, userIdJsonDecoder, userIdToJsonValue, userPublicAndUserIdJsonDecoder, userPublicAndUserIdToJsonValue, userPublicJsonDecoder, userPublicToJsonValue)
+module Data exposing (AccessToken(..), Change(..), ClientMode(..), Comment, Condition(..), DateTime, Expr(..), FileHash(..), FileHashAndIsThumbnail, FunctionCall, Idea, IdeaId(..), IdeaItem(..), KernelExpr(..), LambdaBranch, Language(..), Location(..), ModuleSnapshot, OpenIdConnectProvider(..), PartId(..), PartSnapshot, Project, ProjectId(..), RequestLogInUrlRequestData, Suggestion, TypeBody(..), TypeBodyKernel(..), TypeBodyProductMember, TypeBodySumPattern, TypeId(..), TypeSnapshot, UrlData, UserId(..), UserPublic, UserPublicAndUserId, accessTokenJsonDecoder, accessTokenToJsonValue, changeJsonDecoder, changeToJsonValue, clientModeJsonDecoder, clientModeToJsonValue, commentJsonDecoder, commentToJsonValue, conditionJsonDecoder, conditionToJsonValue, dateTimeJsonDecoder, dateTimeToJsonValue, exprJsonDecoder, exprToJsonValue, fileHashAndIsThumbnailJsonDecoder, fileHashAndIsThumbnailToJsonValue, fileHashJsonDecoder, fileHashToJsonValue, functionCallJsonDecoder, functionCallToJsonValue, ideaIdJsonDecoder, ideaIdToJsonValue, ideaItemJsonDecoder, ideaItemToJsonValue, ideaJsonDecoder, ideaToJsonValue, kernelExprJsonDecoder, kernelExprToJsonValue, lambdaBranchJsonDecoder, lambdaBranchToJsonValue, languageJsonDecoder, languageToJsonValue, locationJsonDecoder, locationToJsonValue, maybeJsonDecoder, maybeToJsonValue, moduleSnapshotJsonDecoder, moduleSnapshotToJsonValue, openIdConnectProviderJsonDecoder, openIdConnectProviderToJsonValue, partIdJsonDecoder, partIdToJsonValue, partSnapshotJsonDecoder, partSnapshotToJsonValue, projectIdJsonDecoder, projectIdToJsonValue, projectJsonDecoder, projectToJsonValue, requestLogInUrlRequestDataJsonDecoder, requestLogInUrlRequestDataToJsonValue, resultJsonDecoder, resultToJsonValue, suggestionJsonDecoder, suggestionToJsonValue, typeBodyJsonDecoder, typeBodyKernelJsonDecoder, typeBodyKernelToJsonValue, typeBodyProductMemberJsonDecoder, typeBodyProductMemberToJsonValue, typeBodySumPatternJsonDecoder, typeBodySumPatternToJsonValue, typeBodyToJsonValue, typeIdJsonDecoder, typeIdToJsonValue, typeSnapshotJsonDecoder, typeSnapshotToJsonValue, urlDataJsonDecoder, urlDataToJsonValue, userIdJsonDecoder, userIdToJsonValue, userPublicAndUserIdJsonDecoder, userPublicAndUserIdToJsonValue, userPublicJsonDecoder, userPublicToJsonValue)
 
 import Json.Decode as Jd
 import Json.Decode.Pipeline as Jdp
@@ -145,7 +145,43 @@ type TypeBodyKernel
 {-| パーツのスナップショット
 -}
 type alias PartSnapshot =
-    { name : String, parentList : List PartId, description : String }
+    { name : String, parentList : List PartId, description : String, expr : Maybe Expr }
+
+
+{-| 式
+-}
+type Expr
+    = ExprKernel KernelExpr
+    | ExprInt32Literal Int
+    | ExprPartReference PartId
+    | ExprFunctionCall FunctionCall
+    | ExprLambda (List LambdaBranch)
+
+
+{-| Definyだけでは表現できない式
+-}
+type KernelExpr
+    = KernelExprInt32Add
+    | KernelExprInt32Sub
+    | KernelExprInt32Mul
+
+
+{-| 関数呼び出し
+-}
+type alias FunctionCall =
+    { function : Expr, parameter : Expr }
+
+
+{-| ラムダのブランチ. Just x -> data x のようなところ
+-}
+type alias LambdaBranch =
+    { condition : Condition, description : String, expr : Maybe Expr }
+
+
+{-| ブランチの式を使う条件
+-}
+type Condition
+    = ConditionInt32 Int
 
 
 {-| getImageに必要なパラメーター
@@ -502,7 +538,74 @@ partSnapshotToJsonValue partSnapshot =
         [ ( "name", Je.string partSnapshot.name )
         , ( "parentList", Je.list partIdToJsonValue partSnapshot.parentList )
         , ( "description", Je.string partSnapshot.description )
+        , ( "expr", maybeToJsonValue exprToJsonValue partSnapshot.expr )
         ]
+
+
+{-| ExprのJSONへのエンコーダ
+-}
+exprToJsonValue : Expr -> Je.Value
+exprToJsonValue expr =
+    case expr of
+        ExprKernel parameter ->
+            Je.object [ ( "_", Je.string "Kernel" ), ( "kernelExpr", kernelExprToJsonValue parameter ) ]
+
+        ExprInt32Literal parameter ->
+            Je.object [ ( "_", Je.string "Int32Literal" ), ( "int32", Je.int parameter ) ]
+
+        ExprPartReference parameter ->
+            Je.object [ ( "_", Je.string "PartReference" ), ( "partId", partIdToJsonValue parameter ) ]
+
+        ExprFunctionCall parameter ->
+            Je.object [ ( "_", Je.string "FunctionCall" ), ( "functionCall", functionCallToJsonValue parameter ) ]
+
+        ExprLambda parameter ->
+            Je.object [ ( "_", Je.string "Lambda" ), ( "lambdaBranchList", Je.list lambdaBranchToJsonValue parameter ) ]
+
+
+{-| KernelExprのJSONへのエンコーダ
+-}
+kernelExprToJsonValue : KernelExpr -> Je.Value
+kernelExprToJsonValue kernelExpr =
+    case kernelExpr of
+        KernelExprInt32Add ->
+            Je.string "Int32Add"
+
+        KernelExprInt32Sub ->
+            Je.string "Int32Sub"
+
+        KernelExprInt32Mul ->
+            Je.string "Int32Mul"
+
+
+{-| FunctionCallのJSONへのエンコーダ
+-}
+functionCallToJsonValue : FunctionCall -> Je.Value
+functionCallToJsonValue functionCall =
+    Je.object
+        [ ( "function", exprToJsonValue functionCall.function )
+        , ( "parameter", exprToJsonValue functionCall.parameter )
+        ]
+
+
+{-| LambdaBranchのJSONへのエンコーダ
+-}
+lambdaBranchToJsonValue : LambdaBranch -> Je.Value
+lambdaBranchToJsonValue lambdaBranch =
+    Je.object
+        [ ( "condition", conditionToJsonValue lambdaBranch.condition )
+        , ( "description", Je.string lambdaBranch.description )
+        , ( "expr", maybeToJsonValue exprToJsonValue lambdaBranch.expr )
+        ]
+
+
+{-| ConditionのJSONへのエンコーダ
+-}
+conditionToJsonValue : Condition -> Je.Value
+conditionToJsonValue condition =
+    case condition of
+        ConditionInt32 parameter ->
+            Je.object [ ( "_", Je.string "Int32" ), ( "int32", Je.int parameter ) ]
 
 
 {-| FileHashAndIsThumbnailのJSONへのエンコーダ
@@ -976,15 +1079,113 @@ typeBodyKernelJsonDecoder =
 partSnapshotJsonDecoder : Jd.Decoder PartSnapshot
 partSnapshotJsonDecoder =
     Jd.succeed
-        (\name parentList description ->
+        (\name parentList description expr ->
             { name = name
             , parentList = parentList
             , description = description
+            , expr = expr
             }
         )
         |> Jdp.required "name" Jd.string
         |> Jdp.required "parentList" (Jd.list partIdJsonDecoder)
         |> Jdp.required "description" Jd.string
+        |> Jdp.required "expr" (maybeJsonDecoder exprJsonDecoder)
+
+
+{-| ExprのJSON Decoder
+-}
+exprJsonDecoder : Jd.Decoder Expr
+exprJsonDecoder =
+    Jd.field "_" Jd.string
+        |> Jd.andThen
+            (\tag ->
+                case tag of
+                    "Kernel" ->
+                        Jd.field "kernelExpr" kernelExprJsonDecoder |> Jd.map ExprKernel
+
+                    "Int32Literal" ->
+                        Jd.field "int32" Jd.int |> Jd.map ExprInt32Literal
+
+                    "PartReference" ->
+                        Jd.field "partId" partIdJsonDecoder |> Jd.map ExprPartReference
+
+                    "FunctionCall" ->
+                        Jd.field "functionCall" functionCallJsonDecoder |> Jd.map ExprFunctionCall
+
+                    "Lambda" ->
+                        Jd.field "lambdaBranchList" (Jd.list lambdaBranchJsonDecoder) |> Jd.map ExprLambda
+
+                    _ ->
+                        Jd.fail ("Exprで不明なタグを受けたとった tag=" ++ tag)
+            )
+
+
+{-| KernelExprのJSON Decoder
+-}
+kernelExprJsonDecoder : Jd.Decoder KernelExpr
+kernelExprJsonDecoder =
+    Jd.string
+        |> Jd.andThen
+            (\tag ->
+                case tag of
+                    "Int32Add" ->
+                        Jd.succeed KernelExprInt32Add
+
+                    "Int32Sub" ->
+                        Jd.succeed KernelExprInt32Sub
+
+                    "Int32Mul" ->
+                        Jd.succeed KernelExprInt32Mul
+
+                    _ ->
+                        Jd.fail ("KernelExprで不明なタグを受けたとった tag=" ++ tag)
+            )
+
+
+{-| FunctionCallのJSON Decoder
+-}
+functionCallJsonDecoder : Jd.Decoder FunctionCall
+functionCallJsonDecoder =
+    Jd.succeed
+        (\function parameter ->
+            { function = function
+            , parameter = parameter
+            }
+        )
+        |> Jdp.required "function" exprJsonDecoder
+        |> Jdp.required "parameter" exprJsonDecoder
+
+
+{-| LambdaBranchのJSON Decoder
+-}
+lambdaBranchJsonDecoder : Jd.Decoder LambdaBranch
+lambdaBranchJsonDecoder =
+    Jd.succeed
+        (\condition description expr ->
+            { condition = condition
+            , description = description
+            , expr = expr
+            }
+        )
+        |> Jdp.required "condition" conditionJsonDecoder
+        |> Jdp.required "description" Jd.string
+        |> Jdp.required "expr" (maybeJsonDecoder exprJsonDecoder)
+
+
+{-| ConditionのJSON Decoder
+-}
+conditionJsonDecoder : Jd.Decoder Condition
+conditionJsonDecoder =
+    Jd.field "_" Jd.string
+        |> Jd.andThen
+            (\tag ->
+                case tag of
+                    "Int32" ->
+                        Jd.field "int32" Jd.int |> Jd.map ConditionInt32
+
+                    _ ->
+                        Jd.fail ("Conditionで不明なタグを受けたとった tag=" ++ tag)
+            )
 
 
 {-| FileHashAndIsThumbnailのJSON Decoder

@@ -36,6 +36,12 @@ const typeBodyProductMemberName = "TypeBodyProductMember";
 const typeBodySumPatternName = "TypeBodySumPattern";
 const typeBodyKernelName = "TypeBodyKernel";
 const fileHashAndIsThumbnailName = "FileHashAndIsThumbnail";
+const exprName = "Expr";
+const kernelExprName = "KernelExpr";
+const functionCallName = "FunctionCall";
+const lambdaBranchName = "LambdaBranch";
+const conditionName = "Condition";
+const conditionTagName = "ConditionTag";
 
 const dateTime: type.CustomType = {
   name: dateTimeName,
@@ -457,6 +463,11 @@ const partSnapshot: type.CustomType = {
       name: "description",
       description: "パーツの説明",
       memberType: type.typeString
+    },
+    {
+      name: "expr",
+      description: "パーツの式",
+      memberType: type.typeMaybe(type.typeCustom(exprName))
     }
   ])
 };
@@ -571,6 +582,113 @@ const fileHashAndIsThumbnail: type.CustomType = {
   ])
 };
 
+const expr: type.CustomType = {
+  name: exprName,
+  description: "式",
+  body: type.customTypeBodySum([
+    {
+      name: "Kernel",
+      description: "Definyだけでは表現できない式",
+      parameter: type.maybeJust(type.typeCustom(kernelExprName))
+    },
+    {
+      name: "Int32Literal",
+      description: "32bit整数",
+      parameter: type.maybeJust(type.typeInt32)
+    },
+    {
+      name: "PartReference",
+      description: "パーツの値を参照",
+      parameter: type.maybeJust(partId)
+    },
+    {
+      name: "FunctionCall",
+      description: "関数呼び出し",
+      parameter: type.maybeJust(type.typeCustom(functionCallName))
+    },
+    {
+      name: "Lambda",
+      description: "ラムダ",
+      parameter: type.maybeJust(
+        type.typeList(type.typeCustom(lambdaBranchName))
+      )
+    }
+  ])
+};
+
+const kernelExpr: type.CustomType = {
+  name: kernelExprName,
+  description: "Definyだけでは表現できない式",
+  body: type.customTypeBodySum([
+    {
+      name: "Int32Add",
+      description: "32bit整数を足す関数",
+      parameter: type.maybeNothing()
+    },
+    {
+      name: "Int32Sub",
+      description: "32bit整数を引く関数",
+      parameter: type.maybeNothing()
+    },
+    {
+      name: "Int32Mul",
+      description: "32bit整数をかける関数",
+      parameter: type.maybeNothing()
+    }
+  ])
+};
+
+const functionCall: type.CustomType = {
+  name: functionCallName,
+  description: "関数呼び出し",
+  body: type.customTypeBodyProduct([
+    {
+      name: "function",
+      description: "関数",
+      memberType: type.typeCustom(exprName)
+    },
+    {
+      name: "parameter",
+      description: "パラメーター",
+      memberType: type.typeCustom(exprName)
+    }
+  ])
+};
+
+const lambdaBranch: type.CustomType = {
+  name: lambdaBranchName,
+  description: "ラムダのブランチ. Just x -> data x のようなところ",
+  body: type.customTypeBodyProduct([
+    {
+      name: "condition",
+      description: "入力値の条件を書くところ. Just x",
+      memberType: type.typeCustom(conditionName)
+    },
+    {
+      name: "description",
+      description: "ブランチの説明",
+      memberType: type.typeString
+    },
+    {
+      name: "expr",
+      description: "式",
+      memberType: type.typeMaybe(type.typeCustom(exprName))
+    }
+  ])
+};
+
+const condition: type.CustomType = {
+  name: conditionName,
+  description: "ブランチの式を使う条件",
+  body: type.customTypeBodySum([
+    {
+      name: "Int32",
+      description: "32bit整数の完全一致",
+      parameter: type.maybeJust(type.typeInt32)
+    }
+  ])
+};
+
 const listCustomType: ReadonlyArray<type.CustomType> = [
   dateTime,
   clientMode,
@@ -594,6 +712,11 @@ const listCustomType: ReadonlyArray<type.CustomType> = [
   typeBodySumPattern,
   typeBodyKernel,
   partSnapshot,
+  expr,
+  kernelExpr,
+  functionCall,
+  lambdaBranch,
+  condition,
   fileHashAndIsThumbnail
 ];
 
