@@ -1,4 +1,4 @@
-module Data exposing (AccessToken(..), Change(..), ClientMode(..), Comment, DateTime, FileHash(..), FileHashAndIsThumbnail, Idea, IdeaId(..), IdeaItem(..), Language(..), Location(..), ModuleSnapshot, OpenIdConnectProvider(..), PartId(..), PartSnapshot, Project, ProjectId(..), RequestLogInUrlRequestData, Suggestion, TypeSnapshot, UrlData, UserId(..), UserPublic, UserPublicAndUserId, accessTokenJsonDecoder, accessTokenToJsonValue, changeJsonDecoder, changeToJsonValue, clientModeJsonDecoder, clientModeToJsonValue, commentJsonDecoder, commentToJsonValue, dateTimeJsonDecoder, dateTimeToJsonValue, fileHashAndIsThumbnailJsonDecoder, fileHashAndIsThumbnailToJsonValue, fileHashJsonDecoder, fileHashToJsonValue, ideaIdJsonDecoder, ideaIdToJsonValue, ideaItemJsonDecoder, ideaItemToJsonValue, ideaJsonDecoder, ideaToJsonValue, languageJsonDecoder, languageToJsonValue, locationJsonDecoder, locationToJsonValue, maybeJsonDecoder, maybeToJsonValue, moduleSnapshotJsonDecoder, moduleSnapshotToJsonValue, openIdConnectProviderJsonDecoder, openIdConnectProviderToJsonValue, partIdJsonDecoder, partIdToJsonValue, partSnapshotJsonDecoder, partSnapshotToJsonValue, projectIdJsonDecoder, projectIdToJsonValue, projectJsonDecoder, projectToJsonValue, requestLogInUrlRequestDataJsonDecoder, requestLogInUrlRequestDataToJsonValue, resultJsonDecoder, resultToJsonValue, suggestionJsonDecoder, suggestionToJsonValue, typeSnapshotJsonDecoder, typeSnapshotToJsonValue, urlDataJsonDecoder, urlDataToJsonValue, userIdJsonDecoder, userIdToJsonValue, userPublicAndUserIdJsonDecoder, userPublicAndUserIdToJsonValue, userPublicJsonDecoder, userPublicToJsonValue)
+module Data exposing (AccessToken(..), Change(..), ClientMode(..), Comment, DateTime, FileHash(..), FileHashAndIsThumbnail, Idea, IdeaId(..), IdeaItem(..), Language(..), Location(..), ModuleSnapshot, OpenIdConnectProvider(..), PartId(..), PartSnapshot, Project, ProjectId(..), RequestLogInUrlRequestData, Suggestion, TypeBody(..), TypeBodyKernel(..), TypeBodyProductMember, TypeBodySumPattern, TypeId(..), TypeSnapshot, UrlData, UserId(..), UserPublic, UserPublicAndUserId, accessTokenJsonDecoder, accessTokenToJsonValue, changeJsonDecoder, changeToJsonValue, clientModeJsonDecoder, clientModeToJsonValue, commentJsonDecoder, commentToJsonValue, dateTimeJsonDecoder, dateTimeToJsonValue, fileHashAndIsThumbnailJsonDecoder, fileHashAndIsThumbnailToJsonValue, fileHashJsonDecoder, fileHashToJsonValue, ideaIdJsonDecoder, ideaIdToJsonValue, ideaItemJsonDecoder, ideaItemToJsonValue, ideaJsonDecoder, ideaToJsonValue, languageJsonDecoder, languageToJsonValue, locationJsonDecoder, locationToJsonValue, maybeJsonDecoder, maybeToJsonValue, moduleSnapshotJsonDecoder, moduleSnapshotToJsonValue, openIdConnectProviderJsonDecoder, openIdConnectProviderToJsonValue, partIdJsonDecoder, partIdToJsonValue, partSnapshotJsonDecoder, partSnapshotToJsonValue, projectIdJsonDecoder, projectIdToJsonValue, projectJsonDecoder, projectToJsonValue, requestLogInUrlRequestDataJsonDecoder, requestLogInUrlRequestDataToJsonValue, resultJsonDecoder, resultToJsonValue, suggestionJsonDecoder, suggestionToJsonValue, typeBodyJsonDecoder, typeBodyKernelJsonDecoder, typeBodyKernelToJsonValue, typeBodyProductMemberJsonDecoder, typeBodyProductMemberToJsonValue, typeBodySumPatternJsonDecoder, typeBodySumPatternToJsonValue, typeBodyToJsonValue, typeIdJsonDecoder, typeIdToJsonValue, typeSnapshotJsonDecoder, typeSnapshotToJsonValue, urlDataJsonDecoder, urlDataToJsonValue, userIdJsonDecoder, userIdToJsonValue, userPublicAndUserIdJsonDecoder, userPublicAndUserIdToJsonValue, userPublicJsonDecoder, userPublicToJsonValue)
 
 import Json.Decode as Jd
 import Json.Decode.Pipeline as Jdp
@@ -114,6 +114,34 @@ type alias TypeSnapshot =
     { name : String, parentList : List PartId, description : String }
 
 
+{-| 型の定義本体
+-}
+type TypeBody
+    = TypeBodyProduct (List TypeBodyProductMember)
+    | TypeBodySum (List TypeBodySumPattern)
+    | TypeBodyKernel TypeBodyKernel
+
+
+{-| 直積型のメンバー
+-}
+type alias TypeBodyProductMember =
+    { name : String, description : String, memberType : TypeId }
+
+
+{-| 直積型のパターン
+-}
+type alias TypeBodySumPattern =
+    { name : String, description : String, parameter : Maybe TypeId }
+
+
+{-| Definyだけでは表現できないデータ型
+-}
+type TypeBodyKernel
+    = TypeBodyKernelFunction
+    | TypeBodyKernelInt32
+    | TypeBodyKernelList
+
+
 {-| パーツのスナップショット
 -}
 type alias PartSnapshot =
@@ -148,6 +176,10 @@ type IdeaId
 
 type PartId
     = PartId String
+
+
+type TypeId
+    = TypeId String
 
 
 maybeToJsonValue : (a -> Je.Value) -> Maybe a -> Je.Value
@@ -197,6 +229,11 @@ ideaIdToJsonValue (IdeaId string) =
 
 partIdToJsonValue : PartId -> Je.Value
 partIdToJsonValue (PartId string) =
+    Je.string string
+
+
+typeIdToJsonValue : TypeId -> Je.Value
+typeIdToJsonValue (TypeId string) =
     Je.string string
 
 
@@ -405,6 +442,58 @@ typeSnapshotToJsonValue typeSnapshot =
         ]
 
 
+{-| TypeBodyのJSONへのエンコーダ
+-}
+typeBodyToJsonValue : TypeBody -> Je.Value
+typeBodyToJsonValue typeBody =
+    case typeBody of
+        TypeBodyProduct parameter ->
+            Je.object [ ( "_", Je.string "Product" ), ( "typeBodyProductMemberList", Je.list typeBodyProductMemberToJsonValue parameter ) ]
+
+        TypeBodySum parameter ->
+            Je.object [ ( "_", Je.string "Sum" ), ( "typeBodySumPatternList", Je.list typeBodySumPatternToJsonValue parameter ) ]
+
+        TypeBodyKernel parameter ->
+            Je.object [ ( "_", Je.string "Kernel" ), ( "typeBodyKernel", typeBodyKernelToJsonValue parameter ) ]
+
+
+{-| TypeBodyProductMemberのJSONへのエンコーダ
+-}
+typeBodyProductMemberToJsonValue : TypeBodyProductMember -> Je.Value
+typeBodyProductMemberToJsonValue typeBodyProductMember =
+    Je.object
+        [ ( "name", Je.string typeBodyProductMember.name )
+        , ( "description", Je.string typeBodyProductMember.description )
+        , ( "memberType", typeIdToJsonValue typeBodyProductMember.memberType )
+        ]
+
+
+{-| TypeBodySumPatternのJSONへのエンコーダ
+-}
+typeBodySumPatternToJsonValue : TypeBodySumPattern -> Je.Value
+typeBodySumPatternToJsonValue typeBodySumPattern =
+    Je.object
+        [ ( "name", Je.string typeBodySumPattern.name )
+        , ( "description", Je.string typeBodySumPattern.description )
+        , ( "parameter", maybeToJsonValue typeIdToJsonValue typeBodySumPattern.parameter )
+        ]
+
+
+{-| TypeBodyKernelのJSONへのエンコーダ
+-}
+typeBodyKernelToJsonValue : TypeBodyKernel -> Je.Value
+typeBodyKernelToJsonValue typeBodyKernel =
+    case typeBodyKernel of
+        TypeBodyKernelFunction ->
+            Je.string "Function"
+
+        TypeBodyKernelInt32 ->
+            Je.string "Int32"
+
+        TypeBodyKernelList ->
+            Je.string "List"
+
+
 {-| PartSnapshotのJSONへのエンコーダ
 -}
 partSnapshotToJsonValue : PartSnapshot -> Je.Value
@@ -488,6 +577,11 @@ ideaIdJsonDecoder =
 partIdJsonDecoder : Jd.Decoder PartId
 partIdJsonDecoder =
     Jd.map PartId Jd.string
+
+
+typeIdJsonDecoder : Jd.Decoder TypeId
+typeIdJsonDecoder =
+    Jd.map TypeId Jd.string
 
 
 {-| DateTimeのJSON Decoder
@@ -799,6 +893,82 @@ typeSnapshotJsonDecoder =
         |> Jdp.required "name" Jd.string
         |> Jdp.required "parentList" (Jd.list partIdJsonDecoder)
         |> Jdp.required "description" Jd.string
+
+
+{-| TypeBodyのJSON Decoder
+-}
+typeBodyJsonDecoder : Jd.Decoder TypeBody
+typeBodyJsonDecoder =
+    Jd.field "_" Jd.string
+        |> Jd.andThen
+            (\tag ->
+                case tag of
+                    "Product" ->
+                        Jd.field "typeBodyProductMemberList" (Jd.list typeBodyProductMemberJsonDecoder) |> Jd.map TypeBodyProduct
+
+                    "Sum" ->
+                        Jd.field "typeBodySumPatternList" (Jd.list typeBodySumPatternJsonDecoder) |> Jd.map TypeBodySum
+
+                    "Kernel" ->
+                        Jd.field "typeBodyKernel" typeBodyKernelJsonDecoder |> Jd.map TypeBodyKernel
+
+                    _ ->
+                        Jd.fail ("TypeBodyで不明なタグを受けたとった tag=" ++ tag)
+            )
+
+
+{-| TypeBodyProductMemberのJSON Decoder
+-}
+typeBodyProductMemberJsonDecoder : Jd.Decoder TypeBodyProductMember
+typeBodyProductMemberJsonDecoder =
+    Jd.succeed
+        (\name description memberType ->
+            { name = name
+            , description = description
+            , memberType = memberType
+            }
+        )
+        |> Jdp.required "name" Jd.string
+        |> Jdp.required "description" Jd.string
+        |> Jdp.required "memberType" typeIdJsonDecoder
+
+
+{-| TypeBodySumPatternのJSON Decoder
+-}
+typeBodySumPatternJsonDecoder : Jd.Decoder TypeBodySumPattern
+typeBodySumPatternJsonDecoder =
+    Jd.succeed
+        (\name description parameter ->
+            { name = name
+            , description = description
+            , parameter = parameter
+            }
+        )
+        |> Jdp.required "name" Jd.string
+        |> Jdp.required "description" Jd.string
+        |> Jdp.required "parameter" (maybeJsonDecoder typeIdJsonDecoder)
+
+
+{-| TypeBodyKernelのJSON Decoder
+-}
+typeBodyKernelJsonDecoder : Jd.Decoder TypeBodyKernel
+typeBodyKernelJsonDecoder =
+    Jd.string
+        |> Jd.andThen
+            (\tag ->
+                case tag of
+                    "Function" ->
+                        Jd.succeed TypeBodyKernelFunction
+
+                    "Int32" ->
+                        Jd.succeed TypeBodyKernelInt32
+
+                    "List" ->
+                        Jd.succeed TypeBodyKernelList
+
+                    _ ->
+                        Jd.fail ("TypeBodyKernelで不明なタグを受けたとった tag=" ++ tag)
+            )
 
 
 {-| PartSnapshotのJSON Decoder

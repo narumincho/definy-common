@@ -31,6 +31,10 @@ const changeName = "Change";
 const moduleSnapshotName = "ModuleSnapshot";
 const typeSnapshotName = "TypeSnapshot";
 const partSnapshotName = "PartSnapshot";
+const typeBodyName = "TypeBody";
+const typeBodyProductMemberName = "TypeBodyProductMember";
+const typeBodySumPatternName = "TypeBodySumPattern";
+const typeBodyKernelName = "TypeBodyKernel";
 const fileHashAndIsThumbnailName = "FileHashAndIsThumbnail";
 
 const dateTime: type.CustomType = {
@@ -457,6 +461,98 @@ const partSnapshot: type.CustomType = {
   ])
 };
 
+const typeBody: type.CustomType = {
+  name: typeBodyName,
+  description: "型の定義本体",
+  body: type.customTypeBodySum([
+    {
+      name: "Product",
+      description: "直積型",
+      parameter: type.maybeJust(
+        type.typeList(type.typeCustom(typeBodyProductMemberName))
+      )
+    },
+    {
+      name: "Sum",
+      description: "直和型",
+      parameter: type.maybeJust(
+        type.typeList(type.typeCustom(typeBodySumPatternName))
+      )
+    },
+    {
+      name: "Kernel",
+      description: "Definyだけでは表現できないデータ型",
+      parameter: type.maybeJust(type.typeCustom(typeBodyKernelName))
+    }
+  ])
+};
+
+const typeBodyProductMember: type.CustomType = {
+  name: typeBodyProductMemberName,
+  description: "直積型のメンバー",
+  body: type.customTypeBodyProduct([
+    {
+      name: "name",
+      description: "メンバー名",
+      memberType: type.typeString
+    },
+    {
+      name: "description",
+      description: "説明文",
+      memberType: type.typeString
+    },
+    {
+      name: "memberType",
+      description: "メンバー値の型",
+      memberType: typeId
+    }
+  ])
+};
+
+const typeBodySumPattern: type.CustomType = {
+  name: typeBodySumPatternName,
+  description: "直積型のパターン",
+  body: type.customTypeBodyProduct([
+    {
+      name: "name",
+      description: "タグ名",
+      memberType: type.typeString
+    },
+    {
+      name: "description",
+      description: "説明文",
+      memberType: type.typeString
+    },
+    {
+      name: "parameter",
+      description: "パラメーター",
+      memberType: type.typeMaybe(typeId)
+    }
+  ])
+};
+
+const typeBodyKernel: type.CustomType = {
+  name: typeBodyKernelName,
+  description: "Definyだけでは表現できないデータ型",
+  body: type.customTypeBodySum([
+    {
+      name: "Function",
+      description: "関数",
+      parameter: type.maybeNothing()
+    },
+    {
+      name: "Int32",
+      description: "32bit整数",
+      parameter: type.maybeNothing()
+    },
+    {
+      name: "List",
+      description: "リスト",
+      parameter: type.maybeNothing()
+    }
+  ])
+};
+
 const fileHashAndIsThumbnail: type.CustomType = {
   name: fileHashAndIsThumbnailName,
   description: "getImageに必要なパラメーター",
@@ -493,6 +589,10 @@ const listCustomType: ReadonlyArray<type.CustomType> = [
   change,
   moduleSnapshot,
   typeSnapshot,
+  typeBody,
+  typeBodyProductMember,
+  typeBodySumPattern,
+  typeBodyKernel,
   partSnapshot,
   fileHashAndIsThumbnail
 ];

@@ -148,6 +148,40 @@ export type TypeSnapshot = {
 };
 
 /**
+ * 型の定義本体
+ */
+export type TypeBody =
+  | {
+      _: "Product";
+      typeBodyProductMemberList: ReadonlyArray<TypeBodyProductMember>;
+    }
+  | { _: "Sum"; typeBodySumPatternList: ReadonlyArray<TypeBodySumPattern> }
+  | { _: "Kernel"; typeBodyKernel: TypeBodyKernel };
+
+/**
+ * 直積型のメンバー
+ */
+export type TypeBodyProductMember = {
+  name: string;
+  description: string;
+  memberType: TypeId;
+};
+
+/**
+ * 直積型のパターン
+ */
+export type TypeBodySumPattern = {
+  name: string;
+  description: string;
+  parameter: Maybe<TypeId>;
+};
+
+/**
+ * Definyだけでは表現できないデータ型
+ */
+export type TypeBodyKernel = "Function" | "Int32" | "List";
+
+/**
  * パーツのスナップショット
  */
 export type PartSnapshot = {
@@ -175,6 +209,8 @@ export type FileHash = string & { _fileHash: never };
 export type IdeaId = string & { _ideaId: never };
 
 export type PartId = string & { _partId: never };
+
+export type TypeId = string & { _typeId: never };
 
 export const maybeJust = <T>(value: T): Maybe<T> => ({
   _: "Just",
@@ -249,6 +285,31 @@ export const ideaItemSuggestion = (suggestion: Suggestion): IdeaItem => ({
 export const changeProjectName = (string_: string): Change => ({
   _: "ProjectName",
   string_: string_
+});
+
+/**
+ * 直積型
+ */
+export const typeBodyProduct = (
+  typeBodyProductMemberList: ReadonlyArray<TypeBodyProductMember>
+): TypeBody => ({
+  _: "Product",
+  typeBodyProductMemberList: typeBodyProductMemberList
+});
+
+/**
+ * 直和型
+ */
+export const typeBodySum = (
+  typeBodySumPatternList: ReadonlyArray<TypeBodySumPattern>
+): TypeBody => ({ _: "Sum", typeBodySumPatternList: typeBodySumPatternList });
+
+/**
+ * Definyだけでは表現できないデータ型
+ */
+export const typeBodyKernel = (typeBodyKernel: TypeBodyKernel): TypeBody => ({
+  _: "Kernel",
+  typeBodyKernel: typeBodyKernel
 });
 
 /**
@@ -502,6 +563,56 @@ export const encodeTypeSnapshot = (
   encodeString(typeSnapshot.name)
     .concat(encodeList(encodeId)(typeSnapshot.parentList))
     .concat(encodeString(typeSnapshot.description));
+
+export const encodeTypeBody = (typeBody: TypeBody): ReadonlyArray<number> => {
+  switch (typeBody._) {
+    case "Product": {
+      return [0].concat(
+        encodeList(encodeTypeBodyProductMember)(
+          typeBody.typeBodyProductMemberList
+        )
+      );
+    }
+    case "Sum": {
+      return [1].concat(
+        encodeList(encodeTypeBodySumPattern)(typeBody.typeBodySumPatternList)
+      );
+    }
+    case "Kernel": {
+      return [2].concat(encodeTypeBodyKernel(typeBody.typeBodyKernel));
+    }
+  }
+};
+
+export const encodeTypeBodyProductMember = (
+  typeBodyProductMember: TypeBodyProductMember
+): ReadonlyArray<number> =>
+  encodeString(typeBodyProductMember.name)
+    .concat(encodeString(typeBodyProductMember.description))
+    .concat(encodeId(typeBodyProductMember.memberType));
+
+export const encodeTypeBodySumPattern = (
+  typeBodySumPattern: TypeBodySumPattern
+): ReadonlyArray<number> =>
+  encodeString(typeBodySumPattern.name)
+    .concat(encodeString(typeBodySumPattern.description))
+    .concat(encodeMaybe(encodeId)(typeBodySumPattern.parameter));
+
+export const encodeTypeBodyKernel = (
+  typeBodyKernel: TypeBodyKernel
+): ReadonlyArray<number> => {
+  switch (typeBodyKernel) {
+    case "Function": {
+      return [0];
+    }
+    case "Int32": {
+      return [1];
+    }
+    case "List": {
+      return [2];
+    }
+  }
+};
 
 export const encodePartSnapshot = (
   partSnapshot: PartSnapshot
@@ -1336,6 +1447,143 @@ export const decodeTypeSnapshot = (
     },
     nextIndex: descriptionAndNextIndex.nextIndex
   };
+};
+
+/**
+ * @param index バイナリを読み込み開始位置
+ * @param binary バイナリ
+ */
+export const decodeTypeBody = (
+  index: number,
+  binary: Uint8Array
+): { result: TypeBody; nextIndex: number } => {
+  const patternIndex: { result: number; nextIndex: number } = decodeInt32(
+    index,
+    binary
+  );
+  if (patternIndex.result === 0) {
+    const result: {
+      result: ReadonlyArray<TypeBodyProductMember>;
+      nextIndex: number;
+    } = decodeList(decodeTypeBodyProductMember)(patternIndex.nextIndex, binary);
+    return {
+      result: typeBodyProduct(result.result),
+      nextIndex: result.nextIndex
+    };
+  }
+  if (patternIndex.result === 1) {
+    const result: {
+      result: ReadonlyArray<TypeBodySumPattern>;
+      nextIndex: number;
+    } = decodeList(decodeTypeBodySumPattern)(patternIndex.nextIndex, binary);
+    return { result: typeBodySum(result.result), nextIndex: result.nextIndex };
+  }
+  if (patternIndex.result === 2) {
+    const result: {
+      result: TypeBodyKernel;
+      nextIndex: number;
+    } = decodeTypeBodyKernel(patternIndex.nextIndex, binary);
+    return {
+      result: typeBodyKernel(result.result),
+      nextIndex: result.nextIndex
+    };
+  }
+  throw new Error("存在しないパターンを指定された 型を更新してください");
+};
+
+/**
+ * @param index バイナリを読み込み開始位置
+ * @param binary バイナリ
+ */
+export const decodeTypeBodyProductMember = (
+  index: number,
+  binary: Uint8Array
+): { result: TypeBodyProductMember; nextIndex: number } => {
+  const nameAndNextIndex: { result: string; nextIndex: number } = decodeString(
+    index,
+    binary
+  );
+  const descriptionAndNextIndex: {
+    result: string;
+    nextIndex: number;
+  } = decodeString(nameAndNextIndex.nextIndex, binary);
+  const memberTypeAndNextIndex: {
+    result: TypeId;
+    nextIndex: number;
+  } = (decodeId as (
+    a: number,
+    b: Uint8Array
+  ) => { result: TypeId; nextIndex: number })(
+    descriptionAndNextIndex.nextIndex,
+    binary
+  );
+  return {
+    result: {
+      name: nameAndNextIndex.result,
+      description: descriptionAndNextIndex.result,
+      memberType: memberTypeAndNextIndex.result
+    },
+    nextIndex: memberTypeAndNextIndex.nextIndex
+  };
+};
+
+/**
+ * @param index バイナリを読み込み開始位置
+ * @param binary バイナリ
+ */
+export const decodeTypeBodySumPattern = (
+  index: number,
+  binary: Uint8Array
+): { result: TypeBodySumPattern; nextIndex: number } => {
+  const nameAndNextIndex: { result: string; nextIndex: number } = decodeString(
+    index,
+    binary
+  );
+  const descriptionAndNextIndex: {
+    result: string;
+    nextIndex: number;
+  } = decodeString(nameAndNextIndex.nextIndex, binary);
+  const parameterAndNextIndex: {
+    result: Maybe<TypeId>;
+    nextIndex: number;
+  } = decodeMaybe(
+    decodeId as (
+      a: number,
+      b: Uint8Array
+    ) => { result: TypeId; nextIndex: number }
+  )(descriptionAndNextIndex.nextIndex, binary);
+  return {
+    result: {
+      name: nameAndNextIndex.result,
+      description: descriptionAndNextIndex.result,
+      parameter: parameterAndNextIndex.result
+    },
+    nextIndex: parameterAndNextIndex.nextIndex
+  };
+};
+
+/**
+ * @param index バイナリを読み込み開始位置
+ * @param binary バイナリ
+ */
+export const decodeTypeBodyKernel = (
+  index: number,
+  binary: Uint8Array
+): { result: TypeBodyKernel; nextIndex: number } => {
+  const patternIndex: { result: number; nextIndex: number } = decodeInt32(
+    index,
+    binary
+  );
+  if (patternIndex.result === 0) {
+    return { result: "Function", nextIndex: patternIndex.nextIndex };
+  }
+  if (patternIndex.result === 1) {
+    return { result: "Int32", nextIndex: patternIndex.nextIndex };
+  }
+  if (patternIndex.result === 2) {
+    return { result: "List", nextIndex: patternIndex.nextIndex };
+  }
+  throw new Error("存在しないパターンを指定された 型を更新してください");
 };
 
 /**
