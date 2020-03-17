@@ -615,7 +615,7 @@ const expr: type.CustomType = {
     {
       name: "LocalPartReference",
       description: "ローカルパーツの参照",
-      parameter: type.maybeJust(localPartId)
+      parameter: type.maybeJust(type.typeCustom(localPartReferenceName))
     },
     {
       name: "TagReference",

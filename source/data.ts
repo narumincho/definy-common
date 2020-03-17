@@ -204,7 +204,7 @@ export type Expr =
   | { _: "Kernel"; kernelExpr: KernelExpr }
   | { _: "Int32Literal"; int32: number }
   | { _: "PartReference"; partId: PartId }
-  | { _: "LocalPartReference"; localPartId: LocalPartId }
+  | { _: "LocalPartReference"; localPartReference: LocalPartReference }
   | { _: "TagReference"; tagReferenceIndex: TagReferenceIndex }
   | { _: "FunctionCall"; functionCall: FunctionCall }
   | { _: "Lambda"; lambdaBranchList: ReadonlyArray<LambdaBranch> };
@@ -422,9 +422,11 @@ export const exprPartReference = (partId: PartId): Expr => ({
 /**
  * ローカルパーツの参照
  */
-export const exprLocalPartReference = (localPartId: LocalPartId): Expr => ({
+export const exprLocalPartReference = (
+  localPartReference: LocalPartReference
+): Expr => ({
   _: "LocalPartReference",
-  localPartId: localPartId
+  localPartReference: localPartReference
 });
 
 /**
@@ -801,7 +803,7 @@ export const encodeExpr = (expr: Expr): ReadonlyArray<number> => {
       return [2].concat(encodeId(expr.partId));
     }
     case "LocalPartReference": {
-      return [3].concat(encodeId(expr.localPartId));
+      return [3].concat(encodeLocalPartReference(expr.localPartReference));
     }
     case "TagReference": {
       return [4].concat(encodeTagReferenceIndex(expr.tagReferenceIndex));
@@ -1980,13 +1982,10 @@ export const decodeExpr = (
     };
   }
   if (patternIndex.result === 3) {
-    const result: { result: LocalPartId; nextIndex: number } = (decodeId as (
-      a: number,
-      b: Uint8Array
-    ) => { result: LocalPartId; nextIndex: number })(
-      patternIndex.nextIndex,
-      binary
-    );
+    const result: {
+      result: LocalPartReference;
+      nextIndex: number;
+    } = decodeLocalPartReference(patternIndex.nextIndex, binary);
     return {
       result: exprLocalPartReference(result.result),
       nextIndex: result.nextIndex

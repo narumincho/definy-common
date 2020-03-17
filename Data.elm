@@ -160,7 +160,7 @@ type Expr
     = ExprKernel KernelExpr
     | ExprInt32Literal Int
     | ExprPartReference PartId
-    | ExprLocalPartReference LocalPartId
+    | ExprLocalPartReference LocalPartReference
     | ExprTagReference TagReferenceIndex
     | ExprFunctionCall FunctionCall
     | ExprLambda (List LambdaBranch)
@@ -627,7 +627,7 @@ exprToJsonValue expr =
             Je.object [ ( "_", Je.string "PartReference" ), ( "partId", partIdToJsonValue parameter ) ]
 
         ExprLocalPartReference parameter ->
-            Je.object [ ( "_", Je.string "LocalPartReference" ), ( "localPartId", localPartIdToJsonValue parameter ) ]
+            Je.object [ ( "_", Je.string "LocalPartReference" ), ( "localPartReference", localPartReferenceToJsonValue parameter ) ]
 
         ExprTagReference parameter ->
             Je.object [ ( "_", Je.string "TagReference" ), ( "tagReferenceIndex", tagReferenceIndexToJsonValue parameter ) ]
@@ -1275,7 +1275,7 @@ exprJsonDecoder =
                         Jd.field "partId" partIdJsonDecoder |> Jd.map ExprPartReference
 
                     "LocalPartReference" ->
-                        Jd.field "localPartId" localPartIdJsonDecoder |> Jd.map ExprLocalPartReference
+                        Jd.field "localPartReference" localPartReferenceJsonDecoder |> Jd.map ExprLocalPartReference
 
                     "TagReference" ->
                         Jd.field "tagReferenceIndex" tagReferenceIndexJsonDecoder |> Jd.map ExprTagReference
