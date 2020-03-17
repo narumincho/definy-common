@@ -48,6 +48,7 @@ const conditionName = "Condition";
 const conditionTagName = "ConditionTag";
 const branchPartDefinitionName = "BranchPartDefinition";
 const conditionCaptureName = "ConditionCapture";
+const evaluateExprErrorName = "EvaluateExprError";
 const fileHashAndIsThumbnailName = "FileHashAndIsThumbnail";
 
 const dateTime: type.CustomType = {
@@ -211,6 +212,24 @@ const language: type.CustomType = {
       name: "Esperanto",
       description: "エスペラント語",
       parameter: type.maybeNothing()
+    }
+  ])
+};
+
+const fileHashAndIsThumbnail: type.CustomType = {
+  name: fileHashAndIsThumbnailName,
+  description: "getImageに必要なパラメーター",
+  body: type.customTypeBodyProduct([
+    {
+      name: "fileHash",
+      description: "ファイルハッシュ (オリジナルの画像)",
+      memberType: fileHash
+    },
+    {
+      name: "isThumbnail",
+      description:
+        "取得したいのは,サイズが小さくて速くデータを受け取れるサムネイル画像かどうか",
+      memberType: type.typeBool
     }
   ])
 };
@@ -835,20 +854,14 @@ const branchPartDefinition: type.CustomType = {
   ])
 };
 
-const fileHashAndIsThumbnail: type.CustomType = {
-  name: fileHashAndIsThumbnailName,
-  description: "getImageに必要なパラメーター",
-  body: type.customTypeBodyProduct([
+const evaluateExprError: type.CustomType = {
+  name: evaluateExprErrorName,
+  description: "",
+  body: type.customTypeBodySum([
     {
-      name: "fileHash",
-      description: "ファイルハッシュ (オリジナルの画像)",
-      memberType: fileHash
-    },
-    {
-      name: "isThumbnail",
-      description:
-        "取得したいのは,サイズが小さくて速くデータを受け取れるサムネイル画像かどうか",
-      memberType: type.typeBool
+      name: "NeedPartDefinition",
+      description: "式を評価するには,このパーツの定義が必要だと言っている",
+      parameter: type.maybeJust(partId)
     }
   ])
 };
@@ -861,6 +874,7 @@ const listCustomType: ReadonlyArray<type.CustomType> = [
   urlData,
   language,
   location,
+  fileHashAndIsThumbnail,
   userPublic,
   userPublicAndUserId,
   project,
@@ -887,7 +901,7 @@ const listCustomType: ReadonlyArray<type.CustomType> = [
   conditionTag,
   conditionCapture,
   branchPartDefinition,
-  fileHashAndIsThumbnail
+  evaluateExprError
 ];
 
 const code = codeGen.generateCodeAsString(

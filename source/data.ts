@@ -65,6 +65,14 @@ export type Location =
   | { _: "Project"; projectId: ProjectId };
 
 /**
+ * getImageに必要なパラメーター
+ */
+export type FileHashAndIsThumbnail = {
+  fileHash: FileHash;
+  isThumbnail: boolean;
+};
+
+/**
  * ユーザーが公開している情報
  */
 export type UserPublic = {
@@ -270,13 +278,7 @@ export type BranchPartDefinition = {
   expr: Expr;
 };
 
-/**
- * getImageに必要なパラメーター
- */
-export type FileHashAndIsThumbnail = {
-  fileHash: FileHash;
-  isThumbnail: boolean;
-};
+export type EvaluateExprError = { _: "NeedPartDefinition"; partId: PartId };
 
 export type AccessToken = string & { _accessToken: never };
 
@@ -483,6 +485,13 @@ export const conditionInt32 = (int32: number): Condition => ({
 });
 
 /**
+ * 式を評価するには,このパーツの定義が必要だと言っている
+ */
+export const evaluateExprErrorNeedPartDefinition = (
+  partId: PartId
+): EvaluateExprError => ({ _: "NeedPartDefinition", partId: partId });
+
+/**
  * numberの32bit符号あり整数をSigned Leb128のバイナリに変換する
  */
 export const encodeInt32 = (value: number): ReadonlyArray<number> => {
@@ -657,6 +666,13 @@ export const encodeLocation = (location: Location): ReadonlyArray<number> => {
     }
   }
 };
+
+export const encodeFileHashAndIsThumbnail = (
+  fileHashAndIsThumbnail: FileHashAndIsThumbnail
+): ReadonlyArray<number> =>
+  encodeToken(fileHashAndIsThumbnail.fileHash).concat(
+    encodeBool(fileHashAndIsThumbnail.isThumbnail)
+  );
 
 export const encodeUserPublic = (
   userPublic: UserPublic
@@ -908,12 +924,15 @@ export const encodeBranchPartDefinition = (
     .concat(encodeType(branchPartDefinition["type"]))
     .concat(encodeExpr(branchPartDefinition.expr));
 
-export const encodeFileHashAndIsThumbnail = (
-  fileHashAndIsThumbnail: FileHashAndIsThumbnail
-): ReadonlyArray<number> =>
-  encodeToken(fileHashAndIsThumbnail.fileHash).concat(
-    encodeBool(fileHashAndIsThumbnail.isThumbnail)
-  );
+export const encodeEvaluateExprError = (
+  evaluateExprError: EvaluateExprError
+): ReadonlyArray<number> => {
+  switch (evaluateExprError._) {
+    case "NeedPartDefinition": {
+      return [0].concat(encodeId(evaluateExprError.partId));
+    }
+  }
+};
 
 /**
  * SignedLeb128で表現されたバイナリをnumberのビット演算ができる32bit符号付き整数の範囲の数値に変換するコード
@@ -1351,6 +1370,34 @@ export const decodeLocation = (
     };
   }
   throw new Error("存在しないパターンを指定された 型を更新してください");
+};
+
+/**
+ * @param index バイナリを読み込み開始位置
+ * @param binary バイナリ
+ */
+export const decodeFileHashAndIsThumbnail = (
+  index: number,
+  binary: Uint8Array
+): { result: FileHashAndIsThumbnail; nextIndex: number } => {
+  const fileHashAndNextIndex: {
+    result: FileHash;
+    nextIndex: number;
+  } = (decodeToken as (
+    a: number,
+    b: Uint8Array
+  ) => { result: FileHash; nextIndex: number })(index, binary);
+  const isThumbnailAndNextIndex: {
+    result: boolean;
+    nextIndex: number;
+  } = decodeBool(fileHashAndNextIndex.nextIndex, binary);
+  return {
+    result: {
+      fileHash: fileHashAndNextIndex.result,
+      isThumbnail: isThumbnailAndNextIndex.result
+    },
+    nextIndex: isThumbnailAndNextIndex.nextIndex
+  };
 };
 
 /**
@@ -2333,26 +2380,23 @@ export const decodeBranchPartDefinition = (
  * @param index バイナリを読み込み開始位置
  * @param binary バイナリ
  */
-export const decodeFileHashAndIsThumbnail = (
+export const decodeEvaluateExprError = (
   index: number,
   binary: Uint8Array
-): { result: FileHashAndIsThumbnail; nextIndex: number } => {
-  const fileHashAndNextIndex: {
-    result: FileHash;
-    nextIndex: number;
-  } = (decodeToken as (
-    a: number,
-    b: Uint8Array
-  ) => { result: FileHash; nextIndex: number })(index, binary);
-  const isThumbnailAndNextIndex: {
-    result: boolean;
-    nextIndex: number;
-  } = decodeBool(fileHashAndNextIndex.nextIndex, binary);
-  return {
-    result: {
-      fileHash: fileHashAndNextIndex.result,
-      isThumbnail: isThumbnailAndNextIndex.result
-    },
-    nextIndex: isThumbnailAndNextIndex.nextIndex
-  };
+): { result: EvaluateExprError; nextIndex: number } => {
+  const patternIndex: { result: number; nextIndex: number } = decodeInt32(
+    index,
+    binary
+  );
+  if (patternIndex.result === 0) {
+    const result: { result: PartId; nextIndex: number } = (decodeId as (
+      a: number,
+      b: Uint8Array
+    ) => { result: PartId; nextIndex: number })(patternIndex.nextIndex, binary);
+    return {
+      result: evaluateExprErrorNeedPartDefinition(result.result),
+      nextIndex: result.nextIndex
+    };
+  }
+  throw new Error("存在しないパターンを指定された 型を更新してください");
 };

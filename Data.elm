@@ -1,4 +1,4 @@
-module Data exposing (AccessToken(..), BranchPartDefinition, Change(..), ClientMode(..), Comment, Condition(..), ConditionCapture, ConditionTag, DateTime, Expr(..), FileHash(..), FileHashAndIsThumbnail, FunctionCall, Idea, IdeaId(..), IdeaItem(..), KernelExpr(..), LambdaBranch, Language(..), LocalPartId(..), LocalPartReference, Location(..), Module, ModuleId(..), OpenIdConnectProvider(..), PartDefinition, PartId(..), Project, ProjectId(..), RequestLogInUrlRequestData, Suggestion, TagId(..), TagReferenceIndex, Type, TypeBody(..), TypeBodyKernel(..), TypeBodyProductMember, TypeBodySumPattern, TypeDefinition, TypeId(..), UrlData, UserId(..), UserPublic, UserPublicAndUserId, accessTokenJsonDecoder, accessTokenToJsonValue, branchPartDefinitionJsonDecoder, branchPartDefinitionToJsonValue, changeJsonDecoder, changeToJsonValue, clientModeJsonDecoder, clientModeToJsonValue, commentJsonDecoder, commentToJsonValue, conditionCaptureJsonDecoder, conditionCaptureToJsonValue, conditionJsonDecoder, conditionTagJsonDecoder, conditionTagToJsonValue, conditionToJsonValue, dateTimeJsonDecoder, dateTimeToJsonValue, exprJsonDecoder, exprToJsonValue, fileHashAndIsThumbnailJsonDecoder, fileHashAndIsThumbnailToJsonValue, fileHashJsonDecoder, fileHashToJsonValue, functionCallJsonDecoder, functionCallToJsonValue, ideaIdJsonDecoder, ideaIdToJsonValue, ideaItemJsonDecoder, ideaItemToJsonValue, ideaJsonDecoder, ideaToJsonValue, kernelExprJsonDecoder, kernelExprToJsonValue, lambdaBranchJsonDecoder, lambdaBranchToJsonValue, languageJsonDecoder, languageToJsonValue, localPartIdJsonDecoder, localPartIdToJsonValue, localPartReferenceJsonDecoder, localPartReferenceToJsonValue, locationJsonDecoder, locationToJsonValue, maybeJsonDecoder, maybeToJsonValue, moduleIdJsonDecoder, moduleIdToJsonValue, moduleJsonDecoder, moduleToJsonValue, openIdConnectProviderJsonDecoder, openIdConnectProviderToJsonValue, partDefinitionJsonDecoder, partDefinitionToJsonValue, partIdJsonDecoder, partIdToJsonValue, projectIdJsonDecoder, projectIdToJsonValue, projectJsonDecoder, projectToJsonValue, requestLogInUrlRequestDataJsonDecoder, requestLogInUrlRequestDataToJsonValue, resultJsonDecoder, resultToJsonValue, suggestionJsonDecoder, suggestionToJsonValue, tagIdJsonDecoder, tagIdToJsonValue, tagReferenceIndexJsonDecoder, tagReferenceIndexToJsonValue, typeBodyJsonDecoder, typeBodyKernelJsonDecoder, typeBodyKernelToJsonValue, typeBodyProductMemberJsonDecoder, typeBodyProductMemberToJsonValue, typeBodySumPatternJsonDecoder, typeBodySumPatternToJsonValue, typeBodyToJsonValue, typeDefinitionJsonDecoder, typeDefinitionToJsonValue, typeIdJsonDecoder, typeIdToJsonValue, typeJsonDecoder, typeToJsonValue, urlDataJsonDecoder, urlDataToJsonValue, userIdJsonDecoder, userIdToJsonValue, userPublicAndUserIdJsonDecoder, userPublicAndUserIdToJsonValue, userPublicJsonDecoder, userPublicToJsonValue)
+module Data exposing (AccessToken(..), BranchPartDefinition, Change(..), ClientMode(..), Comment, Condition(..), ConditionCapture, ConditionTag, DateTime, EvaluateExprError(..), Expr(..), FileHash(..), FileHashAndIsThumbnail, FunctionCall, Idea, IdeaId(..), IdeaItem(..), KernelExpr(..), LambdaBranch, Language(..), LocalPartId(..), LocalPartReference, Location(..), Module, ModuleId(..), OpenIdConnectProvider(..), PartDefinition, PartId(..), Project, ProjectId(..), RequestLogInUrlRequestData, Suggestion, TagId(..), TagReferenceIndex, Type, TypeBody(..), TypeBodyKernel(..), TypeBodyProductMember, TypeBodySumPattern, TypeDefinition, TypeId(..), UrlData, UserId(..), UserPublic, UserPublicAndUserId, accessTokenJsonDecoder, accessTokenToJsonValue, branchPartDefinitionJsonDecoder, branchPartDefinitionToJsonValue, changeJsonDecoder, changeToJsonValue, clientModeJsonDecoder, clientModeToJsonValue, commentJsonDecoder, commentToJsonValue, conditionCaptureJsonDecoder, conditionCaptureToJsonValue, conditionJsonDecoder, conditionTagJsonDecoder, conditionTagToJsonValue, conditionToJsonValue, dateTimeJsonDecoder, dateTimeToJsonValue, evaluateExprErrorJsonDecoder, evaluateExprErrorToJsonValue, exprJsonDecoder, exprToJsonValue, fileHashAndIsThumbnailJsonDecoder, fileHashAndIsThumbnailToJsonValue, fileHashJsonDecoder, fileHashToJsonValue, functionCallJsonDecoder, functionCallToJsonValue, ideaIdJsonDecoder, ideaIdToJsonValue, ideaItemJsonDecoder, ideaItemToJsonValue, ideaJsonDecoder, ideaToJsonValue, kernelExprJsonDecoder, kernelExprToJsonValue, lambdaBranchJsonDecoder, lambdaBranchToJsonValue, languageJsonDecoder, languageToJsonValue, localPartIdJsonDecoder, localPartIdToJsonValue, localPartReferenceJsonDecoder, localPartReferenceToJsonValue, locationJsonDecoder, locationToJsonValue, maybeJsonDecoder, maybeToJsonValue, moduleIdJsonDecoder, moduleIdToJsonValue, moduleJsonDecoder, moduleToJsonValue, openIdConnectProviderJsonDecoder, openIdConnectProviderToJsonValue, partDefinitionJsonDecoder, partDefinitionToJsonValue, partIdJsonDecoder, partIdToJsonValue, projectIdJsonDecoder, projectIdToJsonValue, projectJsonDecoder, projectToJsonValue, requestLogInUrlRequestDataJsonDecoder, requestLogInUrlRequestDataToJsonValue, resultJsonDecoder, resultToJsonValue, suggestionJsonDecoder, suggestionToJsonValue, tagIdJsonDecoder, tagIdToJsonValue, tagReferenceIndexJsonDecoder, tagReferenceIndexToJsonValue, typeBodyJsonDecoder, typeBodyKernelJsonDecoder, typeBodyKernelToJsonValue, typeBodyProductMemberJsonDecoder, typeBodyProductMemberToJsonValue, typeBodySumPatternJsonDecoder, typeBodySumPatternToJsonValue, typeBodyToJsonValue, typeDefinitionJsonDecoder, typeDefinitionToJsonValue, typeIdJsonDecoder, typeIdToJsonValue, typeJsonDecoder, typeToJsonValue, urlDataJsonDecoder, urlDataToJsonValue, userIdJsonDecoder, userIdToJsonValue, userPublicAndUserIdJsonDecoder, userPublicAndUserIdToJsonValue, userPublicJsonDecoder, userPublicToJsonValue)
 
 import Json.Decode as Jd
 import Json.Decode.Pipeline as Jdp
@@ -51,6 +51,12 @@ type Location
     = LocationHome
     | LocationUser UserId
     | LocationProject ProjectId
+
+
+{-| getImageに必要なパラメーター
+-}
+type alias FileHashAndIsThumbnail =
+    { fileHash : FileHash, isThumbnail : Bool }
 
 
 {-| ユーザーが公開している情報
@@ -225,10 +231,8 @@ type alias BranchPartDefinition =
     { localPartId : LocalPartId, name : String, description : String, type_ : Type, expr : Expr }
 
 
-{-| getImageに必要なパラメーター
--}
-type alias FileHashAndIsThumbnail =
-    { fileHash : FileHash, isThumbnail : Bool }
+type EvaluateExprError
+    = EvaluateExprErrorNeedPartDefinition PartId
 
 
 type AccessToken
@@ -429,6 +433,16 @@ locationToJsonValue location =
 
         LocationProject parameter ->
             Je.object [ ( "_", Je.string "Project" ), ( "projectId", projectIdToJsonValue parameter ) ]
+
+
+{-| FileHashAndIsThumbnailのJSONへのエンコーダ
+-}
+fileHashAndIsThumbnailToJsonValue : FileHashAndIsThumbnail -> Je.Value
+fileHashAndIsThumbnailToJsonValue fileHashAndIsThumbnail =
+    Je.object
+        [ ( "fileHash", fileHashToJsonValue fileHashAndIsThumbnail.fileHash )
+        , ( "isThumbnail", Je.bool fileHashAndIsThumbnail.isThumbnail )
+        ]
 
 
 {-| UserPublicのJSONへのエンコーダ
@@ -757,14 +771,13 @@ branchPartDefinitionToJsonValue branchPartDefinition =
         ]
 
 
-{-| FileHashAndIsThumbnailのJSONへのエンコーダ
+{-| EvaluateExprErrorのJSONへのエンコーダ
 -}
-fileHashAndIsThumbnailToJsonValue : FileHashAndIsThumbnail -> Je.Value
-fileHashAndIsThumbnailToJsonValue fileHashAndIsThumbnail =
-    Je.object
-        [ ( "fileHash", fileHashToJsonValue fileHashAndIsThumbnail.fileHash )
-        , ( "isThumbnail", Je.bool fileHashAndIsThumbnail.isThumbnail )
-        ]
+evaluateExprErrorToJsonValue : EvaluateExprError -> Je.Value
+evaluateExprErrorToJsonValue evaluateExprError =
+    case evaluateExprError of
+        EvaluateExprErrorNeedPartDefinition parameter ->
+            Je.object [ ( "_", Je.string "NeedPartDefinition" ), ( "partId", partIdToJsonValue parameter ) ]
 
 
 maybeJsonDecoder : Jd.Decoder a -> Jd.Decoder (Maybe a)
@@ -985,6 +998,20 @@ locationJsonDecoder =
                     _ ->
                         Jd.fail ("Locationで不明なタグを受けたとった tag=" ++ tag)
             )
+
+
+{-| FileHashAndIsThumbnailのJSON Decoder
+-}
+fileHashAndIsThumbnailJsonDecoder : Jd.Decoder FileHashAndIsThumbnail
+fileHashAndIsThumbnailJsonDecoder =
+    Jd.succeed
+        (\fileHash isThumbnail ->
+            { fileHash = fileHash
+            , isThumbnail = isThumbnail
+            }
+        )
+        |> Jdp.required "fileHash" fileHashJsonDecoder
+        |> Jdp.required "isThumbnail" Jd.bool
 
 
 {-| UserPublicのJSON Decoder
@@ -1463,15 +1490,17 @@ branchPartDefinitionJsonDecoder =
         |> Jdp.required "expr" exprJsonDecoder
 
 
-{-| FileHashAndIsThumbnailのJSON Decoder
+{-| EvaluateExprErrorのJSON Decoder
 -}
-fileHashAndIsThumbnailJsonDecoder : Jd.Decoder FileHashAndIsThumbnail
-fileHashAndIsThumbnailJsonDecoder =
-    Jd.succeed
-        (\fileHash isThumbnail ->
-            { fileHash = fileHash
-            , isThumbnail = isThumbnail
-            }
-        )
-        |> Jdp.required "fileHash" fileHashJsonDecoder
-        |> Jdp.required "isThumbnail" Jd.bool
+evaluateExprErrorJsonDecoder : Jd.Decoder EvaluateExprError
+evaluateExprErrorJsonDecoder =
+    Jd.field "_" Jd.string
+        |> Jd.andThen
+            (\tag ->
+                case tag of
+                    "NeedPartDefinition" ->
+                        Jd.field "partId" partIdJsonDecoder |> Jd.map EvaluateExprErrorNeedPartDefinition
+
+                    _ ->
+                        Jd.fail ("EvaluateExprErrorで不明なタグを受けたとった tag=" ++ tag)
+            )
