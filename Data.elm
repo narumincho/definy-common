@@ -1,4 +1,4 @@
-module Data exposing (AccessToken(..), BranchPartDefinition, Change(..), ClientMode(..), Comment, Condition(..), ConditionCapture, ConditionTag, DateTime, Expr(..), FileHash(..), FileHashAndIsThumbnail, FunctionCall, Idea, IdeaId(..), IdeaItem(..), KernelExpr(..), LambdaBranch, Language(..), LocalPartId(..), Location(..), ModuleSnapshot, OpenIdConnectProvider(..), PartId(..), PartSnapshot, Project, ProjectId(..), RequestLogInUrlRequestData, Suggestion, TagId(..), Type, TypeBody(..), TypeBodyKernel(..), TypeBodyProductMember, TypeBodySumPattern, TypeId(..), TypeSnapshot, UrlData, UserId(..), UserPublic, UserPublicAndUserId, accessTokenJsonDecoder, accessTokenToJsonValue, branchPartDefinitionJsonDecoder, branchPartDefinitionToJsonValue, changeJsonDecoder, changeToJsonValue, clientModeJsonDecoder, clientModeToJsonValue, commentJsonDecoder, commentToJsonValue, conditionCaptureJsonDecoder, conditionCaptureToJsonValue, conditionJsonDecoder, conditionTagJsonDecoder, conditionTagToJsonValue, conditionToJsonValue, dateTimeJsonDecoder, dateTimeToJsonValue, exprJsonDecoder, exprToJsonValue, fileHashAndIsThumbnailJsonDecoder, fileHashAndIsThumbnailToJsonValue, fileHashJsonDecoder, fileHashToJsonValue, functionCallJsonDecoder, functionCallToJsonValue, ideaIdJsonDecoder, ideaIdToJsonValue, ideaItemJsonDecoder, ideaItemToJsonValue, ideaJsonDecoder, ideaToJsonValue, kernelExprJsonDecoder, kernelExprToJsonValue, lambdaBranchJsonDecoder, lambdaBranchToJsonValue, languageJsonDecoder, languageToJsonValue, localPartIdJsonDecoder, localPartIdToJsonValue, locationJsonDecoder, locationToJsonValue, maybeJsonDecoder, maybeToJsonValue, moduleSnapshotJsonDecoder, moduleSnapshotToJsonValue, openIdConnectProviderJsonDecoder, openIdConnectProviderToJsonValue, partIdJsonDecoder, partIdToJsonValue, partSnapshotJsonDecoder, partSnapshotToJsonValue, projectIdJsonDecoder, projectIdToJsonValue, projectJsonDecoder, projectToJsonValue, requestLogInUrlRequestDataJsonDecoder, requestLogInUrlRequestDataToJsonValue, resultJsonDecoder, resultToJsonValue, suggestionJsonDecoder, suggestionToJsonValue, tagIdJsonDecoder, tagIdToJsonValue, typeBodyJsonDecoder, typeBodyKernelJsonDecoder, typeBodyKernelToJsonValue, typeBodyProductMemberJsonDecoder, typeBodyProductMemberToJsonValue, typeBodySumPatternJsonDecoder, typeBodySumPatternToJsonValue, typeBodyToJsonValue, typeIdJsonDecoder, typeIdToJsonValue, typeJsonDecoder, typeSnapshotJsonDecoder, typeSnapshotToJsonValue, typeToJsonValue, urlDataJsonDecoder, urlDataToJsonValue, userIdJsonDecoder, userIdToJsonValue, userPublicAndUserIdJsonDecoder, userPublicAndUserIdToJsonValue, userPublicJsonDecoder, userPublicToJsonValue)
+module Data exposing (AccessToken(..), BranchPartDefinition, Change(..), ClientMode(..), Comment, Condition(..), ConditionCapture, ConditionTag, DateTime, Expr(..), FileHash(..), FileHashAndIsThumbnail, FunctionCall, Idea, IdeaId(..), IdeaItem(..), KernelExpr(..), LambdaBranch, Language(..), LocalPartId(..), LocalPartReference, Location(..), ModuleSnapshot, OpenIdConnectProvider(..), PartId(..), PartSnapshot, Project, ProjectId(..), RequestLogInUrlRequestData, Suggestion, TagId(..), TagReferenceIndex, Type, TypeBody(..), TypeBodyKernel(..), TypeBodyProductMember, TypeBodySumPattern, TypeId(..), TypeSnapshot, UrlData, UserId(..), UserPublic, UserPublicAndUserId, accessTokenJsonDecoder, accessTokenToJsonValue, branchPartDefinitionJsonDecoder, branchPartDefinitionToJsonValue, changeJsonDecoder, changeToJsonValue, clientModeJsonDecoder, clientModeToJsonValue, commentJsonDecoder, commentToJsonValue, conditionCaptureJsonDecoder, conditionCaptureToJsonValue, conditionJsonDecoder, conditionTagJsonDecoder, conditionTagToJsonValue, conditionToJsonValue, dateTimeJsonDecoder, dateTimeToJsonValue, exprJsonDecoder, exprToJsonValue, fileHashAndIsThumbnailJsonDecoder, fileHashAndIsThumbnailToJsonValue, fileHashJsonDecoder, fileHashToJsonValue, functionCallJsonDecoder, functionCallToJsonValue, ideaIdJsonDecoder, ideaIdToJsonValue, ideaItemJsonDecoder, ideaItemToJsonValue, ideaJsonDecoder, ideaToJsonValue, kernelExprJsonDecoder, kernelExprToJsonValue, lambdaBranchJsonDecoder, lambdaBranchToJsonValue, languageJsonDecoder, languageToJsonValue, localPartIdJsonDecoder, localPartIdToJsonValue, localPartReferenceJsonDecoder, localPartReferenceToJsonValue, locationJsonDecoder, locationToJsonValue, maybeJsonDecoder, maybeToJsonValue, moduleSnapshotJsonDecoder, moduleSnapshotToJsonValue, openIdConnectProviderJsonDecoder, openIdConnectProviderToJsonValue, partIdJsonDecoder, partIdToJsonValue, partSnapshotJsonDecoder, partSnapshotToJsonValue, projectIdJsonDecoder, projectIdToJsonValue, projectJsonDecoder, projectToJsonValue, requestLogInUrlRequestDataJsonDecoder, requestLogInUrlRequestDataToJsonValue, resultJsonDecoder, resultToJsonValue, suggestionJsonDecoder, suggestionToJsonValue, tagIdJsonDecoder, tagIdToJsonValue, tagReferenceIndexJsonDecoder, tagReferenceIndexToJsonValue, typeBodyJsonDecoder, typeBodyKernelJsonDecoder, typeBodyKernelToJsonValue, typeBodyProductMemberJsonDecoder, typeBodyProductMemberToJsonValue, typeBodySumPatternJsonDecoder, typeBodySumPatternToJsonValue, typeBodyToJsonValue, typeIdJsonDecoder, typeIdToJsonValue, typeJsonDecoder, typeSnapshotJsonDecoder, typeSnapshotToJsonValue, typeToJsonValue, urlDataJsonDecoder, urlDataToJsonValue, userIdJsonDecoder, userIdToJsonValue, userPublicAndUserIdJsonDecoder, userPublicAndUserIdToJsonValue, userPublicJsonDecoder, userPublicToJsonValue)
 
 import Json.Decode as Jd
 import Json.Decode.Pipeline as Jdp
@@ -160,8 +160,8 @@ type Expr
     = ExprKernel KernelExpr
     | ExprInt32Literal Int
     | ExprPartReference PartId
-    | ExprBranchLocalPartReference LocalPartId
-    | ExprTagReference TagId
+    | ExprLocalPartReference LocalPartId
+    | ExprTagReference TagReferenceIndex
     | ExprFunctionCall FunctionCall
     | ExprLambda (List LambdaBranch)
 
@@ -172,6 +172,18 @@ type KernelExpr
     = KernelExprInt32Add
     | KernelExprInt32Sub
     | KernelExprInt32Mul
+
+
+{-| ローカルパスの参照を表す
+-}
+type alias LocalPartReference =
+    { partId : PartId, localPartId : LocalPartId }
+
+
+{-| タグの参照を表す
+-}
+type alias TagReferenceIndex =
+    { typeId : TypeId, tagIndex : Int }
 
 
 {-| 関数呼び出し
@@ -614,11 +626,11 @@ exprToJsonValue expr =
         ExprPartReference parameter ->
             Je.object [ ( "_", Je.string "PartReference" ), ( "partId", partIdToJsonValue parameter ) ]
 
-        ExprBranchLocalPartReference parameter ->
-            Je.object [ ( "_", Je.string "BranchLocalPartReference" ), ( "localPartId", localPartIdToJsonValue parameter ) ]
+        ExprLocalPartReference parameter ->
+            Je.object [ ( "_", Je.string "LocalPartReference" ), ( "localPartId", localPartIdToJsonValue parameter ) ]
 
         ExprTagReference parameter ->
-            Je.object [ ( "_", Je.string "TagReference" ), ( "tagId", tagIdToJsonValue parameter ) ]
+            Je.object [ ( "_", Je.string "TagReference" ), ( "tagReferenceIndex", tagReferenceIndexToJsonValue parameter ) ]
 
         ExprFunctionCall parameter ->
             Je.object [ ( "_", Je.string "FunctionCall" ), ( "functionCall", functionCallToJsonValue parameter ) ]
@@ -640,6 +652,26 @@ kernelExprToJsonValue kernelExpr =
 
         KernelExprInt32Mul ->
             Je.string "Int32Mul"
+
+
+{-| LocalPartReferenceのJSONへのエンコーダ
+-}
+localPartReferenceToJsonValue : LocalPartReference -> Je.Value
+localPartReferenceToJsonValue localPartReference =
+    Je.object
+        [ ( "partId", partIdToJsonValue localPartReference.partId )
+        , ( "localPartId", localPartIdToJsonValue localPartReference.localPartId )
+        ]
+
+
+{-| TagReferenceIndexのJSONへのエンコーダ
+-}
+tagReferenceIndexToJsonValue : TagReferenceIndex -> Je.Value
+tagReferenceIndexToJsonValue tagReferenceIndex =
+    Je.object
+        [ ( "typeId", typeIdToJsonValue tagReferenceIndex.typeId )
+        , ( "tagIndex", Je.int tagReferenceIndex.tagIndex )
+        ]
 
 
 {-| FunctionCallのJSONへのエンコーダ
@@ -1242,11 +1274,11 @@ exprJsonDecoder =
                     "PartReference" ->
                         Jd.field "partId" partIdJsonDecoder |> Jd.map ExprPartReference
 
-                    "BranchLocalPartReference" ->
-                        Jd.field "localPartId" localPartIdJsonDecoder |> Jd.map ExprBranchLocalPartReference
+                    "LocalPartReference" ->
+                        Jd.field "localPartId" localPartIdJsonDecoder |> Jd.map ExprLocalPartReference
 
                     "TagReference" ->
-                        Jd.field "tagId" tagIdJsonDecoder |> Jd.map ExprTagReference
+                        Jd.field "tagReferenceIndex" tagReferenceIndexJsonDecoder |> Jd.map ExprTagReference
 
                     "FunctionCall" ->
                         Jd.field "functionCall" functionCallJsonDecoder |> Jd.map ExprFunctionCall
@@ -1279,6 +1311,34 @@ kernelExprJsonDecoder =
                     _ ->
                         Jd.fail ("KernelExprで不明なタグを受けたとった tag=" ++ tag)
             )
+
+
+{-| LocalPartReferenceのJSON Decoder
+-}
+localPartReferenceJsonDecoder : Jd.Decoder LocalPartReference
+localPartReferenceJsonDecoder =
+    Jd.succeed
+        (\partId localPartId ->
+            { partId = partId
+            , localPartId = localPartId
+            }
+        )
+        |> Jdp.required "partId" partIdJsonDecoder
+        |> Jdp.required "localPartId" localPartIdJsonDecoder
+
+
+{-| TagReferenceIndexのJSON Decoder
+-}
+tagReferenceIndexJsonDecoder : Jd.Decoder TagReferenceIndex
+tagReferenceIndexJsonDecoder =
+    Jd.succeed
+        (\typeId tagIndex ->
+            { typeId = typeId
+            , tagIndex = tagIndex
+            }
+        )
+        |> Jdp.required "typeId" typeIdJsonDecoder
+        |> Jdp.required "tagIndex" Jd.int
 
 
 {-| FunctionCallのJSON Decoder

@@ -204,8 +204,8 @@ export type Expr =
   | { _: "Kernel"; kernelExpr: KernelExpr }
   | { _: "Int32Literal"; int32: number }
   | { _: "PartReference"; partId: PartId }
-  | { _: "BranchLocalPartReference"; localPartId: LocalPartId }
-  | { _: "TagReference"; tagId: TagId }
+  | { _: "LocalPartReference"; localPartId: LocalPartId }
+  | { _: "TagReference"; tagReferenceIndex: TagReferenceIndex }
   | { _: "FunctionCall"; functionCall: FunctionCall }
   | { _: "Lambda"; lambdaBranchList: ReadonlyArray<LambdaBranch> };
 
@@ -213,6 +213,16 @@ export type Expr =
  * Definyだけでは表現できない式
  */
 export type KernelExpr = "Int32Add" | "Int32Sub" | "Int32Mul";
+
+/**
+ * ローカルパスの参照を表す
+ */
+export type LocalPartReference = { partId: PartId; localPartId: LocalPartId };
+
+/**
+ * タグの参照を表す
+ */
+export type TagReferenceIndex = { typeId: TypeId; tagIndex: number };
 
 /**
  * 関数呼び出し
@@ -412,17 +422,17 @@ export const exprPartReference = (partId: PartId): Expr => ({
 /**
  * ローカルパーツの参照
  */
-export const exprBranchLocalPartReference = (
-  localPartId: LocalPartId
-): Expr => ({ _: "BranchLocalPartReference", localPartId: localPartId });
+export const exprLocalPartReference = (localPartId: LocalPartId): Expr => ({
+  _: "LocalPartReference",
+  localPartId: localPartId
+});
 
 /**
  * タグを参照
  */
-export const exprTagReference = (tagId: TagId): Expr => ({
-  _: "TagReference",
-  tagId: tagId
-});
+export const exprTagReference = (
+  tagReferenceIndex: TagReferenceIndex
+): Expr => ({ _: "TagReference", tagReferenceIndex: tagReferenceIndex });
 
 /**
  * 関数呼び出し
@@ -792,11 +802,11 @@ export const encodeExpr = (expr: Expr): ReadonlyArray<number> => {
     case "PartReference": {
       return [2].concat(encodeId(expr.partId));
     }
-    case "BranchLocalPartReference": {
+    case "LocalPartReference": {
       return [3].concat(encodeId(expr.localPartId));
     }
     case "TagReference": {
-      return [4].concat(encodeId(expr.tagId));
+      return [4].concat(encodeTagReferenceIndex(expr.tagReferenceIndex));
     }
     case "FunctionCall": {
       return [5].concat(encodeFunctionCall(expr.functionCall));
@@ -822,6 +832,20 @@ export const encodeKernelExpr = (
     }
   }
 };
+
+export const encodeLocalPartReference = (
+  localPartReference: LocalPartReference
+): ReadonlyArray<number> =>
+  encodeId(localPartReference.partId).concat(
+    encodeId(localPartReference.localPartId)
+  );
+
+export const encodeTagReferenceIndex = (
+  tagReferenceIndex: TagReferenceIndex
+): ReadonlyArray<number> =>
+  encodeId(tagReferenceIndex.typeId).concat(
+    encodeInt32(tagReferenceIndex.tagIndex)
+  );
 
 export const encodeFunctionCall = (
   functionCall: FunctionCall
@@ -1966,15 +1990,15 @@ export const decodeExpr = (
       binary
     );
     return {
-      result: exprBranchLocalPartReference(result.result),
+      result: exprLocalPartReference(result.result),
       nextIndex: result.nextIndex
     };
   }
   if (patternIndex.result === 4) {
-    const result: { result: TagId; nextIndex: number } = (decodeId as (
-      a: number,
-      b: Uint8Array
-    ) => { result: TagId; nextIndex: number })(patternIndex.nextIndex, binary);
+    const result: {
+      result: TagReferenceIndex;
+      nextIndex: number;
+    } = decodeTagReferenceIndex(patternIndex.nextIndex, binary);
     return {
       result: exprTagReference(result.result),
       nextIndex: result.nextIndex
@@ -2022,6 +2046,68 @@ export const decodeKernelExpr = (
     return { result: "Int32Mul", nextIndex: patternIndex.nextIndex };
   }
   throw new Error("存在しないパターンを指定された 型を更新してください");
+};
+
+/**
+ * @param index バイナリを読み込み開始位置
+ * @param binary バイナリ
+ */
+export const decodeLocalPartReference = (
+  index: number,
+  binary: Uint8Array
+): { result: LocalPartReference; nextIndex: number } => {
+  const partIdAndNextIndex: {
+    result: PartId;
+    nextIndex: number;
+  } = (decodeId as (
+    a: number,
+    b: Uint8Array
+  ) => { result: PartId; nextIndex: number })(index, binary);
+  const localPartIdAndNextIndex: {
+    result: LocalPartId;
+    nextIndex: number;
+  } = (decodeId as (
+    a: number,
+    b: Uint8Array
+  ) => { result: LocalPartId; nextIndex: number })(
+    partIdAndNextIndex.nextIndex,
+    binary
+  );
+  return {
+    result: {
+      partId: partIdAndNextIndex.result,
+      localPartId: localPartIdAndNextIndex.result
+    },
+    nextIndex: localPartIdAndNextIndex.nextIndex
+  };
+};
+
+/**
+ * @param index バイナリを読み込み開始位置
+ * @param binary バイナリ
+ */
+export const decodeTagReferenceIndex = (
+  index: number,
+  binary: Uint8Array
+): { result: TagReferenceIndex; nextIndex: number } => {
+  const typeIdAndNextIndex: {
+    result: TypeId;
+    nextIndex: number;
+  } = (decodeId as (
+    a: number,
+    b: Uint8Array
+  ) => { result: TypeId; nextIndex: number })(index, binary);
+  const tagIndexAndNextIndex: {
+    result: number;
+    nextIndex: number;
+  } = decodeInt32(typeIdAndNextIndex.nextIndex, binary);
+  return {
+    result: {
+      typeId: typeIdAndNextIndex.result,
+      tagIndex: tagIndexAndNextIndex.result
+    },
+    nextIndex: tagIndexAndNextIndex.nextIndex
+  };
 };
 
 /**

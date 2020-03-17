@@ -40,6 +40,8 @@ const typeBodyKernelName = "TypeBodyKernel";
 const typeName = "Type";
 const exprName = "Expr";
 const kernelExprName = "KernelExpr";
+const localPartReferenceName = "LocalPartReference";
+const tagReferenceName = "TagReferenceIndex";
 const functionCallName = "FunctionCall";
 const lambdaBranchName = "LambdaBranch";
 const conditionName = "Condition";
@@ -611,14 +613,14 @@ const expr: type.CustomType = {
       parameter: type.maybeJust(partId)
     },
     {
-      name: "BranchLocalPartReference",
+      name: "LocalPartReference",
       description: "ローカルパーツの参照",
       parameter: type.maybeJust(localPartId)
     },
     {
       name: "TagReference",
       description: "タグを参照",
-      parameter: type.maybeJust(tagId)
+      parameter: type.maybeJust(type.typeCustom(tagReferenceName))
     },
     {
       name: "FunctionCall",
@@ -653,6 +655,40 @@ const kernelExpr: type.CustomType = {
       name: "Int32Mul",
       description: "32bit整数をかける関数",
       parameter: type.maybeNothing()
+    }
+  ])
+};
+
+const localPartReference: type.CustomType = {
+  name: localPartReferenceName,
+  description: "ローカルパスの参照を表す",
+  body: type.customTypeBodyProduct([
+    {
+      name: "partId",
+      description: "ローカルパスが定義されているパーツのID",
+      memberType: partId
+    },
+    {
+      name: "localPartId",
+      description: "ローカルパーツID",
+      memberType: localPartId
+    }
+  ])
+};
+
+const tagReference: type.CustomType = {
+  name: tagReferenceName,
+  description: "タグの参照を表す",
+  body: type.customTypeBodyProduct([
+    {
+      name: "typeId",
+      description: "型ID",
+      memberType: typeId
+    },
+    {
+      name: "tagIndex",
+      description: "タグIndex",
+      memberType: type.typeInt32
     }
   ])
 };
@@ -838,6 +874,8 @@ const listCustomType: ReadonlyArray<type.CustomType> = [
   type_,
   expr,
   kernelExpr,
+  localPartReference,
+  tagReference,
   functionCall,
   lambdaBranch,
   condition,
