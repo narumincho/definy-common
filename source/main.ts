@@ -115,15 +115,82 @@ const accessTokenFromUrl = (hash: string): data.Maybe<data.AccessToken> => {
   return data.maybeJust(matchResult[1] as data.AccessToken);
 };
 
-export const evaluateExpr = (expr: data.Expr): number | null => {
+export const evaluateExpr = (
+  typeDefinitionMap: ReadonlyMap<data.TypeId, data.TypeDefinition>,
+  partDefinitionMap: ReadonlyMap<data.PartId, data.PartDefinition>,
+  optimizedPartMap: ReadonlyMap<data.PartId, data.PartDefinition>,
+  optimizedLocalPart: ReadonlyMap<
+    data.PartId,
+    ReadonlyMap<data.LocalPartId, data.Expr>
+  >,
+  expr: data.Expr
+): {
+  result: data.Result<data.Expr, data.EvaluateExprError>;
+  optimizedPartMap: ReadonlyMap<data.PartId, data.PartDefinition>;
+  optimizedLocalPart: ReadonlyMap<
+    data.PartId,
+    ReadonlyMap<data.LocalPartId, data.Expr>
+  >;
+} => {
   switch (expr._) {
     case "Kernel":
-      return null;
+      return {
+        result: data.resultOk(expr),
+        optimizedLocalPart: optimizedLocalPart,
+        optimizedPartMap: optimizedPartMap
+      };
     case "Int32Literal":
-      return expr.int32;
-    case "PartReference":
-      return null;
-    case "CapturePartReference":
+      return {
+        result: data.resultOk(expr),
+        optimizedLocalPart: optimizedLocalPart,
+        optimizedPartMap: optimizedPartMap
+      };
+    case "PartReference": {
+      const part = partDefinitionMap.get(expr.partId);
+      if (part === undefined) {
+        return {
+          result: data.resultError(
+            data.evaluateExprErrorNeedPartDefinition(expr.partId)
+          ),
+          optimizedLocalPart: optimizedLocalPart,
+          optimizedPartMap: optimizedPartMap
+        };
+      }
+      switch (part.expr._) {
+        case "Just": {
+          const evaluatedResult = evaluateExpr(
+            typeDefinitionMap,
+            partDefinitionMap,
+            optimizedPartMap,
+            optimizedLocalPart,
+            part.expr.value
+          );
+          return {
+            result: evaluatedResult.result,
+            optimizedPartMap: new Map([
+              ...optimizedPartMap,
+              ...evaluatedResult.optimizedPartMap,
+              ...(evaluatedResult.result._ === "Ok"
+                ? [partIdAndExpr(expr.partId, evaluatedResult.result.ok)]
+                : [])
+            ]),
+            optimizedLocalPart: new Map([
+              ...optimizedLocalPart,
+              ...evaluatedResult.optimizedLocalPart
+            ])
+          };
+        }
+        case "Nothing":
+          return {
+            result: data.resultError(
+              data.evaluateExprErrorPartExprIsNothing(expr.partId)
+            ),
+            optimizedLocalPart: optimizedLocalPart,
+            optimizedPartMap: optimizedPartMap
+          };
+      }
+    }
+    case "LocalPartReference":
       return null;
     case "TagReference":
       return null;
@@ -133,6 +200,11 @@ export const evaluateExpr = (expr: data.Expr): number | null => {
       return null;
   }
 };
+
+const partIdAndExpr = (
+  partId: data.PartId,
+  expr: data.Expr
+): [data.PartId, data.Expr] => [partId, expr];
 
 const evaluateFunctionCall = (
   functionCall: data.FunctionCall
@@ -166,24 +238,24 @@ const evaluateFunctionCall = (
   return null;
 };
 
-export const exprToString = (expr: data.Expr): string => {
+export const exprToDebugString = (expr: data.Expr): string => {
   switch (expr._) {
     case "Kernel":
       return kernelToString(expr.kernelExpr);
     case "Int32Literal":
       return expr.int32.toString();
-    case "CapturePartReference":
-      return "[c." + (expr.capturePartId as string) + "]";
+    case "LocalPartReference":
+      return "[local " + JSON.stringify(expr.localPartReference) + "]";
     case "PartReference":
-      return "[" + (expr.partId as string) + "]";
+      return "[part " + (expr.partId as string) + "]";
     case "TagReference":
-      return "#" + (expr.tagId as string);
+      return "[tag " + JSON.stringify(expr.tagReferenceIndex) + "]";
     case "FunctionCall":
       return (
         "(" +
-        exprToString(expr.functionCall.function) +
+        exprToDebugString(expr.functionCall.function) +
         " " +
-        exprToString(expr.functionCall.parameter)
+        exprToDebugString(expr.functionCall.parameter)
       );
     case "Lambda":
       return (
@@ -210,7 +282,7 @@ const lambdaBranchToString = (lambdaBranch: data.LambdaBranch): string => {
       : "{-" + lambdaBranch.description + "-}") +
     conditionToString(lambdaBranch.condition) +
     " → " +
-    util.maybeUnwrap(lambdaBranch.expr, exprToString, "□")
+    util.maybeUnwrap(lambdaBranch.expr, exprToDebugString, "□")
   );
 };
 
@@ -232,7 +304,7 @@ const conditionToString = (condition: data.Condition): string => {
       return (
         condition.conditionCapture.name +
         "(" +
-        (condition.conditionCapture.capturePartId as string) +
+        (condition.conditionCapture.localPartId as string) +
         ")"
       );
     case "Any":

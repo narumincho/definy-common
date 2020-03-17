@@ -862,6 +862,11 @@ const evaluateExprError: type.CustomType = {
       name: "NeedPartDefinition",
       description: "式を評価するには,このパーツの定義が必要だと言っている",
       parameter: type.maybeJust(partId)
+    },
+    {
+      name: "PartExprIsNothing",
+      description: "パーツの式が空だと言っている",
+      parameter: type.maybeJust(partId)
     }
   ])
 };

@@ -233,6 +233,7 @@ type alias BranchPartDefinition =
 
 type EvaluateExprError
     = EvaluateExprErrorNeedPartDefinition PartId
+    | EvaluateExprErrorPartExprIsNothing PartId
 
 
 type AccessToken
@@ -778,6 +779,9 @@ evaluateExprErrorToJsonValue evaluateExprError =
     case evaluateExprError of
         EvaluateExprErrorNeedPartDefinition parameter ->
             Je.object [ ( "_", Je.string "NeedPartDefinition" ), ( "partId", partIdToJsonValue parameter ) ]
+
+        EvaluateExprErrorPartExprIsNothing parameter ->
+            Je.object [ ( "_", Je.string "PartExprIsNothing" ), ( "partId", partIdToJsonValue parameter ) ]
 
 
 maybeJsonDecoder : Jd.Decoder a -> Jd.Decoder (Maybe a)
@@ -1500,6 +1504,9 @@ evaluateExprErrorJsonDecoder =
                 case tag of
                     "NeedPartDefinition" ->
                         Jd.field "partId" partIdJsonDecoder |> Jd.map EvaluateExprErrorNeedPartDefinition
+
+                    "PartExprIsNothing" ->
+                        Jd.field "partId" partIdJsonDecoder |> Jd.map EvaluateExprErrorPartExprIsNothing
 
                     _ ->
                         Jd.fail ("EvaluateExprErrorで不明なタグを受けたとった tag=" ++ tag)

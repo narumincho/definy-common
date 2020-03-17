@@ -278,7 +278,9 @@ export type BranchPartDefinition = {
   expr: Expr;
 };
 
-export type EvaluateExprError = { _: "NeedPartDefinition"; partId: PartId };
+export type EvaluateExprError =
+  | { _: "NeedPartDefinition"; partId: PartId }
+  | { _: "PartExprIsNothing"; partId: PartId };
 
 export type AccessToken = string & { _accessToken: never };
 
@@ -490,6 +492,13 @@ export const conditionInt32 = (int32: number): Condition => ({
 export const evaluateExprErrorNeedPartDefinition = (
   partId: PartId
 ): EvaluateExprError => ({ _: "NeedPartDefinition", partId: partId });
+
+/**
+ * パーツの式が空だと言っている
+ */
+export const evaluateExprErrorPartExprIsNothing = (
+  partId: PartId
+): EvaluateExprError => ({ _: "PartExprIsNothing", partId: partId });
 
 /**
  * numberの32bit符号あり整数をSigned Leb128のバイナリに変換する
@@ -930,6 +939,9 @@ export const encodeEvaluateExprError = (
   switch (evaluateExprError._) {
     case "NeedPartDefinition": {
       return [0].concat(encodeId(evaluateExprError.partId));
+    }
+    case "PartExprIsNothing": {
+      return [1].concat(encodeId(evaluateExprError.partId));
     }
   }
 };
@@ -2395,6 +2407,16 @@ export const decodeEvaluateExprError = (
     ) => { result: PartId; nextIndex: number })(patternIndex.nextIndex, binary);
     return {
       result: evaluateExprErrorNeedPartDefinition(result.result),
+      nextIndex: result.nextIndex
+    };
+  }
+  if (patternIndex.result === 1) {
+    const result: { result: PartId; nextIndex: number } = (decodeId as (
+      a: number,
+      b: Uint8Array
+    ) => { result: PartId; nextIndex: number })(patternIndex.nextIndex, binary);
+    return {
+      result: evaluateExprErrorPartExprIsNothing(result.result),
       nextIndex: result.nextIndex
     };
   }
