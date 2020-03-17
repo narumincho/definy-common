@@ -1,4 +1,4 @@
-module Data exposing (AccessToken(..), CapturePartId(..), Change(..), ClientMode(..), Comment, Condition(..), ConditionCapture, ConditionTag, DateTime, Expr(..), FileHash(..), FileHashAndIsThumbnail, FunctionCall, Idea, IdeaId(..), IdeaItem(..), KernelExpr(..), LambdaBranch, Language(..), Location(..), ModuleSnapshot, OpenIdConnectProvider(..), PartId(..), PartSnapshot, Project, ProjectId(..), RequestLogInUrlRequestData, Suggestion, TagId(..), TypeBody(..), TypeBodyKernel(..), TypeBodyProductMember, TypeBodySumPattern, TypeId(..), TypeSnapshot, UrlData, UserId(..), UserPublic, UserPublicAndUserId, accessTokenJsonDecoder, accessTokenToJsonValue, capturePartIdJsonDecoder, capturePartIdToJsonValue, changeJsonDecoder, changeToJsonValue, clientModeJsonDecoder, clientModeToJsonValue, commentJsonDecoder, commentToJsonValue, conditionCaptureJsonDecoder, conditionCaptureToJsonValue, conditionJsonDecoder, conditionTagJsonDecoder, conditionTagToJsonValue, conditionToJsonValue, dateTimeJsonDecoder, dateTimeToJsonValue, exprJsonDecoder, exprToJsonValue, fileHashAndIsThumbnailJsonDecoder, fileHashAndIsThumbnailToJsonValue, fileHashJsonDecoder, fileHashToJsonValue, functionCallJsonDecoder, functionCallToJsonValue, ideaIdJsonDecoder, ideaIdToJsonValue, ideaItemJsonDecoder, ideaItemToJsonValue, ideaJsonDecoder, ideaToJsonValue, kernelExprJsonDecoder, kernelExprToJsonValue, lambdaBranchJsonDecoder, lambdaBranchToJsonValue, languageJsonDecoder, languageToJsonValue, locationJsonDecoder, locationToJsonValue, maybeJsonDecoder, maybeToJsonValue, moduleSnapshotJsonDecoder, moduleSnapshotToJsonValue, openIdConnectProviderJsonDecoder, openIdConnectProviderToJsonValue, partIdJsonDecoder, partIdToJsonValue, partSnapshotJsonDecoder, partSnapshotToJsonValue, projectIdJsonDecoder, projectIdToJsonValue, projectJsonDecoder, projectToJsonValue, requestLogInUrlRequestDataJsonDecoder, requestLogInUrlRequestDataToJsonValue, resultJsonDecoder, resultToJsonValue, suggestionJsonDecoder, suggestionToJsonValue, tagIdJsonDecoder, tagIdToJsonValue, typeBodyJsonDecoder, typeBodyKernelJsonDecoder, typeBodyKernelToJsonValue, typeBodyProductMemberJsonDecoder, typeBodyProductMemberToJsonValue, typeBodySumPatternJsonDecoder, typeBodySumPatternToJsonValue, typeBodyToJsonValue, typeIdJsonDecoder, typeIdToJsonValue, typeSnapshotJsonDecoder, typeSnapshotToJsonValue, urlDataJsonDecoder, urlDataToJsonValue, userIdJsonDecoder, userIdToJsonValue, userPublicAndUserIdJsonDecoder, userPublicAndUserIdToJsonValue, userPublicJsonDecoder, userPublicToJsonValue)
+module Data exposing (AccessToken(..), BranchPartDefinition, Change(..), ClientMode(..), Comment, Condition(..), ConditionCapture, ConditionTag, DateTime, Expr(..), FileHash(..), FileHashAndIsThumbnail, FunctionCall, Idea, IdeaId(..), IdeaItem(..), KernelExpr(..), LambdaBranch, Language(..), LocalPartId(..), Location(..), ModuleSnapshot, OpenIdConnectProvider(..), PartId(..), PartSnapshot, Project, ProjectId(..), RequestLogInUrlRequestData, Suggestion, TagId(..), Type, TypeBody(..), TypeBodyKernel(..), TypeBodyProductMember, TypeBodySumPattern, TypeId(..), TypeSnapshot, UrlData, UserId(..), UserPublic, UserPublicAndUserId, accessTokenJsonDecoder, accessTokenToJsonValue, branchPartDefinitionJsonDecoder, branchPartDefinitionToJsonValue, changeJsonDecoder, changeToJsonValue, clientModeJsonDecoder, clientModeToJsonValue, commentJsonDecoder, commentToJsonValue, conditionCaptureJsonDecoder, conditionCaptureToJsonValue, conditionJsonDecoder, conditionTagJsonDecoder, conditionTagToJsonValue, conditionToJsonValue, dateTimeJsonDecoder, dateTimeToJsonValue, exprJsonDecoder, exprToJsonValue, fileHashAndIsThumbnailJsonDecoder, fileHashAndIsThumbnailToJsonValue, fileHashJsonDecoder, fileHashToJsonValue, functionCallJsonDecoder, functionCallToJsonValue, ideaIdJsonDecoder, ideaIdToJsonValue, ideaItemJsonDecoder, ideaItemToJsonValue, ideaJsonDecoder, ideaToJsonValue, kernelExprJsonDecoder, kernelExprToJsonValue, lambdaBranchJsonDecoder, lambdaBranchToJsonValue, languageJsonDecoder, languageToJsonValue, localPartIdJsonDecoder, localPartIdToJsonValue, locationJsonDecoder, locationToJsonValue, maybeJsonDecoder, maybeToJsonValue, moduleSnapshotJsonDecoder, moduleSnapshotToJsonValue, openIdConnectProviderJsonDecoder, openIdConnectProviderToJsonValue, partIdJsonDecoder, partIdToJsonValue, partSnapshotJsonDecoder, partSnapshotToJsonValue, projectIdJsonDecoder, projectIdToJsonValue, projectJsonDecoder, projectToJsonValue, requestLogInUrlRequestDataJsonDecoder, requestLogInUrlRequestDataToJsonValue, resultJsonDecoder, resultToJsonValue, suggestionJsonDecoder, suggestionToJsonValue, tagIdJsonDecoder, tagIdToJsonValue, typeBodyJsonDecoder, typeBodyKernelJsonDecoder, typeBodyKernelToJsonValue, typeBodyProductMemberJsonDecoder, typeBodyProductMemberToJsonValue, typeBodySumPatternJsonDecoder, typeBodySumPatternToJsonValue, typeBodyToJsonValue, typeIdJsonDecoder, typeIdToJsonValue, typeJsonDecoder, typeSnapshotJsonDecoder, typeSnapshotToJsonValue, typeToJsonValue, urlDataJsonDecoder, urlDataToJsonValue, userIdJsonDecoder, userIdToJsonValue, userPublicAndUserIdJsonDecoder, userPublicAndUserIdToJsonValue, userPublicJsonDecoder, userPublicToJsonValue)
 
 import Json.Decode as Jd
 import Json.Decode.Pipeline as Jdp
@@ -145,7 +145,13 @@ type TypeBodyKernel
 {-| パーツのスナップショット
 -}
 type alias PartSnapshot =
-    { name : String, parentList : List PartId, description : String, expr : Maybe Expr }
+    { name : String, parentList : List PartId, description : String, type_ : Type, expr : Maybe Expr }
+
+
+{-| 型
+-}
+type alias Type =
+    { reference : TypeId, parameter : List Type }
 
 
 {-| 式
@@ -154,7 +160,7 @@ type Expr
     = ExprKernel KernelExpr
     | ExprInt32Literal Int
     | ExprPartReference PartId
-    | ExprCapturePartReference CapturePartId
+    | ExprBranchLocalPartReference LocalPartId
     | ExprTagReference TagId
     | ExprFunctionCall FunctionCall
     | ExprLambda (List LambdaBranch)
@@ -177,7 +183,7 @@ type alias FunctionCall =
 {-| ラムダのブランチ. Just x -> data x のようなところ
 -}
 type alias LambdaBranch =
-    { condition : Condition, description : String, expr : Maybe Expr }
+    { condition : Condition, description : String, localPartList : List BranchPartDefinition, expr : Maybe Expr }
 
 
 {-| ブランチの式を使う条件
@@ -198,7 +204,13 @@ type alias ConditionTag =
 {-| キャプチャパーツへのキャプチャ
 -}
 type alias ConditionCapture =
-    { name : String, capturePartId : CapturePartId }
+    { name : String, localPartId : LocalPartId }
+
+
+{-| ラムダのブランチで使えるパーツを定義する部分
+-}
+type alias BranchPartDefinition =
+    { localPartId : LocalPartId, name : String, description : String, type_ : Type, expr : Expr }
 
 
 {-| getImageに必要なパラメーター
@@ -235,8 +247,8 @@ type TypeId
     = TypeId String
 
 
-type CapturePartId
-    = CapturePartId String
+type LocalPartId
+    = LocalPartId String
 
 
 type TagId
@@ -298,8 +310,8 @@ typeIdToJsonValue (TypeId string) =
     Je.string string
 
 
-capturePartIdToJsonValue : CapturePartId -> Je.Value
-capturePartIdToJsonValue (CapturePartId string) =
+localPartIdToJsonValue : LocalPartId -> Je.Value
+localPartIdToJsonValue (LocalPartId string) =
     Je.string string
 
 
@@ -573,7 +585,18 @@ partSnapshotToJsonValue partSnapshot =
         [ ( "name", Je.string partSnapshot.name )
         , ( "parentList", Je.list partIdToJsonValue partSnapshot.parentList )
         , ( "description", Je.string partSnapshot.description )
+        , ( "type", typeToJsonValue partSnapshot.type_ )
         , ( "expr", maybeToJsonValue exprToJsonValue partSnapshot.expr )
+        ]
+
+
+{-| TypeのJSONへのエンコーダ
+-}
+typeToJsonValue : Type -> Je.Value
+typeToJsonValue type_ =
+    Je.object
+        [ ( "reference", typeIdToJsonValue type_.reference )
+        , ( "parameter", Je.list typeToJsonValue type_.parameter )
         ]
 
 
@@ -591,8 +614,8 @@ exprToJsonValue expr =
         ExprPartReference parameter ->
             Je.object [ ( "_", Je.string "PartReference" ), ( "partId", partIdToJsonValue parameter ) ]
 
-        ExprCapturePartReference parameter ->
-            Je.object [ ( "_", Je.string "CapturePartReference" ), ( "capturePartId", capturePartIdToJsonValue parameter ) ]
+        ExprBranchLocalPartReference parameter ->
+            Je.object [ ( "_", Je.string "BranchLocalPartReference" ), ( "localPartId", localPartIdToJsonValue parameter ) ]
 
         ExprTagReference parameter ->
             Je.object [ ( "_", Je.string "TagReference" ), ( "tagId", tagIdToJsonValue parameter ) ]
@@ -636,6 +659,7 @@ lambdaBranchToJsonValue lambdaBranch =
     Je.object
         [ ( "condition", conditionToJsonValue lambdaBranch.condition )
         , ( "description", Je.string lambdaBranch.description )
+        , ( "localPartList", Je.list branchPartDefinitionToJsonValue lambdaBranch.localPartList )
         , ( "expr", maybeToJsonValue exprToJsonValue lambdaBranch.expr )
         ]
 
@@ -674,7 +698,20 @@ conditionCaptureToJsonValue : ConditionCapture -> Je.Value
 conditionCaptureToJsonValue conditionCapture =
     Je.object
         [ ( "name", Je.string conditionCapture.name )
-        , ( "capturePartId", capturePartIdToJsonValue conditionCapture.capturePartId )
+        , ( "localPartId", localPartIdToJsonValue conditionCapture.localPartId )
+        ]
+
+
+{-| BranchPartDefinitionのJSONへのエンコーダ
+-}
+branchPartDefinitionToJsonValue : BranchPartDefinition -> Je.Value
+branchPartDefinitionToJsonValue branchPartDefinition =
+    Je.object
+        [ ( "localPartId", localPartIdToJsonValue branchPartDefinition.localPartId )
+        , ( "name", Je.string branchPartDefinition.name )
+        , ( "description", Je.string branchPartDefinition.description )
+        , ( "type", typeToJsonValue branchPartDefinition.type_ )
+        , ( "expr", exprToJsonValue branchPartDefinition.expr )
         ]
 
 
@@ -757,9 +794,9 @@ typeIdJsonDecoder =
     Jd.map TypeId Jd.string
 
 
-capturePartIdJsonDecoder : Jd.Decoder CapturePartId
-capturePartIdJsonDecoder =
-    Jd.map CapturePartId Jd.string
+localPartIdJsonDecoder : Jd.Decoder LocalPartId
+localPartIdJsonDecoder =
+    Jd.map LocalPartId Jd.string
 
 
 tagIdJsonDecoder : Jd.Decoder TagId
@@ -1159,17 +1196,33 @@ typeBodyKernelJsonDecoder =
 partSnapshotJsonDecoder : Jd.Decoder PartSnapshot
 partSnapshotJsonDecoder =
     Jd.succeed
-        (\name parentList description expr ->
+        (\name parentList description type_ expr ->
             { name = name
             , parentList = parentList
             , description = description
+            , type_ = type_
             , expr = expr
             }
         )
         |> Jdp.required "name" Jd.string
         |> Jdp.required "parentList" (Jd.list partIdJsonDecoder)
         |> Jdp.required "description" Jd.string
+        |> Jdp.required "type" typeJsonDecoder
         |> Jdp.required "expr" (maybeJsonDecoder exprJsonDecoder)
+
+
+{-| TypeのJSON Decoder
+-}
+typeJsonDecoder : Jd.Decoder Type
+typeJsonDecoder =
+    Jd.succeed
+        (\reference parameter ->
+            { reference = reference
+            , parameter = parameter
+            }
+        )
+        |> Jdp.required "reference" typeIdJsonDecoder
+        |> Jdp.required "parameter" (Jd.list typeJsonDecoder)
 
 
 {-| ExprのJSON Decoder
@@ -1189,8 +1242,8 @@ exprJsonDecoder =
                     "PartReference" ->
                         Jd.field "partId" partIdJsonDecoder |> Jd.map ExprPartReference
 
-                    "CapturePartReference" ->
-                        Jd.field "capturePartId" capturePartIdJsonDecoder |> Jd.map ExprCapturePartReference
+                    "BranchLocalPartReference" ->
+                        Jd.field "localPartId" localPartIdJsonDecoder |> Jd.map ExprBranchLocalPartReference
 
                     "TagReference" ->
                         Jd.field "tagId" tagIdJsonDecoder |> Jd.map ExprTagReference
@@ -1247,14 +1300,16 @@ functionCallJsonDecoder =
 lambdaBranchJsonDecoder : Jd.Decoder LambdaBranch
 lambdaBranchJsonDecoder =
     Jd.succeed
-        (\condition description expr ->
+        (\condition description localPartList expr ->
             { condition = condition
             , description = description
+            , localPartList = localPartList
             , expr = expr
             }
         )
         |> Jdp.required "condition" conditionJsonDecoder
         |> Jdp.required "description" Jd.string
+        |> Jdp.required "localPartList" (Jd.list branchPartDefinitionJsonDecoder)
         |> Jdp.required "expr" (maybeJsonDecoder exprJsonDecoder)
 
 
@@ -1302,13 +1357,33 @@ conditionTagJsonDecoder =
 conditionCaptureJsonDecoder : Jd.Decoder ConditionCapture
 conditionCaptureJsonDecoder =
     Jd.succeed
-        (\name capturePartId ->
+        (\name localPartId ->
             { name = name
-            , capturePartId = capturePartId
+            , localPartId = localPartId
             }
         )
         |> Jdp.required "name" Jd.string
-        |> Jdp.required "capturePartId" capturePartIdJsonDecoder
+        |> Jdp.required "localPartId" localPartIdJsonDecoder
+
+
+{-| BranchPartDefinitionのJSON Decoder
+-}
+branchPartDefinitionJsonDecoder : Jd.Decoder BranchPartDefinition
+branchPartDefinitionJsonDecoder =
+    Jd.succeed
+        (\localPartId name description type_ expr ->
+            { localPartId = localPartId
+            , name = name
+            , description = description
+            , type_ = type_
+            , expr = expr
+            }
+        )
+        |> Jdp.required "localPartId" localPartIdJsonDecoder
+        |> Jdp.required "name" Jd.string
+        |> Jdp.required "description" Jd.string
+        |> Jdp.required "type" typeJsonDecoder
+        |> Jdp.required "expr" exprJsonDecoder
 
 
 {-| FileHashAndIsThumbnailのJSON Decoder

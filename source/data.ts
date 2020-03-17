@@ -188,8 +188,14 @@ export type PartSnapshot = {
   name: string;
   parentList: ReadonlyArray<PartId>;
   description: string;
+  type: Type;
   expr: Maybe<Expr>;
 };
+
+/**
+ * 型
+ */
+export type Type = { reference: TypeId; parameter: ReadonlyArray<Type> };
 
 /**
  * 式
@@ -198,7 +204,7 @@ export type Expr =
   | { _: "Kernel"; kernelExpr: KernelExpr }
   | { _: "Int32Literal"; int32: number }
   | { _: "PartReference"; partId: PartId }
-  | { _: "CapturePartReference"; capturePartId: CapturePartId }
+  | { _: "BranchLocalPartReference"; localPartId: LocalPartId }
   | { _: "TagReference"; tagId: TagId }
   | { _: "FunctionCall"; functionCall: FunctionCall }
   | { _: "Lambda"; lambdaBranchList: ReadonlyArray<LambdaBranch> };
@@ -219,6 +225,7 @@ export type FunctionCall = { function: Expr; parameter: Expr };
 export type LambdaBranch = {
   condition: Condition;
   description: string;
+  localPartList: ReadonlyArray<BranchPartDefinition>;
   expr: Maybe<Expr>;
 };
 
@@ -239,7 +246,18 @@ export type ConditionTag = { tag: TagId; parameter: Maybe<Condition> };
 /**
  * キャプチャパーツへのキャプチャ
  */
-export type ConditionCapture = { name: string; capturePartId: CapturePartId };
+export type ConditionCapture = { name: string; localPartId: LocalPartId };
+
+/**
+ * ラムダのブランチで使えるパーツを定義する部分
+ */
+export type BranchPartDefinition = {
+  localPartId: LocalPartId;
+  name: string;
+  description: string;
+  type: Type;
+  expr: Expr;
+};
 
 /**
  * getImageに必要なパラメーター
@@ -263,7 +281,7 @@ export type PartId = string & { _partId: never };
 
 export type TypeId = string & { _typeId: never };
 
-export type CapturePartId = string & { _capturePartId: never };
+export type LocalPartId = string & { _localPartId: never };
 
 export type TagId = string & { _tagId: never };
 
@@ -392,11 +410,11 @@ export const exprPartReference = (partId: PartId): Expr => ({
 });
 
 /**
- * キャプチャパーツの参照
+ * ローカルパーツの参照
  */
-export const exprCapturePartReference = (
-  capturePartId: CapturePartId
-): Expr => ({ _: "CapturePartReference", capturePartId: capturePartId });
+export const exprBranchLocalPartReference = (
+  localPartId: LocalPartId
+): Expr => ({ _: "BranchLocalPartReference", localPartId: localPartId });
 
 /**
  * タグを参照
@@ -757,7 +775,11 @@ export const encodePartSnapshot = (
   encodeString(partSnapshot.name)
     .concat(encodeList(encodeId)(partSnapshot.parentList))
     .concat(encodeString(partSnapshot.description))
+    .concat(encodeType(partSnapshot["type"]))
     .concat(encodeMaybe(encodeExpr)(partSnapshot.expr));
+
+export const encodeType = (type_: Type): ReadonlyArray<number> =>
+  encodeId(type_.reference).concat(encodeList(encodeType)(type_.parameter));
 
 export const encodeExpr = (expr: Expr): ReadonlyArray<number> => {
   switch (expr._) {
@@ -770,8 +792,8 @@ export const encodeExpr = (expr: Expr): ReadonlyArray<number> => {
     case "PartReference": {
       return [2].concat(encodeId(expr.partId));
     }
-    case "CapturePartReference": {
-      return [3].concat(encodeId(expr.capturePartId));
+    case "BranchLocalPartReference": {
+      return [3].concat(encodeId(expr.localPartId));
     }
     case "TagReference": {
       return [4].concat(encodeId(expr.tagId));
@@ -813,6 +835,7 @@ export const encodeLambdaBranch = (
 ): ReadonlyArray<number> =>
   encodeCondition(lambdaBranch.condition)
     .concat(encodeString(lambdaBranch.description))
+    .concat(encodeList(encodeBranchPartDefinition)(lambdaBranch.localPartList))
     .concat(encodeMaybe(encodeExpr)(lambdaBranch.expr));
 
 export const encodeCondition = (
@@ -845,8 +868,17 @@ export const encodeConditionCapture = (
   conditionCapture: ConditionCapture
 ): ReadonlyArray<number> =>
   encodeString(conditionCapture.name).concat(
-    encodeId(conditionCapture.capturePartId)
+    encodeId(conditionCapture.localPartId)
   );
+
+export const encodeBranchPartDefinition = (
+  branchPartDefinition: BranchPartDefinition
+): ReadonlyArray<number> =>
+  encodeId(branchPartDefinition.localPartId)
+    .concat(encodeString(branchPartDefinition.name))
+    .concat(encodeString(branchPartDefinition.description))
+    .concat(encodeType(branchPartDefinition["type"]))
+    .concat(encodeExpr(branchPartDefinition.expr));
 
 export const encodeFileHashAndIsThumbnail = (
   fileHashAndIsThumbnail: FileHashAndIsThumbnail
@@ -1838,18 +1870,51 @@ export const decodePartSnapshot = (
     result: string;
     nextIndex: number;
   } = decodeString(parentListAndNextIndex.nextIndex, binary);
+  const typeAndNextIndex: { result: Type; nextIndex: number } = decodeType(
+    descriptionAndNextIndex.nextIndex,
+    binary
+  );
   const exprAndNextIndex: {
     result: Maybe<Expr>;
     nextIndex: number;
-  } = decodeMaybe(decodeExpr)(descriptionAndNextIndex.nextIndex, binary);
+  } = decodeMaybe(decodeExpr)(typeAndNextIndex.nextIndex, binary);
   return {
     result: {
       name: nameAndNextIndex.result,
       parentList: parentListAndNextIndex.result,
       description: descriptionAndNextIndex.result,
+      type: typeAndNextIndex.result,
       expr: exprAndNextIndex.result
     },
     nextIndex: exprAndNextIndex.nextIndex
+  };
+};
+
+/**
+ * @param index バイナリを読み込み開始位置
+ * @param binary バイナリ
+ */
+export const decodeType = (
+  index: number,
+  binary: Uint8Array
+): { result: Type; nextIndex: number } => {
+  const referenceAndNextIndex: {
+    result: TypeId;
+    nextIndex: number;
+  } = (decodeId as (
+    a: number,
+    b: Uint8Array
+  ) => { result: TypeId; nextIndex: number })(index, binary);
+  const parameterAndNextIndex: {
+    result: ReadonlyArray<Type>;
+    nextIndex: number;
+  } = decodeList(decodeType)(referenceAndNextIndex.nextIndex, binary);
+  return {
+    result: {
+      reference: referenceAndNextIndex.result,
+      parameter: parameterAndNextIndex.result
+    },
+    nextIndex: parameterAndNextIndex.nextIndex
   };
 };
 
@@ -1893,15 +1958,15 @@ export const decodeExpr = (
     };
   }
   if (patternIndex.result === 3) {
-    const result: { result: CapturePartId; nextIndex: number } = (decodeId as (
+    const result: { result: LocalPartId; nextIndex: number } = (decodeId as (
       a: number,
       b: Uint8Array
-    ) => { result: CapturePartId; nextIndex: number })(
+    ) => { result: LocalPartId; nextIndex: number })(
       patternIndex.nextIndex,
       binary
     );
     return {
-      result: exprCapturePartReference(result.result),
+      result: exprBranchLocalPartReference(result.result),
       nextIndex: result.nextIndex
     };
   }
@@ -2000,14 +2065,22 @@ export const decodeLambdaBranch = (
     result: string;
     nextIndex: number;
   } = decodeString(conditionAndNextIndex.nextIndex, binary);
+  const localPartListAndNextIndex: {
+    result: ReadonlyArray<BranchPartDefinition>;
+    nextIndex: number;
+  } = decodeList(decodeBranchPartDefinition)(
+    descriptionAndNextIndex.nextIndex,
+    binary
+  );
   const exprAndNextIndex: {
     result: Maybe<Expr>;
     nextIndex: number;
-  } = decodeMaybe(decodeExpr)(descriptionAndNextIndex.nextIndex, binary);
+  } = decodeMaybe(decodeExpr)(localPartListAndNextIndex.nextIndex, binary);
   return {
     result: {
       condition: conditionAndNextIndex.result,
       description: descriptionAndNextIndex.result,
+      localPartList: localPartListAndNextIndex.result,
       expr: exprAndNextIndex.result
     },
     nextIndex: exprAndNextIndex.nextIndex
@@ -2096,22 +2169,65 @@ export const decodeConditionCapture = (
     index,
     binary
   );
-  const capturePartIdAndNextIndex: {
-    result: CapturePartId;
+  const localPartIdAndNextIndex: {
+    result: LocalPartId;
     nextIndex: number;
   } = (decodeId as (
     a: number,
     b: Uint8Array
-  ) => { result: CapturePartId; nextIndex: number })(
+  ) => { result: LocalPartId; nextIndex: number })(
     nameAndNextIndex.nextIndex,
     binary
   );
   return {
     result: {
       name: nameAndNextIndex.result,
-      capturePartId: capturePartIdAndNextIndex.result
+      localPartId: localPartIdAndNextIndex.result
     },
-    nextIndex: capturePartIdAndNextIndex.nextIndex
+    nextIndex: localPartIdAndNextIndex.nextIndex
+  };
+};
+
+/**
+ * @param index バイナリを読み込み開始位置
+ * @param binary バイナリ
+ */
+export const decodeBranchPartDefinition = (
+  index: number,
+  binary: Uint8Array
+): { result: BranchPartDefinition; nextIndex: number } => {
+  const localPartIdAndNextIndex: {
+    result: LocalPartId;
+    nextIndex: number;
+  } = (decodeId as (
+    a: number,
+    b: Uint8Array
+  ) => { result: LocalPartId; nextIndex: number })(index, binary);
+  const nameAndNextIndex: { result: string; nextIndex: number } = decodeString(
+    localPartIdAndNextIndex.nextIndex,
+    binary
+  );
+  const descriptionAndNextIndex: {
+    result: string;
+    nextIndex: number;
+  } = decodeString(nameAndNextIndex.nextIndex, binary);
+  const typeAndNextIndex: { result: Type; nextIndex: number } = decodeType(
+    descriptionAndNextIndex.nextIndex,
+    binary
+  );
+  const exprAndNextIndex: { result: Expr; nextIndex: number } = decodeExpr(
+    typeAndNextIndex.nextIndex,
+    binary
+  );
+  return {
+    result: {
+      localPartId: localPartIdAndNextIndex.result,
+      name: nameAndNextIndex.result,
+      description: descriptionAndNextIndex.result,
+      type: typeAndNextIndex.result,
+      expr: exprAndNextIndex.result
+    },
+    nextIndex: exprAndNextIndex.nextIndex
   };
 };
 

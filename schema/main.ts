@@ -13,7 +13,7 @@ const moduleId = type.typeId("ModuleId");
 const typeId = type.typeId("TypeId");
 const tagId = type.typeId("TagId");
 const partId = type.typeId("PartId");
-const capturePartId = type.typeId("CapturePartId");
+const localPartId = type.typeId("LocalPartId");
 
 const dateTimeName = "DateTime";
 const requestLogInUrlRequestDataName = "RequestLogInUrlRequestData";
@@ -37,14 +37,16 @@ const typeBodyName = "TypeBody";
 const typeBodyProductMemberName = "TypeBodyProductMember";
 const typeBodySumPatternName = "TypeBodySumPattern";
 const typeBodyKernelName = "TypeBodyKernel";
-const fileHashAndIsThumbnailName = "FileHashAndIsThumbnail";
+const typeName = "Type";
 const exprName = "Expr";
 const kernelExprName = "KernelExpr";
 const functionCallName = "FunctionCall";
 const lambdaBranchName = "LambdaBranch";
 const conditionName = "Condition";
 const conditionTagName = "ConditionTag";
+const branchPartDefinitionName = "BranchPartDefinition";
 const conditionCaptureName = "ConditionCapture";
+const fileHashAndIsThumbnailName = "FileHashAndIsThumbnail";
 
 const dateTime: type.CustomType = {
   name: dateTimeName,
@@ -468,6 +470,11 @@ const partSnapshot: type.CustomType = {
       memberType: type.typeString
     },
     {
+      name: "type",
+      description: "パーツの型",
+      memberType: type.typeCustom(typeName)
+    },
+    {
       name: "expr",
       description: "パーツの式",
       memberType: type.typeMaybe(type.typeCustom(exprName))
@@ -567,20 +574,19 @@ const typeBodyKernel: type.CustomType = {
   ])
 };
 
-const fileHashAndIsThumbnail: type.CustomType = {
-  name: fileHashAndIsThumbnailName,
-  description: "getImageに必要なパラメーター",
+const type_: type.CustomType = {
+  name: "Type",
+  description: "型",
   body: type.customTypeBodyProduct([
     {
-      name: "fileHash",
-      description: "ファイルハッシュ (オリジナルの画像)",
-      memberType: fileHash
+      name: "reference",
+      description: "型の参照",
+      memberType: typeId
     },
     {
-      name: "isThumbnail",
-      description:
-        "取得したいのは,サイズが小さくて速くデータを受け取れるサムネイル画像かどうか",
-      memberType: type.typeBool
+      name: "parameter",
+      description: "型のパラメーター",
+      memberType: type.typeList(type.typeCustom(typeName))
     }
   ])
 };
@@ -605,9 +611,9 @@ const expr: type.CustomType = {
       parameter: type.maybeJust(partId)
     },
     {
-      name: "CapturePartReference",
-      description: "キャプチャパーツの参照",
-      parameter: type.maybeJust(capturePartId)
+      name: "BranchLocalPartReference",
+      description: "ローカルパーツの参照",
+      parameter: type.maybeJust(localPartId)
     },
     {
       name: "TagReference",
@@ -683,6 +689,11 @@ const lambdaBranch: type.CustomType = {
       memberType: type.typeString
     },
     {
+      name: "localPartList",
+      description: "",
+      memberType: type.typeList(type.typeCustom(branchPartDefinitionName))
+    },
+    {
       name: "expr",
       description: "式",
       memberType: type.typeMaybe(type.typeCustom(exprName))
@@ -744,9 +755,59 @@ const conditionCapture: type.CustomType = {
       memberType: type.typeString
     },
     {
-      name: "capturePartId",
-      description: "キャプチャId",
-      memberType: capturePartId
+      name: "localPartId",
+      description: "ローカルパーツId",
+      memberType: localPartId
+    }
+  ])
+};
+
+const branchPartDefinition: type.CustomType = {
+  name: branchPartDefinitionName,
+  description: "ラムダのブランチで使えるパーツを定義する部分",
+  body: type.customTypeBodyProduct([
+    {
+      name: "localPartId",
+      description: "ローカルパーツID",
+      memberType: localPartId
+    },
+    {
+      name: "name",
+      description: "ブランチパーツの名前",
+      memberType: type.typeString
+    },
+    {
+      name: "description",
+      description: "ブランチパーツの説明",
+      memberType: type.typeString
+    },
+    {
+      name: "type",
+      description: "ローカルパーツの型",
+      memberType: type.typeCustom(typeName)
+    },
+    {
+      name: "expr",
+      description: "ローカルパーツの式",
+      memberType: type.typeCustom(exprName)
+    }
+  ])
+};
+
+const fileHashAndIsThumbnail: type.CustomType = {
+  name: fileHashAndIsThumbnailName,
+  description: "getImageに必要なパラメーター",
+  body: type.customTypeBodyProduct([
+    {
+      name: "fileHash",
+      description: "ファイルハッシュ (オリジナルの画像)",
+      memberType: fileHash
+    },
+    {
+      name: "isThumbnail",
+      description:
+        "取得したいのは,サイズが小さくて速くデータを受け取れるサムネイル画像かどうか",
+      memberType: type.typeBool
     }
   ])
 };
@@ -774,6 +835,7 @@ const listCustomType: ReadonlyArray<type.CustomType> = [
   typeBodySumPattern,
   typeBodyKernel,
   partSnapshot,
+  type_,
   expr,
   kernelExpr,
   functionCall,
@@ -781,6 +843,7 @@ const listCustomType: ReadonlyArray<type.CustomType> = [
   condition,
   conditionTag,
   conditionCapture,
+  branchPartDefinition,
   fileHashAndIsThumbnail
 ];
 
