@@ -61,20 +61,21 @@ describe("test", () => {
   });
   it("dynamic Evaluation", () => {
     console.log(
-      main.dynamicEvaluate({
-        name: "sample",
-        description: "サンプル",
-        parentList: [],
-        expr: main.data.maybeJust(
-          data.exprFunctionCall({
+      main.evaluateExpr(
+        data.exprFunctionCall({
+          function: data.exprFunctionCall({
+            function: data.exprKernel("Int32Add"),
+            parameter: data.exprInt32Literal(50)
+          }),
+          parameter: data.exprFunctionCall({
             function: data.exprFunctionCall({
               function: data.exprKernel("Int32Add"),
               parameter: data.exprInt32Literal(32)
             }),
             parameter: data.exprInt32Literal(100)
           })
-        )
-      })
+        })
+      )
     );
     expect("").toBe("");
   });

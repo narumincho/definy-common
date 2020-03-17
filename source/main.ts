@@ -115,21 +115,7 @@ const accessTokenFromUrl = (hash: string): data.Maybe<data.AccessToken> => {
   return data.maybeJust(matchResult[1] as data.AccessToken);
 };
 
-export const dynamicEvaluate = (part: data.PartSnapshot): string => {
-  switch (part.expr._) {
-    case "Just": {
-      const result = evaluateExpr(part.expr.value);
-      if (result === null) {
-        return part.name + "の評価はできなかった";
-      }
-      return part.name + "の評価結果は " + result.toString();
-    }
-    case "Nothing":
-      return part.name + "は式の定義が空だったため評価できなかった!";
-  }
-};
-
-const evaluateExpr = (expr: data.Expr): number | null => {
+export const evaluateExpr = (expr: data.Expr): number | null => {
   switch (expr._) {
     case "Kernel":
       return null;
