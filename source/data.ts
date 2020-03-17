@@ -190,6 +190,7 @@ export type PartDefinition = {
   description: string;
   type: Type;
   expr: Maybe<Expr>;
+  moduleId: ModuleId;
 };
 
 /**
@@ -290,6 +291,8 @@ export type IdeaId = string & { _ideaId: never };
 export type PartId = string & { _partId: never };
 
 export type TypeId = string & { _typeId: never };
+
+export type ModuleId = string & { _moduleId: never };
 
 export type LocalPartId = string & { _localPartId: never };
 
@@ -786,7 +789,8 @@ export const encodePartDefinition = (
     .concat(encodeList(encodeId)(partDefinition.parentList))
     .concat(encodeString(partDefinition.description))
     .concat(encodeType(partDefinition["type"]))
-    .concat(encodeMaybe(encodeExpr)(partDefinition.expr));
+    .concat(encodeMaybe(encodeExpr)(partDefinition.expr))
+    .concat(encodeId(partDefinition.moduleId));
 
 export const encodeType = (type_: Type): ReadonlyArray<number> =>
   encodeId(type_.reference).concat(encodeList(encodeType)(type_.parameter));
@@ -1902,15 +1906,26 @@ export const decodePartDefinition = (
     result: Maybe<Expr>;
     nextIndex: number;
   } = decodeMaybe(decodeExpr)(typeAndNextIndex.nextIndex, binary);
+  const moduleIdAndNextIndex: {
+    result: ModuleId;
+    nextIndex: number;
+  } = (decodeId as (
+    a: number,
+    b: Uint8Array
+  ) => { result: ModuleId; nextIndex: number })(
+    exprAndNextIndex.nextIndex,
+    binary
+  );
   return {
     result: {
       name: nameAndNextIndex.result,
       parentList: parentListAndNextIndex.result,
       description: descriptionAndNextIndex.result,
       type: typeAndNextIndex.result,
-      expr: exprAndNextIndex.result
+      expr: exprAndNextIndex.result,
+      moduleId: moduleIdAndNextIndex.result
     },
-    nextIndex: exprAndNextIndex.nextIndex
+    nextIndex: moduleIdAndNextIndex.nextIndex
   };
 };
 

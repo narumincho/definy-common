@@ -414,7 +414,7 @@ const module_: type.CustomType = {
   body: type.customTypeBodyProduct([
     {
       name: "name",
-      description: "モジュール名",
+      description: "モジュール名.階層構造を表現することができる",
       memberType: type.typeList(type.typeString)
     },
     {
@@ -480,6 +480,11 @@ const partDefinition: type.CustomType = {
       name: "expr",
       description: "パーツの式",
       memberType: type.typeMaybe(type.typeCustom(exprName))
+    },
+    {
+      name: "moduleId",
+      description: "所属しているモジュール",
+      memberType: moduleId
     }
   ])
 };
