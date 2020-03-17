@@ -1,5 +1,5 @@
 import * as main from "../source/main";
-import { data } from "../source/main";
+import { data, util } from "../source/main";
 
 describe("test", () => {
   it("https://definy.app/ is Home in English", () => {
@@ -62,6 +62,12 @@ describe("test", () => {
   it("dynamic Evaluation", () => {
     console.log(
       main.evaluateExpr(
+        {
+          typeDefinitionMap: new Map(),
+          partDefinitionMap: new Map(),
+          optimizedLocalPart: new Map(),
+          optimizedPartMap: new Map()
+        },
         data.exprFunctionCall({
           function: data.exprFunctionCall({
             function: data.exprKernel("Int32Add"),
@@ -77,6 +83,21 @@ describe("test", () => {
         })
       )
     );
-    expect("").toBe("");
+  });
+
+  it("util util.concatMapValueMap", () => {
+    const result = util.concatMapValueMap([
+      new Map([
+        [
+          "a",
+          new Map([
+            ["localA", "valueA"],
+            ["localB", "valueB"]
+          ])
+        ]
+      ]),
+      new Map([["a", new Map([["newLocalA", "newLocalValueA"]])]])
+    ]);
+    expect(result).toBe("");
   });
 });

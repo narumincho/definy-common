@@ -120,3 +120,22 @@ export const resultFromMaybe = <Ok, Error>(
       return data.resultError(error);
   }
 };
+
+export const concatMapValueMap = <keyA, keyB, value>(
+  listMapMap: ReadonlyArray<ReadonlyMap<keyA, ReadonlyMap<keyB, value>>>
+): ReadonlyMap<keyA, ReadonlyMap<keyB, value>> => {
+  const result: Map<keyA, Map<keyB, value>> = new Map();
+  for (const mapMap of listMapMap) {
+    for (const [keyA, map] of mapMap) {
+      let keyAMap = result.get(keyA);
+      if (keyAMap === undefined) {
+        keyAMap = new Map();
+        result.set(keyA, keyAMap);
+      }
+      for (const [keyB, value] of map) {
+        keyAMap.set(keyB, value);
+      }
+    }
+  }
+  return result;
+};

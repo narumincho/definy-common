@@ -115,18 +115,43 @@ const accessTokenFromUrl = (hash: string): data.Maybe<data.AccessToken> => {
   return data.maybeJust(matchResult[1] as data.AccessToken);
 };
 
-export const evaluateExpr = (
-  typeDefinitionMap: ReadonlyMap<data.TypeId, data.TypeDefinition>,
-  partDefinitionMap: ReadonlyMap<data.PartId, data.PartDefinition>,
-  optimizedPartMap: ReadonlyMap<data.PartId, data.PartDefinition>,
+type Source = {
+  typeDefinitionMap: ReadonlyMap<data.TypeId, data.TypeDefinition>;
+  partDefinitionMap: ReadonlyMap<data.PartId, data.PartDefinition>;
+  optimizedPartMap: ReadonlyMap<data.PartId, data.Expr>;
   optimizedLocalPart: ReadonlyMap<
     data.PartId,
     ReadonlyMap<data.LocalPartId, data.Expr>
-  >,
+  >;
+};
+
+const getPartExpr = (
+  source: Source,
+  partId: data.PartId
+): data.Result<data.Expr, data.EvaluateExprError> => {
+  const optimizedPart = source.optimizedPartMap.get(partId);
+  if (optimizedPart !== undefined) {
+    return data.resultOk(optimizedPart);
+  }
+  const part = source.partDefinitionMap.get(partId);
+  if (part === undefined) {
+    return data.resultError(data.evaluateExprErrorNeedPartDefinition(partId));
+  }
+  const expr = part.expr;
+  switch (expr._) {
+    case "Just":
+      return data.resultOk(expr.value);
+    case "Nothing":
+      return data.resultError(data.evaluateExprErrorPartExprIsNothing(partId));
+  }
+};
+
+export const evaluateExpr = (
+  source: Source,
   expr: data.Expr
 ): {
   result: data.Result<data.Expr, data.EvaluateExprError>;
-  optimizedPartMap: ReadonlyMap<data.PartId, data.PartDefinition>;
+  optimizedPartMap: ReadonlyMap<data.PartId, data.Expr>;
   optimizedLocalPart: ReadonlyMap<
     data.PartId,
     ReadonlyMap<data.LocalPartId, data.Expr>
@@ -136,57 +161,40 @@ export const evaluateExpr = (
     case "Kernel":
       return {
         result: data.resultOk(expr),
-        optimizedLocalPart: optimizedLocalPart,
-        optimizedPartMap: optimizedPartMap
+        optimizedLocalPart: source.optimizedLocalPart,
+        optimizedPartMap: source.optimizedPartMap
       };
     case "Int32Literal":
       return {
         result: data.resultOk(expr),
-        optimizedLocalPart: optimizedLocalPart,
-        optimizedPartMap: optimizedPartMap
+        optimizedLocalPart: source.optimizedLocalPart,
+        optimizedPartMap: source.optimizedPartMap
       };
     case "PartReference": {
-      const part = partDefinitionMap.get(expr.partId);
-      if (part === undefined) {
-        return {
-          result: data.resultError(
-            data.evaluateExprErrorNeedPartDefinition(expr.partId)
-          ),
-          optimizedLocalPart: optimizedLocalPart,
-          optimizedPartMap: optimizedPartMap
-        };
-      }
-      switch (part.expr._) {
-        case "Just": {
-          const evaluatedResult = evaluateExpr(
-            typeDefinitionMap,
-            partDefinitionMap,
-            optimizedPartMap,
-            optimizedLocalPart,
-            part.expr.value
-          );
+      const exprResult = getPartExpr(source, expr.partId);
+      switch (exprResult._) {
+        case "Ok": {
+          const evaluatedResult = evaluateExpr(source, exprResult.ok);
           return {
             result: evaluatedResult.result,
             optimizedPartMap: new Map([
-              ...optimizedPartMap,
+              ...source.optimizedPartMap,
               ...evaluatedResult.optimizedPartMap,
               ...(evaluatedResult.result._ === "Ok"
                 ? [partIdAndExpr(expr.partId, evaluatedResult.result.ok)]
                 : [])
             ]),
-            optimizedLocalPart: new Map([
-              ...optimizedLocalPart,
-              ...evaluatedResult.optimizedLocalPart
+            optimizedLocalPart: util.concatMapValueMap([
+              source.optimizedLocalPart,
+              evaluatedResult.optimizedLocalPart
             ])
           };
         }
-        case "Nothing":
+        case "Error":
           return {
-            result: data.resultError(
-              data.evaluateExprErrorPartExprIsNothing(expr.partId)
-            ),
-            optimizedLocalPart: optimizedLocalPart,
-            optimizedPartMap: optimizedPartMap
+            result: exprResult,
+            optimizedLocalPart: source.optimizedLocalPart,
+            optimizedPartMap: source.optimizedPartMap
           };
       }
     }
@@ -207,15 +215,17 @@ const partIdAndExpr = (
 ): [data.PartId, data.Expr] => [partId, expr];
 
 const evaluateFunctionCall = (
+  source: Source,
   functionCall: data.FunctionCall
 ): number | null => {
-  const parameterB = evaluateExpr(functionCall.parameter);
+  const parameterB = evaluateExpr(source, functionCall.parameter);
   if (parameterB === null) {
     return null;
   }
   switch (functionCall.function._) {
     case "FunctionCall": {
       const parameterA = evaluateExpr(
+        source,
         functionCall.function.functionCall.parameter
       );
       if (parameterA === null) {
