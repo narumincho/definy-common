@@ -130,18 +130,18 @@ export type Suggestion = {
 export type Change = { _: "ProjectName"; string_: string };
 
 /**
- * モジュールのスナップショット
+ * モジュール
  */
-export type ModuleSnapshot = {
+export type Module = {
   name: ReadonlyArray<string>;
   description: string;
   export: boolean;
 };
 
 /**
- * 型のスナップショット
+ * 型の定義
  */
-export type TypeSnapshot = {
+export type TypeDefinition = {
   name: string;
   parentList: ReadonlyArray<PartId>;
   description: string;
@@ -182,9 +182,9 @@ export type TypeBodySumPattern = {
 export type TypeBodyKernel = "Function" | "Int32" | "List";
 
 /**
- * パーツのスナップショット
+ * パーツの定義
  */
-export type PartSnapshot = {
+export type PartDefinition = {
   name: string;
   parentList: ReadonlyArray<PartId>;
   description: string;
@@ -715,19 +715,17 @@ export const encodeChange = (change: Change): ReadonlyArray<number> => {
   }
 };
 
-export const encodeModuleSnapshot = (
-  moduleSnapshot: ModuleSnapshot
-): ReadonlyArray<number> =>
-  encodeList(encodeString)(moduleSnapshot.name)
-    .concat(encodeString(moduleSnapshot.description))
-    .concat(encodeBool(moduleSnapshot["export"]));
+export const encodeModule = (module_: Module): ReadonlyArray<number> =>
+  encodeList(encodeString)(module_.name)
+    .concat(encodeString(module_.description))
+    .concat(encodeBool(module_["export"]));
 
-export const encodeTypeSnapshot = (
-  typeSnapshot: TypeSnapshot
+export const encodeTypeDefinition = (
+  typeDefinition: TypeDefinition
 ): ReadonlyArray<number> =>
-  encodeString(typeSnapshot.name)
-    .concat(encodeList(encodeId)(typeSnapshot.parentList))
-    .concat(encodeString(typeSnapshot.description));
+  encodeString(typeDefinition.name)
+    .concat(encodeList(encodeId)(typeDefinition.parentList))
+    .concat(encodeString(typeDefinition.description));
 
 export const encodeTypeBody = (typeBody: TypeBody): ReadonlyArray<number> => {
   switch (typeBody._) {
@@ -779,14 +777,14 @@ export const encodeTypeBodyKernel = (
   }
 };
 
-export const encodePartSnapshot = (
-  partSnapshot: PartSnapshot
+export const encodePartDefinition = (
+  partDefinition: PartDefinition
 ): ReadonlyArray<number> =>
-  encodeString(partSnapshot.name)
-    .concat(encodeList(encodeId)(partSnapshot.parentList))
-    .concat(encodeString(partSnapshot.description))
-    .concat(encodeType(partSnapshot["type"]))
-    .concat(encodeMaybe(encodeExpr)(partSnapshot.expr));
+  encodeString(partDefinition.name)
+    .concat(encodeList(encodeId)(partDefinition.parentList))
+    .concat(encodeString(partDefinition.description))
+    .concat(encodeType(partDefinition["type"]))
+    .concat(encodeMaybe(encodeExpr)(partDefinition.expr));
 
 export const encodeType = (type_: Type): ReadonlyArray<number> =>
   encodeId(type_.reference).concat(encodeList(encodeType)(type_.parameter));
@@ -1671,10 +1669,10 @@ export const decodeChange = (
  * @param index バイナリを読み込み開始位置
  * @param binary バイナリ
  */
-export const decodeModuleSnapshot = (
+export const decodeModule = (
   index: number,
   binary: Uint8Array
-): { result: ModuleSnapshot; nextIndex: number } => {
+): { result: Module; nextIndex: number } => {
   const nameAndNextIndex: {
     result: ReadonlyArray<string>;
     nextIndex: number;
@@ -1701,10 +1699,10 @@ export const decodeModuleSnapshot = (
  * @param index バイナリを読み込み開始位置
  * @param binary バイナリ
  */
-export const decodeTypeSnapshot = (
+export const decodeTypeDefinition = (
   index: number,
   binary: Uint8Array
-): { result: TypeSnapshot; nextIndex: number } => {
+): { result: TypeDefinition; nextIndex: number } => {
   const nameAndNextIndex: { result: string; nextIndex: number } = decodeString(
     index,
     binary
@@ -1873,10 +1871,10 @@ export const decodeTypeBodyKernel = (
  * @param index バイナリを読み込み開始位置
  * @param binary バイナリ
  */
-export const decodePartSnapshot = (
+export const decodePartDefinition = (
   index: number,
   binary: Uint8Array
-): { result: PartSnapshot; nextIndex: number } => {
+): { result: PartDefinition; nextIndex: number } => {
   const nameAndNextIndex: { result: string; nextIndex: number } = decodeString(
     index,
     binary

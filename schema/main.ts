@@ -30,9 +30,9 @@ const ideaItemName = "IdeaItem";
 const commentName = "Comment";
 const suggestionName = "Suggestion";
 const changeName = "Change";
-const moduleSnapshotName = "ModuleSnapshot";
-const typeSnapshotName = "TypeSnapshot";
-const partSnapshotName = "PartSnapshot";
+const moduleName = "Module";
+const typeDefinitionName = "TypeDefinition";
+const partDefinitionName = "PartDefinition";
 const typeBodyName = "TypeBody";
 const typeBodyProductMemberName = "TypeBodyProductMember";
 const typeBodySumPatternName = "TypeBodySumPattern";
@@ -408,9 +408,9 @@ const change: type.CustomType = {
   ])
 };
 
-const moduleSnapshot: type.CustomType = {
-  name: moduleSnapshotName,
-  description: "モジュールのスナップショット",
+const module_: type.CustomType = {
+  name: moduleName,
+  description: "モジュール",
   body: type.customTypeBodyProduct([
     {
       name: "name",
@@ -430,9 +430,9 @@ const moduleSnapshot: type.CustomType = {
   ])
 };
 
-const typeSnapshot: type.CustomType = {
-  name: typeSnapshotName,
-  description: "型のスナップショット",
+const typeDefinition: type.CustomType = {
+  name: typeDefinitionName,
+  description: "型の定義",
   body: type.customTypeBodyProduct([
     {
       name: "name",
@@ -452,9 +452,9 @@ const typeSnapshot: type.CustomType = {
   ])
 };
 
-const partSnapshot: type.CustomType = {
-  name: partSnapshotName,
-  description: "パーツのスナップショット",
+const partDefinition: type.CustomType = {
+  name: partDefinitionName,
+  description: "パーツの定義",
   body: type.customTypeBodyProduct([
     {
       name: "name",
@@ -864,13 +864,13 @@ const listCustomType: ReadonlyArray<type.CustomType> = [
   ideaCommentText,
   suggestion,
   change,
-  moduleSnapshot,
-  typeSnapshot,
+  module_,
+  typeDefinition,
   typeBody,
   typeBodyProductMember,
   typeBodySumPattern,
   typeBodyKernel,
-  partSnapshot,
+  partDefinition,
   type_,
   expr,
   kernelExpr,
