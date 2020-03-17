@@ -165,3 +165,79 @@ const evaluateFunctionCall = (
   }
   return null;
 };
+
+export const exprToString = (expr: data.Expr): string => {
+  switch (expr._) {
+    case "Kernel":
+      return kernelToString(expr.kernelExpr);
+    case "Int32Literal":
+      return expr.int32.toString();
+    case "CapturePartReference":
+      return "[c." + (expr.capturePartId as string) + "]";
+    case "PartReference":
+      return "[" + (expr.partId as string) + "]";
+    case "TagReference":
+      return "#" + (expr.tagId as string);
+    case "FunctionCall":
+      return (
+        "(" +
+        exprToString(expr.functionCall.function) +
+        " " +
+        exprToString(expr.functionCall.parameter)
+      );
+    case "Lambda":
+      return (
+        "λ( " + expr.lambdaBranchList.map(lambdaBranchToString).join(",") + ")"
+      );
+  }
+};
+
+const kernelToString = (kernelExpr: data.KernelExpr): string => {
+  switch (kernelExpr) {
+    case "Int32Add":
+      return "+";
+    case "Int32Sub":
+      return "-";
+    case "Int32Mul":
+      return "*";
+  }
+};
+
+const lambdaBranchToString = (lambdaBranch: data.LambdaBranch): string => {
+  return (
+    (lambdaBranch.description === ""
+      ? ""
+      : "{-" + lambdaBranch.description + "-}") +
+    conditionToString(lambdaBranch.condition) +
+    " → " +
+    util.maybeUnwrap(lambdaBranch.expr, exprToString, "□")
+  );
+};
+
+const conditionToString = (condition: data.Condition): string => {
+  switch (condition._) {
+    case "Tag":
+      return (
+        "#" +
+        (condition.conditionTag.tag as string) +
+        " " +
+        util.maybeUnwrap(
+          condition.conditionTag.parameter,
+          conditionToString,
+          ""
+        ) +
+        ")"
+      );
+    case "Capture":
+      return (
+        condition.conditionCapture.name +
+        "(" +
+        (condition.conditionCapture.capturePartId as string) +
+        ")"
+      );
+    case "Any":
+      return "_";
+    case "Int32":
+      return condition.int32.toString();
+  }
+};
