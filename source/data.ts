@@ -280,7 +280,11 @@ export type BranchPartDefinition = {
 
 export type EvaluateExprError =
   | { _: "NeedPartDefinition"; partId: PartId }
-  | { _: "PartExprIsNothing"; partId: PartId };
+  | { _: "PartExprIsNothing"; partId: PartId }
+  | {
+      _: "CannotFindLocalPartDefinition";
+      localPartReference: LocalPartReference;
+    };
 
 export type AccessToken = string & { _accessToken: never };
 
@@ -499,6 +503,16 @@ export const evaluateExprErrorNeedPartDefinition = (
 export const evaluateExprErrorPartExprIsNothing = (
   partId: PartId
 ): EvaluateExprError => ({ _: "PartExprIsNothing", partId: partId });
+
+/**
+ * ローカルパーツの定義を見つけることができなかった
+ */
+export const evaluateExprErrorCannotFindLocalPartDefinition = (
+  localPartReference: LocalPartReference
+): EvaluateExprError => ({
+  _: "CannotFindLocalPartDefinition",
+  localPartReference: localPartReference
+});
 
 /**
  * numberの32bit符号あり整数をSigned Leb128のバイナリに変換する
@@ -942,6 +956,11 @@ export const encodeEvaluateExprError = (
     }
     case "PartExprIsNothing": {
       return [1].concat(encodeId(evaluateExprError.partId));
+    }
+    case "CannotFindLocalPartDefinition": {
+      return [2].concat(
+        encodeLocalPartReference(evaluateExprError.localPartReference)
+      );
     }
   }
 };
@@ -2417,6 +2436,16 @@ export const decodeEvaluateExprError = (
     ) => { result: PartId; nextIndex: number })(patternIndex.nextIndex, binary);
     return {
       result: evaluateExprErrorPartExprIsNothing(result.result),
+      nextIndex: result.nextIndex
+    };
+  }
+  if (patternIndex.result === 2) {
+    const result: {
+      result: LocalPartReference;
+      nextIndex: number;
+    } = decodeLocalPartReference(patternIndex.nextIndex, binary);
+    return {
+      result: evaluateExprErrorCannotFindLocalPartDefinition(result.result),
       nextIndex: result.nextIndex
     };
   }

@@ -234,6 +234,7 @@ type alias BranchPartDefinition =
 type EvaluateExprError
     = EvaluateExprErrorNeedPartDefinition PartId
     | EvaluateExprErrorPartExprIsNothing PartId
+    | EvaluateExprErrorCannotFindLocalPartDefinition LocalPartReference
 
 
 type AccessToken
@@ -782,6 +783,9 @@ evaluateExprErrorToJsonValue evaluateExprError =
 
         EvaluateExprErrorPartExprIsNothing parameter ->
             Je.object [ ( "_", Je.string "PartExprIsNothing" ), ( "partId", partIdToJsonValue parameter ) ]
+
+        EvaluateExprErrorCannotFindLocalPartDefinition parameter ->
+            Je.object [ ( "_", Je.string "CannotFindLocalPartDefinition" ), ( "localPartReference", localPartReferenceToJsonValue parameter ) ]
 
 
 maybeJsonDecoder : Jd.Decoder a -> Jd.Decoder (Maybe a)
@@ -1507,6 +1511,9 @@ evaluateExprErrorJsonDecoder =
 
                     "PartExprIsNothing" ->
                         Jd.field "partId" partIdJsonDecoder |> Jd.map EvaluateExprErrorPartExprIsNothing
+
+                    "CannotFindLocalPartDefinition" ->
+                        Jd.field "localPartReference" localPartReferenceJsonDecoder |> Jd.map EvaluateExprErrorCannotFindLocalPartDefinition
 
                     _ ->
                         Jd.fail ("EvaluateExprErrorで不明なタグを受けたとった tag=" ++ tag)

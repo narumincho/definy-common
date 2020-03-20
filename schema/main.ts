@@ -867,6 +867,11 @@ const evaluateExprError: type.CustomType = {
       name: "PartExprIsNothing",
       description: "パーツの式が空だと言っている",
       parameter: type.maybeJust(partId)
+    },
+    {
+      name: "CannotFindLocalPartDefinition",
+      description: "ローカルパーツの定義を見つけることができなかった",
+      parameter: type.maybeJust(type.typeCustom(localPartReferenceName))
     }
   ])
 };

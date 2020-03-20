@@ -115,18 +115,23 @@ const accessTokenFromUrl = (hash: string): data.Maybe<data.AccessToken> => {
   return data.maybeJust(matchResult[1] as data.AccessToken);
 };
 
-type Source = {
+type SourceAndCache = {
   typeDefinitionMap: ReadonlyMap<data.TypeId, data.TypeDefinition>;
   partDefinitionMap: ReadonlyMap<data.PartId, data.PartDefinition>;
   optimizedPartMap: ReadonlyMap<data.PartId, data.Expr>;
-  optimizedLocalPart: ReadonlyMap<
-    data.PartId,
-    ReadonlyMap<data.LocalPartId, data.Expr>
-  >;
+  /** パーツ内に含まれるローカルパーツの式を格納する. キーはPartIdをLocalPartIdを結合したもの */
+  optimizedLocalPart: ReadonlyMap<string, data.Expr>;
+};
+
+type EvaluationResult = {
+  result: data.Result<data.Expr, data.EvaluateExprError>;
+  optimizedPartMap: ReadonlyMap<data.PartId, data.Expr>;
+  /** パーツ内に含まれるローカルパーツの式を格納する. キーはPartIdをLocalPartIdを結合したもの */
+  optimizedLocalPart: ReadonlyMap<string, data.Expr>;
 };
 
 const getPartExpr = (
-  source: Source,
+  source: SourceAndCache,
   partId: data.PartId
 ): data.Result<data.Expr, data.EvaluateExprError> => {
   const optimizedPart = source.optimizedPartMap.get(partId);
@@ -146,62 +151,37 @@ const getPartExpr = (
   }
 };
 
+/** 正格評価  TODO 遅延評価バージョンも作る! */
 export const evaluateExpr = (
-  source: Source,
+  sourceAndCache: SourceAndCache,
   expr: data.Expr
-): {
-  result: data.Result<data.Expr, data.EvaluateExprError>;
-  optimizedPartMap: ReadonlyMap<data.PartId, data.Expr>;
-  optimizedLocalPart: ReadonlyMap<
-    data.PartId,
-    ReadonlyMap<data.LocalPartId, data.Expr>
-  >;
-} => {
+): EvaluationResult => {
   switch (expr._) {
     case "Kernel":
       return {
         result: data.resultOk(expr),
-        optimizedLocalPart: source.optimizedLocalPart,
-        optimizedPartMap: source.optimizedPartMap
+        optimizedLocalPart: sourceAndCache.optimizedLocalPart,
+        optimizedPartMap: sourceAndCache.optimizedPartMap
       };
     case "Int32Literal":
       return {
         result: data.resultOk(expr),
-        optimizedLocalPart: source.optimizedLocalPart,
-        optimizedPartMap: source.optimizedPartMap
+        optimizedLocalPart: sourceAndCache.optimizedLocalPart,
+        optimizedPartMap: sourceAndCache.optimizedPartMap
       };
-    case "PartReference": {
-      const exprResult = getPartExpr(source, expr.partId);
-      switch (exprResult._) {
-        case "Ok": {
-          const evaluatedResult = evaluateExpr(source, exprResult.ok);
-          return {
-            result: evaluatedResult.result,
-            optimizedPartMap: new Map([
-              ...source.optimizedPartMap,
-              ...evaluatedResult.optimizedPartMap,
-              ...(evaluatedResult.result._ === "Ok"
-                ? [partIdAndExpr(expr.partId, evaluatedResult.result.ok)]
-                : [])
-            ]),
-            optimizedLocalPart: util.concatMapValueMap([
-              source.optimizedLocalPart,
-              evaluatedResult.optimizedLocalPart
-            ])
-          };
-        }
-        case "Error":
-          return {
-            result: exprResult,
-            optimizedLocalPart: source.optimizedLocalPart,
-            optimizedPartMap: source.optimizedPartMap
-          };
-      }
-    }
+    case "PartReference":
+      return evaluatePartReference(sourceAndCache, expr.partId);
     case "LocalPartReference":
-      return null;
+      return evaluateLocalPartReference(
+        sourceAndCache,
+        expr.localPartReference
+      );
     case "TagReference":
-      return null;
+      return {
+        result: data.resultOk(expr),
+        optimizedLocalPart: sourceAndCache.optimizedLocalPart,
+        optimizedPartMap: sourceAndCache.optimizedPartMap
+      };
     case "FunctionCall":
       return evaluateFunctionCall(expr.functionCall);
     case "Lambda":
@@ -214,8 +194,82 @@ const partIdAndExpr = (
   expr: data.Expr
 ): [data.PartId, data.Expr] => [partId, expr];
 
+const evaluatePartReference = (
+  sourceAndCache: SourceAndCache,
+  partId: data.PartId
+): EvaluationResult => {
+  const exprResult = getPartExpr(sourceAndCache, partId);
+  switch (exprResult._) {
+    case "Ok": {
+      const evaluatedResult = evaluateExpr(sourceAndCache, exprResult.ok);
+      return {
+        result: evaluatedResult.result,
+        optimizedPartMap: new Map([
+          ...sourceAndCache.optimizedPartMap,
+          ...evaluatedResult.optimizedPartMap,
+          ...(evaluatedResult.result._ === "Ok"
+            ? [partIdAndExpr(partId, evaluatedResult.result.ok)]
+            : [])
+        ]),
+        optimizedLocalPart: new Map([
+          ...sourceAndCache.optimizedLocalPart,
+          ...evaluatedResult.optimizedLocalPart
+        ])
+      };
+    }
+    case "Error":
+      return {
+        result: exprResult,
+        optimizedLocalPart: sourceAndCache.optimizedLocalPart,
+        optimizedPartMap: sourceAndCache.optimizedPartMap
+      };
+  }
+};
+
+const evaluateLocalPartReference = (
+  sourceAndCache: SourceAndCache,
+  localPartReference: data.LocalPartReference
+): EvaluationResult => {
+  const localPartInPart = localOptimizedPartGetLocalPart(
+    sourceAndCache.optimizedLocalPart,
+    localPartReference
+  );
+  if (localPartInPart === undefined) {
+    return {
+      result: data.resultError(
+        data.evaluateExprErrorCannotFindLocalPartDefinition(localPartReference)
+      ),
+      optimizedLocalPart: sourceAndCache.optimizedLocalPart,
+      optimizedPartMap: sourceAndCache.optimizedPartMap
+    };
+  }
+  return evaluateExpr(sourceAndCache, localPartInPart);
+};
+
+const localOptimizedPartGetLocalPart = (
+  optimizedLocalPart: ReadonlyMap<string, data.Expr>,
+  localPartReference: data.LocalPartReference
+): data.Expr | undefined => {
+  return optimizedLocalPart.get(
+    (localPartReference.partId as string) +
+      (localPartReference.localPartId as string)
+  );
+};
+
+const localOptimizedPartSetLocalPart = (
+  optimizedLocalPart: ReadonlyMap<string, data.Expr>,
+  localPartReference: data.LocalPartReference,
+  expr: data.Expr
+): ReadonlyMap<string, data.Expr> => {
+  return new Map(optimizedLocalPart).set(
+    (localPartReference.partId as string) +
+      (localPartReference.localPartId as string),
+    expr
+  );
+};
+
 const evaluateFunctionCall = (
-  source: Source,
+  source: SourceAndCache,
   functionCall: data.FunctionCall
 ): number | null => {
   const parameterB = evaluateExpr(source, functionCall.parameter);
