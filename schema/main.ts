@@ -39,7 +39,8 @@ const typeBodySumPatternName = "TypeBodySumPattern";
 const typeBodyKernelName = "TypeBodyKernel";
 const typeName = "Type";
 const exprName = "Expr";
-const rootEvaluatedExprName = "RootEvaluatedExpr";
+const evaluatedExprName = "EvaluatedExpr";
+const kernelCallName = "KernelCall";
 const kernelExprName = "KernelExpr";
 const localPartReferenceName = "LocalPartReference";
 const tagReferenceName = "TagReferenceIndex";
@@ -663,9 +664,9 @@ const expr: type.CustomType = {
   ])
 };
 
-const rootEvaluatedExpr: type.CustomType = {
-  name: rootEvaluatedExprName,
-  description: "直下が評価しきった式",
+const evaluatedExpr: type.CustomType = {
+  name: evaluatedExprName,
+  description: "評価しきった式",
   body: type.customTypeBodySum([
     {
       name: "Kernel",
@@ -688,6 +689,28 @@ const rootEvaluatedExpr: type.CustomType = {
       parameter: type.maybeJust(
         type.typeList(type.typeCustom(lambdaBranchName))
       )
+    },
+    {
+      name: "KernelCall",
+      description: "内部関数呼び出し",
+      parameter: type.maybeJust(type.typeCustom(kernelCallName))
+    }
+  ])
+};
+
+const kernelCall: type.CustomType = {
+  name: kernelCallName,
+  description: "複数の引数が必要な内部関数の部分呼び出し",
+  body: type.customTypeBodyProduct([
+    {
+      name: "kernel",
+      description: "関数",
+      memberType: type.typeCustom(kernelExprName)
+    },
+    {
+      name: "expr",
+      description: "呼び出すパラメーター",
+      memberType: type.typeCustom(evaluatedExprName)
     }
   ])
 };
@@ -908,6 +931,11 @@ const evaluateExprError: type.CustomType = {
       name: "TypeError",
       description: "型が合わない",
       parameter: type.maybeJust(type.typeCustom(typeErrorName))
+    },
+    {
+      name: "NotSupported",
+      description: "まだサポートしていないものが含まれている",
+      parameter: type.maybeNothing()
     }
   ])
 };
@@ -917,14 +945,9 @@ const typeError: type.CustomType = {
   description: "型エラー",
   body: type.customTypeBodyProduct([
     {
-      name: "expect",
-      description: "期待していた型",
-      memberType: type.typeCustom(typeName)
-    },
-    {
-      name: "actual",
-      description: "実際の型",
-      memberType: type.typeCustom(typeName)
+      name: "message",
+      description: "型エラーの説明",
+      memberType: type.typeString
     }
   ])
 };
@@ -955,7 +978,8 @@ const listCustomType: ReadonlyArray<type.CustomType> = [
   partDefinition,
   type_,
   expr,
-  rootEvaluatedExpr,
+  evaluatedExpr,
+  kernelCall,
   kernelExpr,
   localPartReference,
   tagReference,

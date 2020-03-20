@@ -219,13 +219,19 @@ export type Expr =
   | { _: "Lambda"; lambdaBranchList: ReadonlyArray<LambdaBranch> };
 
 /**
- * 直下が評価しきった式
+ * 評価しきった式
  */
-export type RootEvaluatedExpr =
+export type EvaluatedExpr =
   | { _: "Kernel"; kernelExpr: KernelExpr }
   | { _: "Int32"; int32: number }
   | { _: "TagReference"; tagReferenceIndex: TagReferenceIndex }
-  | { _: "Lambda"; lambdaBranchList: ReadonlyArray<LambdaBranch> };
+  | { _: "Lambda"; lambdaBranchList: ReadonlyArray<LambdaBranch> }
+  | { _: "KernelCall"; kernelCall: KernelCall };
+
+/**
+ * 複数の引数が必要な内部関数の部分呼び出し
+ */
+export type KernelCall = { kernel: KernelExpr; expr: EvaluatedExpr };
 
 /**
  * Definyだけでは表現できない式
@@ -294,12 +300,13 @@ export type EvaluateExprError =
       _: "CannotFindLocalPartDefinition";
       localPartReference: LocalPartReference;
     }
-  | { _: "TypeError"; typeError: TypeError };
+  | { _: "TypeError"; typeError: TypeError }
+  | { _: "NotSupported" };
 
 /**
  * 型エラー
  */
-export type TypeError = { expect: Type; actual: Type };
+export type TypeError = { message: string };
 
 export type AccessToken = string & { _accessToken: never };
 
@@ -480,14 +487,15 @@ export const exprLambda = (
 /**
  * Definyだけでは表現できない式
  */
-export const rootEvaluatedExprKernel = (
-  kernelExpr: KernelExpr
-): RootEvaluatedExpr => ({ _: "Kernel", kernelExpr: kernelExpr });
+export const evaluatedExprKernel = (kernelExpr: KernelExpr): EvaluatedExpr => ({
+  _: "Kernel",
+  kernelExpr: kernelExpr
+});
 
 /**
  * 32bit整数
  */
-export const rootEvaluatedExprInt32 = (int32: number): RootEvaluatedExpr => ({
+export const evaluatedExprInt32 = (int32: number): EvaluatedExpr => ({
   _: "Int32",
   int32: int32
 });
@@ -495,9 +503,9 @@ export const rootEvaluatedExprInt32 = (int32: number): RootEvaluatedExpr => ({
 /**
  * タグを参照
  */
-export const rootEvaluatedExprTagReference = (
+export const evaluatedExprTagReference = (
   tagReferenceIndex: TagReferenceIndex
-): RootEvaluatedExpr => ({
+): EvaluatedExpr => ({
   _: "TagReference",
   tagReferenceIndex: tagReferenceIndex
 });
@@ -505,9 +513,16 @@ export const rootEvaluatedExprTagReference = (
 /**
  * ラムダ
  */
-export const rootEvaluatedExprLambda = (
+export const evaluatedExprLambda = (
   lambdaBranchList: ReadonlyArray<LambdaBranch>
-): RootEvaluatedExpr => ({ _: "Lambda", lambdaBranchList: lambdaBranchList });
+): EvaluatedExpr => ({ _: "Lambda", lambdaBranchList: lambdaBranchList });
+
+/**
+ * 内部関数呼び出し
+ */
+export const evaluatedExprKernelCall = (
+  kernelCall: KernelCall
+): EvaluatedExpr => ({ _: "KernelCall", kernelCall: kernelCall });
 
 /**
  * タグ
@@ -567,6 +582,13 @@ export const evaluateExprErrorCannotFindLocalPartDefinition = (
 export const evaluateExprErrorTypeError = (
   typeError: TypeError
 ): EvaluateExprError => ({ _: "TypeError", typeError: typeError });
+
+/**
+ * まだサポートしていないものが含まれている
+ */
+export const evaluateExprErrorNotSupported: EvaluateExprError = {
+  _: "NotSupported"
+};
 
 /**
  * numberの32bit符号あり整数をSigned Leb128のバイナリに変換する
@@ -914,28 +936,38 @@ export const encodeExpr = (expr: Expr): ReadonlyArray<number> => {
   }
 };
 
-export const encodeRootEvaluatedExpr = (
-  rootEvaluatedExpr: RootEvaluatedExpr
+export const encodeEvaluatedExpr = (
+  evaluatedExpr: EvaluatedExpr
 ): ReadonlyArray<number> => {
-  switch (rootEvaluatedExpr._) {
+  switch (evaluatedExpr._) {
     case "Kernel": {
-      return [0].concat(encodeKernelExpr(rootEvaluatedExpr.kernelExpr));
+      return [0].concat(encodeKernelExpr(evaluatedExpr.kernelExpr));
     }
     case "Int32": {
-      return [1].concat(encodeInt32(rootEvaluatedExpr.int32));
+      return [1].concat(encodeInt32(evaluatedExpr.int32));
     }
     case "TagReference": {
       return [2].concat(
-        encodeTagReferenceIndex(rootEvaluatedExpr.tagReferenceIndex)
+        encodeTagReferenceIndex(evaluatedExpr.tagReferenceIndex)
       );
     }
     case "Lambda": {
       return [3].concat(
-        encodeList(encodeLambdaBranch)(rootEvaluatedExpr.lambdaBranchList)
+        encodeList(encodeLambdaBranch)(evaluatedExpr.lambdaBranchList)
       );
+    }
+    case "KernelCall": {
+      return [4].concat(encodeKernelCall(evaluatedExpr.kernelCall));
     }
   }
 };
+
+export const encodeKernelCall = (
+  kernelCall: KernelCall
+): ReadonlyArray<number> =>
+  encodeKernelExpr(kernelCall.kernel).concat(
+    encodeEvaluatedExpr(kernelCall.expr)
+  );
 
 export const encodeKernelExpr = (
   kernelExpr: KernelExpr
@@ -1042,11 +1074,14 @@ export const encodeEvaluateExprError = (
     case "TypeError": {
       return [3].concat(encodeTypeError(evaluateExprError.typeError));
     }
+    case "NotSupported": {
+      return [4];
+    }
   }
 };
 
 export const encodeTypeError = (typeError: TypeError): ReadonlyArray<number> =>
-  encodeType(typeError.expect).concat(encodeType(typeError.actual));
+  encodeString(typeError.message);
 
 /**
  * SignedLeb128で表現されたバイナリをnumberのビット演算ができる32bit符号付き整数の範囲の数値に変換するコード
@@ -2201,10 +2236,10 @@ export const decodeExpr = (
  * @param index バイナリを読み込み開始位置
  * @param binary バイナリ
  */
-export const decodeRootEvaluatedExpr = (
+export const decodeEvaluatedExpr = (
   index: number,
   binary: Uint8Array
-): { result: RootEvaluatedExpr; nextIndex: number } => {
+): { result: EvaluatedExpr; nextIndex: number } => {
   const patternIndex: { result: number; nextIndex: number } = decodeInt32(
     index,
     binary
@@ -2215,7 +2250,7 @@ export const decodeRootEvaluatedExpr = (
       binary
     );
     return {
-      result: rootEvaluatedExprKernel(result.result),
+      result: evaluatedExprKernel(result.result),
       nextIndex: result.nextIndex
     };
   }
@@ -2225,7 +2260,7 @@ export const decodeRootEvaluatedExpr = (
       binary
     );
     return {
-      result: rootEvaluatedExprInt32(result.result),
+      result: evaluatedExprInt32(result.result),
       nextIndex: result.nextIndex
     };
   }
@@ -2235,7 +2270,7 @@ export const decodeRootEvaluatedExpr = (
       nextIndex: number;
     } = decodeTagReferenceIndex(patternIndex.nextIndex, binary);
     return {
-      result: rootEvaluatedExprTagReference(result.result),
+      result: evaluatedExprTagReference(result.result),
       nextIndex: result.nextIndex
     };
   }
@@ -2245,11 +2280,46 @@ export const decodeRootEvaluatedExpr = (
       nextIndex: number;
     } = decodeList(decodeLambdaBranch)(patternIndex.nextIndex, binary);
     return {
-      result: rootEvaluatedExprLambda(result.result),
+      result: evaluatedExprLambda(result.result),
+      nextIndex: result.nextIndex
+    };
+  }
+  if (patternIndex.result === 4) {
+    const result: { result: KernelCall; nextIndex: number } = decodeKernelCall(
+      patternIndex.nextIndex,
+      binary
+    );
+    return {
+      result: evaluatedExprKernelCall(result.result),
       nextIndex: result.nextIndex
     };
   }
   throw new Error("存在しないパターンを指定された 型を更新してください");
+};
+
+/**
+ * @param index バイナリを読み込み開始位置
+ * @param binary バイナリ
+ */
+export const decodeKernelCall = (
+  index: number,
+  binary: Uint8Array
+): { result: KernelCall; nextIndex: number } => {
+  const kernelAndNextIndex: {
+    result: KernelExpr;
+    nextIndex: number;
+  } = decodeKernelExpr(index, binary);
+  const exprAndNextIndex: {
+    result: EvaluatedExpr;
+    nextIndex: number;
+  } = decodeEvaluatedExpr(kernelAndNextIndex.nextIndex, binary);
+  return {
+    result: {
+      kernel: kernelAndNextIndex.result,
+      expr: exprAndNextIndex.result
+    },
+    nextIndex: exprAndNextIndex.nextIndex
+  };
 };
 
 /**
@@ -2597,6 +2667,12 @@ export const decodeEvaluateExprError = (
       nextIndex: result.nextIndex
     };
   }
+  if (patternIndex.result === 4) {
+    return {
+      result: evaluateExprErrorNotSupported,
+      nextIndex: patternIndex.nextIndex
+    };
+  }
   throw new Error("存在しないパターンを指定された 型を更新してください");
 };
 
@@ -2608,19 +2684,12 @@ export const decodeTypeError = (
   index: number,
   binary: Uint8Array
 ): { result: TypeError; nextIndex: number } => {
-  const expectAndNextIndex: { result: Type; nextIndex: number } = decodeType(
-    index,
-    binary
-  );
-  const actualAndNextIndex: { result: Type; nextIndex: number } = decodeType(
-    expectAndNextIndex.nextIndex,
-    binary
-  );
+  const messageAndNextIndex: {
+    result: string;
+    nextIndex: number;
+  } = decodeString(index, binary);
   return {
-    result: {
-      expect: expectAndNextIndex.result,
-      actual: actualAndNextIndex.result
-    },
-    nextIndex: actualAndNextIndex.nextIndex
+    result: { message: messageAndNextIndex.result },
+    nextIndex: messageAndNextIndex.nextIndex
   };
 };

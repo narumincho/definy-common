@@ -118,49 +118,22 @@ const accessTokenFromUrl = (hash: string): data.Maybe<data.AccessToken> => {
 type SourceAndCache = {
   typeDefinitionMap: ReadonlyMap<data.TypeId, data.TypeDefinition>;
   partDefinitionMap: ReadonlyMap<data.PartId, data.PartDefinition>;
-  optimizedPartMap: ReadonlyMap<data.PartId, data.Expr>;
   /** パーツ内に含まれるローカルパーツの式を格納する. キーはPartIdをLocalPartIdを結合したもの */
-  optimizedLocalPart: ReadonlyMap<string, data.Expr>;
+  localPartMap: ReadonlyMap<string, data.Expr>;
+
+  evaluatedPartMap: ReadonlyMap<data.PartId, data.EvaluatedExpr>;
+  /** パーツ内に含まれるローカルパーツの式を格納する. キーはPartIdをLocalPartIdを結合したもの */
+  evaluatedLocalPartMap: ReadonlyMap<string, data.EvaluatedExpr>;
 };
 
 type EvaluationResult = {
-  result: data.Result<data.Expr, ReadonlyArray<data.EvaluateExprError>>;
-  optimizedPartMap: ReadonlyMap<data.PartId, data.Expr>;
-  /** パーツ内に含まれるローカルパーツの式を格納する. キーはPartIdをLocalPartIdを結合したもの */
-  optimizedLocalPart: ReadonlyMap<string, data.Expr>;
-};
-
-type EvaluateOneResult = {
   result: data.Result<
-    data.RootEvaluatedExpr,
+    data.EvaluatedExpr,
     ReadonlyArray<data.EvaluateExprError>
   >;
-  optimizedPartMap: ReadonlyMap<data.PartId, data.Expr>;
+  evaluatedPartMap: ReadonlyMap<data.PartId, data.EvaluatedExpr>;
   /** パーツ内に含まれるローカルパーツの式を格納する. キーはPartIdをLocalPartIdを結合したもの */
-  optimizedLocalPart: ReadonlyMap<string, data.Expr>;
-};
-
-const getPartExpr = (
-  source: SourceAndCache,
-  partId: data.PartId
-): data.Result<data.Expr, ReadonlyArray<data.EvaluateExprError>> => {
-  const optimizedPart = source.optimizedPartMap.get(partId);
-  if (optimizedPart !== undefined) {
-    return data.resultOk(optimizedPart);
-  }
-  const part = source.partDefinitionMap.get(partId);
-  if (part === undefined) {
-    return data.resultError([data.evaluateExprErrorNeedPartDefinition(partId)]);
-  }
-  const expr = part.expr;
-  switch (expr._) {
-    case "Just":
-      return data.resultOk(expr.value);
-    case "Nothing":
-      return data.resultError([
-        data.evaluateExprErrorPartExprIsNothing(partId)
-      ]);
-  }
+  evaluatedLocalPartMap: ReadonlyMap<string, data.EvaluatedExpr>;
 };
 
 /** 正格評価  TODO 遅延評価バージョンも作る! */
@@ -171,16 +144,16 @@ export const evaluateExpr = (
   switch (expr._) {
     case "Kernel":
       return {
-        result: data.resultOk(expr),
-        optimizedLocalPart: new Map(),
-        optimizedPartMap: new Map()
+        result: data.resultOk(data.evaluatedExprKernel(expr.kernelExpr)),
+        evaluatedLocalPartMap: new Map(),
+        evaluatedPartMap: new Map()
       };
 
     case "Int32Literal":
       return {
-        result: data.resultOk(expr),
-        optimizedLocalPart: new Map(),
-        optimizedPartMap: new Map()
+        result: data.resultOk(data.evaluatedExprInt32(expr.int32)),
+        evaluatedLocalPartMap: new Map(),
+        evaluatedPartMap: new Map()
       };
 
     case "PartReference":
@@ -195,108 +168,169 @@ export const evaluateExpr = (
     case "TagReference":
       return {
         result: data.resultOk(expr),
-        optimizedLocalPart: sourceAndCache.optimizedLocalPart,
-        optimizedPartMap: sourceAndCache.optimizedPartMap
+        evaluatedLocalPartMap: sourceAndCache.evaluatedLocalPartMap,
+        evaluatedPartMap: sourceAndCache.evaluatedPartMap
       };
 
     case "FunctionCall":
       return evaluateFunctionCall(sourceAndCache, expr.functionCall);
 
     case "Lambda":
-      return null;
-  }
-};
-
-export const evaluateOne = (
-  sourceAndCache: SourceAndCache,
-  expr: data.Expr
-): EvaluateOneResult => {
-  switch (expr._) {
-    case "Kernel":
       return {
-        result: data.resultOk(data.rootEvaluatedExprKernel(expr.kernelExpr)),
-        optimizedPartMap: new Map(),
-        optimizedLocalPart: new Map()
-      };
-
-    case "Int32Literal":
-      return {
-        result: data.resultOk(data.rootEvaluatedExprInt32(expr.int32)),
-        optimizedPartMap: new Map(),
-        optimizedLocalPart: new Map()
+        result: data.resultError([data.evaluateExprErrorNotSupported]),
+        evaluatedPartMap: new Map(),
+        evaluatedLocalPartMap: new Map()
       };
   }
 };
 
-const partIdAndExpr = (
+const partIdAndEvaluatedExpr = (
   partId: data.PartId,
-  expr: data.Expr
-): [data.PartId, data.Expr] => [partId, expr];
+  evaluatedExpr: data.EvaluatedExpr
+): [data.PartId, data.EvaluatedExpr] => [partId, evaluatedExpr];
+
+const localPartReferenceAndEvaluatedExpr = (
+  localPartReference: data.LocalPartReference,
+  evaluateExpr: data.EvaluatedExpr
+): [string, data.EvaluatedExpr] => [
+  (localPartReference.partId as string) +
+    (localPartReference.localPartId as string),
+  evaluateExpr
+];
 
 const evaluatePartReference = (
   sourceAndCache: SourceAndCache,
   partId: data.PartId
 ): EvaluationResult => {
-  const exprResult = getPartExpr(sourceAndCache, partId);
-  switch (exprResult._) {
-    case "Ok": {
-      const evaluatedResult = evaluateExpr(sourceAndCache, exprResult.ok);
-      return {
-        result: evaluatedResult.result,
-        optimizedPartMap: new Map([
-          ...evaluatedResult.optimizedPartMap,
-          ...(evaluatedResult.result._ === "Ok"
-            ? [partIdAndExpr(partId, evaluatedResult.result.ok)]
-            : [])
-        ]),
-        optimizedLocalPart: evaluatedResult.optimizedLocalPart
-      };
-    }
-    case "Error":
-      return {
-        result: exprResult,
-        optimizedLocalPart: new Map(),
-        optimizedPartMap: new Map()
-      };
+  const evaluatedPart = sourceAndCache.evaluatedPartMap.get(partId);
+  if (evaluatedPart !== undefined) {
+    return {
+      result: data.resultOk(evaluatedPart),
+      evaluatedPartMap: new Map(),
+      evaluatedLocalPartMap: new Map()
+    };
   }
+  const part = sourceAndCache.partDefinitionMap.get(partId);
+  if (part !== undefined) {
+    const expr = part.expr;
+    switch (expr._) {
+      case "Just": {
+        const evaluatedResult = evaluateExpr(sourceAndCache, expr.value);
+        return {
+          result: evaluatedResult.result,
+          evaluatedPartMap: new Map([
+            ...evaluatedResult.evaluatedPartMap,
+            ...(evaluatedResult.result._ === "Ok"
+              ? [partIdAndEvaluatedExpr(partId, evaluatedResult.result.ok)]
+              : [])
+          ]),
+          evaluatedLocalPartMap: evaluatedResult.evaluatedLocalPartMap
+        };
+      }
+      case "Nothing":
+        return {
+          result: data.resultError([
+            data.evaluateExprErrorNeedPartDefinition(partId)
+          ]),
+          evaluatedPartMap: new Map(),
+          evaluatedLocalPartMap: new Map()
+        };
+    }
+  }
+
+  return {
+    result: data.resultError([
+      data.evaluateExprErrorNeedPartDefinition(partId)
+    ]),
+    evaluatedPartMap: new Map(),
+    evaluatedLocalPartMap: new Map()
+  };
 };
 
 const evaluateLocalPartReference = (
   sourceAndCache: SourceAndCache,
   localPartReference: data.LocalPartReference
 ): EvaluationResult => {
-  const localPartInPart = localOptimizedPartGetLocalPart(
-    sourceAndCache.optimizedLocalPart,
+  const evaluatedExpr = localEvaluatedPartMapGetLocalPartExpr(
+    sourceAndCache.evaluatedLocalPartMap,
     localPartReference
   );
-  if (localPartInPart === undefined) {
+  if (evaluatedExpr !== undefined) {
     return {
-      result: data.resultError([
-        data.evaluateExprErrorCannotFindLocalPartDefinition(localPartReference)
-      ]),
-      optimizedLocalPart: new Map(),
-      optimizedPartMap: new Map()
+      result: data.resultOk(evaluatedExpr),
+      evaluatedPartMap: new Map(),
+      evaluatedLocalPartMap: new Map()
     };
   }
-  return evaluateExpr(sourceAndCache, localPartInPart);
+  const expr = localPartMapGetLocalPartExpr(
+    sourceAndCache.localPartMap,
+    localPartReference
+  );
+  if (expr !== undefined) {
+    const result = evaluateExpr(sourceAndCache, expr);
+    return {
+      result: result.result,
+      evaluatedPartMap: result.evaluatedPartMap,
+      evaluatedLocalPartMap: new Map([
+        ...result.evaluatedLocalPartMap,
+        ...(result.result._ === "Ok"
+          ? [
+              localPartReferenceAndEvaluatedExpr(
+                localPartReference,
+                result.result.ok
+              )
+            ]
+          : [])
+      ])
+    };
+  }
+  return {
+    result: data.resultError([
+      data.evaluateExprErrorCannotFindLocalPartDefinition(localPartReference)
+    ]),
+    evaluatedLocalPartMap: new Map(),
+    evaluatedPartMap: new Map()
+  };
 };
 
-const localOptimizedPartGetLocalPart = (
-  optimizedLocalPart: ReadonlyMap<string, data.Expr>,
+const localEvaluatedPartMapGetLocalPartExpr = (
+  evaluatedLocalPartMap: ReadonlyMap<string, data.EvaluatedExpr>,
   localPartReference: data.LocalPartReference
-): data.Expr | undefined => {
-  return optimizedLocalPart.get(
+): data.EvaluatedExpr | undefined => {
+  return evaluatedLocalPartMap.get(
     (localPartReference.partId as string) +
       (localPartReference.localPartId as string)
   );
 };
 
-const localOptimizedPartSetLocalPart = (
-  optimizedLocalPart: ReadonlyMap<string, data.Expr>,
+const localPartMapGetLocalPartExpr = (
+  localPartMap: ReadonlyMap<string, data.Expr>,
+  localPartReference: data.LocalPartReference
+): data.Expr | undefined => {
+  return localPartMap.get(
+    (localPartReference.partId as string) +
+      (localPartReference.localPartId as string)
+  );
+};
+
+const localEvaluatedPartMapSetLocalPartExpr = (
+  optimizedLocalPart: ReadonlyMap<string, data.EvaluatedExpr>,
+  localPartReference: data.LocalPartReference,
+  evaluatedExpr: data.EvaluatedExpr
+): ReadonlyMap<string, data.EvaluatedExpr> => {
+  return new Map(optimizedLocalPart).set(
+    (localPartReference.partId as string) +
+      (localPartReference.localPartId as string),
+    evaluatedExpr
+  );
+};
+
+const localPartMapSetLocalPartExpr = (
+  localPartMap: ReadonlyMap<string, data.Expr>,
   localPartReference: data.LocalPartReference,
   expr: data.Expr
 ): ReadonlyMap<string, data.Expr> => {
-  return new Map(optimizedLocalPart).set(
+  return new Map(localPartMap).set(
     (localPartReference.partId as string) +
       (localPartReference.localPartId as string),
     expr
@@ -309,22 +343,34 @@ const evaluateFunctionCall = (
 ): EvaluationResult => {
   const functionResult = evaluateExpr(sourceAndCache, functionCall.function);
   const newSourceAndCache = concatCache(sourceAndCache, functionResult);
-  const parameterBResult = evaluateExpr(
+  const parameterResult = evaluateExpr(
     newSourceAndCache,
     functionCall.parameter
   );
+  const evaluatedPartMap = new Map([
+    ...functionResult.evaluatedPartMap,
+    ...parameterResult.evaluatedPartMap
+  ]);
+  const evaluatedLocalPartMap = new Map([
+    ...functionResult.evaluatedPartMap,
+    ...parameterResult.evaluatedLocalPartMap
+  ]);
 
   switch (functionResult.result._) {
     case "Ok":
-      switch (parameterBResult.result._) {
-        case "Ok":
-          return evaluateFunctionCallResultOk(
-            concatCache(newSourceAndCache, parameterBResult),
-            functionResult.result.ok,
-            parameterBResult.result.ok
-          );
+      switch (parameterResult.result._) {
+        case "Ok": {
+          return {
+            result: evaluateFunctionCallResultOk(
+              functionResult.result.ok,
+              parameterResult.result.ok
+            ),
+            evaluatedPartMap: evaluatedPartMap,
+            evaluatedLocalPartMap: evaluatedLocalPartMap
+          };
+        }
         case "Error":
-          return parameterBResult;
+          return parameterResult;
       }
       break;
 
@@ -332,72 +378,115 @@ const evaluateFunctionCall = (
       return {
         result: data.resultError(
           functionResult.result.error.concat(
-            parameterBResult.result._ === "Error"
-              ? parameterBResult.result.error
+            parameterResult.result._ === "Error"
+              ? parameterResult.result.error
               : []
           )
         ),
-        optimizedLocalPart: parameterBResult.optimizedLocalPart,
-        optimizedPartMap: parameterBResult.optimizedPartMap
+        evaluatedPartMap: evaluatedPartMap,
+        evaluatedLocalPartMap: evaluatedLocalPartMap
       };
   }
 };
 
 const evaluateFunctionCallResultOk = (
-  sourceAndCache: SourceAndCache,
-  functionExpr: data.Expr,
-  parameter: data.Expr
-): EvaluationResult => {
-  if (functionExpr._ !== "FunctionCall") {
-    return {
-      result: data.resultOk(
-        data.exprFunctionCall({
-          function: functionExpr,
-          parameter: parameter
+  functionExpr: data.EvaluatedExpr,
+  parameter: data.EvaluatedExpr
+): data.Result<data.EvaluatedExpr, ReadonlyArray<data.EvaluateExprError>> => {
+  switch (functionExpr._) {
+    case "Kernel": {
+      return data.resultOk(
+        data.evaluatedExprKernelCall({
+          kernel: functionExpr.kernelExpr,
+          expr: parameter
         })
-      ),
-      optimizedLocalPart: new Map(),
-      optimizedPartMap: new Map()
-    };
-  }
-  switch (functionExpr.functionCall.function._) {
-    case "Kernel":
-      switch (functionExpr.functionCall.function.kernelExpr) {
+      );
+    }
+    case "KernelCall": {
+      switch (functionExpr.kernelCall.kernel) {
         case "Int32Add":
-          switch (parameter._) {
-            case "Int32Literal":
-              switch (functionExpr.functionCall.parameter._) {
-                case "Int32Literal":
-                  return {
-                    result: data.resultOk(
-                      data.exprInt32Literal(
-                        functionExpr.functionCall.parameter.int32 +
-                          parameter.int32
-                      )
-                    ),
-                    optimizedLocalPart: new Map(),
-                    optimizedPartMap: new Map()
-                  };
-              }
-          }
+          return int32Add(functionExpr.kernelCall.expr, parameter);
+        case "Int32Mul":
+          return int32Mul(functionExpr.kernelCall.expr, parameter);
+        case "Int32Sub":
+          return int32Sub(functionExpr.kernelCall.expr, parameter);
       }
+    }
   }
+  return data.resultError([
+    data.evaluateExprErrorTypeError({
+      message: "関数のところにkernel,kernelCall以外が来てしまった"
+    })
+  ]);
 };
 
-/**
- * +
- * @param sourceAndCache
- * @param parameterA 評価をできるだけ進める?
- * @param parameterB 評価をできるだけ進める?
- */
 const int32Add = (
-  sourceAndCache: SourceAndCache,
-  parameterA: data.Expr,
-  parameterB: data.Expr
-): EvaluationResult => {
-  const parameterAResult = evaluateExpr(sourceAndCache, parameterA);
-  const newSourceAndCache = concatCache(sourceAndCache, parameterAResult);
-  const parameterBResult = evaluateExpr(newSourceAndCache, parameterB);
+  parameterA: data.EvaluatedExpr,
+  parameterB: data.EvaluatedExpr
+): data.Result<data.EvaluatedExpr, ReadonlyArray<data.EvaluateExprError>> => {
+  switch (parameterA._) {
+    case "Int32":
+      switch (parameterB._) {
+        case "Int32": {
+          const parameterAInt: number = parameterA.int32;
+          const parameterBInt: number = parameterB.int32;
+          return data.resultOk(
+            data.evaluatedExprInt32((parameterAInt + parameterBInt) | 0)
+          );
+        }
+      }
+  }
+  return data.resultError([
+    data.evaluateExprErrorTypeError({
+      message: "int32Addで整数が渡されなかった"
+    })
+  ]);
+};
+
+const int32Mul = (
+  parameterA: data.EvaluatedExpr,
+  parameterB: data.EvaluatedExpr
+): data.Result<data.EvaluatedExpr, ReadonlyArray<data.EvaluateExprError>> => {
+  switch (parameterA._) {
+    case "Int32":
+      switch (parameterB._) {
+        case "Int32": {
+          const parameterAInt: number = parameterA.int32;
+          const parameterBInt: number = parameterB.int32;
+          return data.resultOk(
+            data.evaluatedExprInt32((parameterAInt * parameterBInt) | 0)
+          );
+        }
+      }
+  }
+  return data.resultError([
+    data.evaluateExprErrorTypeError({
+      message: "int33Mulで整数が渡されなかった"
+    })
+  ]);
+};
+
+const int32Sub = (
+  parameterA: data.EvaluatedExpr,
+  parameterB: data.EvaluatedExpr
+): data.Result<data.EvaluatedExpr, ReadonlyArray<data.EvaluateExprError>> => {
+  switch (parameterA._) {
+    case "Int32":
+      switch (parameterB._) {
+        case "Int32": {
+          const parameterAInt: number = parameterA.int32;
+          const parameterBInt: number = parameterB.int32;
+          return data.resultOk(
+            data.evaluatedExprInt32((parameterAInt - parameterBInt) | 0)
+          );
+        }
+      }
+  }
+  return data.resultError([
+    data.evaluateExprErrorTypeError({
+      message: "int33Subで整数が渡されなかった"
+    })
+  ]);
 };
 
 const concatCache = (
@@ -407,13 +496,14 @@ const concatCache = (
   return {
     typeDefinitionMap: sourceAndCache.typeDefinitionMap,
     partDefinitionMap: sourceAndCache.partDefinitionMap,
-    optimizedPartMap: new Map([
-      ...sourceAndCache.optimizedPartMap,
-      ...result.optimizedPartMap
+    localPartMap: sourceAndCache.localPartMap,
+    evaluatedPartMap: new Map([
+      ...sourceAndCache.evaluatedPartMap,
+      ...result.evaluatedPartMap
     ]),
-    optimizedLocalPart: new Map([
-      ...sourceAndCache.optimizedPartMap,
-      ...result.optimizedLocalPart
+    evaluatedLocalPartMap: new Map([
+      ...sourceAndCache.evaluatedPartMap,
+      ...result.evaluatedLocalPartMap
     ])
   };
 };

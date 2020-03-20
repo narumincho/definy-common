@@ -1,4 +1,4 @@
-module Data exposing (AccessToken(..), BranchPartDefinition, Change(..), ClientMode(..), Comment, Condition(..), ConditionCapture, ConditionTag, DateTime, EvaluateExprError(..), Expr(..), FileHash(..), FileHashAndIsThumbnail, FunctionCall, Idea, IdeaId(..), IdeaItem(..), KernelExpr(..), LambdaBranch, Language(..), LocalPartId(..), LocalPartReference, Location(..), Module, ModuleId(..), OpenIdConnectProvider(..), PartDefinition, PartId(..), Project, ProjectId(..), RequestLogInUrlRequestData, RootEvaluatedExpr(..), Suggestion, TagId(..), TagReferenceIndex, Type, TypeBody(..), TypeBodyKernel(..), TypeBodyProductMember, TypeBodySumPattern, TypeDefinition, TypeError, TypeId(..), UrlData, UserId(..), UserPublic, UserPublicAndUserId, accessTokenJsonDecoder, accessTokenToJsonValue, branchPartDefinitionJsonDecoder, branchPartDefinitionToJsonValue, changeJsonDecoder, changeToJsonValue, clientModeJsonDecoder, clientModeToJsonValue, commentJsonDecoder, commentToJsonValue, conditionCaptureJsonDecoder, conditionCaptureToJsonValue, conditionJsonDecoder, conditionTagJsonDecoder, conditionTagToJsonValue, conditionToJsonValue, dateTimeJsonDecoder, dateTimeToJsonValue, evaluateExprErrorJsonDecoder, evaluateExprErrorToJsonValue, exprJsonDecoder, exprToJsonValue, fileHashAndIsThumbnailJsonDecoder, fileHashAndIsThumbnailToJsonValue, fileHashJsonDecoder, fileHashToJsonValue, functionCallJsonDecoder, functionCallToJsonValue, ideaIdJsonDecoder, ideaIdToJsonValue, ideaItemJsonDecoder, ideaItemToJsonValue, ideaJsonDecoder, ideaToJsonValue, kernelExprJsonDecoder, kernelExprToJsonValue, lambdaBranchJsonDecoder, lambdaBranchToJsonValue, languageJsonDecoder, languageToJsonValue, localPartIdJsonDecoder, localPartIdToJsonValue, localPartReferenceJsonDecoder, localPartReferenceToJsonValue, locationJsonDecoder, locationToJsonValue, maybeJsonDecoder, maybeToJsonValue, moduleIdJsonDecoder, moduleIdToJsonValue, moduleJsonDecoder, moduleToJsonValue, openIdConnectProviderJsonDecoder, openIdConnectProviderToJsonValue, partDefinitionJsonDecoder, partDefinitionToJsonValue, partIdJsonDecoder, partIdToJsonValue, projectIdJsonDecoder, projectIdToJsonValue, projectJsonDecoder, projectToJsonValue, requestLogInUrlRequestDataJsonDecoder, requestLogInUrlRequestDataToJsonValue, resultJsonDecoder, resultToJsonValue, rootEvaluatedExprJsonDecoder, rootEvaluatedExprToJsonValue, suggestionJsonDecoder, suggestionToJsonValue, tagIdJsonDecoder, tagIdToJsonValue, tagReferenceIndexJsonDecoder, tagReferenceIndexToJsonValue, typeBodyJsonDecoder, typeBodyKernelJsonDecoder, typeBodyKernelToJsonValue, typeBodyProductMemberJsonDecoder, typeBodyProductMemberToJsonValue, typeBodySumPatternJsonDecoder, typeBodySumPatternToJsonValue, typeBodyToJsonValue, typeDefinitionJsonDecoder, typeDefinitionToJsonValue, typeErrorJsonDecoder, typeErrorToJsonValue, typeIdJsonDecoder, typeIdToJsonValue, typeJsonDecoder, typeToJsonValue, urlDataJsonDecoder, urlDataToJsonValue, userIdJsonDecoder, userIdToJsonValue, userPublicAndUserIdJsonDecoder, userPublicAndUserIdToJsonValue, userPublicJsonDecoder, userPublicToJsonValue)
+module Data exposing (AccessToken(..), BranchPartDefinition, Change(..), ClientMode(..), Comment, Condition(..), ConditionCapture, ConditionTag, DateTime, EvaluateExprError(..), EvaluatedExpr(..), Expr(..), FileHash(..), FileHashAndIsThumbnail, FunctionCall, Idea, IdeaId(..), IdeaItem(..), KernelCall, KernelExpr(..), LambdaBranch, Language(..), LocalPartId(..), LocalPartReference, Location(..), Module, ModuleId(..), OpenIdConnectProvider(..), PartDefinition, PartId(..), Project, ProjectId(..), RequestLogInUrlRequestData, Suggestion, TagId(..), TagReferenceIndex, Type, TypeBody(..), TypeBodyKernel(..), TypeBodyProductMember, TypeBodySumPattern, TypeDefinition, TypeError, TypeId(..), UrlData, UserId(..), UserPublic, UserPublicAndUserId, accessTokenJsonDecoder, accessTokenToJsonValue, branchPartDefinitionJsonDecoder, branchPartDefinitionToJsonValue, changeJsonDecoder, changeToJsonValue, clientModeJsonDecoder, clientModeToJsonValue, commentJsonDecoder, commentToJsonValue, conditionCaptureJsonDecoder, conditionCaptureToJsonValue, conditionJsonDecoder, conditionTagJsonDecoder, conditionTagToJsonValue, conditionToJsonValue, dateTimeJsonDecoder, dateTimeToJsonValue, evaluateExprErrorJsonDecoder, evaluateExprErrorToJsonValue, evaluatedExprJsonDecoder, evaluatedExprToJsonValue, exprJsonDecoder, exprToJsonValue, fileHashAndIsThumbnailJsonDecoder, fileHashAndIsThumbnailToJsonValue, fileHashJsonDecoder, fileHashToJsonValue, functionCallJsonDecoder, functionCallToJsonValue, ideaIdJsonDecoder, ideaIdToJsonValue, ideaItemJsonDecoder, ideaItemToJsonValue, ideaJsonDecoder, ideaToJsonValue, kernelCallJsonDecoder, kernelCallToJsonValue, kernelExprJsonDecoder, kernelExprToJsonValue, lambdaBranchJsonDecoder, lambdaBranchToJsonValue, languageJsonDecoder, languageToJsonValue, localPartIdJsonDecoder, localPartIdToJsonValue, localPartReferenceJsonDecoder, localPartReferenceToJsonValue, locationJsonDecoder, locationToJsonValue, maybeJsonDecoder, maybeToJsonValue, moduleIdJsonDecoder, moduleIdToJsonValue, moduleJsonDecoder, moduleToJsonValue, openIdConnectProviderJsonDecoder, openIdConnectProviderToJsonValue, partDefinitionJsonDecoder, partDefinitionToJsonValue, partIdJsonDecoder, partIdToJsonValue, projectIdJsonDecoder, projectIdToJsonValue, projectJsonDecoder, projectToJsonValue, requestLogInUrlRequestDataJsonDecoder, requestLogInUrlRequestDataToJsonValue, resultJsonDecoder, resultToJsonValue, suggestionJsonDecoder, suggestionToJsonValue, tagIdJsonDecoder, tagIdToJsonValue, tagReferenceIndexJsonDecoder, tagReferenceIndexToJsonValue, typeBodyJsonDecoder, typeBodyKernelJsonDecoder, typeBodyKernelToJsonValue, typeBodyProductMemberJsonDecoder, typeBodyProductMemberToJsonValue, typeBodySumPatternJsonDecoder, typeBodySumPatternToJsonValue, typeBodyToJsonValue, typeDefinitionJsonDecoder, typeDefinitionToJsonValue, typeErrorJsonDecoder, typeErrorToJsonValue, typeIdJsonDecoder, typeIdToJsonValue, typeJsonDecoder, typeToJsonValue, urlDataJsonDecoder, urlDataToJsonValue, userIdJsonDecoder, userIdToJsonValue, userPublicAndUserIdJsonDecoder, userPublicAndUserIdToJsonValue, userPublicJsonDecoder, userPublicToJsonValue)
 
 import Json.Decode as Jd
 import Json.Decode.Pipeline as Jdp
@@ -172,13 +172,20 @@ type Expr
     | ExprLambda (List LambdaBranch)
 
 
-{-| 直下が評価しきった式
+{-| 評価しきった式
 -}
-type RootEvaluatedExpr
-    = RootEvaluatedExprKernel KernelExpr
-    | RootEvaluatedExprInt32 Int
-    | RootEvaluatedExprTagReference TagReferenceIndex
-    | RootEvaluatedExprLambda (List LambdaBranch)
+type EvaluatedExpr
+    = EvaluatedExprKernel KernelExpr
+    | EvaluatedExprInt32 Int
+    | EvaluatedExprTagReference TagReferenceIndex
+    | EvaluatedExprLambda (List LambdaBranch)
+    | EvaluatedExprKernelCall KernelCall
+
+
+{-| 複数の引数が必要な内部関数の部分呼び出し
+-}
+type alias KernelCall =
+    { kernel : KernelExpr, expr : EvaluatedExpr }
 
 
 {-| Definyだけでは表現できない式
@@ -245,12 +252,13 @@ type EvaluateExprError
     | EvaluateExprErrorPartExprIsNothing PartId
     | EvaluateExprErrorCannotFindLocalPartDefinition LocalPartReference
     | EvaluateExprErrorTypeError TypeError
+    | EvaluateExprErrorNotSupported
 
 
 {-| 型エラー
 -}
 type alias TypeError =
-    { expect : Type, actual : Type }
+    { message : String }
 
 
 type AccessToken
@@ -681,22 +689,35 @@ exprToJsonValue expr =
             Je.object [ ( "_", Je.string "Lambda" ), ( "lambdaBranchList", Je.list lambdaBranchToJsonValue parameter ) ]
 
 
-{-| RootEvaluatedExprのJSONへのエンコーダ
+{-| EvaluatedExprのJSONへのエンコーダ
 -}
-rootEvaluatedExprToJsonValue : RootEvaluatedExpr -> Je.Value
-rootEvaluatedExprToJsonValue rootEvaluatedExpr =
-    case rootEvaluatedExpr of
-        RootEvaluatedExprKernel parameter ->
+evaluatedExprToJsonValue : EvaluatedExpr -> Je.Value
+evaluatedExprToJsonValue evaluatedExpr =
+    case evaluatedExpr of
+        EvaluatedExprKernel parameter ->
             Je.object [ ( "_", Je.string "Kernel" ), ( "kernelExpr", kernelExprToJsonValue parameter ) ]
 
-        RootEvaluatedExprInt32 parameter ->
+        EvaluatedExprInt32 parameter ->
             Je.object [ ( "_", Je.string "Int32" ), ( "int32", Je.int parameter ) ]
 
-        RootEvaluatedExprTagReference parameter ->
+        EvaluatedExprTagReference parameter ->
             Je.object [ ( "_", Je.string "TagReference" ), ( "tagReferenceIndex", tagReferenceIndexToJsonValue parameter ) ]
 
-        RootEvaluatedExprLambda parameter ->
+        EvaluatedExprLambda parameter ->
             Je.object [ ( "_", Je.string "Lambda" ), ( "lambdaBranchList", Je.list lambdaBranchToJsonValue parameter ) ]
+
+        EvaluatedExprKernelCall parameter ->
+            Je.object [ ( "_", Je.string "KernelCall" ), ( "kernelCall", kernelCallToJsonValue parameter ) ]
+
+
+{-| KernelCallのJSONへのエンコーダ
+-}
+kernelCallToJsonValue : KernelCall -> Je.Value
+kernelCallToJsonValue kernelCall =
+    Je.object
+        [ ( "kernel", kernelExprToJsonValue kernelCall.kernel )
+        , ( "expr", evaluatedExprToJsonValue kernelCall.expr )
+        ]
 
 
 {-| KernelExprのJSONへのエンコーダ
@@ -824,14 +845,16 @@ evaluateExprErrorToJsonValue evaluateExprError =
         EvaluateExprErrorTypeError parameter ->
             Je.object [ ( "_", Je.string "TypeError" ), ( "typeError", typeErrorToJsonValue parameter ) ]
 
+        EvaluateExprErrorNotSupported ->
+            Je.object [ ( "_", Je.string "NotSupported" ) ]
+
 
 {-| TypeErrorのJSONへのエンコーダ
 -}
 typeErrorToJsonValue : TypeError -> Je.Value
 typeErrorToJsonValue typeError =
     Je.object
-        [ ( "expect", typeToJsonValue typeError.expect )
-        , ( "actual", typeToJsonValue typeError.actual )
+        [ ( "message", Je.string typeError.message )
         ]
 
 
@@ -1390,29 +1413,46 @@ exprJsonDecoder =
             )
 
 
-{-| RootEvaluatedExprのJSON Decoder
+{-| EvaluatedExprのJSON Decoder
 -}
-rootEvaluatedExprJsonDecoder : Jd.Decoder RootEvaluatedExpr
-rootEvaluatedExprJsonDecoder =
+evaluatedExprJsonDecoder : Jd.Decoder EvaluatedExpr
+evaluatedExprJsonDecoder =
     Jd.field "_" Jd.string
         |> Jd.andThen
             (\tag ->
                 case tag of
                     "Kernel" ->
-                        Jd.field "kernelExpr" kernelExprJsonDecoder |> Jd.map RootEvaluatedExprKernel
+                        Jd.field "kernelExpr" kernelExprJsonDecoder |> Jd.map EvaluatedExprKernel
 
                     "Int32" ->
-                        Jd.field "int32" Jd.int |> Jd.map RootEvaluatedExprInt32
+                        Jd.field "int32" Jd.int |> Jd.map EvaluatedExprInt32
 
                     "TagReference" ->
-                        Jd.field "tagReferenceIndex" tagReferenceIndexJsonDecoder |> Jd.map RootEvaluatedExprTagReference
+                        Jd.field "tagReferenceIndex" tagReferenceIndexJsonDecoder |> Jd.map EvaluatedExprTagReference
 
                     "Lambda" ->
-                        Jd.field "lambdaBranchList" (Jd.list lambdaBranchJsonDecoder) |> Jd.map RootEvaluatedExprLambda
+                        Jd.field "lambdaBranchList" (Jd.list lambdaBranchJsonDecoder) |> Jd.map EvaluatedExprLambda
+
+                    "KernelCall" ->
+                        Jd.field "kernelCall" kernelCallJsonDecoder |> Jd.map EvaluatedExprKernelCall
 
                     _ ->
-                        Jd.fail ("RootEvaluatedExprで不明なタグを受けたとった tag=" ++ tag)
+                        Jd.fail ("EvaluatedExprで不明なタグを受けたとった tag=" ++ tag)
             )
+
+
+{-| KernelCallのJSON Decoder
+-}
+kernelCallJsonDecoder : Jd.Decoder KernelCall
+kernelCallJsonDecoder =
+    Jd.succeed
+        (\kernel expr ->
+            { kernel = kernel
+            , expr = expr
+            }
+        )
+        |> Jdp.required "kernel" kernelExprJsonDecoder
+        |> Jdp.required "expr" evaluatedExprJsonDecoder
 
 
 {-| KernelExprのJSON Decoder
@@ -1590,6 +1630,9 @@ evaluateExprErrorJsonDecoder =
                     "TypeError" ->
                         Jd.field "typeError" typeErrorJsonDecoder |> Jd.map EvaluateExprErrorTypeError
 
+                    "NotSupported" ->
+                        Jd.succeed EvaluateExprErrorNotSupported
+
                     _ ->
                         Jd.fail ("EvaluateExprErrorで不明なタグを受けたとった tag=" ++ tag)
             )
@@ -1600,10 +1643,8 @@ evaluateExprErrorJsonDecoder =
 typeErrorJsonDecoder : Jd.Decoder TypeError
 typeErrorJsonDecoder =
     Jd.succeed
-        (\expect actual ->
-            { expect = expect
-            , actual = actual
+        (\message ->
+            { message = message
             }
         )
-        |> Jdp.required "expect" typeJsonDecoder
-        |> Jdp.required "actual" typeJsonDecoder
+        |> Jdp.required "message" Jd.string
