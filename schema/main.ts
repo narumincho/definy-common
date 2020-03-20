@@ -39,6 +39,7 @@ const typeBodySumPatternName = "TypeBodySumPattern";
 const typeBodyKernelName = "TypeBodyKernel";
 const typeName = "Type";
 const exprName = "Expr";
+const rootEvaluatedExprName = "RootEvaluatedExpr";
 const kernelExprName = "KernelExpr";
 const localPartReferenceName = "LocalPartReference";
 const tagReferenceName = "TagReferenceIndex";
@@ -662,6 +663,35 @@ const expr: type.CustomType = {
   ])
 };
 
+const rootEvaluatedExpr: type.CustomType = {
+  name: rootEvaluatedExprName,
+  description: "直下が評価しきった式",
+  body: type.customTypeBodySum([
+    {
+      name: "Kernel",
+      description: "Definyだけでは表現できない式",
+      parameter: type.maybeJust(type.typeCustom(kernelExprName))
+    },
+    {
+      name: "Int32",
+      description: "32bit整数",
+      parameter: type.maybeJust(type.typeInt32)
+    },
+    {
+      name: "TagReference",
+      description: "タグを参照",
+      parameter: type.maybeJust(type.typeCustom(tagReferenceName))
+    },
+    {
+      name: "Lambda",
+      description: "ラムダ",
+      parameter: type.maybeJust(
+        type.typeList(type.typeCustom(lambdaBranchName))
+      )
+    }
+  ])
+};
+
 const kernelExpr: type.CustomType = {
   name: kernelExprName,
   description: "Definyだけでは表現できない式",
@@ -925,6 +955,7 @@ const listCustomType: ReadonlyArray<type.CustomType> = [
   partDefinition,
   type_,
   expr,
+  rootEvaluatedExpr,
   kernelExpr,
   localPartReference,
   tagReference,

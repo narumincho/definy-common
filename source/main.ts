@@ -130,6 +130,16 @@ type EvaluationResult = {
   optimizedLocalPart: ReadonlyMap<string, data.Expr>;
 };
 
+type EvaluateOneResult = {
+  result: data.Result<
+    data.RootEvaluatedExpr,
+    ReadonlyArray<data.EvaluateExprError>
+  >;
+  optimizedPartMap: ReadonlyMap<data.PartId, data.Expr>;
+  /** パーツ内に含まれるローカルパーツの式を格納する. キーはPartIdをLocalPartIdを結合したもの */
+  optimizedLocalPart: ReadonlyMap<string, data.Expr>;
+};
+
 const getPartExpr = (
   source: SourceAndCache,
   partId: data.PartId
@@ -194,6 +204,27 @@ export const evaluateExpr = (
 
     case "Lambda":
       return null;
+  }
+};
+
+export const evaluateOne = (
+  sourceAndCache: SourceAndCache,
+  expr: data.Expr
+): EvaluateOneResult => {
+  switch (expr._) {
+    case "Kernel":
+      return {
+        result: data.resultOk(data.rootEvaluatedExprKernel(expr.kernelExpr)),
+        optimizedPartMap: new Map(),
+        optimizedLocalPart: new Map()
+      };
+
+    case "Int32Literal":
+      return {
+        result: data.resultOk(data.rootEvaluatedExprInt32(expr.int32)),
+        optimizedPartMap: new Map(),
+        optimizedLocalPart: new Map()
+      };
   }
 };
 

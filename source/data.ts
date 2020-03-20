@@ -219,6 +219,15 @@ export type Expr =
   | { _: "Lambda"; lambdaBranchList: ReadonlyArray<LambdaBranch> };
 
 /**
+ * 直下が評価しきった式
+ */
+export type RootEvaluatedExpr =
+  | { _: "Kernel"; kernelExpr: KernelExpr }
+  | { _: "Int32"; int32: number }
+  | { _: "TagReference"; tagReferenceIndex: TagReferenceIndex }
+  | { _: "Lambda"; lambdaBranchList: ReadonlyArray<LambdaBranch> };
+
+/**
  * Definyだけでは表現できない式
  */
 export type KernelExpr = "Int32Add" | "Int32Sub" | "Int32Mul";
@@ -467,6 +476,38 @@ export const exprFunctionCall = (functionCall: FunctionCall): Expr => ({
 export const exprLambda = (
   lambdaBranchList: ReadonlyArray<LambdaBranch>
 ): Expr => ({ _: "Lambda", lambdaBranchList: lambdaBranchList });
+
+/**
+ * Definyだけでは表現できない式
+ */
+export const rootEvaluatedExprKernel = (
+  kernelExpr: KernelExpr
+): RootEvaluatedExpr => ({ _: "Kernel", kernelExpr: kernelExpr });
+
+/**
+ * 32bit整数
+ */
+export const rootEvaluatedExprInt32 = (int32: number): RootEvaluatedExpr => ({
+  _: "Int32",
+  int32: int32
+});
+
+/**
+ * タグを参照
+ */
+export const rootEvaluatedExprTagReference = (
+  tagReferenceIndex: TagReferenceIndex
+): RootEvaluatedExpr => ({
+  _: "TagReference",
+  tagReferenceIndex: tagReferenceIndex
+});
+
+/**
+ * ラムダ
+ */
+export const rootEvaluatedExprLambda = (
+  lambdaBranchList: ReadonlyArray<LambdaBranch>
+): RootEvaluatedExpr => ({ _: "Lambda", lambdaBranchList: lambdaBranchList });
 
 /**
  * タグ
@@ -869,6 +910,29 @@ export const encodeExpr = (expr: Expr): ReadonlyArray<number> => {
     }
     case "Lambda": {
       return [6].concat(encodeList(encodeLambdaBranch)(expr.lambdaBranchList));
+    }
+  }
+};
+
+export const encodeRootEvaluatedExpr = (
+  rootEvaluatedExpr: RootEvaluatedExpr
+): ReadonlyArray<number> => {
+  switch (rootEvaluatedExpr._) {
+    case "Kernel": {
+      return [0].concat(encodeKernelExpr(rootEvaluatedExpr.kernelExpr));
+    }
+    case "Int32": {
+      return [1].concat(encodeInt32(rootEvaluatedExpr.int32));
+    }
+    case "TagReference": {
+      return [2].concat(
+        encodeTagReferenceIndex(rootEvaluatedExpr.tagReferenceIndex)
+      );
+    }
+    case "Lambda": {
+      return [3].concat(
+        encodeList(encodeLambdaBranch)(rootEvaluatedExpr.lambdaBranchList)
+      );
     }
   }
 };
@@ -2129,6 +2193,61 @@ export const decodeExpr = (
       nextIndex: number;
     } = decodeList(decodeLambdaBranch)(patternIndex.nextIndex, binary);
     return { result: exprLambda(result.result), nextIndex: result.nextIndex };
+  }
+  throw new Error("存在しないパターンを指定された 型を更新してください");
+};
+
+/**
+ * @param index バイナリを読み込み開始位置
+ * @param binary バイナリ
+ */
+export const decodeRootEvaluatedExpr = (
+  index: number,
+  binary: Uint8Array
+): { result: RootEvaluatedExpr; nextIndex: number } => {
+  const patternIndex: { result: number; nextIndex: number } = decodeInt32(
+    index,
+    binary
+  );
+  if (patternIndex.result === 0) {
+    const result: { result: KernelExpr; nextIndex: number } = decodeKernelExpr(
+      patternIndex.nextIndex,
+      binary
+    );
+    return {
+      result: rootEvaluatedExprKernel(result.result),
+      nextIndex: result.nextIndex
+    };
+  }
+  if (patternIndex.result === 1) {
+    const result: { result: number; nextIndex: number } = decodeInt32(
+      patternIndex.nextIndex,
+      binary
+    );
+    return {
+      result: rootEvaluatedExprInt32(result.result),
+      nextIndex: result.nextIndex
+    };
+  }
+  if (patternIndex.result === 2) {
+    const result: {
+      result: TagReferenceIndex;
+      nextIndex: number;
+    } = decodeTagReferenceIndex(patternIndex.nextIndex, binary);
+    return {
+      result: rootEvaluatedExprTagReference(result.result),
+      nextIndex: result.nextIndex
+    };
+  }
+  if (patternIndex.result === 3) {
+    const result: {
+      result: ReadonlyArray<LambdaBranch>;
+      nextIndex: number;
+    } = decodeList(decodeLambdaBranch)(patternIndex.nextIndex, binary);
+    return {
+      result: rootEvaluatedExprLambda(result.result),
+      nextIndex: result.nextIndex
+    };
   }
   throw new Error("存在しないパターンを指定された 型を更新してください");
 };
