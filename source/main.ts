@@ -168,8 +168,8 @@ export const evaluateExpr = (
     case "TagReference":
       return {
         result: data.resultOk(expr),
-        evaluatedLocalPartMap: sourceAndCache.evaluatedLocalPartMap,
-        evaluatedPartMap: sourceAndCache.evaluatedPartMap
+        evaluatedLocalPartMap: new Map(),
+        evaluatedPartMap: new Map()
       };
 
     case "FunctionCall":
@@ -352,7 +352,7 @@ const evaluateFunctionCall = (
     ...parameterResult.evaluatedPartMap
   ]);
   const evaluatedLocalPartMap = new Map([
-    ...functionResult.evaluatedPartMap,
+    ...functionResult.evaluatedLocalPartMap,
     ...parameterResult.evaluatedLocalPartMap
   ]);
 
