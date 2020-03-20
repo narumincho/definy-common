@@ -284,7 +284,13 @@ export type EvaluateExprError =
   | {
       _: "CannotFindLocalPartDefinition";
       localPartReference: LocalPartReference;
-    };
+    }
+  | { _: "TypeError"; typeError: TypeError };
+
+/**
+ * 型エラー
+ */
+export type TypeError = { expect: Type; actual: Type };
 
 export type AccessToken = string & { _accessToken: never };
 
@@ -515,6 +521,13 @@ export const evaluateExprErrorCannotFindLocalPartDefinition = (
 });
 
 /**
+ * 型が合わない
+ */
+export const evaluateExprErrorTypeError = (
+  typeError: TypeError
+): EvaluateExprError => ({ _: "TypeError", typeError: typeError });
+
+/**
  * numberの32bit符号あり整数をSigned Leb128のバイナリに変換する
  */
 export const encodeInt32 = (value: number): ReadonlyArray<number> => {
@@ -538,11 +551,11 @@ export const encodeInt32 = (value: number): ReadonlyArray<number> => {
  * stringからバイナリに変換する.
  */
 export const encodeString = (text: string): ReadonlyArray<number> => {
-  const result: ReadonlyArray<number> = Array["from"](
-    new (process === undefined || process.title === "browser"
+  const result: ReadonlyArray<number> = [
+    ...new (process === undefined || process.title === "browser"
       ? TextEncoder
       : a.TextEncoder)().encode(text)
-  );
+  ];
   return encodeInt32(result.length).concat(result);
 };
 
@@ -554,7 +567,7 @@ export const encodeBool = (value: boolean): ReadonlyArray<number> => [
 ];
 
 export const encodeBinary = (value: Uint8Array): ReadonlyArray<number> =>
-  encodeInt32(value.length).concat(Array["from"](value));
+  encodeInt32(value.length).concat([...value]);
 
 export const encodeList = <T>(
   encodeFunction: (a: T) => ReadonlyArray<number>
@@ -962,8 +975,14 @@ export const encodeEvaluateExprError = (
         encodeLocalPartReference(evaluateExprError.localPartReference)
       );
     }
+    case "TypeError": {
+      return [3].concat(encodeTypeError(evaluateExprError.typeError));
+    }
   }
 };
+
+export const encodeTypeError = (typeError: TypeError): ReadonlyArray<number> =>
+  encodeType(typeError.expect).concat(encodeType(typeError.actual));
 
 /**
  * SignedLeb128で表現されたバイナリをnumberのビット演算ができる32bit符号付き整数の範囲の数値に変換するコード
@@ -1162,7 +1181,7 @@ export const decodeId = (
   index: number,
   binary: Uint8Array
 ): { result: string; nextIndex: number } => ({
-  result: Array["from"](binary.slice(index, index + 16))
+  result: [...binary.slice(index, index + 16)]
     .map((n: number): string => n.toString(16).padStart(2, "0"))
     .join(""),
   nextIndex: index + 16
@@ -1176,7 +1195,7 @@ export const decodeToken = (
   index: number,
   binary: Uint8Array
 ): { result: string; nextIndex: number } => ({
-  result: Array["from"](binary.slice(index, index + 32))
+  result: [...binary.slice(index, index + 32)]
     .map((n: number): string => n.toString(16).padStart(2, "0"))
     .join(""),
   nextIndex: index + 32
@@ -2449,5 +2468,40 @@ export const decodeEvaluateExprError = (
       nextIndex: result.nextIndex
     };
   }
+  if (patternIndex.result === 3) {
+    const result: { result: TypeError; nextIndex: number } = decodeTypeError(
+      patternIndex.nextIndex,
+      binary
+    );
+    return {
+      result: evaluateExprErrorTypeError(result.result),
+      nextIndex: result.nextIndex
+    };
+  }
   throw new Error("存在しないパターンを指定された 型を更新してください");
+};
+
+/**
+ * @param index バイナリを読み込み開始位置
+ * @param binary バイナリ
+ */
+export const decodeTypeError = (
+  index: number,
+  binary: Uint8Array
+): { result: TypeError; nextIndex: number } => {
+  const expectAndNextIndex: { result: Type; nextIndex: number } = decodeType(
+    index,
+    binary
+  );
+  const actualAndNextIndex: { result: Type; nextIndex: number } = decodeType(
+    expectAndNextIndex.nextIndex,
+    binary
+  );
+  return {
+    result: {
+      expect: expectAndNextIndex.result,
+      actual: actualAndNextIndex.result
+    },
+    nextIndex: actualAndNextIndex.nextIndex
+  };
 };

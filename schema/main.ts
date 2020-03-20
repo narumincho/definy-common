@@ -49,6 +49,7 @@ const conditionTagName = "ConditionTag";
 const branchPartDefinitionName = "BranchPartDefinition";
 const conditionCaptureName = "ConditionCapture";
 const evaluateExprErrorName = "EvaluateExprError";
+const typeErrorName = "TypeError";
 const fileHashAndIsThumbnailName = "FileHashAndIsThumbnail";
 
 const dateTime: type.CustomType = {
@@ -872,6 +873,28 @@ const evaluateExprError: type.CustomType = {
       name: "CannotFindLocalPartDefinition",
       description: "ローカルパーツの定義を見つけることができなかった",
       parameter: type.maybeJust(type.typeCustom(localPartReferenceName))
+    },
+    {
+      name: "TypeError",
+      description: "型が合わない",
+      parameter: type.maybeJust(type.typeCustom(typeErrorName))
+    }
+  ])
+};
+
+const typeError: type.CustomType = {
+  name: typeErrorName,
+  description: "型エラー",
+  body: type.customTypeBodyProduct([
+    {
+      name: "expect",
+      description: "期待していた型",
+      memberType: type.typeCustom(typeName)
+    },
+    {
+      name: "actual",
+      description: "実際の型",
+      memberType: type.typeCustom(typeName)
     }
   ])
 };
@@ -911,7 +934,8 @@ const listCustomType: ReadonlyArray<type.CustomType> = [
   conditionTag,
   conditionCapture,
   branchPartDefinition,
-  evaluateExprError
+  evaluateExprError,
+  typeError
 ];
 
 const code = codeGen.generateCodeAsString(
