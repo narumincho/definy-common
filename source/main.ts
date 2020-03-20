@@ -126,7 +126,7 @@ type SourceAndCache = {
   evaluatedLocalPartMap: ReadonlyMap<string, data.EvaluatedExpr>;
 };
 
-type EvaluationResult = {
+export type EvaluationResult = {
   result: data.Result<
     data.EvaluatedExpr,
     ReadonlyArray<data.EvaluateExprError>
