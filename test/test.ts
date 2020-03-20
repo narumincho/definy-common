@@ -49,8 +49,8 @@ describe("test", () => {
   it("encode, decode user url", () => {
     const languageAndLocation: data.UrlData = {
       clientMode: data.clientModeDebugMode(123),
-      location: main.data.locationUser(
-        "580d8d6a54cf43e4452a0bba6694a4ed" as main.data.UserId
+      location: data.locationUser(
+        "580d8d6a54cf43e4452a0bba6694a4ed" as data.UserId
       ),
       language: "Esperanto",
       accessToken: data.maybeNothing()
@@ -59,24 +59,102 @@ describe("test", () => {
     const decodedLanguageAndLocation: data.UrlData = main.urlDataFromUrl(url);
     expect(languageAndLocation).toEqual(decodedLanguageAndLocation);
   });
-  it("dynamic Evaluation", () => {
-    console.log(
-      main.evaluateExpr(
-        data.exprFunctionCall({
+  it("dynamic Evaluation: simple expr", () => {
+    /*
+     * = (add 50) ((add 32) 100)
+     */
+    const result = main.evaluateExpr(
+      {
+        typeDefinitionMap: new Map(),
+        partDefinitionMap: new Map(),
+        localPartMap: new Map(),
+        evaluatedLocalPartMap: new Map(),
+        evaluatedPartMap: new Map()
+      },
+      data.exprFunctionCall({
+        function: data.exprFunctionCall({
+          function: data.exprKernel("Int32Add"),
+          parameter: data.exprInt32Literal(50)
+        }),
+        parameter: data.exprFunctionCall({
           function: data.exprFunctionCall({
             function: data.exprKernel("Int32Add"),
-            parameter: data.exprInt32Literal(50)
+            parameter: data.exprInt32Literal(32)
           }),
-          parameter: data.exprFunctionCall({
-            function: data.exprFunctionCall({
-              function: data.exprKernel("Int32Add"),
-              parameter: data.exprInt32Literal(32)
-            }),
-            parameter: data.exprInt32Literal(100)
-          })
+          parameter: data.exprInt32Literal(100)
         })
-      )
+      })
     );
-    expect("").toBe("");
+    console.log(result);
+  });
+
+  it("dynamic Evaluation: use part definition", () => {
+    /*
+     * [0]
+     * one = 1
+     *
+     * [1]
+     * addOneHundred = + 100
+     *
+     *
+     * = (add (addOneHundred one)) one
+     */
+    const intType: data.Type = {
+      reference: "" as data.TypeId,
+      parameter: []
+    };
+    const oneName = "0" as data.PartId;
+    const addOneHundredName = "1" as data.PartId;
+    const result = main.evaluateExpr(
+      {
+        typeDefinitionMap: new Map(),
+        partDefinitionMap: new Map<data.PartId, data.PartDefinition>([
+          [
+            oneName,
+            {
+              name: "one",
+              description: "1を表す",
+              moduleId: "0" as data.ModuleId,
+              parentList: [],
+              type: intType,
+              expr: data.maybeJust(data.exprInt32Literal(1))
+            }
+          ],
+          [
+            addOneHundredName,
+            {
+              name: "addOneHundred",
+              description: "100を足す関数",
+              moduleId: "0" as data.ModuleId,
+              parentList: [],
+              type: intType,
+              expr: data.maybeJust(
+                data.exprFunctionCall({
+                  function: data.exprKernel("Int32Add"),
+                  parameter: data.exprInt32Literal(100)
+                })
+              )
+            }
+          ]
+        ]),
+        localPartMap: new Map(),
+        evaluatedLocalPartMap: new Map(),
+        evaluatedPartMap: new Map()
+      },
+      data.exprFunctionCall({
+        function: data.exprFunctionCall({
+          function: data.exprKernel("Int32Add"),
+          parameter: data.exprFunctionCall({
+            function: data.exprPartReference(addOneHundredName),
+            parameter: data.exprPartReference(oneName)
+          })
+        }),
+        parameter: data.exprPartReference(oneName)
+      })
+    );
+    console.log(result);
+    expect(result.result).toEqual<
+      data.Result<data.EvaluatedExpr, data.EvaluateExprError>
+    >(data.resultOk(data.evaluatedExprInt32(102)));
   });
 });

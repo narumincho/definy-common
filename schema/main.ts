@@ -39,6 +39,8 @@ const typeBodySumPatternName = "TypeBodySumPattern";
 const typeBodyKernelName = "TypeBodyKernel";
 const typeName = "Type";
 const exprName = "Expr";
+const evaluatedExprName = "EvaluatedExpr";
+const kernelCallName = "KernelCall";
 const kernelExprName = "KernelExpr";
 const localPartReferenceName = "LocalPartReference";
 const tagReferenceName = "TagReferenceIndex";
@@ -49,6 +51,7 @@ const conditionTagName = "ConditionTag";
 const branchPartDefinitionName = "BranchPartDefinition";
 const conditionCaptureName = "ConditionCapture";
 const evaluateExprErrorName = "EvaluateExprError";
+const typeErrorName = "TypeError";
 const fileHashAndIsThumbnailName = "FileHashAndIsThumbnail";
 
 const dateTime: type.CustomType = {
@@ -661,6 +664,57 @@ const expr: type.CustomType = {
   ])
 };
 
+const evaluatedExpr: type.CustomType = {
+  name: evaluatedExprName,
+  description: "評価しきった式",
+  body: type.customTypeBodySum([
+    {
+      name: "Kernel",
+      description: "Definyだけでは表現できない式",
+      parameter: type.maybeJust(type.typeCustom(kernelExprName))
+    },
+    {
+      name: "Int32",
+      description: "32bit整数",
+      parameter: type.maybeJust(type.typeInt32)
+    },
+    {
+      name: "TagReference",
+      description: "タグを参照",
+      parameter: type.maybeJust(type.typeCustom(tagReferenceName))
+    },
+    {
+      name: "Lambda",
+      description: "ラムダ",
+      parameter: type.maybeJust(
+        type.typeList(type.typeCustom(lambdaBranchName))
+      )
+    },
+    {
+      name: "KernelCall",
+      description: "内部関数呼び出し",
+      parameter: type.maybeJust(type.typeCustom(kernelCallName))
+    }
+  ])
+};
+
+const kernelCall: type.CustomType = {
+  name: kernelCallName,
+  description: "複数の引数が必要な内部関数の部分呼び出し",
+  body: type.customTypeBodyProduct([
+    {
+      name: "kernel",
+      description: "関数",
+      memberType: type.typeCustom(kernelExprName)
+    },
+    {
+      name: "expr",
+      description: "呼び出すパラメーター",
+      memberType: type.typeCustom(evaluatedExprName)
+    }
+  ])
+};
+
 const kernelExpr: type.CustomType = {
   name: kernelExprName,
   description: "Definyだけでは表現できない式",
@@ -862,6 +916,38 @@ const evaluateExprError: type.CustomType = {
       name: "NeedPartDefinition",
       description: "式を評価するには,このパーツの定義が必要だと言っている",
       parameter: type.maybeJust(partId)
+    },
+    {
+      name: "PartExprIsNothing",
+      description: "パーツの式が空だと言っている",
+      parameter: type.maybeJust(partId)
+    },
+    {
+      name: "CannotFindLocalPartDefinition",
+      description: "ローカルパーツの定義を見つけることができなかった",
+      parameter: type.maybeJust(type.typeCustom(localPartReferenceName))
+    },
+    {
+      name: "TypeError",
+      description: "型が合わない",
+      parameter: type.maybeJust(type.typeCustom(typeErrorName))
+    },
+    {
+      name: "NotSupported",
+      description: "まだサポートしていないものが含まれている",
+      parameter: type.maybeNothing()
+    }
+  ])
+};
+
+const typeError: type.CustomType = {
+  name: typeErrorName,
+  description: "型エラー",
+  body: type.customTypeBodyProduct([
+    {
+      name: "message",
+      description: "型エラーの説明",
+      memberType: type.typeString
     }
   ])
 };
@@ -892,6 +978,8 @@ const listCustomType: ReadonlyArray<type.CustomType> = [
   partDefinition,
   type_,
   expr,
+  evaluatedExpr,
+  kernelCall,
   kernelExpr,
   localPartReference,
   tagReference,
@@ -901,7 +989,8 @@ const listCustomType: ReadonlyArray<type.CustomType> = [
   conditionTag,
   conditionCapture,
   branchPartDefinition,
-  evaluateExprError
+  evaluateExprError,
+  typeError
 ];
 
 const code = codeGen.generateCodeAsString(
