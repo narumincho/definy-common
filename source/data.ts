@@ -90,6 +90,7 @@ export type Project = {
   icon: FileHash;
   image: FileHash;
   createdAt: DateTime;
+  createdBy: UserId;
 };
 
 /**
@@ -299,6 +300,14 @@ export type EvaluateExprError =
  * 型エラー
  */
 export type TypeError = { message: string };
+
+/**
+ * プロジェクト作成時に必要なパラメーター
+ */
+export type CreateProjectParameter = {
+  accessToken: AccessToken;
+  projectName: string;
+};
 
 export type AccessToken = string & { _accessToken: never };
 
@@ -780,7 +789,8 @@ export const encodeProject = (project: Project): ReadonlyArray<number> =>
   encodeString(project.name)
     .concat(encodeToken(project.icon))
     .concat(encodeToken(project.image))
-    .concat(encodeDateTime(project.createdAt));
+    .concat(encodeDateTime(project.createdAt))
+    .concat(encodeId(project.createdBy));
 
 export const encodeIdea = (idea: Idea): ReadonlyArray<number> =>
   encodeString(idea.name)
@@ -1067,6 +1077,13 @@ export const encodeEvaluateExprError = (
 
 export const encodeTypeError = (typeError: TypeError): ReadonlyArray<number> =>
   encodeString(typeError.message);
+
+export const encodeCreateProjectParameter = (
+  createProjectParameter: CreateProjectParameter
+): ReadonlyArray<number> =>
+  encodeToken(createProjectParameter.accessToken).concat(
+    encodeString(createProjectParameter.projectName)
+  );
 
 /**
  * SignedLeb128で表現されたバイナリをnumberのビット演算ができる32bit符号付き整数の範囲の数値に変換するコード
@@ -1641,14 +1658,25 @@ export const decodeProject = (
     result: DateTime;
     nextIndex: number;
   } = decodeDateTime(imageAndNextIndex.nextIndex, binary);
+  const createdByAndNextIndex: {
+    result: UserId;
+    nextIndex: number;
+  } = (decodeId as (
+    a: number,
+    b: Uint8Array
+  ) => { result: UserId; nextIndex: number })(
+    createdAtAndNextIndex.nextIndex,
+    binary
+  );
   return {
     result: {
       name: nameAndNextIndex.result,
       icon: iconAndNextIndex.result,
       image: imageAndNextIndex.result,
-      createdAt: createdAtAndNextIndex.result
+      createdAt: createdAtAndNextIndex.result,
+      createdBy: createdByAndNextIndex.result
     },
-    nextIndex: createdAtAndNextIndex.nextIndex
+    nextIndex: createdByAndNextIndex.nextIndex
   };
 };
 
@@ -2648,5 +2676,33 @@ export const decodeTypeError = (
   return {
     result: { message: messageAndNextIndex.result },
     nextIndex: messageAndNextIndex.nextIndex
+  };
+};
+
+/**
+ * @param index バイナリを読み込み開始位置
+ * @param binary バイナリ
+ */
+export const decodeCreateProjectParameter = (
+  index: number,
+  binary: Uint8Array
+): { result: CreateProjectParameter; nextIndex: number } => {
+  const accessTokenAndNextIndex: {
+    result: AccessToken;
+    nextIndex: number;
+  } = (decodeToken as (
+    a: number,
+    b: Uint8Array
+  ) => { result: AccessToken; nextIndex: number })(index, binary);
+  const projectNameAndNextIndex: {
+    result: string;
+    nextIndex: number;
+  } = decodeString(accessTokenAndNextIndex.nextIndex, binary);
+  return {
+    result: {
+      accessToken: accessTokenAndNextIndex.result,
+      projectName: projectNameAndNextIndex.result
+    },
+    nextIndex: projectNameAndNextIndex.nextIndex
   };
 };

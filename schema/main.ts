@@ -52,6 +52,7 @@ const branchPartDefinitionName = "BranchPartDefinition";
 const conditionCaptureName = "ConditionCapture";
 const evaluateExprErrorName = "EvaluateExprError";
 const typeErrorName = "TypeError";
+const createProjectParameterName = "CreateProjectParameter";
 
 const dateTime: type.CustomType = {
   name: dateTimeName,
@@ -302,6 +303,11 @@ const project: type.CustomType = {
       name: "createdAt",
       description: "作成日時",
       memberType: type.typeCustom(dateTimeName)
+    },
+    {
+      name: "createdBy",
+      description: "作成アカウント",
+      memberType: userId
     }
   ])
 };
@@ -933,6 +939,23 @@ const typeError: type.CustomType = {
   ])
 };
 
+const createProjectParameter: type.CustomType = {
+  name: createProjectParameterName,
+  description: "プロジェクト作成時に必要なパラメーター",
+  body: type.customTypeBodyProduct([
+    {
+      name: "accessToken",
+      description: "プロジェクトを作るときのアカウント",
+      memberType: accessToken
+    },
+    {
+      name: "projectName",
+      description: "プロジェクト名",
+      memberType: type.typeString
+    }
+  ])
+};
+
 const listCustomType: ReadonlyArray<type.CustomType> = [
   dateTime,
   clientMode,
@@ -970,7 +993,8 @@ const listCustomType: ReadonlyArray<type.CustomType> = [
   conditionCapture,
   branchPartDefinition,
   evaluateExprError,
-  typeError
+  typeError,
+  createProjectParameter
 ];
 
 const code = codeGen.generateCodeAsString(
