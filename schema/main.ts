@@ -52,7 +52,6 @@ const branchPartDefinitionName = "BranchPartDefinition";
 const conditionCaptureName = "ConditionCapture";
 const evaluateExprErrorName = "EvaluateExprError";
 const typeErrorName = "TypeError";
-const fileHashAndIsThumbnailName = "FileHashAndIsThumbnail";
 
 const dateTime: type.CustomType = {
   name: dateTimeName,
@@ -215,24 +214,6 @@ const language: type.CustomType = {
       name: "Esperanto",
       description: "エスペラント語",
       parameter: type.maybeNothing()
-    }
-  ])
-};
-
-const fileHashAndIsThumbnail: type.CustomType = {
-  name: fileHashAndIsThumbnailName,
-  description: "getImageに必要なパラメーター",
-  body: type.customTypeBodyProduct([
-    {
-      name: "fileHash",
-      description: "ファイルハッシュ (オリジナルの画像)",
-      memberType: fileHash
-    },
-    {
-      name: "isThumbnail",
-      description:
-        "取得したいのは,サイズが小さくて速くデータを受け取れるサムネイル画像かどうか",
-      memberType: type.typeBool
     }
   ])
 };
@@ -960,7 +941,6 @@ const listCustomType: ReadonlyArray<type.CustomType> = [
   urlData,
   language,
   location,
-  fileHashAndIsThumbnail,
   userPublic,
   userPublicAndUserId,
   project,

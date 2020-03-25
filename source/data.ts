@@ -65,14 +65,6 @@ export type Location =
   | { _: "Project"; projectId: ProjectId };
 
 /**
- * getImageに必要なパラメーター
- */
-export type FileHashAndIsThumbnail = {
-  fileHash: FileHash;
-  isThumbnail: boolean;
-};
-
-/**
  * ユーザーが公開している情報
  */
 export type UserPublic = {
@@ -765,13 +757,6 @@ export const encodeLocation = (location: Location): ReadonlyArray<number> => {
     }
   }
 };
-
-export const encodeFileHashAndIsThumbnail = (
-  fileHashAndIsThumbnail: FileHashAndIsThumbnail
-): ReadonlyArray<number> =>
-  encodeToken(fileHashAndIsThumbnail.fileHash).concat(
-    encodeBool(fileHashAndIsThumbnail.isThumbnail)
-  );
 
 export const encodeUserPublic = (
   userPublic: UserPublic
@@ -1519,34 +1504,6 @@ export const decodeLocation = (
     };
   }
   throw new Error("存在しないパターンを指定された 型を更新してください");
-};
-
-/**
- * @param index バイナリを読み込み開始位置
- * @param binary バイナリ
- */
-export const decodeFileHashAndIsThumbnail = (
-  index: number,
-  binary: Uint8Array
-): { result: FileHashAndIsThumbnail; nextIndex: number } => {
-  const fileHashAndNextIndex: {
-    result: FileHash;
-    nextIndex: number;
-  } = (decodeToken as (
-    a: number,
-    b: Uint8Array
-  ) => { result: FileHash; nextIndex: number })(index, binary);
-  const isThumbnailAndNextIndex: {
-    result: boolean;
-    nextIndex: number;
-  } = decodeBool(fileHashAndNextIndex.nextIndex, binary);
-  return {
-    result: {
-      fileHash: fileHashAndNextIndex.result,
-      isThumbnail: isThumbnailAndNextIndex.result
-    },
-    nextIndex: isThumbnailAndNextIndex.nextIndex
-  };
 };
 
 /**
