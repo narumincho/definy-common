@@ -808,12 +808,12 @@ const condition: type.CustomType = {
   description: "ブランチの式を使う条件",
   body: type.customTypeBodySum([
     {
-      name: "Tag",
+      name: "ByTag",
       description: "タグ",
       parameter: type.maybeJust(type.typeCustom(conditionTagName))
     },
     {
-      name: "Capture",
+      name: "ByCapture",
       description: "キャプチャパーツへのキャプチャ",
       parameter: type.maybeJust(type.typeCustom(conditionCaptureName))
     },

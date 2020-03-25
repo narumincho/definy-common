@@ -260,8 +260,8 @@ export type LambdaBranch = {
  * ブランチの式を使う条件
  */
 export type Condition =
-  | { _: "Tag"; conditionTag: ConditionTag }
-  | { _: "Capture"; conditionCapture: ConditionCapture }
+  | { _: "ByTag"; conditionTag: ConditionTag }
+  | { _: "ByCapture"; conditionCapture: ConditionCapture }
   | { _: "Any" }
   | { _: "Int32"; int32: number };
 
@@ -535,17 +535,17 @@ export const evaluatedExprKernelCall = (
 /**
  * タグ
  */
-export const conditionTag = (conditionTag: ConditionTag): Condition => ({
-  _: "Tag",
+export const conditionByTag = (conditionTag: ConditionTag): Condition => ({
+  _: "ByTag",
   conditionTag: conditionTag
 });
 
 /**
  * キャプチャパーツへのキャプチャ
  */
-export const conditionCapture = (
+export const conditionByCapture = (
   conditionCapture: ConditionCapture
-): Condition => ({ _: "Capture", conditionCapture: conditionCapture });
+): Condition => ({ _: "ByCapture", conditionCapture: conditionCapture });
 
 /**
  * _ すべてのパターンを通すもの
@@ -1020,10 +1020,10 @@ export const encodeCondition = (
   condition: Condition
 ): ReadonlyArray<number> => {
   switch (condition._) {
-    case "Tag": {
+    case "ByTag": {
       return [0].concat(encodeConditionTag(condition.conditionTag));
     }
-    case "Capture": {
+    case "ByCapture": {
       return [1].concat(encodeConditionCapture(condition.conditionCapture));
     }
     case "Any": {
@@ -2493,7 +2493,10 @@ export const decodeCondition = (
       result: ConditionTag;
       nextIndex: number;
     } = decodeConditionTag(patternIndex.nextIndex, binary);
-    return { result: conditionTag(result.result), nextIndex: result.nextIndex };
+    return {
+      result: conditionByTag(result.result),
+      nextIndex: result.nextIndex
+    };
   }
   if (patternIndex.result === 1) {
     const result: {
@@ -2501,7 +2504,7 @@ export const decodeCondition = (
       nextIndex: number;
     } = decodeConditionCapture(patternIndex.nextIndex, binary);
     return {
-      result: conditionCapture(result.result),
+      result: conditionByCapture(result.result),
       nextIndex: result.nextIndex
     };
   }

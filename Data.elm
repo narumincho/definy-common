@@ -217,8 +217,8 @@ type alias LambdaBranch =
 {-| ブランチの式を使う条件
 -}
 type Condition
-    = ConditionTag ConditionTag
-    | ConditionCapture ConditionCapture
+    = ConditionByTag ConditionTag
+    | ConditionByCapture ConditionCapture
     | ConditionAny
     | ConditionInt32 Int
 
@@ -780,11 +780,11 @@ lambdaBranchToJsonValue lambdaBranch =
 conditionToJsonValue : Condition -> Je.Value
 conditionToJsonValue condition =
     case condition of
-        ConditionTag parameter ->
-            Je.object [ ( "_", Je.string "Tag" ), ( "conditionTag", conditionTagToJsonValue parameter ) ]
+        ConditionByTag parameter ->
+            Je.object [ ( "_", Je.string "ByTag" ), ( "conditionTag", conditionTagToJsonValue parameter ) ]
 
-        ConditionCapture parameter ->
-            Je.object [ ( "_", Je.string "Capture" ), ( "conditionCapture", conditionCaptureToJsonValue parameter ) ]
+        ConditionByCapture parameter ->
+            Je.object [ ( "_", Je.string "ByCapture" ), ( "conditionCapture", conditionCaptureToJsonValue parameter ) ]
 
         ConditionAny ->
             Je.object [ ( "_", Je.string "Any" ) ]
@@ -1553,11 +1553,11 @@ conditionJsonDecoder =
         |> Jd.andThen
             (\tag ->
                 case tag of
-                    "Tag" ->
-                        Jd.field "conditionTag" conditionTagJsonDecoder |> Jd.map ConditionTag
+                    "ByTag" ->
+                        Jd.field "conditionTag" conditionTagJsonDecoder |> Jd.map ConditionByTag
 
-                    "Capture" ->
-                        Jd.field "conditionCapture" conditionCaptureJsonDecoder |> Jd.map ConditionCapture
+                    "ByCapture" ->
+                        Jd.field "conditionCapture" conditionCaptureJsonDecoder |> Jd.map ConditionByCapture
 
                     "Any" ->
                         Jd.succeed ConditionAny
