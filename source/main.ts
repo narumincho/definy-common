@@ -558,7 +558,7 @@ const lambdaBranchToString = (lambdaBranch: data.LambdaBranch): string => {
 
 const conditionToString = (condition: data.Condition): string => {
   switch (condition._) {
-    case "Tag":
+    case "ByTag":
       return (
         "#" +
         (condition.conditionTag.tag as string) +
@@ -570,13 +570,15 @@ const conditionToString = (condition: data.Condition): string => {
         ) +
         ")"
       );
-    case "Capture":
+    case "ByCapture": {
+      const capturePartName: string = condition.conditionCapture.name;
       return (
-        condition.conditionCapture.name +
+        capturePartName +
         "(" +
         (condition.conditionCapture.localPartId as string) +
         ")"
       );
+    }
     case "Any":
       return "_";
     case "Int32":
