@@ -115,6 +115,47 @@ const accessTokenFromUrl = (hash: string): data.Maybe<data.AccessToken> => {
   return data.maybeJust(matchResult[1] as data.AccessToken);
 };
 
+export const userNameDecoder = (userName: string): string | null => {
+  const normalized = normalizeString(userName);
+  if (normalized === null) {
+    return null;
+  }
+  return [...normalized].slice(0, 50).join("");
+};
+
+export const projectNameDecoder = (userName: string): string | null => {
+  const normalized = normalizeString(userName);
+  if (normalized === null) {
+    return null;
+  }
+  return [...normalized].slice(0, 50).join("");
+};
+
+const normalizeString = (text: string): string | null => {
+  const normalized = text.normalize("NFKC").trim();
+  let result = "";
+  let beforeSpace = false;
+  for (const char of normalized) {
+    const codePoint = char.codePointAt(0) ?? 0;
+    if (codePoint <= 0x19 || (0x7f <= codePoint && codePoint <= 0xa0)) {
+      continue;
+    }
+    if (char === " ") {
+      if (beforeSpace) {
+        continue;
+      }
+      beforeSpace = true;
+    } else {
+      beforeSpace = false;
+    }
+    result += char;
+  }
+  if (result.length === 0) {
+    return null;
+  }
+  return result;
+};
+
 type SourceAndCache = {
   typeDefinitionMap: ReadonlyMap<data.TypeId, data.TypeDefinition>;
   partDefinitionMap: ReadonlyMap<data.PartId, data.PartDefinition>;
