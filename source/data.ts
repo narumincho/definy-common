@@ -61,6 +61,7 @@ export type Language = "Japanese" | "English" | "Esperanto";
  */
 export type Location =
   | { _: "Home" }
+  | { _: "CreateProject" }
   | { _: "User"; userId: UserId }
   | { _: "Project"; projectId: ProjectId };
 
@@ -370,6 +371,11 @@ export const clientModeRelease: ClientMode = { _: "Release" };
  * 最初のページ
  */
 export const locationHome: Location = { _: "Home" };
+
+/**
+ * プロジェクト作成画面
+ */
+export const locationCreateProject: Location = { _: "CreateProject" };
 
 /**
  * ユーザーの詳細ページ
@@ -765,11 +771,14 @@ export const encodeLocation = (location: Location): ReadonlyArray<number> => {
     case "Home": {
       return [0];
     }
+    case "CreateProject": {
+      return [1];
+    }
     case "User": {
-      return [1].concat(encodeId(location.userId));
+      return [2].concat(encodeId(location.userId));
     }
     case "Project": {
-      return [2].concat(encodeId(location.projectId));
+      return [3].concat(encodeId(location.projectId));
     }
   }
 };
@@ -1521,13 +1530,16 @@ export const decodeLocation = (
     return { result: locationHome, nextIndex: patternIndex.nextIndex };
   }
   if (patternIndex.result === 1) {
+    return { result: locationCreateProject, nextIndex: patternIndex.nextIndex };
+  }
+  if (patternIndex.result === 2) {
     const result: { result: UserId; nextIndex: number } = (decodeId as (
       a: number,
       b: Uint8Array
     ) => { result: UserId; nextIndex: number })(patternIndex.nextIndex, binary);
     return { result: locationUser(result.result), nextIndex: result.nextIndex };
   }
-  if (patternIndex.result === 2) {
+  if (patternIndex.result === 3) {
     const result: { result: ProjectId; nextIndex: number } = (decodeId as (
       a: number,
       b: Uint8Array

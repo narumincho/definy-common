@@ -186,6 +186,11 @@ const location: type.CustomType = {
       parameter: type.maybeNothing()
     },
     {
+      name: "CreateProject",
+      description: "プロジェクト作成画面",
+      parameter: type.maybeNothing()
+    },
+    {
       name: "User",
       description: "ユーザーの詳細ページ",
       parameter: type.maybeJust(type.typeId("UserId"))
