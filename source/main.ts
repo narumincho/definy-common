@@ -86,6 +86,9 @@ const clientModeFromUrl = (
 };
 
 const locationFromUrl = (pathName: string): data.Location => {
+  if (pathName === "/create-project/") {
+    return data.locationCreateProject;
+  }
   const projectResult = pathName.match(/^\/project\/([0-9a-f]{32})$/u);
   if (projectResult !== null) {
     return data.locationProject(projectResult[1] as data.ProjectId);
