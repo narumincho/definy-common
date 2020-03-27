@@ -42,6 +42,8 @@ const locationToPath = (location: data.Location): string => {
       return "/user/" + (location.userId as string);
     case "Project":
       return "/project/" + (location.projectId as string);
+    case "CreateProject":
+      return "/create-project";
   }
 };
 
@@ -136,8 +138,12 @@ const normalizeString = (text: string): string | null => {
   let result = "";
   let beforeSpace = false;
   for (const char of normalized) {
-    const codePoint = char.codePointAt(0) ?? 0;
-    if (codePoint <= 0x19 || (0x7f <= codePoint && codePoint <= 0xa0)) {
+    const codePoint = char.codePointAt(0);
+    if (
+      codePoint === undefined ||
+      codePoint <= 0x19 ||
+      (0x7f <= codePoint && codePoint <= 0xa0)
+    ) {
       continue;
     }
     if (char === " ") {
