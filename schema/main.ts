@@ -3,6 +3,7 @@ import { type } from "@narumincho/type";
 import * as codeGen from "js-ts-code-generator";
 import * as fs from "fs";
 import * as childProcess from "child_process";
+import * as prettier from "prettier";
 
 const accessToken = type.typeToken("AccessToken");
 const userId = type.typeId("UserId");
@@ -1028,18 +1029,11 @@ const code = codeGen.generateCodeAsString(
 );
 
 const typeScriptPath = "source/data.ts";
-fs.promises.writeFile(typeScriptPath, code).then(() => {
-  childProcess.exec(
-    "npx prettier " + typeScriptPath,
-    (error, standardOutput) => {
-      if (error !== null) {
-        throw new Error("TypeScript code error! " + error.toString());
-      }
-      fs.promises.writeFile(typeScriptPath, standardOutput);
-      console.log("output TypeScript code!");
-    }
-  );
-});
+fs.promises
+  .writeFile(typeScriptPath, prettier.format(code, { parser: "typescript" }))
+  .then(() => {
+    console.log("output TypeScript code!");
+  });
 const elmPath = "Data.elm";
 fs.promises
   .writeFile(elmPath, nt.generateElmCode("Data", listCustomType))
