@@ -120,7 +120,7 @@ const accessTokenFromUrl = (hash: string): data.Maybe<data.AccessToken> => {
   return data.maybeJust(matchResult[1] as data.AccessToken);
 };
 
-export const userNameDecoder = (userName: string): string | null => {
+export const stringToValidUserName = (userName: string): string | null => {
   const normalized = normalizeString(userName);
   if (normalized === null) {
     return null;
@@ -128,7 +128,7 @@ export const userNameDecoder = (userName: string): string | null => {
   return [...normalized].slice(0, 50).join("");
 };
 
-export const projectNameDecoder = (userName: string): string | null => {
+export const stringToValidProjectName = (userName: string): string | null => {
   const normalized = normalizeString(userName);
   if (normalized === null) {
     return null;
