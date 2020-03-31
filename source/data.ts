@@ -95,6 +95,11 @@ export type Project = {
 };
 
 /**
+ * プロジェクトを作成したときに返ってくるデータ
+ */
+export type ProjectAndProjectId = { projectId: ProjectId; project: Project };
+
+/**
  * アイデア
  */
 export type Idea = {
@@ -803,6 +808,13 @@ export const encodeProject = (project: Project): ReadonlyArray<number> =>
     .concat(encodeToken(project.image))
     .concat(encodeDateTime(project.createdAt))
     .concat(encodeId(project.createdBy));
+
+export const encodeProjectAndProjectId = (
+  projectAndProjectId: ProjectAndProjectId
+): ReadonlyArray<number> =>
+  encodeId(projectAndProjectId.projectId).concat(
+    encodeProject(projectAndProjectId.project)
+  );
 
 export const encodeIdea = (idea: Idea): ReadonlyArray<number> =>
   encodeString(idea.name)
@@ -1705,6 +1717,34 @@ export const decodeProject = (
       createdBy: createdByAndNextIndex.result
     },
     nextIndex: createdByAndNextIndex.nextIndex
+  };
+};
+
+/**
+ * @param index バイナリを読み込み開始位置
+ * @param binary バイナリ
+ */
+export const decodeProjectAndProjectId = (
+  index: number,
+  binary: Uint8Array
+): { result: ProjectAndProjectId; nextIndex: number } => {
+  const projectIdAndNextIndex: {
+    result: ProjectId;
+    nextIndex: number;
+  } = (decodeId as (
+    a: number,
+    b: Uint8Array
+  ) => { result: ProjectId; nextIndex: number })(index, binary);
+  const projectAndNextIndex: {
+    result: Project;
+    nextIndex: number;
+  } = decodeProject(projectIdAndNextIndex.nextIndex, binary);
+  return {
+    result: {
+      projectId: projectIdAndNextIndex.result,
+      project: projectAndNextIndex.result
+    },
+    nextIndex: projectAndNextIndex.nextIndex
   };
 };
 

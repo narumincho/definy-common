@@ -26,6 +26,7 @@ const languageName = "Language";
 const userName = "User";
 const userAndUserIdName = "UserAndUserId";
 const projectName = "Project";
+const projectAndProjectIdName = "ProjectAndProjectId";
 const ideaName = "Idea";
 const ideaItemName = "IdeaItem";
 const commentName = "Comment";
@@ -315,6 +316,23 @@ const project: type.CustomType = {
       name: "createdBy",
       description: "作成アカウント",
       memberType: userId
+    }
+  ])
+};
+
+const projectAndProjectId: type.CustomType = {
+  name: projectAndProjectIdName,
+  description: "プロジェクトを作成したときに返ってくるデータ",
+  body: type.customTypeBodyProduct([
+    {
+      name: "projectId",
+      description: "プロジェクトID",
+      memberType: projectId
+    },
+    {
+      name: "project",
+      description: "プロジェクトのデータ",
+      memberType: type.typeCustom(projectName)
     }
   ])
 };
@@ -992,6 +1010,7 @@ const listCustomType: ReadonlyArray<type.CustomType> = [
   user,
   userAndUserId,
   project,
+  projectAndProjectId,
   idea,
   ideaItem,
   ideaCommentText,
