@@ -23,8 +23,8 @@ const urlDataName = "UrlData";
 const clientModeName = "ClientMode";
 const locationName = "Location";
 const languageName = "Language";
-const userPublicName = "UserPublic";
-const userPublicAndUserIdName = "UserPublicAndUserId";
+const userName = "User";
+const userAndUserIdName = "UserAndUserId";
 const projectName = "Project";
 const ideaName = "Idea";
 const ideaItemName = "IdeaItem";
@@ -226,8 +226,8 @@ const language: type.CustomType = {
   ])
 };
 
-const userPublic: type.CustomType = {
-  name: userPublicName,
+const user: type.CustomType = {
+  name: userName,
   description: "ユーザーが公開している情報",
   body: type.customTypeBodyProduct([
     {
@@ -270,8 +270,8 @@ const userPublic: type.CustomType = {
   ])
 };
 
-const userPublicAndUserId: type.CustomType = {
-  name: userPublicAndUserIdName,
+const userAndUserId: type.CustomType = {
+  name: userAndUserIdName,
   description: "最初に自分の情報を得るときに返ってくるデータ",
   body: type.customTypeBodyProduct([
     {
@@ -280,9 +280,9 @@ const userPublicAndUserId: type.CustomType = {
       memberType: userId
     },
     {
-      name: "userPublic",
+      name: "user",
       description: "ユーザーのデータ",
-      memberType: type.typeCustom(userPublicName)
+      memberType: type.typeCustom(userName)
     }
   ])
 };
@@ -989,8 +989,8 @@ const listCustomType: ReadonlyArray<type.CustomType> = [
   urlData,
   language,
   location,
-  userPublic,
-  userPublicAndUserId,
+  user,
+  userAndUserId,
   project,
   idea,
   ideaItem,

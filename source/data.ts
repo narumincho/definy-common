@@ -68,7 +68,7 @@ export type Location =
 /**
  * ユーザーが公開している情報
  */
-export type UserPublic = {
+export type User = {
   name: string;
   imageHash: FileHash;
   introduction: string;
@@ -81,7 +81,7 @@ export type UserPublic = {
 /**
  * 最初に自分の情報を得るときに返ってくるデータ
  */
-export type UserPublicAndUserId = { userId: UserId; userPublic: UserPublic };
+export type UserAndUserId = { userId: UserId; user: User };
 
 /**
  * プロジェクト
@@ -783,23 +783,19 @@ export const encodeLocation = (location: Location): ReadonlyArray<number> => {
   }
 };
 
-export const encodeUserPublic = (
-  userPublic: UserPublic
-): ReadonlyArray<number> =>
-  encodeString(userPublic.name)
-    .concat(encodeToken(userPublic.imageHash))
-    .concat(encodeString(userPublic.introduction))
-    .concat(encodeDateTime(userPublic.createdAt))
-    .concat(encodeList(encodeId)(userPublic.likedProjectIdList))
-    .concat(encodeList(encodeId)(userPublic.developedProjectIdList))
-    .concat(encodeList(encodeId)(userPublic.commentedIdeaIdList));
+export const encodeUser = (user: User): ReadonlyArray<number> =>
+  encodeString(user.name)
+    .concat(encodeToken(user.imageHash))
+    .concat(encodeString(user.introduction))
+    .concat(encodeDateTime(user.createdAt))
+    .concat(encodeList(encodeId)(user.likedProjectIdList))
+    .concat(encodeList(encodeId)(user.developedProjectIdList))
+    .concat(encodeList(encodeId)(user.commentedIdeaIdList));
 
-export const encodeUserPublicAndUserId = (
-  userPublicAndUserId: UserPublicAndUserId
+export const encodeUserAndUserId = (
+  userAndUserId: UserAndUserId
 ): ReadonlyArray<number> =>
-  encodeId(userPublicAndUserId.userId).concat(
-    encodeUserPublic(userPublicAndUserId.userPublic)
-  );
+  encodeId(userAndUserId.userId).concat(encodeUser(userAndUserId.user));
 
 export const encodeProject = (project: Project): ReadonlyArray<number> =>
   encodeString(project.name)
@@ -1559,10 +1555,10 @@ export const decodeLocation = (
  * @param index バイナリを読み込み開始位置
  * @param binary バイナリ
  */
-export const decodeUserPublic = (
+export const decodeUser = (
   index: number,
   binary: Uint8Array
-): { result: UserPublic; nextIndex: number } => {
+): { result: User; nextIndex: number } => {
   const nameAndNextIndex: { result: string; nextIndex: number } = decodeString(
     index,
     binary
@@ -1630,10 +1626,10 @@ export const decodeUserPublic = (
  * @param index バイナリを読み込み開始位置
  * @param binary バイナリ
  */
-export const decodeUserPublicAndUserId = (
+export const decodeUserAndUserId = (
   index: number,
   binary: Uint8Array
-): { result: UserPublicAndUserId; nextIndex: number } => {
+): { result: UserAndUserId; nextIndex: number } => {
   const userIdAndNextIndex: {
     result: UserId;
     nextIndex: number;
@@ -1641,16 +1637,16 @@ export const decodeUserPublicAndUserId = (
     a: number,
     b: Uint8Array
   ) => { result: UserId; nextIndex: number })(index, binary);
-  const userPublicAndNextIndex: {
-    result: UserPublic;
-    nextIndex: number;
-  } = decodeUserPublic(userIdAndNextIndex.nextIndex, binary);
+  const userAndNextIndex: { result: User; nextIndex: number } = decodeUser(
+    userIdAndNextIndex.nextIndex,
+    binary
+  );
   return {
     result: {
       userId: userIdAndNextIndex.result,
-      userPublic: userPublicAndNextIndex.result
+      user: userAndNextIndex.result
     },
-    nextIndex: userPublicAndNextIndex.nextIndex
+    nextIndex: userAndNextIndex.nextIndex
   };
 };
 
