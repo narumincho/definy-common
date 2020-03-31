@@ -122,21 +122,23 @@ const accessTokenFromUrl = (hash: string): data.Maybe<data.AccessToken> => {
 
 export const stringToValidUserName = (userName: string): string | null => {
   const normalized = normalizeString(userName);
-  if (normalized === null) {
+  const length = [...normalized].length;
+  if (length <= 0 || 50 < length) {
     return null;
   }
-  return [...normalized].slice(0, 50).join("");
+  return normalized;
 };
 
 export const stringToValidProjectName = (userName: string): string | null => {
   const normalized = normalizeString(userName);
-  if (normalized === null) {
+  const length = [...normalized].length;
+  if (length <= 0 || 50 < length) {
     return null;
   }
-  return [...normalized].slice(0, 50).join("");
+  return normalized;
 };
 
-const normalizeString = (text: string): string | null => {
+const normalizeString = (text: string): string => {
   const normalized = text.normalize("NFKC").trim();
   let result = "";
   let beforeSpace = false;
@@ -158,9 +160,6 @@ const normalizeString = (text: string): string | null => {
       beforeSpace = false;
     }
     result += char;
-  }
-  if (result.length === 0) {
-    return null;
   }
   return result;
 };
