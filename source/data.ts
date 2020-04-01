@@ -322,6 +322,16 @@ export type AccessTokenError =
   | "AccessTokenExpiredOrInvalid"
   | "ProjectNameIsInvalid";
 
+/**
+ * indexDBに格納する取得日時も含めたProject
+ */
+export type ProjectCache = { project: Project; respondAt: DateTime };
+
+/**
+ * indexDBに格納する取得日も含めたUser
+ */
+export type UserCache = { user: User; respondAt: DateTime };
+
 export type AccessToken = string & { _accessToken: never };
 
 export type UserId = string & { _userId: never };
@@ -1121,6 +1131,16 @@ export const encodeAccessTokenError = (
     }
   }
 };
+
+export const encodeProjectCache = (
+  projectCache: ProjectCache
+): ReadonlyArray<number> =>
+  encodeProject(projectCache.project).concat(
+    encodeDateTime(projectCache.respondAt)
+  );
+
+export const encodeUserCache = (userCache: UserCache): ReadonlyArray<number> =>
+  encodeUser(userCache.user).concat(encodeDateTime(userCache.respondAt));
 
 /**
  * SignedLeb128で表現されたバイナリをnumberのビット演算ができる32bit符号付き整数の範囲の数値に変換するコード
@@ -2803,4 +2823,54 @@ export const decodeAccessTokenError = (
     };
   }
   throw new Error("存在しないパターンを指定された 型を更新してください");
+};
+
+/**
+ * @param index バイナリを読み込み開始位置
+ * @param binary バイナリ
+ */
+export const decodeProjectCache = (
+  index: number,
+  binary: Uint8Array
+): { result: ProjectCache; nextIndex: number } => {
+  const projectAndNextIndex: {
+    result: Project;
+    nextIndex: number;
+  } = decodeProject(index, binary);
+  const respondAtAndNextIndex: {
+    result: DateTime;
+    nextIndex: number;
+  } = decodeDateTime(projectAndNextIndex.nextIndex, binary);
+  return {
+    result: {
+      project: projectAndNextIndex.result,
+      respondAt: respondAtAndNextIndex.result
+    },
+    nextIndex: respondAtAndNextIndex.nextIndex
+  };
+};
+
+/**
+ * @param index バイナリを読み込み開始位置
+ * @param binary バイナリ
+ */
+export const decodeUserCache = (
+  index: number,
+  binary: Uint8Array
+): { result: UserCache; nextIndex: number } => {
+  const userAndNextIndex: { result: User; nextIndex: number } = decodeUser(
+    index,
+    binary
+  );
+  const respondAtAndNextIndex: {
+    result: DateTime;
+    nextIndex: number;
+  } = decodeDateTime(userAndNextIndex.nextIndex, binary);
+  return {
+    result: {
+      user: userAndNextIndex.result,
+      respondAt: respondAtAndNextIndex.result
+    },
+    nextIndex: respondAtAndNextIndex.nextIndex
+  };
 };

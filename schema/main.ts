@@ -56,6 +56,8 @@ const evaluateExprErrorName = "EvaluateExprError";
 const typeErrorName = "TypeError";
 const createProjectParameterName = "CreateProjectParameter";
 const accessTokenErrorName = "AccessTokenError";
+const projectCacheName = "ProjectCache";
+const userCacheName = "UserCache";
 
 const dateTime: type.CustomType = {
   name: dateTimeName,
@@ -999,6 +1001,40 @@ const createProjectError: type.CustomType = {
   ])
 };
 
+const projectCache: type.CustomType = {
+  name: projectCacheName,
+  description: "indexDBに格納する取得日時も含めたProject",
+  body: type.customTypeBodyProduct([
+    {
+      name: "project",
+      description: "プロジェクト",
+      memberType: type.typeCustom(projectName)
+    },
+    {
+      name: "respondAt",
+      description: "取得日時",
+      memberType: type.typeCustom(dateTimeName)
+    }
+  ])
+};
+
+const userCache: type.CustomType = {
+  name: userCacheName,
+  description: "indexDBに格納する取得日も含めたUser",
+  body: type.customTypeBodyProduct([
+    {
+      name: "user",
+      description: "ユーザー",
+      memberType: type.typeCustom(userName)
+    },
+    {
+      name: "respondAt",
+      description: "取得日時",
+      memberType: type.typeCustom(dateTimeName)
+    }
+  ])
+};
+
 const listCustomType: ReadonlyArray<type.CustomType> = [
   dateTime,
   clientMode,
@@ -1039,7 +1075,9 @@ const listCustomType: ReadonlyArray<type.CustomType> = [
   evaluateExprError,
   typeError,
   createProjectParameter,
-  createProjectError
+  createProjectError,
+  projectCache,
+  userCache
 ];
 
 const code = codeGen.generateCodeAsString(
