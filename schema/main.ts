@@ -66,34 +66,34 @@ const dateTime: type.CustomType = {
     {
       name: "year",
       description: "年. 人類紀元. 西暦に10000を足したもの Human Era",
-      memberType: type.typeInt32
+      memberType: type.typeInt32,
     },
     {
       name: "month",
       description: "月. 1月～12月. 最大値は月や年によって決まる",
-      memberType: type.typeInt32
+      memberType: type.typeInt32,
     },
     {
       name: "day",
       description: "日",
-      memberType: type.typeInt32
+      memberType: type.typeInt32,
     },
     {
       name: "hour",
       description: "時. 0時～23時",
-      memberType: type.typeInt32
+      memberType: type.typeInt32,
     },
     {
       name: "minute",
       description: "分",
-      memberType: type.typeInt32
+      memberType: type.typeInt32,
     },
     {
       name: "second",
       description: "秒",
-      memberType: type.typeInt32
-    }
-  ])
+      memberType: type.typeInt32,
+    },
+  ]),
 };
 
 const requestLogInUrlRequestData: type.CustomType = {
@@ -103,14 +103,14 @@ const requestLogInUrlRequestData: type.CustomType = {
     {
       name: "openIdConnectProvider",
       description: "ログインに使用するプロバイダー",
-      memberType: type.typeCustom(openIdConnectProviderName)
+      memberType: type.typeCustom(openIdConnectProviderName),
     },
     {
       name: "urlData",
       description: "ログインした後に返ってくるURLに必要なデータ",
-      memberType: type.typeCustom(urlDataName)
-    }
-  ])
+      memberType: type.typeCustom(urlDataName),
+    },
+  ]),
 };
 
 const openIdConnectProvider: type.CustomType = {
@@ -121,15 +121,15 @@ const openIdConnectProvider: type.CustomType = {
       name: "Google",
       description:
         "Google ( https://developers.google.com/identity/sign-in/web/ )",
-      parameter: type.maybeNothing()
+      parameter: type.maybeNothing(),
     },
     {
       name: "GitHub",
       description:
         "GitHub ( https://developer.github.com/v3/guides/basics-of-authentication/ )",
-      parameter: type.maybeNothing()
-    }
-  ])
+      parameter: type.maybeNothing(),
+    },
+  ]),
 };
 
 const urlData: type.CustomType = {
@@ -140,25 +140,25 @@ const urlData: type.CustomType = {
     {
       name: "clientMode",
       description: "クライアントモード",
-      memberType: type.typeCustom(clientModeName)
+      memberType: type.typeCustom(clientModeName),
     },
     {
       name: "location",
       description: "場所",
-      memberType: type.typeCustom(locationName)
+      memberType: type.typeCustom(locationName),
     },
     {
       name: "language",
       description: "言語",
-      memberType: type.typeCustom(languageName)
+      memberType: type.typeCustom(languageName),
     },
     {
       name: "accessToken",
       description:
         "アクセストークン. ログインした後のリダイレクト先としてサーバーから渡される",
-      memberType: type.typeMaybe(accessToken)
-    }
-  ])
+      memberType: type.typeMaybe(accessToken),
+    },
+  ]),
 };
 
 const clientMode: type.CustomType = {
@@ -169,14 +169,14 @@ const clientMode: type.CustomType = {
       name: "DebugMode",
       description:
         "デバッグモード. ポート番号を保持する. オリジンは http://[::1]:2520 のようなもの",
-      parameter: type.maybeJust(type.typeInt32)
+      parameter: type.maybeJust(type.typeInt32),
     },
     {
       name: "Release",
       description: "リリースモード. https://definy.app ",
-      parameter: type.maybeNothing()
-    }
-  ])
+      parameter: type.maybeNothing(),
+    },
+  ]),
 };
 
 const location: type.CustomType = {
@@ -187,24 +187,24 @@ const location: type.CustomType = {
     {
       name: "Home",
       description: "最初のページ",
-      parameter: type.maybeNothing()
+      parameter: type.maybeNothing(),
     },
     {
       name: "CreateProject",
       description: "プロジェクト作成画面",
-      parameter: type.maybeNothing()
+      parameter: type.maybeNothing(),
     },
     {
       name: "User",
       description: "ユーザーの詳細ページ",
-      parameter: type.maybeJust(type.typeId("UserId"))
+      parameter: type.maybeJust(type.typeId("UserId")),
     },
     {
       name: "Project",
       description: "プロジェクトの詳細ページ",
-      parameter: type.maybeJust(type.typeId("ProjectId"))
-    }
-  ])
+      parameter: type.maybeJust(type.typeId("ProjectId")),
+    },
+  ]),
 };
 
 const language: type.CustomType = {
@@ -214,19 +214,19 @@ const language: type.CustomType = {
     {
       name: "Japanese",
       description: "日本語",
-      parameter: type.maybeNothing()
+      parameter: type.maybeNothing(),
     },
     {
       name: "English",
       description: "英語",
-      parameter: type.maybeNothing()
+      parameter: type.maybeNothing(),
     },
     {
       name: "Esperanto",
       description: "エスペラント語",
-      parameter: type.maybeNothing()
-    }
-  ])
+      parameter: type.maybeNothing(),
+    },
+  ]),
 };
 
 const user: type.CustomType = {
@@ -237,40 +237,40 @@ const user: type.CustomType = {
       name: "name",
       description:
         "ユーザー名. 表示される名前。他のユーザーとかぶっても良い. 絵文字も使える. 全角英数は半角英数,半角カタカナは全角カタカナ, (株)の合字を分解するなどのNFKCの正規化がされる. U+0000-U+0019 と U+007F-U+00A0 の範囲の文字は入らない. 前後に空白を含められない. 間の空白は2文字以上連続しない. 文字数のカウント方法は正規化されたあとのCodePoint単位. Twitterと同じ、1文字以上50文字以下",
-      memberType: type.typeString
+      memberType: type.typeString,
     },
     {
       name: "imageHash",
       description: "プロフィール画像",
-      memberType: fileHash
+      memberType: fileHash,
     },
     {
       name: "introduction",
       description:
         "自己紹介文. 改行文字を含めることができる. Twitterと同じ 0～160文字",
-      memberType: type.typeString
+      memberType: type.typeString,
     },
     {
       name: "createdAt",
       description: "ユーザーが作成された日時",
-      memberType: type.typeCustom(dateTimeName)
+      memberType: type.typeCustom(dateTimeName),
     },
     {
       name: "likedProjectIdList",
       description: "プロジェクトに対する いいね",
-      memberType: type.typeList(projectId)
+      memberType: type.typeList(projectId),
     },
     {
       name: "developedProjectIdList",
       description: "開発に参加した (書いたコードが使われた) プロジェクト",
-      memberType: type.typeList(projectId)
+      memberType: type.typeList(projectId),
     },
     {
       name: "commentedIdeaIdList",
       description: "コメントをしたアイデア",
-      memberType: type.typeList(ideaId)
-    }
-  ])
+      memberType: type.typeList(ideaId),
+    },
+  ]),
 };
 
 const userAndUserId: type.CustomType = {
@@ -280,14 +280,14 @@ const userAndUserId: type.CustomType = {
     {
       name: "userId",
       description: "ユーザーID",
-      memberType: userId
+      memberType: userId,
     },
     {
       name: "user",
       description: "ユーザーのデータ",
-      memberType: type.typeCustom(userName)
-    }
-  ])
+      memberType: type.typeCustom(userName),
+    },
+  ]),
 };
 
 const project: type.CustomType = {
@@ -297,29 +297,29 @@ const project: type.CustomType = {
     {
       name: "name",
       description: "プロジェクト名",
-      memberType: type.typeString
+      memberType: type.typeString,
     },
     {
       name: "icon",
       description: "プロジェクトのアイコン画像",
-      memberType: fileHash
+      memberType: fileHash,
     },
     {
       name: "image",
       description: "プロジェクトのカバー画像",
-      memberType: fileHash
+      memberType: fileHash,
     },
     {
       name: "createdAt",
       description: "作成日時",
-      memberType: type.typeCustom(dateTimeName)
+      memberType: type.typeCustom(dateTimeName),
     },
     {
       name: "createdBy",
       description: "作成アカウント",
-      memberType: userId
-    }
-  ])
+      memberType: userId,
+    },
+  ]),
 };
 
 const projectAndProjectId: type.CustomType = {
@@ -329,14 +329,14 @@ const projectAndProjectId: type.CustomType = {
     {
       name: "projectId",
       description: "プロジェクトID",
-      memberType: projectId
+      memberType: projectId,
     },
     {
       name: "project",
       description: "プロジェクトのデータ",
-      memberType: type.typeCustom(projectName)
-    }
-  ])
+      memberType: type.typeCustom(projectName),
+    },
+  ]),
 };
 
 const idea: type.CustomType = {
@@ -346,29 +346,29 @@ const idea: type.CustomType = {
     {
       name: "name",
       description: "アイデア名",
-      memberType: type.typeString
+      memberType: type.typeString,
     },
     {
       name: "createdBy",
       description: "言い出しっぺ",
-      memberType: userId
+      memberType: userId,
     },
     {
       name: "description",
       description: "アイデアの説明",
-      memberType: type.typeString
+      memberType: type.typeString,
     },
     {
       name: "createdAt",
       description: "作成日時",
-      memberType: type.typeCustom(dateTimeName)
+      memberType: type.typeCustom(dateTimeName),
     },
     {
       name: "itemList",
       description: "アイデアの要素",
-      memberType: type.typeList(type.typeCustom(ideaItemName))
-    }
-  ])
+      memberType: type.typeList(type.typeCustom(ideaItemName)),
+    },
+  ]),
 };
 
 const ideaItem: type.CustomType = {
@@ -378,14 +378,14 @@ const ideaItem: type.CustomType = {
     {
       name: "Comment",
       description: "文章でのコメント",
-      parameter: type.maybeJust(type.typeCustom(commentName))
+      parameter: type.maybeJust(type.typeCustom(commentName)),
     },
     {
       name: "Suggestion",
       description: "編集提案をする",
-      parameter: type.maybeJust(type.typeCustom(suggestionName))
-    }
-  ])
+      parameter: type.maybeJust(type.typeCustom(suggestionName)),
+    },
+  ]),
 };
 
 const ideaCommentText: type.CustomType = {
@@ -395,19 +395,19 @@ const ideaCommentText: type.CustomType = {
     {
       name: "body",
       description: "本文",
-      memberType: type.typeString
+      memberType: type.typeString,
     },
     {
       name: "createdBy",
       description: "作成者",
-      memberType: userId
+      memberType: userId,
     },
     {
       name: "createdAt",
       description: "作成日時",
-      memberType: type.typeCustom(dateTimeName)
-    }
-  ])
+      memberType: type.typeCustom(dateTimeName),
+    },
+  ]),
 };
 
 const suggestion: type.CustomType = {
@@ -417,19 +417,19 @@ const suggestion: type.CustomType = {
     {
       name: "createdAt",
       description: "アイデアに投稿した日時",
-      memberType: type.typeCustom(dateTimeName)
+      memberType: type.typeCustom(dateTimeName),
     },
     {
       name: "description",
       description: "なぜ,どんな変更をしたのかの説明",
-      memberType: type.typeString
+      memberType: type.typeString,
     },
     {
       name: "change",
       description: "変更点",
-      memberType: type.typeCustom(changeName)
-    }
-  ])
+      memberType: type.typeCustom(changeName),
+    },
+  ]),
 };
 
 const change: type.CustomType = {
@@ -439,9 +439,9 @@ const change: type.CustomType = {
     {
       name: "ProjectName",
       description: "プロジェクト名の変更",
-      parameter: type.maybeJust(type.typeString)
-    }
-  ])
+      parameter: type.maybeJust(type.typeString),
+    },
+  ]),
 };
 
 const module_: type.CustomType = {
@@ -451,19 +451,19 @@ const module_: type.CustomType = {
     {
       name: "name",
       description: "モジュール名.階層構造を表現することができる",
-      memberType: type.typeList(type.typeString)
+      memberType: type.typeList(type.typeString),
     },
     {
       name: "description",
       description: "モジュールの説明",
-      memberType: type.typeString
+      memberType: type.typeString,
     },
     {
       name: "export",
       description: "外部のプロジェクトに公開するかどうか",
-      memberType: type.typeBool
-    }
-  ])
+      memberType: type.typeBool,
+    },
+  ]),
 };
 
 const typeDefinition: type.CustomType = {
@@ -473,19 +473,19 @@ const typeDefinition: type.CustomType = {
     {
       name: "name",
       description: "型の名前",
-      memberType: type.typeString
+      memberType: type.typeString,
     },
     {
       name: "parentList",
       description: "この型の元",
-      memberType: type.typeList(partId)
+      memberType: type.typeList(partId),
     },
     {
       name: "description",
       description: "型の説明",
-      memberType: type.typeString
-    }
-  ])
+      memberType: type.typeString,
+    },
+  ]),
 };
 
 const partDefinition: type.CustomType = {
@@ -495,34 +495,34 @@ const partDefinition: type.CustomType = {
     {
       name: "name",
       description: "パーツの名前",
-      memberType: type.typeString
+      memberType: type.typeString,
     },
     {
       name: "parentList",
       description: "このパーツの元",
-      memberType: type.typeList(partId)
+      memberType: type.typeList(partId),
     },
     {
       name: "description",
       description: "パーツの説明",
-      memberType: type.typeString
+      memberType: type.typeString,
     },
     {
       name: "type",
       description: "パーツの型",
-      memberType: type.typeCustom(typeName)
+      memberType: type.typeCustom(typeName),
     },
     {
       name: "expr",
       description: "パーツの式",
-      memberType: type.typeMaybe(type.typeCustom(exprName))
+      memberType: type.typeMaybe(type.typeCustom(exprName)),
     },
     {
       name: "moduleId",
       description: "所属しているモジュール",
-      memberType: moduleId
-    }
-  ])
+      memberType: moduleId,
+    },
+  ]),
 };
 
 const typeBody: type.CustomType = {
@@ -534,21 +534,21 @@ const typeBody: type.CustomType = {
       description: "直積型",
       parameter: type.maybeJust(
         type.typeList(type.typeCustom(typeBodyProductMemberName))
-      )
+      ),
     },
     {
       name: "Sum",
       description: "直和型",
       parameter: type.maybeJust(
         type.typeList(type.typeCustom(typeBodySumPatternName))
-      )
+      ),
     },
     {
       name: "Kernel",
       description: "Definyだけでは表現できないデータ型",
-      parameter: type.maybeJust(type.typeCustom(typeBodyKernelName))
-    }
-  ])
+      parameter: type.maybeJust(type.typeCustom(typeBodyKernelName)),
+    },
+  ]),
 };
 
 const typeBodyProductMember: type.CustomType = {
@@ -558,19 +558,19 @@ const typeBodyProductMember: type.CustomType = {
     {
       name: "name",
       description: "メンバー名",
-      memberType: type.typeString
+      memberType: type.typeString,
     },
     {
       name: "description",
       description: "説明文",
-      memberType: type.typeString
+      memberType: type.typeString,
     },
     {
       name: "memberType",
       description: "メンバー値の型",
-      memberType: typeId
-    }
-  ])
+      memberType: typeId,
+    },
+  ]),
 };
 
 const typeBodySumPattern: type.CustomType = {
@@ -580,19 +580,19 @@ const typeBodySumPattern: type.CustomType = {
     {
       name: "name",
       description: "タグ名",
-      memberType: type.typeString
+      memberType: type.typeString,
     },
     {
       name: "description",
       description: "説明文",
-      memberType: type.typeString
+      memberType: type.typeString,
     },
     {
       name: "parameter",
       description: "パラメーター",
-      memberType: type.typeMaybe(typeId)
-    }
-  ])
+      memberType: type.typeMaybe(typeId),
+    },
+  ]),
 };
 
 const typeBodyKernel: type.CustomType = {
@@ -602,19 +602,19 @@ const typeBodyKernel: type.CustomType = {
     {
       name: "Function",
       description: "関数",
-      parameter: type.maybeNothing()
+      parameter: type.maybeNothing(),
     },
     {
       name: "Int32",
       description: "32bit整数",
-      parameter: type.maybeNothing()
+      parameter: type.maybeNothing(),
     },
     {
       name: "List",
       description: "リスト",
-      parameter: type.maybeNothing()
-    }
-  ])
+      parameter: type.maybeNothing(),
+    },
+  ]),
 };
 
 const type_: type.CustomType = {
@@ -624,14 +624,14 @@ const type_: type.CustomType = {
     {
       name: "reference",
       description: "型の参照",
-      memberType: typeId
+      memberType: typeId,
     },
     {
       name: "parameter",
       description: "型のパラメーター",
-      memberType: type.typeList(type.typeCustom(typeName))
-    }
-  ])
+      memberType: type.typeList(type.typeCustom(typeName)),
+    },
+  ]),
 };
 
 const expr: type.CustomType = {
@@ -641,41 +641,41 @@ const expr: type.CustomType = {
     {
       name: "Kernel",
       description: "Definyだけでは表現できない式",
-      parameter: type.maybeJust(type.typeCustom(kernelExprName))
+      parameter: type.maybeJust(type.typeCustom(kernelExprName)),
     },
     {
       name: "Int32Literal",
       description: "32bit整数",
-      parameter: type.maybeJust(type.typeInt32)
+      parameter: type.maybeJust(type.typeInt32),
     },
     {
       name: "PartReference",
       description: "パーツの値を参照",
-      parameter: type.maybeJust(partId)
+      parameter: type.maybeJust(partId),
     },
     {
       name: "LocalPartReference",
       description: "ローカルパーツの参照",
-      parameter: type.maybeJust(type.typeCustom(localPartReferenceName))
+      parameter: type.maybeJust(type.typeCustom(localPartReferenceName)),
     },
     {
       name: "TagReference",
       description: "タグを参照",
-      parameter: type.maybeJust(type.typeCustom(tagReferenceName))
+      parameter: type.maybeJust(type.typeCustom(tagReferenceName)),
     },
     {
       name: "FunctionCall",
       description: "関数呼び出し",
-      parameter: type.maybeJust(type.typeCustom(functionCallName))
+      parameter: type.maybeJust(type.typeCustom(functionCallName)),
     },
     {
       name: "Lambda",
       description: "ラムダ",
       parameter: type.maybeJust(
         type.typeList(type.typeCustom(lambdaBranchName))
-      )
-    }
-  ])
+      ),
+    },
+  ]),
 };
 
 const evaluatedExpr: type.CustomType = {
@@ -685,31 +685,31 @@ const evaluatedExpr: type.CustomType = {
     {
       name: "Kernel",
       description: "Definyだけでは表現できない式",
-      parameter: type.maybeJust(type.typeCustom(kernelExprName))
+      parameter: type.maybeJust(type.typeCustom(kernelExprName)),
     },
     {
       name: "Int32",
       description: "32bit整数",
-      parameter: type.maybeJust(type.typeInt32)
+      parameter: type.maybeJust(type.typeInt32),
     },
     {
       name: "TagReference",
       description: "タグを参照",
-      parameter: type.maybeJust(type.typeCustom(tagReferenceName))
+      parameter: type.maybeJust(type.typeCustom(tagReferenceName)),
     },
     {
       name: "Lambda",
       description: "ラムダ",
       parameter: type.maybeJust(
         type.typeList(type.typeCustom(lambdaBranchName))
-      )
+      ),
     },
     {
       name: "KernelCall",
       description: "内部関数呼び出し",
-      parameter: type.maybeJust(type.typeCustom(kernelCallName))
-    }
-  ])
+      parameter: type.maybeJust(type.typeCustom(kernelCallName)),
+    },
+  ]),
 };
 
 const kernelCall: type.CustomType = {
@@ -719,14 +719,14 @@ const kernelCall: type.CustomType = {
     {
       name: "kernel",
       description: "関数",
-      memberType: type.typeCustom(kernelExprName)
+      memberType: type.typeCustom(kernelExprName),
     },
     {
       name: "expr",
       description: "呼び出すパラメーター",
-      memberType: type.typeCustom(evaluatedExprName)
-    }
-  ])
+      memberType: type.typeCustom(evaluatedExprName),
+    },
+  ]),
 };
 
 const kernelExpr: type.CustomType = {
@@ -736,19 +736,19 @@ const kernelExpr: type.CustomType = {
     {
       name: "Int32Add",
       description: "32bit整数を足す関数",
-      parameter: type.maybeNothing()
+      parameter: type.maybeNothing(),
     },
     {
       name: "Int32Sub",
       description: "32bit整数を引く関数",
-      parameter: type.maybeNothing()
+      parameter: type.maybeNothing(),
     },
     {
       name: "Int32Mul",
       description: "32bit整数をかける関数",
-      parameter: type.maybeNothing()
-    }
-  ])
+      parameter: type.maybeNothing(),
+    },
+  ]),
 };
 
 const localPartReference: type.CustomType = {
@@ -758,14 +758,14 @@ const localPartReference: type.CustomType = {
     {
       name: "partId",
       description: "ローカルパスが定義されているパーツのID",
-      memberType: partId
+      memberType: partId,
     },
     {
       name: "localPartId",
       description: "ローカルパーツID",
-      memberType: localPartId
-    }
-  ])
+      memberType: localPartId,
+    },
+  ]),
 };
 
 const tagReference: type.CustomType = {
@@ -775,14 +775,14 @@ const tagReference: type.CustomType = {
     {
       name: "typeId",
       description: "型ID",
-      memberType: typeId
+      memberType: typeId,
     },
     {
       name: "tagIndex",
       description: "タグIndex",
-      memberType: type.typeInt32
-    }
-  ])
+      memberType: type.typeInt32,
+    },
+  ]),
 };
 
 const functionCall: type.CustomType = {
@@ -792,14 +792,14 @@ const functionCall: type.CustomType = {
     {
       name: "function",
       description: "関数",
-      memberType: type.typeCustom(exprName)
+      memberType: type.typeCustom(exprName),
     },
     {
       name: "parameter",
       description: "パラメーター",
-      memberType: type.typeCustom(exprName)
-    }
-  ])
+      memberType: type.typeCustom(exprName),
+    },
+  ]),
 };
 
 const lambdaBranch: type.CustomType = {
@@ -809,24 +809,24 @@ const lambdaBranch: type.CustomType = {
     {
       name: "condition",
       description: "入力値の条件を書くところ. Just x",
-      memberType: type.typeCustom(conditionName)
+      memberType: type.typeCustom(conditionName),
     },
     {
       name: "description",
       description: "ブランチの説明",
-      memberType: type.typeString
+      memberType: type.typeString,
     },
     {
       name: "localPartList",
       description: "",
-      memberType: type.typeList(type.typeCustom(branchPartDefinitionName))
+      memberType: type.typeList(type.typeCustom(branchPartDefinitionName)),
     },
     {
       name: "expr",
       description: "式",
-      memberType: type.typeMaybe(type.typeCustom(exprName))
-    }
-  ])
+      memberType: type.typeMaybe(type.typeCustom(exprName)),
+    },
+  ]),
 };
 
 const condition: type.CustomType = {
@@ -836,24 +836,24 @@ const condition: type.CustomType = {
     {
       name: "ByTag",
       description: "タグ",
-      parameter: type.maybeJust(type.typeCustom(conditionTagName))
+      parameter: type.maybeJust(type.typeCustom(conditionTagName)),
     },
     {
       name: "ByCapture",
       description: "キャプチャパーツへのキャプチャ",
-      parameter: type.maybeJust(type.typeCustom(conditionCaptureName))
+      parameter: type.maybeJust(type.typeCustom(conditionCaptureName)),
     },
     {
       name: "Any",
       description: "_ すべてのパターンを通すもの",
-      parameter: type.maybeNothing()
+      parameter: type.maybeNothing(),
     },
     {
       name: "Int32",
       description: "32bit整数の完全一致",
-      parameter: type.maybeJust(type.typeInt32)
-    }
-  ])
+      parameter: type.maybeJust(type.typeInt32),
+    },
+  ]),
 };
 
 const conditionTag: type.CustomType = {
@@ -863,14 +863,14 @@ const conditionTag: type.CustomType = {
     {
       name: "tag",
       description: "タグ",
-      memberType: tagId
+      memberType: tagId,
     },
     {
       name: "parameter",
       description: "パラメーター",
-      memberType: type.typeMaybe(type.typeCustom(conditionName))
-    }
-  ])
+      memberType: type.typeMaybe(type.typeCustom(conditionName)),
+    },
+  ]),
 };
 
 const conditionCapture: type.CustomType = {
@@ -880,14 +880,14 @@ const conditionCapture: type.CustomType = {
     {
       name: "name",
       description: "キャプチャパーツの名前",
-      memberType: type.typeString
+      memberType: type.typeString,
     },
     {
       name: "localPartId",
       description: "ローカルパーツId",
-      memberType: localPartId
-    }
-  ])
+      memberType: localPartId,
+    },
+  ]),
 };
 
 const branchPartDefinition: type.CustomType = {
@@ -897,29 +897,29 @@ const branchPartDefinition: type.CustomType = {
     {
       name: "localPartId",
       description: "ローカルパーツID",
-      memberType: localPartId
+      memberType: localPartId,
     },
     {
       name: "name",
       description: "ブランチパーツの名前",
-      memberType: type.typeString
+      memberType: type.typeString,
     },
     {
       name: "description",
       description: "ブランチパーツの説明",
-      memberType: type.typeString
+      memberType: type.typeString,
     },
     {
       name: "type",
       description: "ローカルパーツの型",
-      memberType: type.typeCustom(typeName)
+      memberType: type.typeCustom(typeName),
     },
     {
       name: "expr",
       description: "ローカルパーツの式",
-      memberType: type.typeCustom(exprName)
-    }
-  ])
+      memberType: type.typeCustom(exprName),
+    },
+  ]),
 };
 
 const evaluateExprError: type.CustomType = {
@@ -929,29 +929,29 @@ const evaluateExprError: type.CustomType = {
     {
       name: "NeedPartDefinition",
       description: "式を評価するには,このパーツの定義が必要だと言っている",
-      parameter: type.maybeJust(partId)
+      parameter: type.maybeJust(partId),
     },
     {
       name: "PartExprIsNothing",
       description: "パーツの式が空だと言っている",
-      parameter: type.maybeJust(partId)
+      parameter: type.maybeJust(partId),
     },
     {
       name: "CannotFindLocalPartDefinition",
       description: "ローカルパーツの定義を見つけることができなかった",
-      parameter: type.maybeJust(type.typeCustom(localPartReferenceName))
+      parameter: type.maybeJust(type.typeCustom(localPartReferenceName)),
     },
     {
       name: "TypeError",
       description: "型が合わない",
-      parameter: type.maybeJust(type.typeCustom(typeErrorName))
+      parameter: type.maybeJust(type.typeCustom(typeErrorName)),
     },
     {
       name: "NotSupported",
       description: "まだサポートしていないものが含まれている",
-      parameter: type.maybeNothing()
-    }
-  ])
+      parameter: type.maybeNothing(),
+    },
+  ]),
 };
 
 const typeError: type.CustomType = {
@@ -961,9 +961,9 @@ const typeError: type.CustomType = {
     {
       name: "message",
       description: "型エラーの説明",
-      memberType: type.typeString
-    }
-  ])
+      memberType: type.typeString,
+    },
+  ]),
 };
 
 const createProjectParameter: type.CustomType = {
@@ -973,14 +973,14 @@ const createProjectParameter: type.CustomType = {
     {
       name: "accessToken",
       description: "プロジェクトを作るときのアカウント",
-      memberType: accessToken
+      memberType: accessToken,
     },
     {
       name: "projectName",
       description: "プロジェクト名",
-      memberType: type.typeString
-    }
-  ])
+      memberType: type.typeString,
+    },
+  ]),
 };
 
 const createProjectError: type.CustomType = {
@@ -990,15 +990,15 @@ const createProjectError: type.CustomType = {
     {
       name: "AccessTokenExpiredOrInvalid",
       description: "アクセストークンが期限切れまたは無効です",
-      parameter: type.maybeNothing()
+      parameter: type.maybeNothing(),
     },
     {
       name: "ProjectNameIsInvalid",
       description:
         "指定したプロジェクト名から使えない文字をとったら何も残りませんでした",
-      parameter: type.maybeNothing()
-    }
-  ])
+      parameter: type.maybeNothing(),
+    },
+  ]),
 };
 
 const projectCache: type.CustomType = {
@@ -1008,14 +1008,14 @@ const projectCache: type.CustomType = {
     {
       name: "project",
       description: "プロジェクト",
-      memberType: type.typeCustom(projectName)
+      memberType: type.typeCustom(projectName),
     },
     {
       name: "respondAt",
       description: "取得日時",
-      memberType: type.typeCustom(dateTimeName)
-    }
-  ])
+      memberType: type.typeCustom(dateTimeName),
+    },
+  ]),
 };
 
 const userCache: type.CustomType = {
@@ -1025,14 +1025,14 @@ const userCache: type.CustomType = {
     {
       name: "user",
       description: "ユーザー",
-      memberType: type.typeCustom(userName)
+      memberType: type.typeCustom(userName),
     },
     {
       name: "respondAt",
       description: "取得日時",
-      memberType: type.typeCustom(dateTimeName)
-    }
-  ])
+      memberType: type.typeCustom(dateTimeName),
+    },
+  ]),
 };
 
 const listCustomType: ReadonlyArray<type.CustomType> = [
@@ -1077,7 +1077,7 @@ const listCustomType: ReadonlyArray<type.CustomType> = [
   createProjectParameter,
   createProjectError,
   projectCache,
-  userCache
+  userCache,
 ];
 
 const code = codeGen.generateCodeAsString(
@@ -1095,7 +1095,7 @@ const elmPath = "Data.elm";
 fs.promises
   .writeFile(elmPath, nt.generateElmCode("Data", listCustomType))
   .then(() => {
-    childProcess.exec("elm-format --yes " + elmPath, error => {
+    childProcess.exec("elm-format --yes " + elmPath, (error) => {
       console.log("output Elm code!");
       if (error !== null) {
         throw new Error("elm code error! " + error.toString());

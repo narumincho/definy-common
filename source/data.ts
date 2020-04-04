@@ -354,19 +354,19 @@ export type TagId = string & { _tagId: never };
 
 export const maybeJust = <T>(value: T): Maybe<T> => ({
   _: "Just",
-  value: value
+  value: value,
 });
 
 export const maybeNothing = <T>(): Maybe<T> => ({ _: "Nothing" });
 
 export const resultOk = <ok, error>(ok: ok): Result<ok, error> => ({
   _: "Ok",
-  ok: ok
+  ok: ok,
 });
 
 export const resultError = <ok, error>(error: error): Result<ok, error> => ({
   _: "Error",
-  error: error
+  error: error,
 });
 
 /**
@@ -374,7 +374,7 @@ export const resultError = <ok, error>(error: error): Result<ok, error> => ({
  */
 export const clientModeDebugMode = (int32: number): ClientMode => ({
   _: "DebugMode",
-  int32: int32
+  int32: int32,
 });
 
 /**
@@ -397,7 +397,7 @@ export const locationCreateProject: Location = { _: "CreateProject" };
  */
 export const locationUser = (userId: UserId): Location => ({
   _: "User",
-  userId: userId
+  userId: userId,
 });
 
 /**
@@ -405,7 +405,7 @@ export const locationUser = (userId: UserId): Location => ({
  */
 export const locationProject = (projectId: ProjectId): Location => ({
   _: "Project",
-  projectId: projectId
+  projectId: projectId,
 });
 
 /**
@@ -413,7 +413,7 @@ export const locationProject = (projectId: ProjectId): Location => ({
  */
 export const ideaItemComment = (comment: Comment): IdeaItem => ({
   _: "Comment",
-  comment: comment
+  comment: comment,
 });
 
 /**
@@ -421,7 +421,7 @@ export const ideaItemComment = (comment: Comment): IdeaItem => ({
  */
 export const ideaItemSuggestion = (suggestion: Suggestion): IdeaItem => ({
   _: "Suggestion",
-  suggestion: suggestion
+  suggestion: suggestion,
 });
 
 /**
@@ -429,7 +429,7 @@ export const ideaItemSuggestion = (suggestion: Suggestion): IdeaItem => ({
  */
 export const changeProjectName = (string_: string): Change => ({
   _: "ProjectName",
-  string_: string_
+  string_: string_,
 });
 
 /**
@@ -439,7 +439,7 @@ export const typeBodyProduct = (
   typeBodyProductMemberList: ReadonlyArray<TypeBodyProductMember>
 ): TypeBody => ({
   _: "Product",
-  typeBodyProductMemberList: typeBodyProductMemberList
+  typeBodyProductMemberList: typeBodyProductMemberList,
 });
 
 /**
@@ -454,7 +454,7 @@ export const typeBodySum = (
  */
 export const typeBodyKernel = (typeBodyKernel: TypeBodyKernel): TypeBody => ({
   _: "Kernel",
-  typeBodyKernel: typeBodyKernel
+  typeBodyKernel: typeBodyKernel,
 });
 
 /**
@@ -462,7 +462,7 @@ export const typeBodyKernel = (typeBodyKernel: TypeBodyKernel): TypeBody => ({
  */
 export const exprKernel = (kernelExpr: KernelExpr): Expr => ({
   _: "Kernel",
-  kernelExpr: kernelExpr
+  kernelExpr: kernelExpr,
 });
 
 /**
@@ -470,7 +470,7 @@ export const exprKernel = (kernelExpr: KernelExpr): Expr => ({
  */
 export const exprInt32Literal = (int32: number): Expr => ({
   _: "Int32Literal",
-  int32: int32
+  int32: int32,
 });
 
 /**
@@ -478,7 +478,7 @@ export const exprInt32Literal = (int32: number): Expr => ({
  */
 export const exprPartReference = (partId: PartId): Expr => ({
   _: "PartReference",
-  partId: partId
+  partId: partId,
 });
 
 /**
@@ -488,7 +488,7 @@ export const exprLocalPartReference = (
   localPartReference: LocalPartReference
 ): Expr => ({
   _: "LocalPartReference",
-  localPartReference: localPartReference
+  localPartReference: localPartReference,
 });
 
 /**
@@ -503,7 +503,7 @@ export const exprTagReference = (
  */
 export const exprFunctionCall = (functionCall: FunctionCall): Expr => ({
   _: "FunctionCall",
-  functionCall: functionCall
+  functionCall: functionCall,
 });
 
 /**
@@ -518,7 +518,7 @@ export const exprLambda = (
  */
 export const evaluatedExprKernel = (kernelExpr: KernelExpr): EvaluatedExpr => ({
   _: "Kernel",
-  kernelExpr: kernelExpr
+  kernelExpr: kernelExpr,
 });
 
 /**
@@ -526,7 +526,7 @@ export const evaluatedExprKernel = (kernelExpr: KernelExpr): EvaluatedExpr => ({
  */
 export const evaluatedExprInt32 = (int32: number): EvaluatedExpr => ({
   _: "Int32",
-  int32: int32
+  int32: int32,
 });
 
 /**
@@ -536,7 +536,7 @@ export const evaluatedExprTagReference = (
   tagReferenceIndex: TagReferenceIndex
 ): EvaluatedExpr => ({
   _: "TagReference",
-  tagReferenceIndex: tagReferenceIndex
+  tagReferenceIndex: tagReferenceIndex,
 });
 
 /**
@@ -558,7 +558,7 @@ export const evaluatedExprKernelCall = (
  */
 export const conditionByTag = (conditionTag: ConditionTag): Condition => ({
   _: "ByTag",
-  conditionTag: conditionTag
+  conditionTag: conditionTag,
 });
 
 /**
@@ -578,7 +578,7 @@ export const conditionAny: Condition = { _: "Any" };
  */
 export const conditionInt32 = (int32: number): Condition => ({
   _: "Int32",
-  int32: int32
+  int32: int32,
 });
 
 /**
@@ -602,7 +602,7 @@ export const evaluateExprErrorCannotFindLocalPartDefinition = (
   localPartReference: LocalPartReference
 ): EvaluateExprError => ({
   _: "CannotFindLocalPartDefinition",
-  localPartReference: localPartReference
+  localPartReference: localPartReference,
 });
 
 /**
@@ -616,7 +616,7 @@ export const evaluateExprErrorTypeError = (
  * まだサポートしていないものが含まれている
  */
 export const evaluateExprErrorNotSupported: EvaluateExprError = {
-  _: "NotSupported"
+  _: "NotSupported",
 };
 
 /**
@@ -646,7 +646,7 @@ export const encodeString = (text: string): ReadonlyArray<number> => {
   const result: ReadonlyArray<number> = [
     ...new (process === undefined || process.title === "browser"
       ? TextEncoder
-      : a.TextEncoder)().encode(text)
+      : a.TextEncoder)().encode(text),
   ];
   return encodeInt32(result.length).concat(result);
 };
@@ -655,7 +655,7 @@ export const encodeString = (text: string): ReadonlyArray<number> => {
  * boolからバイナリに変換する
  */
 export const encodeBool = (value: boolean): ReadonlyArray<number> => [
-  value ? 1 : 0
+  value ? 1 : 0,
 ];
 
 export const encodeBinary = (value: Uint8Array): ReadonlyArray<number> =>
@@ -1161,7 +1161,7 @@ export const decodeInt32 = (
       if (offset * 7 < 32 && (byte & 64) !== 0) {
         return {
           result: result | (~0 << (offset * 7)),
-          nextIndex: index + offset
+          nextIndex: index + offset,
         };
       }
       return { result: result, nextIndex: index + offset };
@@ -1189,12 +1189,12 @@ export const decodeString = (
   if (isBrowser) {
     return {
       result: new TextDecoder().decode(textBinary),
-      nextIndex: nextIndex
+      nextIndex: nextIndex,
     };
   }
   return {
     result: new a.TextDecoder().decode(textBinary),
-    nextIndex: nextIndex
+    nextIndex: nextIndex,
   };
 };
 
@@ -1207,7 +1207,7 @@ export const decodeBool = (
   binary: Uint8Array
 ): { result: boolean; nextIndex: number } => ({
   result: binary[index] !== 0,
-  nextIndex: index + 1
+  nextIndex: index + 1,
 });
 
 /**
@@ -1225,7 +1225,7 @@ export const decodeBinary = (
   const nextIndex: number = length.nextIndex + length.result;
   return {
     result: binary.slice(length.nextIndex, nextIndex),
-    nextIndex: nextIndex
+    nextIndex: nextIndex,
   };
 };
 
@@ -1272,13 +1272,13 @@ export const decodeMaybe = <T>(
     );
     return {
       result: maybeJust(valueAndNextIndex.result),
-      nextIndex: valueAndNextIndex.nextIndex
+      nextIndex: valueAndNextIndex.nextIndex,
     };
   }
   if (patternIndexAndNextIndex.result === 1) {
     return {
       result: maybeNothing(),
-      nextIndex: patternIndexAndNextIndex.nextIndex
+      nextIndex: patternIndexAndNextIndex.nextIndex,
     };
   }
   throw new Error(
@@ -1313,7 +1313,7 @@ export const decodeResult = <ok, error>(
     );
     return {
       result: resultOk(okAndNextIndex.result),
-      nextIndex: okAndNextIndex.nextIndex
+      nextIndex: okAndNextIndex.nextIndex,
     };
   }
   if (patternIndexAndNextIndex.result === 1) {
@@ -1323,7 +1323,7 @@ export const decodeResult = <ok, error>(
     } = errorDecodeFunction(patternIndexAndNextIndex.nextIndex, binary);
     return {
       result: resultError(errorAndNextIndex.result),
-      nextIndex: errorAndNextIndex.nextIndex
+      nextIndex: errorAndNextIndex.nextIndex,
     };
   }
   throw new Error(
@@ -1342,7 +1342,7 @@ export const decodeId = (
   result: [...binary.slice(index, index + 16)]
     .map((n: number): string => n.toString(16).padStart(2, "0"))
     .join(""),
-  nextIndex: index + 16
+  nextIndex: index + 16,
 });
 
 /**
@@ -1356,7 +1356,7 @@ export const decodeToken = (
   result: [...binary.slice(index, index + 32)]
     .map((n: number): string => n.toString(16).padStart(2, "0"))
     .join(""),
-  nextIndex: index + 32
+  nextIndex: index + 32,
 });
 
 /**
@@ -1398,9 +1398,9 @@ export const decodeDateTime = (
       day: dayAndNextIndex.result,
       hour: hourAndNextIndex.result,
       minute: minuteAndNextIndex.result,
-      second: secondAndNextIndex.result
+      second: secondAndNextIndex.result,
     },
-    nextIndex: secondAndNextIndex.nextIndex
+    nextIndex: secondAndNextIndex.nextIndex,
   };
 };
 
@@ -1423,7 +1423,7 @@ export const decodeClientMode = (
     );
     return {
       result: clientModeDebugMode(result.result),
-      nextIndex: result.nextIndex
+      nextIndex: result.nextIndex,
     };
   }
   if (patternIndex.result === 1) {
@@ -1451,9 +1451,9 @@ export const decodeRequestLogInUrlRequestData = (
   return {
     result: {
       openIdConnectProvider: openIdConnectProviderAndNextIndex.result,
-      urlData: urlDataAndNextIndex.result
+      urlData: urlDataAndNextIndex.result,
     },
-    nextIndex: urlDataAndNextIndex.nextIndex
+    nextIndex: urlDataAndNextIndex.nextIndex,
   };
 };
 
@@ -1512,9 +1512,9 @@ export const decodeUrlData = (
       clientMode: clientModeAndNextIndex.result,
       location: locationAndNextIndex.result,
       language: languageAndNextIndex.result,
-      accessToken: accessTokenAndNextIndex.result
+      accessToken: accessTokenAndNextIndex.result,
     },
-    nextIndex: accessTokenAndNextIndex.nextIndex
+    nextIndex: accessTokenAndNextIndex.nextIndex,
   };
 };
 
@@ -1577,7 +1577,7 @@ export const decodeLocation = (
     );
     return {
       result: locationProject(result.result),
-      nextIndex: result.nextIndex
+      nextIndex: result.nextIndex,
     };
   }
   throw new Error("存在しないパターンを指定された 型を更新してください");
@@ -1648,9 +1648,9 @@ export const decodeUser = (
       createdAt: createdAtAndNextIndex.result,
       likedProjectIdList: likedProjectIdListAndNextIndex.result,
       developedProjectIdList: developedProjectIdListAndNextIndex.result,
-      commentedIdeaIdList: commentedIdeaIdListAndNextIndex.result
+      commentedIdeaIdList: commentedIdeaIdListAndNextIndex.result,
     },
-    nextIndex: commentedIdeaIdListAndNextIndex.nextIndex
+    nextIndex: commentedIdeaIdListAndNextIndex.nextIndex,
   };
 };
 
@@ -1676,9 +1676,9 @@ export const decodeUserAndUserId = (
   return {
     result: {
       userId: userIdAndNextIndex.result,
-      user: userAndNextIndex.result
+      user: userAndNextIndex.result,
     },
-    nextIndex: userAndNextIndex.nextIndex
+    nextIndex: userAndNextIndex.nextIndex,
   };
 };
 
@@ -1734,9 +1734,9 @@ export const decodeProject = (
       icon: iconAndNextIndex.result,
       image: imageAndNextIndex.result,
       createdAt: createdAtAndNextIndex.result,
-      createdBy: createdByAndNextIndex.result
+      createdBy: createdByAndNextIndex.result,
     },
-    nextIndex: createdByAndNextIndex.nextIndex
+    nextIndex: createdByAndNextIndex.nextIndex,
   };
 };
 
@@ -1762,9 +1762,9 @@ export const decodeProjectAndProjectId = (
   return {
     result: {
       projectId: projectIdAndNextIndex.result,
-      project: projectAndNextIndex.result
+      project: projectAndNextIndex.result,
     },
-    nextIndex: projectAndNextIndex.nextIndex
+    nextIndex: projectAndNextIndex.nextIndex,
   };
 };
 
@@ -1808,9 +1808,9 @@ export const decodeIdea = (
       createdBy: createdByAndNextIndex.result,
       description: descriptionAndNextIndex.result,
       createdAt: createdAtAndNextIndex.result,
-      itemList: itemListAndNextIndex.result
+      itemList: itemListAndNextIndex.result,
     },
-    nextIndex: itemListAndNextIndex.nextIndex
+    nextIndex: itemListAndNextIndex.nextIndex,
   };
 };
 
@@ -1833,7 +1833,7 @@ export const decodeIdeaItem = (
     );
     return {
       result: ideaItemComment(result.result),
-      nextIndex: result.nextIndex
+      nextIndex: result.nextIndex,
     };
   }
   if (patternIndex.result === 1) {
@@ -1843,7 +1843,7 @@ export const decodeIdeaItem = (
     );
     return {
       result: ideaItemSuggestion(result.result),
-      nextIndex: result.nextIndex
+      nextIndex: result.nextIndex,
     };
   }
   throw new Error("存在しないパターンを指定された 型を更新してください");
@@ -1879,9 +1879,9 @@ export const decodeComment = (
     result: {
       body: bodyAndNextIndex.result,
       createdBy: createdByAndNextIndex.result,
-      createdAt: createdAtAndNextIndex.result
+      createdAt: createdAtAndNextIndex.result,
     },
-    nextIndex: createdAtAndNextIndex.nextIndex
+    nextIndex: createdAtAndNextIndex.nextIndex,
   };
 };
 
@@ -1909,9 +1909,9 @@ export const decodeSuggestion = (
     result: {
       createdAt: createdAtAndNextIndex.result,
       description: descriptionAndNextIndex.result,
-      change: changeAndNextIndex.result
+      change: changeAndNextIndex.result,
     },
-    nextIndex: changeAndNextIndex.nextIndex
+    nextIndex: changeAndNextIndex.nextIndex,
   };
 };
 
@@ -1934,7 +1934,7 @@ export const decodeChange = (
     );
     return {
       result: changeProjectName(result.result),
-      nextIndex: result.nextIndex
+      nextIndex: result.nextIndex,
     };
   }
   throw new Error("存在しないパターンを指定された 型を更新してください");
@@ -1964,9 +1964,9 @@ export const decodeModule = (
     result: {
       name: nameAndNextIndex.result,
       description: descriptionAndNextIndex.result,
-      export: exportAndNextIndex.result
+      export: exportAndNextIndex.result,
     },
-    nextIndex: exportAndNextIndex.nextIndex
+    nextIndex: exportAndNextIndex.nextIndex,
   };
 };
 
@@ -1999,9 +1999,9 @@ export const decodeTypeDefinition = (
     result: {
       name: nameAndNextIndex.result,
       parentList: parentListAndNextIndex.result,
-      description: descriptionAndNextIndex.result
+      description: descriptionAndNextIndex.result,
     },
-    nextIndex: descriptionAndNextIndex.nextIndex
+    nextIndex: descriptionAndNextIndex.nextIndex,
   };
 };
 
@@ -2024,7 +2024,7 @@ export const decodeTypeBody = (
     } = decodeList(decodeTypeBodyProductMember)(patternIndex.nextIndex, binary);
     return {
       result: typeBodyProduct(result.result),
-      nextIndex: result.nextIndex
+      nextIndex: result.nextIndex,
     };
   }
   if (patternIndex.result === 1) {
@@ -2041,7 +2041,7 @@ export const decodeTypeBody = (
     } = decodeTypeBodyKernel(patternIndex.nextIndex, binary);
     return {
       result: typeBodyKernel(result.result),
-      nextIndex: result.nextIndex
+      nextIndex: result.nextIndex,
     };
   }
   throw new Error("存在しないパターンを指定された 型を更新してください");
@@ -2077,9 +2077,9 @@ export const decodeTypeBodyProductMember = (
     result: {
       name: nameAndNextIndex.result,
       description: descriptionAndNextIndex.result,
-      memberType: memberTypeAndNextIndex.result
+      memberType: memberTypeAndNextIndex.result,
     },
-    nextIndex: memberTypeAndNextIndex.nextIndex
+    nextIndex: memberTypeAndNextIndex.nextIndex,
   };
 };
 
@@ -2112,9 +2112,9 @@ export const decodeTypeBodySumPattern = (
     result: {
       name: nameAndNextIndex.result,
       description: descriptionAndNextIndex.result,
-      parameter: parameterAndNextIndex.result
+      parameter: parameterAndNextIndex.result,
     },
-    nextIndex: parameterAndNextIndex.nextIndex
+    nextIndex: parameterAndNextIndex.nextIndex,
   };
 };
 
@@ -2192,9 +2192,9 @@ export const decodePartDefinition = (
       description: descriptionAndNextIndex.result,
       type: typeAndNextIndex.result,
       expr: exprAndNextIndex.result,
-      moduleId: moduleIdAndNextIndex.result
+      moduleId: moduleIdAndNextIndex.result,
     },
-    nextIndex: moduleIdAndNextIndex.nextIndex
+    nextIndex: moduleIdAndNextIndex.nextIndex,
   };
 };
 
@@ -2220,9 +2220,9 @@ export const decodeType = (
   return {
     result: {
       reference: referenceAndNextIndex.result,
-      parameter: parameterAndNextIndex.result
+      parameter: parameterAndNextIndex.result,
     },
-    nextIndex: parameterAndNextIndex.nextIndex
+    nextIndex: parameterAndNextIndex.nextIndex,
   };
 };
 
@@ -2252,7 +2252,7 @@ export const decodeExpr = (
     );
     return {
       result: exprInt32Literal(result.result),
-      nextIndex: result.nextIndex
+      nextIndex: result.nextIndex,
     };
   }
   if (patternIndex.result === 2) {
@@ -2262,7 +2262,7 @@ export const decodeExpr = (
     ) => { result: PartId; nextIndex: number })(patternIndex.nextIndex, binary);
     return {
       result: exprPartReference(result.result),
-      nextIndex: result.nextIndex
+      nextIndex: result.nextIndex,
     };
   }
   if (patternIndex.result === 3) {
@@ -2272,7 +2272,7 @@ export const decodeExpr = (
     } = decodeLocalPartReference(patternIndex.nextIndex, binary);
     return {
       result: exprLocalPartReference(result.result),
-      nextIndex: result.nextIndex
+      nextIndex: result.nextIndex,
     };
   }
   if (patternIndex.result === 4) {
@@ -2282,7 +2282,7 @@ export const decodeExpr = (
     } = decodeTagReferenceIndex(patternIndex.nextIndex, binary);
     return {
       result: exprTagReference(result.result),
-      nextIndex: result.nextIndex
+      nextIndex: result.nextIndex,
     };
   }
   if (patternIndex.result === 5) {
@@ -2292,7 +2292,7 @@ export const decodeExpr = (
     } = decodeFunctionCall(patternIndex.nextIndex, binary);
     return {
       result: exprFunctionCall(result.result),
-      nextIndex: result.nextIndex
+      nextIndex: result.nextIndex,
     };
   }
   if (patternIndex.result === 6) {
@@ -2324,7 +2324,7 @@ export const decodeEvaluatedExpr = (
     );
     return {
       result: evaluatedExprKernel(result.result),
-      nextIndex: result.nextIndex
+      nextIndex: result.nextIndex,
     };
   }
   if (patternIndex.result === 1) {
@@ -2334,7 +2334,7 @@ export const decodeEvaluatedExpr = (
     );
     return {
       result: evaluatedExprInt32(result.result),
-      nextIndex: result.nextIndex
+      nextIndex: result.nextIndex,
     };
   }
   if (patternIndex.result === 2) {
@@ -2344,7 +2344,7 @@ export const decodeEvaluatedExpr = (
     } = decodeTagReferenceIndex(patternIndex.nextIndex, binary);
     return {
       result: evaluatedExprTagReference(result.result),
-      nextIndex: result.nextIndex
+      nextIndex: result.nextIndex,
     };
   }
   if (patternIndex.result === 3) {
@@ -2354,7 +2354,7 @@ export const decodeEvaluatedExpr = (
     } = decodeList(decodeLambdaBranch)(patternIndex.nextIndex, binary);
     return {
       result: evaluatedExprLambda(result.result),
-      nextIndex: result.nextIndex
+      nextIndex: result.nextIndex,
     };
   }
   if (patternIndex.result === 4) {
@@ -2364,7 +2364,7 @@ export const decodeEvaluatedExpr = (
     );
     return {
       result: evaluatedExprKernelCall(result.result),
-      nextIndex: result.nextIndex
+      nextIndex: result.nextIndex,
     };
   }
   throw new Error("存在しないパターンを指定された 型を更新してください");
@@ -2389,9 +2389,9 @@ export const decodeKernelCall = (
   return {
     result: {
       kernel: kernelAndNextIndex.result,
-      expr: exprAndNextIndex.result
+      expr: exprAndNextIndex.result,
     },
-    nextIndex: exprAndNextIndex.nextIndex
+    nextIndex: exprAndNextIndex.nextIndex,
   };
 };
 
@@ -2447,9 +2447,9 @@ export const decodeLocalPartReference = (
   return {
     result: {
       partId: partIdAndNextIndex.result,
-      localPartId: localPartIdAndNextIndex.result
+      localPartId: localPartIdAndNextIndex.result,
     },
-    nextIndex: localPartIdAndNextIndex.nextIndex
+    nextIndex: localPartIdAndNextIndex.nextIndex,
   };
 };
 
@@ -2475,9 +2475,9 @@ export const decodeTagReferenceIndex = (
   return {
     result: {
       typeId: typeIdAndNextIndex.result,
-      tagIndex: tagIndexAndNextIndex.result
+      tagIndex: tagIndexAndNextIndex.result,
     },
-    nextIndex: tagIndexAndNextIndex.nextIndex
+    nextIndex: tagIndexAndNextIndex.nextIndex,
   };
 };
 
@@ -2500,9 +2500,9 @@ export const decodeFunctionCall = (
   return {
     result: {
       function: functionAndNextIndex.result,
-      parameter: parameterAndNextIndex.result
+      parameter: parameterAndNextIndex.result,
     },
-    nextIndex: parameterAndNextIndex.nextIndex
+    nextIndex: parameterAndNextIndex.nextIndex,
   };
 };
 
@@ -2538,9 +2538,9 @@ export const decodeLambdaBranch = (
       condition: conditionAndNextIndex.result,
       description: descriptionAndNextIndex.result,
       localPartList: localPartListAndNextIndex.result,
-      expr: exprAndNextIndex.result
+      expr: exprAndNextIndex.result,
     },
-    nextIndex: exprAndNextIndex.nextIndex
+    nextIndex: exprAndNextIndex.nextIndex,
   };
 };
 
@@ -2563,7 +2563,7 @@ export const decodeCondition = (
     } = decodeConditionTag(patternIndex.nextIndex, binary);
     return {
       result: conditionByTag(result.result),
-      nextIndex: result.nextIndex
+      nextIndex: result.nextIndex,
     };
   }
   if (patternIndex.result === 1) {
@@ -2573,7 +2573,7 @@ export const decodeCondition = (
     } = decodeConditionCapture(patternIndex.nextIndex, binary);
     return {
       result: conditionByCapture(result.result),
-      nextIndex: result.nextIndex
+      nextIndex: result.nextIndex,
     };
   }
   if (patternIndex.result === 2) {
@@ -2586,7 +2586,7 @@ export const decodeCondition = (
     );
     return {
       result: conditionInt32(result.result),
-      nextIndex: result.nextIndex
+      nextIndex: result.nextIndex,
     };
   }
   throw new Error("存在しないパターンを指定された 型を更新してください");
@@ -2611,9 +2611,9 @@ export const decodeConditionTag = (
   return {
     result: {
       tag: tagAndNextIndex.result,
-      parameter: parameterAndNextIndex.result
+      parameter: parameterAndNextIndex.result,
     },
-    nextIndex: parameterAndNextIndex.nextIndex
+    nextIndex: parameterAndNextIndex.nextIndex,
   };
 };
 
@@ -2642,9 +2642,9 @@ export const decodeConditionCapture = (
   return {
     result: {
       name: nameAndNextIndex.result,
-      localPartId: localPartIdAndNextIndex.result
+      localPartId: localPartIdAndNextIndex.result,
     },
-    nextIndex: localPartIdAndNextIndex.nextIndex
+    nextIndex: localPartIdAndNextIndex.nextIndex,
   };
 };
 
@@ -2685,9 +2685,9 @@ export const decodeBranchPartDefinition = (
       name: nameAndNextIndex.result,
       description: descriptionAndNextIndex.result,
       type: typeAndNextIndex.result,
-      expr: exprAndNextIndex.result
+      expr: exprAndNextIndex.result,
     },
-    nextIndex: exprAndNextIndex.nextIndex
+    nextIndex: exprAndNextIndex.nextIndex,
   };
 };
 
@@ -2710,7 +2710,7 @@ export const decodeEvaluateExprError = (
     ) => { result: PartId; nextIndex: number })(patternIndex.nextIndex, binary);
     return {
       result: evaluateExprErrorNeedPartDefinition(result.result),
-      nextIndex: result.nextIndex
+      nextIndex: result.nextIndex,
     };
   }
   if (patternIndex.result === 1) {
@@ -2720,7 +2720,7 @@ export const decodeEvaluateExprError = (
     ) => { result: PartId; nextIndex: number })(patternIndex.nextIndex, binary);
     return {
       result: evaluateExprErrorPartExprIsNothing(result.result),
-      nextIndex: result.nextIndex
+      nextIndex: result.nextIndex,
     };
   }
   if (patternIndex.result === 2) {
@@ -2730,7 +2730,7 @@ export const decodeEvaluateExprError = (
     } = decodeLocalPartReference(patternIndex.nextIndex, binary);
     return {
       result: evaluateExprErrorCannotFindLocalPartDefinition(result.result),
-      nextIndex: result.nextIndex
+      nextIndex: result.nextIndex,
     };
   }
   if (patternIndex.result === 3) {
@@ -2740,13 +2740,13 @@ export const decodeEvaluateExprError = (
     );
     return {
       result: evaluateExprErrorTypeError(result.result),
-      nextIndex: result.nextIndex
+      nextIndex: result.nextIndex,
     };
   }
   if (patternIndex.result === 4) {
     return {
       result: evaluateExprErrorNotSupported,
-      nextIndex: patternIndex.nextIndex
+      nextIndex: patternIndex.nextIndex,
     };
   }
   throw new Error("存在しないパターンを指定された 型を更新してください");
@@ -2766,7 +2766,7 @@ export const decodeTypeError = (
   } = decodeString(index, binary);
   return {
     result: { message: messageAndNextIndex.result },
-    nextIndex: messageAndNextIndex.nextIndex
+    nextIndex: messageAndNextIndex.nextIndex,
   };
 };
 
@@ -2792,9 +2792,9 @@ export const decodeCreateProjectParameter = (
   return {
     result: {
       accessToken: accessTokenAndNextIndex.result,
-      projectName: projectNameAndNextIndex.result
+      projectName: projectNameAndNextIndex.result,
     },
-    nextIndex: projectNameAndNextIndex.nextIndex
+    nextIndex: projectNameAndNextIndex.nextIndex,
   };
 };
 
@@ -2813,13 +2813,13 @@ export const decodeAccessTokenError = (
   if (patternIndex.result === 0) {
     return {
       result: "AccessTokenExpiredOrInvalid",
-      nextIndex: patternIndex.nextIndex
+      nextIndex: patternIndex.nextIndex,
     };
   }
   if (patternIndex.result === 1) {
     return {
       result: "ProjectNameIsInvalid",
-      nextIndex: patternIndex.nextIndex
+      nextIndex: patternIndex.nextIndex,
     };
   }
   throw new Error("存在しないパターンを指定された 型を更新してください");
@@ -2844,9 +2844,9 @@ export const decodeProjectCache = (
   return {
     result: {
       project: projectAndNextIndex.result,
-      respondAt: respondAtAndNextIndex.result
+      respondAt: respondAtAndNextIndex.result,
     },
-    nextIndex: respondAtAndNextIndex.nextIndex
+    nextIndex: respondAtAndNextIndex.nextIndex,
   };
 };
 
@@ -2869,8 +2869,8 @@ export const decodeUserCache = (
   return {
     result: {
       user: userAndNextIndex.result,
-      respondAt: respondAtAndNextIndex.result
+      respondAt: respondAtAndNextIndex.result,
     },
-    nextIndex: respondAtAndNextIndex.nextIndex
+    nextIndex: respondAtAndNextIndex.nextIndex,
   };
 };

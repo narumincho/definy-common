@@ -70,7 +70,7 @@ export const urlDataFromUrl = (url: URL): data.UrlData => {
     clientMode: clientModeFromUrl(url.hostname, url.port),
     location: locationFromUrl(url.pathname),
     language: language,
-    accessToken: accessTokenFromUrl(url.hash)
+    accessToken: accessTokenFromUrl(url.hash),
   };
 };
 
@@ -195,14 +195,14 @@ export const evaluateExpr = (
       return {
         result: data.resultOk(data.evaluatedExprKernel(expr.kernelExpr)),
         evaluatedLocalPartMap: new Map(),
-        evaluatedPartMap: new Map()
+        evaluatedPartMap: new Map(),
       };
 
     case "Int32Literal":
       return {
         result: data.resultOk(data.evaluatedExprInt32(expr.int32)),
         evaluatedLocalPartMap: new Map(),
-        evaluatedPartMap: new Map()
+        evaluatedPartMap: new Map(),
       };
 
     case "PartReference":
@@ -218,7 +218,7 @@ export const evaluateExpr = (
       return {
         result: data.resultOk(expr),
         evaluatedLocalPartMap: new Map(),
-        evaluatedPartMap: new Map()
+        evaluatedPartMap: new Map(),
       };
 
     case "FunctionCall":
@@ -228,7 +228,7 @@ export const evaluateExpr = (
       return {
         result: data.resultError([data.evaluateExprErrorNotSupported]),
         evaluatedPartMap: new Map(),
-        evaluatedLocalPartMap: new Map()
+        evaluatedLocalPartMap: new Map(),
       };
   }
 };
@@ -244,7 +244,7 @@ const localPartReferenceAndEvaluatedExpr = (
 ): [string, data.EvaluatedExpr] => [
   (localPartReference.partId as string) +
     (localPartReference.localPartId as string),
-  evaluateExpr
+  evaluateExpr,
 ];
 
 const evaluatePartReference = (
@@ -256,7 +256,7 @@ const evaluatePartReference = (
     return {
       result: data.resultOk(evaluatedPart),
       evaluatedPartMap: new Map(),
-      evaluatedLocalPartMap: new Map()
+      evaluatedLocalPartMap: new Map(),
     };
   }
   const part = sourceAndCache.partDefinitionMap.get(partId);
@@ -271,28 +271,28 @@ const evaluatePartReference = (
             ...evaluatedResult.evaluatedPartMap,
             ...(evaluatedResult.result._ === "Ok"
               ? [partIdAndEvaluatedExpr(partId, evaluatedResult.result.ok)]
-              : [])
+              : []),
           ]),
-          evaluatedLocalPartMap: evaluatedResult.evaluatedLocalPartMap
+          evaluatedLocalPartMap: evaluatedResult.evaluatedLocalPartMap,
         };
       }
       case "Nothing":
         return {
           result: data.resultError([
-            data.evaluateExprErrorNeedPartDefinition(partId)
+            data.evaluateExprErrorNeedPartDefinition(partId),
           ]),
           evaluatedPartMap: new Map(),
-          evaluatedLocalPartMap: new Map()
+          evaluatedLocalPartMap: new Map(),
         };
     }
   }
 
   return {
     result: data.resultError([
-      data.evaluateExprErrorNeedPartDefinition(partId)
+      data.evaluateExprErrorNeedPartDefinition(partId),
     ]),
     evaluatedPartMap: new Map(),
-    evaluatedLocalPartMap: new Map()
+    evaluatedLocalPartMap: new Map(),
   };
 };
 
@@ -308,7 +308,7 @@ const evaluateLocalPartReference = (
     return {
       result: data.resultOk(evaluatedExpr),
       evaluatedPartMap: new Map(),
-      evaluatedLocalPartMap: new Map()
+      evaluatedLocalPartMap: new Map(),
     };
   }
   const expr = localPartMapGetLocalPartExpr(
@@ -327,18 +327,18 @@ const evaluateLocalPartReference = (
               localPartReferenceAndEvaluatedExpr(
                 localPartReference,
                 result.result.ok
-              )
+              ),
             ]
-          : [])
-      ])
+          : []),
+      ]),
     };
   }
   return {
     result: data.resultError([
-      data.evaluateExprErrorCannotFindLocalPartDefinition(localPartReference)
+      data.evaluateExprErrorCannotFindLocalPartDefinition(localPartReference),
     ]),
     evaluatedLocalPartMap: new Map(),
-    evaluatedPartMap: new Map()
+    evaluatedPartMap: new Map(),
   };
 };
 
@@ -398,11 +398,11 @@ const evaluateFunctionCall = (
   );
   const evaluatedPartMap = new Map([
     ...functionResult.evaluatedPartMap,
-    ...parameterResult.evaluatedPartMap
+    ...parameterResult.evaluatedPartMap,
   ]);
   const evaluatedLocalPartMap = new Map([
     ...functionResult.evaluatedLocalPartMap,
-    ...parameterResult.evaluatedLocalPartMap
+    ...parameterResult.evaluatedLocalPartMap,
   ]);
 
   switch (functionResult.result._) {
@@ -415,7 +415,7 @@ const evaluateFunctionCall = (
               parameterResult.result.ok
             ),
             evaluatedPartMap: evaluatedPartMap,
-            evaluatedLocalPartMap: evaluatedLocalPartMap
+            evaluatedLocalPartMap: evaluatedLocalPartMap,
           };
         }
         case "Error":
@@ -433,7 +433,7 @@ const evaluateFunctionCall = (
           )
         ),
         evaluatedPartMap: evaluatedPartMap,
-        evaluatedLocalPartMap: evaluatedLocalPartMap
+        evaluatedLocalPartMap: evaluatedLocalPartMap,
       };
   }
 };
@@ -447,7 +447,7 @@ const evaluateFunctionCallResultOk = (
       return data.resultOk(
         data.evaluatedExprKernelCall({
           kernel: functionExpr.kernelExpr,
-          expr: parameter
+          expr: parameter,
         })
       );
     }
@@ -464,8 +464,8 @@ const evaluateFunctionCallResultOk = (
   }
   return data.resultError([
     data.evaluateExprErrorTypeError({
-      message: "関数のところにkernel,kernelCall以外が来てしまった"
-    })
+      message: "関数のところにkernel,kernelCall以外が来てしまった",
+    }),
   ]);
 };
 
@@ -487,8 +487,8 @@ const int32Add = (
   }
   return data.resultError([
     data.evaluateExprErrorTypeError({
-      message: "int32Addで整数が渡されなかった"
-    })
+      message: "int32Addで整数が渡されなかった",
+    }),
   ]);
 };
 
@@ -510,8 +510,8 @@ const int32Mul = (
   }
   return data.resultError([
     data.evaluateExprErrorTypeError({
-      message: "int33Mulで整数が渡されなかった"
-    })
+      message: "int33Mulで整数が渡されなかった",
+    }),
   ]);
 };
 
@@ -533,8 +533,8 @@ const int32Sub = (
   }
   return data.resultError([
     data.evaluateExprErrorTypeError({
-      message: "int33Subで整数が渡されなかった"
-    })
+      message: "int33Subで整数が渡されなかった",
+    }),
   ]);
 };
 
@@ -548,12 +548,12 @@ const concatCache = (
     localPartMap: sourceAndCache.localPartMap,
     evaluatedPartMap: new Map([
       ...sourceAndCache.evaluatedPartMap,
-      ...result.evaluatedPartMap
+      ...result.evaluatedPartMap,
     ]),
     evaluatedLocalPartMap: new Map([
       ...sourceAndCache.evaluatedPartMap,
-      ...result.evaluatedLocalPartMap
-    ])
+      ...result.evaluatedLocalPartMap,
+    ]),
   };
 };
 

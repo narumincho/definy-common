@@ -9,7 +9,7 @@ describe("test", () => {
       clientMode: data.clientModeRelease,
       location: data.locationHome,
       language: "English",
-      accessToken: data.maybeNothing()
+      accessToken: data.maybeNothing(),
     });
   });
   it("project url", () => {
@@ -25,7 +25,7 @@ describe("test", () => {
         "580d8d6a54cf43e4452a0bba6694a4ed" as data.ProjectId
       ),
       language: "Japanese",
-      accessToken: data.maybeNothing()
+      accessToken: data.maybeNothing(),
     });
   });
   it("local host and accessToken", () => {
@@ -43,7 +43,7 @@ describe("test", () => {
       language: "Esperanto",
       accessToken: data.maybeJust(
         "f81919b78537257302b50f776b77a90b984cc3d75fa899f9f460ff972dcc8cb0" as data.AccessToken
-      )
+      ),
     });
   });
   it("encode, decode user url", () => {
@@ -53,7 +53,7 @@ describe("test", () => {
         "580d8d6a54cf43e4452a0bba6694a4ed" as data.UserId
       ),
       language: "Esperanto",
-      accessToken: data.maybeNothing()
+      accessToken: data.maybeNothing(),
     };
     const url = main.urlDataToUrl(languageAndLocation);
     const decodedLanguageAndLocation: data.UrlData = main.urlDataFromUrl(url);
@@ -69,20 +69,20 @@ describe("test", () => {
         partDefinitionMap: new Map(),
         localPartMap: new Map(),
         evaluatedLocalPartMap: new Map(),
-        evaluatedPartMap: new Map()
+        evaluatedPartMap: new Map(),
       },
       data.exprFunctionCall({
         function: data.exprFunctionCall({
           function: data.exprKernel("Int32Add"),
-          parameter: data.exprInt32Literal(50)
+          parameter: data.exprInt32Literal(50),
         }),
         parameter: data.exprFunctionCall({
           function: data.exprFunctionCall({
             function: data.exprKernel("Int32Add"),
-            parameter: data.exprInt32Literal(32)
+            parameter: data.exprInt32Literal(32),
           }),
-          parameter: data.exprInt32Literal(100)
-        })
+          parameter: data.exprInt32Literal(100),
+        }),
       })
     );
     console.log(result);
@@ -101,7 +101,7 @@ describe("test", () => {
      */
     const intType: data.Type = {
       reference: "" as data.TypeId,
-      parameter: []
+      parameter: [],
     };
     const oneName = "0" as data.PartId;
     const addOneHundredName = "1" as data.PartId;
@@ -117,8 +117,8 @@ describe("test", () => {
               moduleId: "0" as data.ModuleId,
               parentList: [],
               type: intType,
-              expr: data.maybeJust(data.exprInt32Literal(1))
-            }
+              expr: data.maybeJust(data.exprInt32Literal(1)),
+            },
           ],
           [
             addOneHundredName,
@@ -131,25 +131,25 @@ describe("test", () => {
               expr: data.maybeJust(
                 data.exprFunctionCall({
                   function: data.exprKernel("Int32Add"),
-                  parameter: data.exprInt32Literal(100)
+                  parameter: data.exprInt32Literal(100),
                 })
-              )
-            }
-          ]
+              ),
+            },
+          ],
         ]),
         localPartMap: new Map(),
         evaluatedLocalPartMap: new Map(),
-        evaluatedPartMap: new Map()
+        evaluatedPartMap: new Map(),
       },
       data.exprFunctionCall({
         function: data.exprFunctionCall({
           function: data.exprKernel("Int32Add"),
           parameter: data.exprFunctionCall({
             function: data.exprPartReference(addOneHundredName),
-            parameter: data.exprPartReference(oneName)
-          })
+            parameter: data.exprPartReference(oneName),
+          }),
         }),
-        parameter: data.exprPartReference(oneName)
+        parameter: data.exprPartReference(oneName),
       })
     );
     console.log(result);
