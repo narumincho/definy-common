@@ -59,6 +59,19 @@ describe("test", () => {
     const decodedLanguageAndLocation: data.UrlData = main.urlDataFromUrl(url);
     expect(languageAndLocation).toEqual(decodedLanguageAndLocation);
   });
+  it("dateTime and js Date conversion", () => {
+    const sampleDateTime: data.DateTime = {
+      year: 2015,
+      month: 3,
+      day: 21,
+      hour: 14,
+      minute: 46,
+      second: 3,
+    };
+    expect(sampleDateTime).toEqual(
+      main.util.dateTimeFromDate(main.util.dateTimeToDate(sampleDateTime))
+    );
+  });
   it("dynamic Evaluation: simple expr", () => {
     /*
      * = (add 50) ((add 32) 100)

@@ -120,3 +120,24 @@ export const resultFromMaybe = <Ok, Error>(
       return data.resultError(error);
   }
 };
+
+export const dateTimeToDate = (dateTime: data.DateTime): Date =>
+  new Date(
+    Date.UTC(
+      dateTime.year - 10000,
+      dateTime.month - 1,
+      dateTime.day,
+      dateTime.hour,
+      dateTime.minute,
+      dateTime.second
+    )
+  );
+
+export const dateTimeFromDate = (date: Date): data.DateTime => ({
+  year: 10000 + date.getUTCFullYear(),
+  month: 1 + date.getUTCMonth(),
+  day: date.getUTCDate(),
+  hour: date.getUTCHours(),
+  minute: date.getUTCMinutes(),
+  second: date.getUTCSeconds(),
+});
