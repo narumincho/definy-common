@@ -58,6 +58,8 @@ const createProjectParameterName = "CreateProjectParameter";
 const accessTokenErrorName = "AccessTokenError";
 const projectCacheName = "ProjectCache";
 const userCacheName = "UserCache";
+const projectWithIdAndRespondTimeName = "ProjectWithIdAndRespondTime";
+const userWithIdAndRespondTimeName = "UserWithIdAndRespondTime";
 
 const dateTime: type.CustomType = {
   name: dateTimeName,
@@ -1024,11 +1026,55 @@ const userCache: type.CustomType = {
   body: type.customTypeBodyProduct([
     {
       name: "user",
-      description: "ユーザー",
+      description: "ユーザーのデータ",
       memberType: type.typeCustom(userName),
     },
     {
       name: "respondAt",
+      description: "取得日時",
+      memberType: type.typeCustom(dateTimeName),
+    },
+  ]),
+};
+
+const projectWithIdAndRespondTime: type.CustomType = {
+  name: projectWithIdAndRespondTimeName,
+  description: "プロジェクトのデータとIDと受け取った時間",
+  body: type.customTypeBodyProduct([
+    {
+      name: "project",
+      description: "プロジェクトのデータ",
+      memberType: type.typeCustom(projectName),
+    },
+    {
+      name: "projectId",
+      description: "プロジェクトのID",
+      memberType: projectId,
+    },
+    {
+      name: "respondTime",
+      description: "取得日時",
+      memberType: type.typeCustom(dateTimeName),
+    },
+  ]),
+};
+
+const userWithIdAndRespondTime: type.CustomType = {
+  name: userWithIdAndRespondTimeName,
+  description: "ユーザーのデータとIDと受け取った時間",
+  body: type.customTypeBodyProduct([
+    {
+      name: "user",
+      description: "ユーザーのデータ",
+      memberType: type.typeCustom(userName),
+    },
+    {
+      name: "userId",
+      description: "ユーザーID",
+      memberType: userId,
+    },
+    {
+      name: "respondTime",
       description: "取得日時",
       memberType: type.typeCustom(dateTimeName),
     },
@@ -1078,6 +1124,8 @@ const listCustomType: ReadonlyArray<type.CustomType> = [
   createProjectError,
   projectCache,
   userCache,
+  projectWithIdAndRespondTime,
+  userWithIdAndRespondTime,
 ];
 
 const code = codeGen.generateCodeAsString(
