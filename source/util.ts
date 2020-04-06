@@ -121,23 +121,15 @@ export const resultFromMaybe = <Ok, Error>(
   }
 };
 
-export const dateTimeToDate = (dateTime: data.DateTime): Date =>
-  new Date(
-    Date.UTC(
-      dateTime.year - 10000,
-      dateTime.month - 1,
-      dateTime.day,
-      dateTime.hour,
-      dateTime.minute,
-      dateTime.second
-    )
-  );
+const millisecondInDay = 1000 * 60 * 60 * 24;
 
-export const dateTimeFromDate = (date: Date): data.DateTime => ({
-  year: 10000 + date.getUTCFullYear(),
-  month: 1 + date.getUTCMonth(),
-  day: date.getUTCDate(),
-  hour: date.getUTCHours(),
-  minute: date.getUTCMinutes(),
-  second: date.getUTCSeconds(),
-});
+export const timeToDate = (dateTime: data.Time): Date =>
+  new Date(dateTime.day * millisecondInDay + dateTime.millisecond);
+
+export const timeFromDate = (date: Date): data.Time => {
+  const millisecond = date.getTime();
+  return {
+    day: Math.floor(millisecond / millisecondInDay),
+    millisecond: millisecond % millisecondInDay,
+  };
+};
