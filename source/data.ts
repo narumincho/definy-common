@@ -323,32 +323,27 @@ export type AccessTokenError =
   | "ProjectNameIsInvalid";
 
 /**
- * indexDBに格納する取得日時も含めたProject
+ * indexDBに格納したりする取得日時も含めたProject
  */
-export type ProjectCache = { project: Project; respondAt: DateTime };
+export type ProjectCache = { project: Project; respondTime: DateTime };
 
 /**
- * indexDBに格納する取得日も含めたUser
+ * indexDBに格納したりする取得日も含めたUser
  */
-export type UserCache = { user: User; respondAt: DateTime };
+export type UserCache = { user: User; respondTime: DateTime };
 
 /**
- * プロジェクトのデータとIDと受け取った時間
+ * プロジェクトのキャッシュデータとID. indexedDBからElmに渡す用
  */
-export type ProjectWithIdAndRespondTime = {
-  project: Project;
+export type ProjectCacheWithId = {
+  projectCache: Maybe<ProjectCache>;
   projectId: ProjectId;
-  respondTime: DateTime;
 };
 
 /**
- * ユーザーのデータとIDと受け取った時間
+ * ユーザーのキャッシュデータとID. indexedDBからElmに渡す用
  */
-export type UserWithIdAndRespondTime = {
-  user: User;
-  userId: UserId;
-  respondTime: DateTime;
-};
+export type UserCacheWithId = { userCache: Maybe<UserCache>; userId: UserId };
 
 export type AccessToken = string & { _accessToken: never };
 
@@ -1154,25 +1149,25 @@ export const encodeProjectCache = (
   projectCache: ProjectCache
 ): ReadonlyArray<number> =>
   encodeProject(projectCache.project).concat(
-    encodeDateTime(projectCache.respondAt)
+    encodeDateTime(projectCache.respondTime)
   );
 
 export const encodeUserCache = (userCache: UserCache): ReadonlyArray<number> =>
-  encodeUser(userCache.user).concat(encodeDateTime(userCache.respondAt));
+  encodeUser(userCache.user).concat(encodeDateTime(userCache.respondTime));
 
-export const encodeProjectWithIdAndRespondTime = (
-  projectWithIdAndRespondTime: ProjectWithIdAndRespondTime
+export const encodeProjectCacheWithId = (
+  projectCacheWithId: ProjectCacheWithId
 ): ReadonlyArray<number> =>
-  encodeProject(projectWithIdAndRespondTime.project)
-    .concat(encodeId(projectWithIdAndRespondTime.projectId))
-    .concat(encodeDateTime(projectWithIdAndRespondTime.respondTime));
+  encodeMaybe(encodeProjectCache)(projectCacheWithId.projectCache).concat(
+    encodeId(projectCacheWithId.projectId)
+  );
 
-export const encodeUserWithIdAndRespondTime = (
-  userWithIdAndRespondTime: UserWithIdAndRespondTime
+export const encodeUserCacheWithId = (
+  userCacheWithId: UserCacheWithId
 ): ReadonlyArray<number> =>
-  encodeUser(userWithIdAndRespondTime.user)
-    .concat(encodeId(userWithIdAndRespondTime.userId))
-    .concat(encodeDateTime(userWithIdAndRespondTime.respondTime));
+  encodeMaybe(encodeUserCache)(userCacheWithId.userCache).concat(
+    encodeId(userCacheWithId.userId)
+  );
 
 /**
  * SignedLeb128で表現されたバイナリをnumberのビット演算ができる32bit符号付き整数の範囲の数値に変換するコード
@@ -2869,16 +2864,16 @@ export const decodeProjectCache = (
     result: Project;
     nextIndex: number;
   } = decodeProject(index, binary);
-  const respondAtAndNextIndex: {
+  const respondTimeAndNextIndex: {
     result: DateTime;
     nextIndex: number;
   } = decodeDateTime(projectAndNextIndex.nextIndex, binary);
   return {
     result: {
       project: projectAndNextIndex.result,
-      respondAt: respondAtAndNextIndex.result,
+      respondTime: respondTimeAndNextIndex.result,
     },
-    nextIndex: respondAtAndNextIndex.nextIndex,
+    nextIndex: respondTimeAndNextIndex.nextIndex,
   };
 };
 
@@ -2894,16 +2889,16 @@ export const decodeUserCache = (
     index,
     binary
   );
-  const respondAtAndNextIndex: {
+  const respondTimeAndNextIndex: {
     result: DateTime;
     nextIndex: number;
   } = decodeDateTime(userAndNextIndex.nextIndex, binary);
   return {
     result: {
       user: userAndNextIndex.result,
-      respondAt: respondAtAndNextIndex.result,
+      respondTime: respondTimeAndNextIndex.result,
     },
-    nextIndex: respondAtAndNextIndex.nextIndex,
+    nextIndex: respondTimeAndNextIndex.nextIndex,
   };
 };
 
@@ -2911,14 +2906,14 @@ export const decodeUserCache = (
  * @param index バイナリを読み込み開始位置
  * @param binary バイナリ
  */
-export const decodeProjectWithIdAndRespondTime = (
+export const decodeProjectCacheWithId = (
   index: number,
   binary: Uint8Array
-): { result: ProjectWithIdAndRespondTime; nextIndex: number } => {
-  const projectAndNextIndex: {
-    result: Project;
+): { result: ProjectCacheWithId; nextIndex: number } => {
+  const projectCacheAndNextIndex: {
+    result: Maybe<ProjectCache>;
     nextIndex: number;
-  } = decodeProject(index, binary);
+  } = decodeMaybe(decodeProjectCache)(index, binary);
   const projectIdAndNextIndex: {
     result: ProjectId;
     nextIndex: number;
@@ -2926,20 +2921,15 @@ export const decodeProjectWithIdAndRespondTime = (
     a: number,
     b: Uint8Array
   ) => { result: ProjectId; nextIndex: number })(
-    projectAndNextIndex.nextIndex,
+    projectCacheAndNextIndex.nextIndex,
     binary
   );
-  const respondTimeAndNextIndex: {
-    result: DateTime;
-    nextIndex: number;
-  } = decodeDateTime(projectIdAndNextIndex.nextIndex, binary);
   return {
     result: {
-      project: projectAndNextIndex.result,
+      projectCache: projectCacheAndNextIndex.result,
       projectId: projectIdAndNextIndex.result,
-      respondTime: respondTimeAndNextIndex.result,
     },
-    nextIndex: respondTimeAndNextIndex.nextIndex,
+    nextIndex: projectIdAndNextIndex.nextIndex,
   };
 };
 
@@ -2947,14 +2937,14 @@ export const decodeProjectWithIdAndRespondTime = (
  * @param index バイナリを読み込み開始位置
  * @param binary バイナリ
  */
-export const decodeUserWithIdAndRespondTime = (
+export const decodeUserCacheWithId = (
   index: number,
   binary: Uint8Array
-): { result: UserWithIdAndRespondTime; nextIndex: number } => {
-  const userAndNextIndex: { result: User; nextIndex: number } = decodeUser(
-    index,
-    binary
-  );
+): { result: UserCacheWithId; nextIndex: number } => {
+  const userCacheAndNextIndex: {
+    result: Maybe<UserCache>;
+    nextIndex: number;
+  } = decodeMaybe(decodeUserCache)(index, binary);
   const userIdAndNextIndex: {
     result: UserId;
     nextIndex: number;
@@ -2962,19 +2952,14 @@ export const decodeUserWithIdAndRespondTime = (
     a: number,
     b: Uint8Array
   ) => { result: UserId; nextIndex: number })(
-    userAndNextIndex.nextIndex,
+    userCacheAndNextIndex.nextIndex,
     binary
   );
-  const respondTimeAndNextIndex: {
-    result: DateTime;
-    nextIndex: number;
-  } = decodeDateTime(userIdAndNextIndex.nextIndex, binary);
   return {
     result: {
-      user: userAndNextIndex.result,
+      userCache: userCacheAndNextIndex.result,
       userId: userIdAndNextIndex.result,
-      respondTime: respondTimeAndNextIndex.result,
     },
-    nextIndex: respondTimeAndNextIndex.nextIndex,
+    nextIndex: userIdAndNextIndex.nextIndex,
   };
 };

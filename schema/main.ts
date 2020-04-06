@@ -58,8 +58,8 @@ const createProjectParameterName = "CreateProjectParameter";
 const accessTokenErrorName = "AccessTokenError";
 const projectCacheName = "ProjectCache";
 const userCacheName = "UserCache";
-const projectWithIdAndRespondTimeName = "ProjectWithIdAndRespondTime";
-const userWithIdAndRespondTimeName = "UserWithIdAndRespondTime";
+const projectCacheWithIdName = "ProjectCacheWithId";
+const userCacheWithIdName = "UserCacheWithId";
 
 const dateTime: type.CustomType = {
   name: dateTimeName,
@@ -1005,7 +1005,7 @@ const createProjectError: type.CustomType = {
 
 const projectCache: type.CustomType = {
   name: projectCacheName,
-  description: "indexDBに格納する取得日時も含めたProject",
+  description: "indexDBに格納したりする取得日時も含めたProject",
   body: type.customTypeBodyProduct([
     {
       name: "project",
@@ -1013,7 +1013,7 @@ const projectCache: type.CustomType = {
       memberType: type.typeCustom(projectName),
     },
     {
-      name: "respondAt",
+      name: "respondTime",
       description: "取得日時",
       memberType: type.typeCustom(dateTimeName),
     },
@@ -1022,7 +1022,7 @@ const projectCache: type.CustomType = {
 
 const userCache: type.CustomType = {
   name: userCacheName,
-  description: "indexDBに格納する取得日も含めたUser",
+  description: "indexDBに格納したりする取得日も含めたUser",
   body: type.customTypeBodyProduct([
     {
       name: "user",
@@ -1030,53 +1030,43 @@ const userCache: type.CustomType = {
       memberType: type.typeCustom(userName),
     },
     {
-      name: "respondAt",
+      name: "respondTime",
       description: "取得日時",
       memberType: type.typeCustom(dateTimeName),
     },
   ]),
 };
 
-const projectWithIdAndRespondTime: type.CustomType = {
-  name: projectWithIdAndRespondTimeName,
-  description: "プロジェクトのデータとIDと受け取った時間",
+const projectCacheWithId: type.CustomType = {
+  name: projectCacheWithIdName,
+  description: "プロジェクトのキャッシュデータとID. indexedDBからElmに渡す用",
   body: type.customTypeBodyProduct([
     {
-      name: "project",
+      name: "projectCache",
       description: "プロジェクトのデータ",
-      memberType: type.typeCustom(projectName),
+      memberType: type.typeMaybe(type.typeCustom(projectCacheName)),
     },
     {
       name: "projectId",
       description: "プロジェクトのID",
       memberType: projectId,
     },
-    {
-      name: "respondTime",
-      description: "取得日時",
-      memberType: type.typeCustom(dateTimeName),
-    },
   ]),
 };
 
-const userWithIdAndRespondTime: type.CustomType = {
-  name: userWithIdAndRespondTimeName,
-  description: "ユーザーのデータとIDと受け取った時間",
+const userCacheWithId: type.CustomType = {
+  name: userCacheWithIdName,
+  description: "ユーザーのキャッシュデータとID. indexedDBからElmに渡す用",
   body: type.customTypeBodyProduct([
     {
-      name: "user",
+      name: "userCache",
       description: "ユーザーのデータ",
-      memberType: type.typeCustom(userName),
+      memberType: type.typeMaybe(type.typeCustom(userCacheName)),
     },
     {
       name: "userId",
       description: "ユーザーID",
       memberType: userId,
-    },
-    {
-      name: "respondTime",
-      description: "取得日時",
-      memberType: type.typeCustom(dateTimeName),
     },
   ]),
 };
@@ -1124,8 +1114,8 @@ const listCustomType: ReadonlyArray<type.CustomType> = [
   createProjectError,
   projectCache,
   userCache,
-  projectWithIdAndRespondTime,
-  userWithIdAndRespondTime,
+  projectCacheWithId,
+  userCacheWithId,
 ];
 
 const code = codeGen.generateCodeAsString(
