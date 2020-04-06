@@ -14,7 +14,16 @@ export type Result<ok, error> =
 /**
  * 日時. 0001-01-01T00:00:00.000Z to 9999-12-31T23:59:59.999Z 最小単位はミリ秒. ミリ秒の求め方は day*1000*60*60*24 + millisecond
  */
-export type Time = { day: number; millisecond: number };
+export type Time = {
+  /**
+   * 1970-01-01からの経過日数. マイナスになることもある
+   */
+  day: number
+  /**
+   * 日にちの中のミリ秒. 0 to 86399999 (=1000*60*60*24-1)
+   */;
+  millisecond: number;
+};
 
 /**
  * デバッグの状態と, デバッグ時ならアクセスしているポート番号
@@ -25,7 +34,13 @@ export type ClientMode = { _: "DebugMode"; int32: number } | { _: "Release" };
  * ログインのURLを発行するために必要なデータ
  */
 export type RequestLogInUrlRequestData = {
-  openIdConnectProvider: OpenIdConnectProvider;
+  /**
+   * ログインに使用するプロバイダー
+   */
+  openIdConnectProvider: OpenIdConnectProvider
+  /**
+   * ログインした後に返ってくるURLに必要なデータ
+   */;
   urlData: UrlData;
 };
 
@@ -38,9 +53,21 @@ export type OpenIdConnectProvider = "Google" | "GitHub";
  * デバッグモードかどうか,言語とページの場所. URLとして表現されるデータ. Googleなどの検索エンジンの都合( https://support.google.com/webmasters/answer/182192?hl=ja )で,URLにページの言語のを入れて,言語ごとに別のURLである必要がある. デバッグ時のホスト名は http://[::1] になる
  */
 export type UrlData = {
-  clientMode: ClientMode;
-  location: Location;
-  language: Language;
+  /**
+   * クライアントモード
+   */
+  clientMode: ClientMode
+  /**
+   * 場所
+   */;
+  location: Location
+  /**
+   * 言語
+   */;
+  language: Language
+  /**
+   * アクセストークン. ログインした後のリダイレクト先としてサーバーから渡される
+   */;
   accessToken: Maybe<AccessToken>;
 };
 
@@ -62,44 +89,113 @@ export type Location =
  * ユーザーが公開している情報
  */
 export type User = {
-  name: string;
-  imageHash: FileHash;
-  introduction: string;
-  createdAt: Time;
-  likedProjectIdList: ReadonlyArray<ProjectId>;
-  developedProjectIdList: ReadonlyArray<ProjectId>;
+  /**
+   * ユーザー名. 表示される名前。他のユーザーとかぶっても良い. 絵文字も使える. 全角英数は半角英数,半角カタカナは全角カタカナ, (株)の合字を分解するなどのNFKCの正規化がされる. U+0000-U+0019 と U+007F-U+00A0 の範囲の文字は入らない. 前後に空白を含められない. 間の空白は2文字以上連続しない. 文字数のカウント方法は正規化されたあとのCodePoint単位. Twitterと同じ、1文字以上50文字以下
+   */
+  name: string
+  /**
+   * プロフィール画像
+   */;
+  imageHash: FileHash
+  /**
+   * 自己紹介文. 改行文字を含めることができる. Twitterと同じ 0～160文字
+   */;
+  introduction: string
+  /**
+   * ユーザーが作成された日時
+   */;
+  createdAt: Time
+  /**
+   * プロジェクトに対する いいね
+   */;
+  likedProjectIdList: ReadonlyArray<ProjectId>
+  /**
+   * 開発に参加した (書いたコードが使われた) プロジェクト
+   */;
+  developedProjectIdList: ReadonlyArray<ProjectId>
+  /**
+   * コメントをしたアイデア
+   */;
   commentedIdeaIdList: ReadonlyArray<IdeaId>;
 };
 
 /**
  * 最初に自分の情報を得るときに返ってくるデータ
  */
-export type UserAndUserId = { userId: UserId; user: User };
+export type UserAndUserId = {
+  /**
+   * ユーザーID
+   */
+  userId: UserId
+  /**
+   * ユーザーのデータ
+   */;
+  user: User;
+};
 
 /**
  * プロジェクト
  */
 export type Project = {
-  name: string;
-  icon: FileHash;
-  image: FileHash;
-  createdAt: Time;
+  /**
+   * プロジェクト名
+   */
+  name: string
+  /**
+   * プロジェクトのアイコン画像
+   */;
+  icon: FileHash
+  /**
+   * プロジェクトのカバー画像
+   */;
+  image: FileHash
+  /**
+   * 作成日時
+   */;
+  createdAt: Time
+  /**
+   * 作成アカウント
+   */;
   createdBy: UserId;
 };
 
 /**
  * プロジェクトを作成したときに返ってくるデータ
  */
-export type ProjectAndProjectId = { projectId: ProjectId; project: Project };
+export type ProjectAndProjectId = {
+  /**
+   * プロジェクトID
+   */
+  projectId: ProjectId
+  /**
+   * プロジェクトのデータ
+   */;
+  project: Project;
+};
 
 /**
  * アイデア
  */
 export type Idea = {
-  name: string;
-  createdBy: UserId;
-  description: string;
-  createdAt: Time;
+  /**
+   * アイデア名
+   */
+  name: string
+  /**
+   * 言い出しっぺ
+   */;
+  createdBy: UserId
+  /**
+   * アイデアの説明
+   */;
+  description: string
+  /**
+   * 作成日時
+   */;
+  createdAt: Time
+  /**
+   * アイデアの要素
+   */;
   itemList: ReadonlyArray<IdeaItem>;
 };
 
@@ -113,14 +209,36 @@ export type IdeaItem =
 /**
  * 文章でのコメント
  */
-export type Comment = { body: string; createdBy: UserId; createdAt: Time };
+export type Comment = {
+  /**
+   * 本文
+   */
+  body: string
+  /**
+   * 作成者
+   */;
+  createdBy: UserId
+  /**
+   * 作成日時
+   */;
+  createdAt: Time;
+};
 
 /**
  * 編集提案
  */
 export type Suggestion = {
-  createdAt: Time;
-  description: string;
+  /**
+   * アイデアに投稿した日時
+   */
+  createdAt: Time
+  /**
+   * なぜ,どんな変更をしたのかの説明
+   */;
+  description: string
+  /**
+   * 変更点
+   */;
   change: Change;
 };
 
@@ -133,8 +251,17 @@ export type Change = { _: "ProjectName"; string_: string };
  * モジュール
  */
 export type Module = {
-  name: ReadonlyArray<string>;
-  description: string;
+  /**
+   * モジュール名.階層構造を表現することができる
+   */
+  name: ReadonlyArray<string>
+  /**
+   * モジュールの説明
+   */;
+  description: string
+  /**
+   * 外部のプロジェクトに公開するかどうか
+   */;
   export: boolean;
 };
 
@@ -142,8 +269,17 @@ export type Module = {
  * 型の定義
  */
 export type TypeDefinition = {
-  name: string;
-  parentList: ReadonlyArray<PartId>;
+  /**
+   * 型の名前
+   */
+  name: string
+  /**
+   * この型の元
+   */;
+  parentList: ReadonlyArray<PartId>
+  /**
+   * 型の説明
+   */;
   description: string;
 };
 
@@ -162,8 +298,17 @@ export type TypeBody =
  * 直積型のメンバー
  */
 export type TypeBodyProductMember = {
-  name: string;
-  description: string;
+  /**
+   * メンバー名
+   */
+  name: string
+  /**
+   * 説明文
+   */;
+  description: string
+  /**
+   * メンバー値の型
+   */;
   memberType: TypeId;
 };
 
@@ -171,8 +316,17 @@ export type TypeBodyProductMember = {
  * 直積型のパターン
  */
 export type TypeBodySumPattern = {
-  name: string;
-  description: string;
+  /**
+   * タグ名
+   */
+  name: string
+  /**
+   * 説明文
+   */;
+  description: string
+  /**
+   * パラメーター
+   */;
   parameter: Maybe<TypeId>;
 };
 
@@ -185,18 +339,45 @@ export type TypeBodyKernel = "Function" | "Int32" | "List";
  * パーツの定義
  */
 export type PartDefinition = {
-  name: string;
-  parentList: ReadonlyArray<PartId>;
-  description: string;
-  type: Type;
-  expr: Maybe<Expr>;
+  /**
+   * パーツの名前
+   */
+  name: string
+  /**
+   * このパーツの元
+   */;
+  parentList: ReadonlyArray<PartId>
+  /**
+   * パーツの説明
+   */;
+  description: string
+  /**
+   * パーツの型
+   */;
+  type: Type
+  /**
+   * パーツの式
+   */;
+  expr: Maybe<Expr>
+  /**
+   * 所属しているモジュール
+   */;
   moduleId: ModuleId;
 };
 
 /**
  * 型
  */
-export type Type = { reference: TypeId; parameter: ReadonlyArray<Type> };
+export type Type = {
+  /**
+   * 型の参照
+   */
+  reference: TypeId
+  /**
+   * 型のパラメーター
+   */;
+  parameter: ReadonlyArray<Type>;
+};
 
 /**
  * 式
@@ -223,7 +404,16 @@ export type EvaluatedExpr =
 /**
  * 複数の引数が必要な内部関数の部分呼び出し
  */
-export type KernelCall = { kernel: KernelExpr; expr: EvaluatedExpr };
+export type KernelCall = {
+  /**
+   * 関数
+   */
+  kernel: KernelExpr
+  /**
+   * 呼び出すパラメーター
+   */;
+  expr: EvaluatedExpr;
+};
 
 /**
  * Definyだけでは表現できない式
@@ -233,25 +423,61 @@ export type KernelExpr = "Int32Add" | "Int32Sub" | "Int32Mul";
 /**
  * ローカルパスの参照を表す
  */
-export type LocalPartReference = { partId: PartId; localPartId: LocalPartId };
+export type LocalPartReference = {
+  /**
+   * ローカルパスが定義されているパーツのID
+   */
+  partId: PartId
+  /**
+   * ローカルパーツID
+   */;
+  localPartId: LocalPartId;
+};
 
 /**
  * タグの参照を表す
  */
-export type TagReferenceIndex = { typeId: TypeId; tagIndex: number };
+export type TagReferenceIndex = {
+  /**
+   * 型ID
+   */
+  typeId: TypeId
+  /**
+   * タグIndex
+   */;
+  tagIndex: number;
+};
 
 /**
  * 関数呼び出し
  */
-export type FunctionCall = { function: Expr; parameter: Expr };
+export type FunctionCall = {
+  /**
+   * 関数
+   */
+  function: Expr
+  /**
+   * パラメーター
+   */;
+  parameter: Expr;
+};
 
 /**
  * ラムダのブランチ. Just x -> data x のようなところ
  */
 export type LambdaBranch = {
-  condition: Condition;
+  /**
+   * 入力値の条件を書くところ. Just x
+   */
+  condition: Condition
+  /**
+   * ブランチの説明
+   */;
   description: string;
-  localPartList: ReadonlyArray<BranchPartDefinition>;
+  localPartList: ReadonlyArray<BranchPartDefinition>
+  /**
+   * 式
+   */;
   expr: Maybe<Expr>;
 };
 
@@ -267,21 +493,54 @@ export type Condition =
 /**
  * タグによる条件
  */
-export type ConditionTag = { tag: TagId; parameter: Maybe<Condition> };
+export type ConditionTag = {
+  /**
+   * タグ
+   */
+  tag: TagId
+  /**
+   * パラメーター
+   */;
+  parameter: Maybe<Condition>;
+};
 
 /**
  * キャプチャパーツへのキャプチャ
  */
-export type ConditionCapture = { name: string; localPartId: LocalPartId };
+export type ConditionCapture = {
+  /**
+   * キャプチャパーツの名前
+   */
+  name: string
+  /**
+   * ローカルパーツId
+   */;
+  localPartId: LocalPartId;
+};
 
 /**
  * ラムダのブランチで使えるパーツを定義する部分
  */
 export type BranchPartDefinition = {
-  localPartId: LocalPartId;
-  name: string;
-  description: string;
-  type: Type;
+  /**
+   * ローカルパーツID
+   */
+  localPartId: LocalPartId
+  /**
+   * ブランチパーツの名前
+   */;
+  name: string
+  /**
+   * ブランチパーツの説明
+   */;
+  description: string
+  /**
+   * ローカルパーツの型
+   */;
+  type: Type
+  /**
+   * ローカルパーツの式
+   */;
   expr: Expr;
 };
 
@@ -298,13 +557,24 @@ export type EvaluateExprError =
 /**
  * 型エラー
  */
-export type TypeError = { message: string };
+export type TypeError = {
+  /**
+   * 型エラーの説明
+   */
+  message: string;
+};
 
 /**
  * プロジェクト作成時に必要なパラメーター
  */
 export type CreateProjectParameter = {
-  accessToken: AccessToken;
+  /**
+   * プロジェクトを作るときのアカウント
+   */
+  accessToken: AccessToken
+  /**
+   * プロジェクト名
+   */;
   projectName: string;
 };
 
@@ -318,25 +588,58 @@ export type AccessTokenError =
 /**
  * indexDBに格納したりする取得日時も含めたProject
  */
-export type ProjectCache = { project: Project; respondTime: Time };
+export type ProjectCache = {
+  /**
+   * プロジェクト
+   */
+  project: Project
+  /**
+   * 取得日時
+   */;
+  respondTime: Time;
+};
 
 /**
  * indexDBに格納したりする取得日も含めたUser
  */
-export type UserCache = { user: User; respondTime: Time };
+export type UserCache = {
+  /**
+   * ユーザーのデータ
+   */
+  user: User
+  /**
+   * 取得日時
+   */;
+  respondTime: Time;
+};
 
 /**
  * プロジェクトのキャッシュデータとID. indexedDBからElmに渡す用
  */
 export type ProjectCacheWithId = {
-  projectCache: Maybe<ProjectCache>;
+  /**
+   * プロジェクトのデータ
+   */
+  projectCache: Maybe<ProjectCache>
+  /**
+   * プロジェクトのID
+   */;
   projectId: ProjectId;
 };
 
 /**
  * ユーザーのキャッシュデータとID. indexedDBからElmに渡す用
  */
-export type UserCacheWithId = { userCache: Maybe<UserCache>; userId: UserId };
+export type UserCacheWithId = {
+  /**
+   * ユーザーのデータ
+   */
+  userCache: Maybe<UserCache>
+  /**
+   * ユーザーID
+   */;
+  userId: UserId;
+};
 
 export type AccessToken = string & { _accessToken: never };
 
@@ -1497,10 +1800,8 @@ export const decodeUrlData = (
     result: Maybe<AccessToken>;
     nextIndex: number;
   } = decodeMaybe(
-    decodeToken as (
-      a: number,
-      b: Uint8Array
-    ) => { result: AccessToken; nextIndex: number }
+    decodeToken as
+      (a: number, b: Uint8Array) => { result: AccessToken; nextIndex: number }
   )(languageAndNextIndex.nextIndex, binary);
   return {
     result: {
@@ -1556,20 +1857,17 @@ export const decodeLocation = (
     return { result: locationCreateProject, nextIndex: patternIndex.nextIndex };
   }
   if (patternIndex.result === 2) {
-    const result: { result: UserId; nextIndex: number } = (decodeId as (
-      a: number,
-      b: Uint8Array
-    ) => { result: UserId; nextIndex: number })(patternIndex.nextIndex, binary);
+    const result: { result: UserId; nextIndex: number } = (
+      decodeId as
+      (a: number, b: Uint8Array) => { result: UserId; nextIndex: number }
+    )(patternIndex.nextIndex, binary);
     return { result: locationUser(result.result), nextIndex: result.nextIndex };
   }
   if (patternIndex.result === 3) {
-    const result: { result: ProjectId; nextIndex: number } = (decodeId as (
-      a: number,
-      b: Uint8Array
-    ) => { result: ProjectId; nextIndex: number })(
-      patternIndex.nextIndex,
-      binary
-    );
+    const result: { result: ProjectId; nextIndex: number } = (
+      decodeId as
+      (a: number, b: Uint8Array) => { result: ProjectId; nextIndex: number }
+    )(patternIndex.nextIndex, binary);
     return {
       result: locationProject(result.result),
       nextIndex: result.nextIndex,
@@ -1590,16 +1888,10 @@ export const decodeUser = (
     index,
     binary
   );
-  const imageHashAndNextIndex: {
-    result: FileHash;
-    nextIndex: number;
-  } = (decodeToken as (
-    a: number,
-    b: Uint8Array
-  ) => { result: FileHash; nextIndex: number })(
-    nameAndNextIndex.nextIndex,
-    binary
-  );
+  const imageHashAndNextIndex: { result: FileHash; nextIndex: number } = (
+    decodeToken as
+    (a: number, b: Uint8Array) => { result: FileHash; nextIndex: number }
+  )(nameAndNextIndex.nextIndex, binary);
   const introductionAndNextIndex: {
     result: string;
     nextIndex: number;
@@ -1612,28 +1904,22 @@ export const decodeUser = (
     result: ReadonlyArray<ProjectId>;
     nextIndex: number;
   } = decodeList(
-    decodeId as (
-      a: number,
-      b: Uint8Array
-    ) => { result: ProjectId; nextIndex: number }
+    decodeId as
+      (a: number, b: Uint8Array) => { result: ProjectId; nextIndex: number }
   )(createdAtAndNextIndex.nextIndex, binary);
   const developedProjectIdListAndNextIndex: {
     result: ReadonlyArray<ProjectId>;
     nextIndex: number;
   } = decodeList(
-    decodeId as (
-      a: number,
-      b: Uint8Array
-    ) => { result: ProjectId; nextIndex: number }
+    decodeId as
+      (a: number, b: Uint8Array) => { result: ProjectId; nextIndex: number }
   )(likedProjectIdListAndNextIndex.nextIndex, binary);
   const commentedIdeaIdListAndNextIndex: {
     result: ReadonlyArray<IdeaId>;
     nextIndex: number;
   } = decodeList(
-    decodeId as (
-      a: number,
-      b: Uint8Array
-    ) => { result: IdeaId; nextIndex: number }
+    decodeId as
+      (a: number, b: Uint8Array) => { result: IdeaId; nextIndex: number }
   )(developedProjectIdListAndNextIndex.nextIndex, binary);
   return {
     result: {
@@ -1657,13 +1943,10 @@ export const decodeUserAndUserId = (
   index: number,
   binary: Uint8Array
 ): { result: UserAndUserId; nextIndex: number } => {
-  const userIdAndNextIndex: {
-    result: UserId;
-    nextIndex: number;
-  } = (decodeId as (
-    a: number,
-    b: Uint8Array
-  ) => { result: UserId; nextIndex: number })(index, binary);
+  const userIdAndNextIndex: { result: UserId; nextIndex: number } = (
+    decodeId as
+    (a: number, b: Uint8Array) => { result: UserId; nextIndex: number }
+  )(index, binary);
   const userAndNextIndex: { result: User; nextIndex: number } = decodeUser(
     userIdAndNextIndex.nextIndex,
     binary
@@ -1689,40 +1972,22 @@ export const decodeProject = (
     index,
     binary
   );
-  const iconAndNextIndex: {
-    result: FileHash;
-    nextIndex: number;
-  } = (decodeToken as (
-    a: number,
-    b: Uint8Array
-  ) => { result: FileHash; nextIndex: number })(
-    nameAndNextIndex.nextIndex,
-    binary
-  );
-  const imageAndNextIndex: {
-    result: FileHash;
-    nextIndex: number;
-  } = (decodeToken as (
-    a: number,
-    b: Uint8Array
-  ) => { result: FileHash; nextIndex: number })(
-    iconAndNextIndex.nextIndex,
-    binary
-  );
+  const iconAndNextIndex: { result: FileHash; nextIndex: number } = (
+    decodeToken as
+    (a: number, b: Uint8Array) => { result: FileHash; nextIndex: number }
+  )(nameAndNextIndex.nextIndex, binary);
+  const imageAndNextIndex: { result: FileHash; nextIndex: number } = (
+    decodeToken as
+    (a: number, b: Uint8Array) => { result: FileHash; nextIndex: number }
+  )(iconAndNextIndex.nextIndex, binary);
   const createdAtAndNextIndex: { result: Time; nextIndex: number } = decodeTime(
     imageAndNextIndex.nextIndex,
     binary
   );
-  const createdByAndNextIndex: {
-    result: UserId;
-    nextIndex: number;
-  } = (decodeId as (
-    a: number,
-    b: Uint8Array
-  ) => { result: UserId; nextIndex: number })(
-    createdAtAndNextIndex.nextIndex,
-    binary
-  );
+  const createdByAndNextIndex: { result: UserId; nextIndex: number } = (
+    decodeId as
+    (a: number, b: Uint8Array) => { result: UserId; nextIndex: number }
+  )(createdAtAndNextIndex.nextIndex, binary);
   return {
     result: {
       name: nameAndNextIndex.result,
@@ -1743,13 +2008,10 @@ export const decodeProjectAndProjectId = (
   index: number,
   binary: Uint8Array
 ): { result: ProjectAndProjectId; nextIndex: number } => {
-  const projectIdAndNextIndex: {
-    result: ProjectId;
-    nextIndex: number;
-  } = (decodeId as (
-    a: number,
-    b: Uint8Array
-  ) => { result: ProjectId; nextIndex: number })(index, binary);
+  const projectIdAndNextIndex: { result: ProjectId; nextIndex: number } = (
+    decodeId as
+    (a: number, b: Uint8Array) => { result: ProjectId; nextIndex: number }
+  )(index, binary);
   const projectAndNextIndex: {
     result: Project;
     nextIndex: number;
@@ -1775,16 +2037,10 @@ export const decodeIdea = (
     index,
     binary
   );
-  const createdByAndNextIndex: {
-    result: UserId;
-    nextIndex: number;
-  } = (decodeId as (
-    a: number,
-    b: Uint8Array
-  ) => { result: UserId; nextIndex: number })(
-    nameAndNextIndex.nextIndex,
-    binary
-  );
+  const createdByAndNextIndex: { result: UserId; nextIndex: number } = (
+    decodeId as
+    (a: number, b: Uint8Array) => { result: UserId; nextIndex: number }
+  )(nameAndNextIndex.nextIndex, binary);
   const descriptionAndNextIndex: {
     result: string;
     nextIndex: number;
@@ -1856,16 +2112,10 @@ export const decodeComment = (
     index,
     binary
   );
-  const createdByAndNextIndex: {
-    result: UserId;
-    nextIndex: number;
-  } = (decodeId as (
-    a: number,
-    b: Uint8Array
-  ) => { result: UserId; nextIndex: number })(
-    bodyAndNextIndex.nextIndex,
-    binary
-  );
+  const createdByAndNextIndex: { result: UserId; nextIndex: number } = (
+    decodeId as
+    (a: number, b: Uint8Array) => { result: UserId; nextIndex: number }
+  )(bodyAndNextIndex.nextIndex, binary);
   const createdAtAndNextIndex: { result: Time; nextIndex: number } = decodeTime(
     createdByAndNextIndex.nextIndex,
     binary
@@ -1981,10 +2231,8 @@ export const decodeTypeDefinition = (
     result: ReadonlyArray<PartId>;
     nextIndex: number;
   } = decodeList(
-    decodeId as (
-      a: number,
-      b: Uint8Array
-    ) => { result: PartId; nextIndex: number }
+    decodeId as
+      (a: number, b: Uint8Array) => { result: PartId; nextIndex: number }
   )(nameAndNextIndex.nextIndex, binary);
   const descriptionAndNextIndex: {
     result: string;
@@ -2058,16 +2306,10 @@ export const decodeTypeBodyProductMember = (
     result: string;
     nextIndex: number;
   } = decodeString(nameAndNextIndex.nextIndex, binary);
-  const memberTypeAndNextIndex: {
-    result: TypeId;
-    nextIndex: number;
-  } = (decodeId as (
-    a: number,
-    b: Uint8Array
-  ) => { result: TypeId; nextIndex: number })(
-    descriptionAndNextIndex.nextIndex,
-    binary
-  );
+  const memberTypeAndNextIndex: { result: TypeId; nextIndex: number } = (
+    decodeId as
+    (a: number, b: Uint8Array) => { result: TypeId; nextIndex: number }
+  )(descriptionAndNextIndex.nextIndex, binary);
   return {
     result: {
       name: nameAndNextIndex.result,
@@ -2098,10 +2340,8 @@ export const decodeTypeBodySumPattern = (
     result: Maybe<TypeId>;
     nextIndex: number;
   } = decodeMaybe(
-    decodeId as (
-      a: number,
-      b: Uint8Array
-    ) => { result: TypeId; nextIndex: number }
+    decodeId as
+      (a: number, b: Uint8Array) => { result: TypeId; nextIndex: number }
   )(descriptionAndNextIndex.nextIndex, binary);
   return {
     result: {
@@ -2153,10 +2393,8 @@ export const decodePartDefinition = (
     result: ReadonlyArray<PartId>;
     nextIndex: number;
   } = decodeList(
-    decodeId as (
-      a: number,
-      b: Uint8Array
-    ) => { result: PartId; nextIndex: number }
+    decodeId as
+      (a: number, b: Uint8Array) => { result: PartId; nextIndex: number }
   )(nameAndNextIndex.nextIndex, binary);
   const descriptionAndNextIndex: {
     result: string;
@@ -2170,16 +2408,10 @@ export const decodePartDefinition = (
     result: Maybe<Expr>;
     nextIndex: number;
   } = decodeMaybe(decodeExpr)(typeAndNextIndex.nextIndex, binary);
-  const moduleIdAndNextIndex: {
-    result: ModuleId;
-    nextIndex: number;
-  } = (decodeId as (
-    a: number,
-    b: Uint8Array
-  ) => { result: ModuleId; nextIndex: number })(
-    exprAndNextIndex.nextIndex,
-    binary
-  );
+  const moduleIdAndNextIndex: { result: ModuleId; nextIndex: number } = (
+    decodeId as
+    (a: number, b: Uint8Array) => { result: ModuleId; nextIndex: number }
+  )(exprAndNextIndex.nextIndex, binary);
   return {
     result: {
       name: nameAndNextIndex.result,
@@ -2201,13 +2433,10 @@ export const decodeType = (
   index: number,
   binary: Uint8Array
 ): { result: Type; nextIndex: number } => {
-  const referenceAndNextIndex: {
-    result: TypeId;
-    nextIndex: number;
-  } = (decodeId as (
-    a: number,
-    b: Uint8Array
-  ) => { result: TypeId; nextIndex: number })(index, binary);
+  const referenceAndNextIndex: { result: TypeId; nextIndex: number } = (
+    decodeId as
+    (a: number, b: Uint8Array) => { result: TypeId; nextIndex: number }
+  )(index, binary);
   const parameterAndNextIndex: {
     result: ReadonlyArray<Type>;
     nextIndex: number;
@@ -2251,10 +2480,10 @@ export const decodeExpr = (
     };
   }
   if (patternIndex.result === 2) {
-    const result: { result: PartId; nextIndex: number } = (decodeId as (
-      a: number,
-      b: Uint8Array
-    ) => { result: PartId; nextIndex: number })(patternIndex.nextIndex, binary);
+    const result: { result: PartId; nextIndex: number } = (
+      decodeId as
+      (a: number, b: Uint8Array) => { result: PartId; nextIndex: number }
+    )(patternIndex.nextIndex, binary);
     return {
       result: exprPartReference(result.result),
       nextIndex: result.nextIndex,
@@ -2422,23 +2651,14 @@ export const decodeLocalPartReference = (
   index: number,
   binary: Uint8Array
 ): { result: LocalPartReference; nextIndex: number } => {
-  const partIdAndNextIndex: {
-    result: PartId;
-    nextIndex: number;
-  } = (decodeId as (
-    a: number,
-    b: Uint8Array
-  ) => { result: PartId; nextIndex: number })(index, binary);
-  const localPartIdAndNextIndex: {
-    result: LocalPartId;
-    nextIndex: number;
-  } = (decodeId as (
-    a: number,
-    b: Uint8Array
-  ) => { result: LocalPartId; nextIndex: number })(
-    partIdAndNextIndex.nextIndex,
-    binary
-  );
+  const partIdAndNextIndex: { result: PartId; nextIndex: number } = (
+    decodeId as
+    (a: number, b: Uint8Array) => { result: PartId; nextIndex: number }
+  )(index, binary);
+  const localPartIdAndNextIndex: { result: LocalPartId; nextIndex: number } = (
+    decodeId as
+    (a: number, b: Uint8Array) => { result: LocalPartId; nextIndex: number }
+  )(partIdAndNextIndex.nextIndex, binary);
   return {
     result: {
       partId: partIdAndNextIndex.result,
@@ -2456,13 +2676,10 @@ export const decodeTagReferenceIndex = (
   index: number,
   binary: Uint8Array
 ): { result: TagReferenceIndex; nextIndex: number } => {
-  const typeIdAndNextIndex: {
-    result: TypeId;
-    nextIndex: number;
-  } = (decodeId as (
-    a: number,
-    b: Uint8Array
-  ) => { result: TypeId; nextIndex: number })(index, binary);
+  const typeIdAndNextIndex: { result: TypeId; nextIndex: number } = (
+    decodeId as
+    (a: number, b: Uint8Array) => { result: TypeId; nextIndex: number }
+  )(index, binary);
   const tagIndexAndNextIndex: {
     result: number;
     nextIndex: number;
@@ -2595,10 +2812,10 @@ export const decodeConditionTag = (
   index: number,
   binary: Uint8Array
 ): { result: ConditionTag; nextIndex: number } => {
-  const tagAndNextIndex: { result: TagId; nextIndex: number } = (decodeId as (
-    a: number,
-    b: Uint8Array
-  ) => { result: TagId; nextIndex: number })(index, binary);
+  const tagAndNextIndex: { result: TagId; nextIndex: number } = (
+    decodeId as
+    (a: number, b: Uint8Array) => { result: TagId; nextIndex: number }
+  )(index, binary);
   const parameterAndNextIndex: {
     result: Maybe<Condition>;
     nextIndex: number;
@@ -2624,16 +2841,10 @@ export const decodeConditionCapture = (
     index,
     binary
   );
-  const localPartIdAndNextIndex: {
-    result: LocalPartId;
-    nextIndex: number;
-  } = (decodeId as (
-    a: number,
-    b: Uint8Array
-  ) => { result: LocalPartId; nextIndex: number })(
-    nameAndNextIndex.nextIndex,
-    binary
-  );
+  const localPartIdAndNextIndex: { result: LocalPartId; nextIndex: number } = (
+    decodeId as
+    (a: number, b: Uint8Array) => { result: LocalPartId; nextIndex: number }
+  )(nameAndNextIndex.nextIndex, binary);
   return {
     result: {
       name: nameAndNextIndex.result,
@@ -2651,13 +2862,10 @@ export const decodeBranchPartDefinition = (
   index: number,
   binary: Uint8Array
 ): { result: BranchPartDefinition; nextIndex: number } => {
-  const localPartIdAndNextIndex: {
-    result: LocalPartId;
-    nextIndex: number;
-  } = (decodeId as (
-    a: number,
-    b: Uint8Array
-  ) => { result: LocalPartId; nextIndex: number })(index, binary);
+  const localPartIdAndNextIndex: { result: LocalPartId; nextIndex: number } = (
+    decodeId as
+    (a: number, b: Uint8Array) => { result: LocalPartId; nextIndex: number }
+  )(index, binary);
   const nameAndNextIndex: { result: string; nextIndex: number } = decodeString(
     localPartIdAndNextIndex.nextIndex,
     binary
@@ -2699,20 +2907,20 @@ export const decodeEvaluateExprError = (
     binary
   );
   if (patternIndex.result === 0) {
-    const result: { result: PartId; nextIndex: number } = (decodeId as (
-      a: number,
-      b: Uint8Array
-    ) => { result: PartId; nextIndex: number })(patternIndex.nextIndex, binary);
+    const result: { result: PartId; nextIndex: number } = (
+      decodeId as
+      (a: number, b: Uint8Array) => { result: PartId; nextIndex: number }
+    )(patternIndex.nextIndex, binary);
     return {
       result: evaluateExprErrorNeedPartDefinition(result.result),
       nextIndex: result.nextIndex,
     };
   }
   if (patternIndex.result === 1) {
-    const result: { result: PartId; nextIndex: number } = (decodeId as (
-      a: number,
-      b: Uint8Array
-    ) => { result: PartId; nextIndex: number })(patternIndex.nextIndex, binary);
+    const result: { result: PartId; nextIndex: number } = (
+      decodeId as
+      (a: number, b: Uint8Array) => { result: PartId; nextIndex: number }
+    )(patternIndex.nextIndex, binary);
     return {
       result: evaluateExprErrorPartExprIsNothing(result.result),
       nextIndex: result.nextIndex,
@@ -2773,13 +2981,10 @@ export const decodeCreateProjectParameter = (
   index: number,
   binary: Uint8Array
 ): { result: CreateProjectParameter; nextIndex: number } => {
-  const accessTokenAndNextIndex: {
-    result: AccessToken;
-    nextIndex: number;
-  } = (decodeToken as (
-    a: number,
-    b: Uint8Array
-  ) => { result: AccessToken; nextIndex: number })(index, binary);
+  const accessTokenAndNextIndex: { result: AccessToken; nextIndex: number } = (
+    decodeToken as
+    (a: number, b: Uint8Array) => { result: AccessToken; nextIndex: number }
+  )(index, binary);
   const projectNameAndNextIndex: {
     result: string;
     nextIndex: number;
@@ -2882,16 +3087,10 @@ export const decodeProjectCacheWithId = (
     result: Maybe<ProjectCache>;
     nextIndex: number;
   } = decodeMaybe(decodeProjectCache)(index, binary);
-  const projectIdAndNextIndex: {
-    result: ProjectId;
-    nextIndex: number;
-  } = (decodeId as (
-    a: number,
-    b: Uint8Array
-  ) => { result: ProjectId; nextIndex: number })(
-    projectCacheAndNextIndex.nextIndex,
-    binary
-  );
+  const projectIdAndNextIndex: { result: ProjectId; nextIndex: number } = (
+    decodeId as
+    (a: number, b: Uint8Array) => { result: ProjectId; nextIndex: number }
+  )(projectCacheAndNextIndex.nextIndex, binary);
   return {
     result: {
       projectCache: projectCacheAndNextIndex.result,
@@ -2913,16 +3112,10 @@ export const decodeUserCacheWithId = (
     result: Maybe<UserCache>;
     nextIndex: number;
   } = decodeMaybe(decodeUserCache)(index, binary);
-  const userIdAndNextIndex: {
-    result: UserId;
-    nextIndex: number;
-  } = (decodeId as (
-    a: number,
-    b: Uint8Array
-  ) => { result: UserId; nextIndex: number })(
-    userCacheAndNextIndex.nextIndex,
-    binary
-  );
+  const userIdAndNextIndex: { result: UserId; nextIndex: number } = (
+    decodeId as
+    (a: number, b: Uint8Array) => { result: UserId; nextIndex: number }
+  )(userCacheAndNextIndex.nextIndex, binary);
   return {
     result: {
       userCache: userCacheAndNextIndex.result,
