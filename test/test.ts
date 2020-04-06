@@ -42,7 +42,8 @@ describe("test", () => {
       ),
       language: "Esperanto",
       accessToken: data.maybeJust(
-        "f81919b78537257302b50f776b77a90b984cc3d75fa899f9f460ff972dcc8cb0" as data.AccessToken
+        "f81919b78537257302b50f776b77a90b984cc3d75fa899f9f460ff972dcc8cb0" as
+          data.AccessToken
       ),
     });
   });
@@ -60,16 +61,11 @@ describe("test", () => {
     expect(languageAndLocation).toEqual(decodedLanguageAndLocation);
   });
   it("dateTime and js Date conversion", () => {
-    const sampleDateTime: data.DateTime = {
-      year: 2015,
-      month: 3,
-      day: 21,
-      hour: 14,
-      minute: 46,
-      second: 3,
-    };
+    const sampleDateTime: data.Time = main.util.timeFromDate(
+      new Date(2015, 3, 21, 14, 46, 3, 1234)
+    );
     expect(sampleDateTime).toEqual(
-      main.util.dateTimeFromDate(main.util.dateTimeToDate(sampleDateTime))
+      main.util.timeFromDate(main.util.timeToDate(sampleDateTime))
     );
   });
   it("dynamic Evaluation: simple expr", () => {
