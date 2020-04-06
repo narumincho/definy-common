@@ -16,7 +16,7 @@ const tagId = type.typeId("TagId");
 const partId = type.typeId("PartId");
 const localPartId = type.typeId("LocalPartId");
 
-const dateTimeName = "DateTime";
+const timeName = "Time";
 const requestLogInUrlRequestDataName = "RequestLogInUrlRequestData";
 const openIdConnectProviderName = "OpenIdConnectProvider";
 const urlDataName = "UrlData";
@@ -61,38 +61,19 @@ const userCacheName = "UserCache";
 const projectCacheWithIdName = "ProjectCacheWithId";
 const userCacheWithIdName = "UserCacheWithId";
 
-const dateTime: type.CustomType = {
-  name: dateTimeName,
-  description: "日時 最小単位は秒",
+const time: type.CustomType = {
+  name: timeName,
+  description:
+    "日時. 0001-01-01T00:00:00.000Z to 9999-12-31T23:59:59.999Z 最小単位はミリ秒. ミリ秒の求め方は day*1000*60*60*24 + millisecond",
   body: type.customTypeBodyProduct([
     {
-      name: "year",
-      description: "年. 人類紀元. 西暦に10000を足したもの Human Era",
-      memberType: type.typeInt32,
-    },
-    {
-      name: "month",
-      description: "月. 1月～12月. 最大値は月や年によって決まる",
-      memberType: type.typeInt32,
-    },
-    {
       name: "day",
-      description: "日",
+      description: "1970-01-01からの経過日数. マイナスになることもある",
       memberType: type.typeInt32,
     },
     {
-      name: "hour",
-      description: "時. 0時～23時",
-      memberType: type.typeInt32,
-    },
-    {
-      name: "minute",
-      description: "分",
-      memberType: type.typeInt32,
-    },
-    {
-      name: "second",
-      description: "秒",
+      name: "millisecond",
+      description: "日にちの中のミリ秒. 0 to 86400000 (=1000*60*60*24)",
       memberType: type.typeInt32,
     },
   ]),
@@ -255,7 +236,7 @@ const user: type.CustomType = {
     {
       name: "createdAt",
       description: "ユーザーが作成された日時",
-      memberType: type.typeCustom(dateTimeName),
+      memberType: type.typeCustom(timeName),
     },
     {
       name: "likedProjectIdList",
@@ -314,7 +295,7 @@ const project: type.CustomType = {
     {
       name: "createdAt",
       description: "作成日時",
-      memberType: type.typeCustom(dateTimeName),
+      memberType: type.typeCustom(timeName),
     },
     {
       name: "createdBy",
@@ -363,7 +344,7 @@ const idea: type.CustomType = {
     {
       name: "createdAt",
       description: "作成日時",
-      memberType: type.typeCustom(dateTimeName),
+      memberType: type.typeCustom(timeName),
     },
     {
       name: "itemList",
@@ -407,7 +388,7 @@ const ideaCommentText: type.CustomType = {
     {
       name: "createdAt",
       description: "作成日時",
-      memberType: type.typeCustom(dateTimeName),
+      memberType: type.typeCustom(timeName),
     },
   ]),
 };
@@ -419,7 +400,7 @@ const suggestion: type.CustomType = {
     {
       name: "createdAt",
       description: "アイデアに投稿した日時",
-      memberType: type.typeCustom(dateTimeName),
+      memberType: type.typeCustom(timeName),
     },
     {
       name: "description",
@@ -1015,7 +996,7 @@ const projectCache: type.CustomType = {
     {
       name: "respondTime",
       description: "取得日時",
-      memberType: type.typeCustom(dateTimeName),
+      memberType: type.typeCustom(timeName),
     },
   ]),
 };
@@ -1032,7 +1013,7 @@ const userCache: type.CustomType = {
     {
       name: "respondTime",
       description: "取得日時",
-      memberType: type.typeCustom(dateTimeName),
+      memberType: type.typeCustom(timeName),
     },
   ]),
 };
@@ -1072,7 +1053,7 @@ const userCacheWithId: type.CustomType = {
 };
 
 const listCustomType: ReadonlyArray<type.CustomType> = [
-  dateTime,
+  time,
   clientMode,
   requestLogInUrlRequestData,
   openIdConnectProvider,

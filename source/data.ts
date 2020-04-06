@@ -12,16 +12,9 @@ export type Result<ok, error> =
   | { _: "Error"; error: error };
 
 /**
- * 日時 最小単位は秒
+ * 日時. 0001-01-01T00:00:00.000Z to 9999-12-31T23:59:59.999Z 最小単位はミリ秒. ミリ秒の求め方は day*1000*60*60*24 + millisecond
  */
-export type DateTime = {
-  year: number;
-  month: number;
-  day: number;
-  hour: number;
-  minute: number;
-  second: number;
-};
+export type Time = { day: number; millisecond: number };
 
 /**
  * デバッグの状態と, デバッグ時ならアクセスしているポート番号
@@ -72,7 +65,7 @@ export type User = {
   name: string;
   imageHash: FileHash;
   introduction: string;
-  createdAt: DateTime;
+  createdAt: Time;
   likedProjectIdList: ReadonlyArray<ProjectId>;
   developedProjectIdList: ReadonlyArray<ProjectId>;
   commentedIdeaIdList: ReadonlyArray<IdeaId>;
@@ -90,7 +83,7 @@ export type Project = {
   name: string;
   icon: FileHash;
   image: FileHash;
-  createdAt: DateTime;
+  createdAt: Time;
   createdBy: UserId;
 };
 
@@ -106,7 +99,7 @@ export type Idea = {
   name: string;
   createdBy: UserId;
   description: string;
-  createdAt: DateTime;
+  createdAt: Time;
   itemList: ReadonlyArray<IdeaItem>;
 };
 
@@ -120,13 +113,13 @@ export type IdeaItem =
 /**
  * 文章でのコメント
  */
-export type Comment = { body: string; createdBy: UserId; createdAt: DateTime };
+export type Comment = { body: string; createdBy: UserId; createdAt: Time };
 
 /**
  * 編集提案
  */
 export type Suggestion = {
-  createdAt: DateTime;
+  createdAt: Time;
   description: string;
   change: Change;
 };
@@ -325,12 +318,12 @@ export type AccessTokenError =
 /**
  * indexDBに格納したりする取得日時も含めたProject
  */
-export type ProjectCache = { project: Project; respondTime: DateTime };
+export type ProjectCache = { project: Project; respondTime: Time };
 
 /**
  * indexDBに格納したりする取得日も含めたUser
  */
-export type UserCache = { user: User; respondTime: DateTime };
+export type UserCache = { user: User; respondTime: Time };
 
 /**
  * プロジェクトのキャッシュデータとID. indexedDBからElmに渡す用
@@ -733,13 +726,8 @@ export const encodeToken = (id: string): ReadonlyArray<number> => {
   return result;
 };
 
-export const encodeDateTime = (dateTime: DateTime): ReadonlyArray<number> =>
-  encodeInt32(dateTime.year)
-    .concat(encodeInt32(dateTime.month))
-    .concat(encodeInt32(dateTime.day))
-    .concat(encodeInt32(dateTime.hour))
-    .concat(encodeInt32(dateTime.minute))
-    .concat(encodeInt32(dateTime.second));
+export const encodeTime = (time: Time): ReadonlyArray<number> =>
+  encodeInt32(time.day).concat(encodeInt32(time.millisecond));
 
 export const encodeClientMode = (
   clientMode: ClientMode
@@ -815,7 +803,7 @@ export const encodeUser = (user: User): ReadonlyArray<number> =>
   encodeString(user.name)
     .concat(encodeToken(user.imageHash))
     .concat(encodeString(user.introduction))
-    .concat(encodeDateTime(user.createdAt))
+    .concat(encodeTime(user.createdAt))
     .concat(encodeList(encodeId)(user.likedProjectIdList))
     .concat(encodeList(encodeId)(user.developedProjectIdList))
     .concat(encodeList(encodeId)(user.commentedIdeaIdList));
@@ -829,7 +817,7 @@ export const encodeProject = (project: Project): ReadonlyArray<number> =>
   encodeString(project.name)
     .concat(encodeToken(project.icon))
     .concat(encodeToken(project.image))
-    .concat(encodeDateTime(project.createdAt))
+    .concat(encodeTime(project.createdAt))
     .concat(encodeId(project.createdBy));
 
 export const encodeProjectAndProjectId = (
@@ -843,7 +831,7 @@ export const encodeIdea = (idea: Idea): ReadonlyArray<number> =>
   encodeString(idea.name)
     .concat(encodeId(idea.createdBy))
     .concat(encodeString(idea.description))
-    .concat(encodeDateTime(idea.createdAt))
+    .concat(encodeTime(idea.createdAt))
     .concat(encodeList(encodeIdeaItem)(idea.itemList));
 
 export const encodeIdeaItem = (ideaItem: IdeaItem): ReadonlyArray<number> => {
@@ -860,12 +848,12 @@ export const encodeIdeaItem = (ideaItem: IdeaItem): ReadonlyArray<number> => {
 export const encodeComment = (comment: Comment): ReadonlyArray<number> =>
   encodeString(comment.body)
     .concat(encodeId(comment.createdBy))
-    .concat(encodeDateTime(comment.createdAt));
+    .concat(encodeTime(comment.createdAt));
 
 export const encodeSuggestion = (
   suggestion: Suggestion
 ): ReadonlyArray<number> =>
-  encodeDateTime(suggestion.createdAt)
+  encodeTime(suggestion.createdAt)
     .concat(encodeString(suggestion.description))
     .concat(encodeChange(suggestion.change));
 
@@ -1149,11 +1137,11 @@ export const encodeProjectCache = (
   projectCache: ProjectCache
 ): ReadonlyArray<number> =>
   encodeProject(projectCache.project).concat(
-    encodeDateTime(projectCache.respondTime)
+    encodeTime(projectCache.respondTime)
   );
 
 export const encodeUserCache = (userCache: UserCache): ReadonlyArray<number> =>
-  encodeUser(userCache.user).concat(encodeDateTime(userCache.respondTime));
+  encodeUser(userCache.user).concat(encodeTime(userCache.respondTime));
 
 export const encodeProjectCacheWithId = (
   projectCacheWithId: ProjectCacheWithId
@@ -1390,44 +1378,24 @@ export const decodeToken = (
  * @param index バイナリを読み込み開始位置
  * @param binary バイナリ
  */
-export const decodeDateTime = (
+export const decodeTime = (
   index: number,
   binary: Uint8Array
-): { result: DateTime; nextIndex: number } => {
-  const yearAndNextIndex: { result: number; nextIndex: number } = decodeInt32(
+): { result: Time; nextIndex: number } => {
+  const dayAndNextIndex: { result: number; nextIndex: number } = decodeInt32(
     index,
     binary
   );
-  const monthAndNextIndex: { result: number; nextIndex: number } = decodeInt32(
-    yearAndNextIndex.nextIndex,
-    binary
-  );
-  const dayAndNextIndex: { result: number; nextIndex: number } = decodeInt32(
-    monthAndNextIndex.nextIndex,
-    binary
-  );
-  const hourAndNextIndex: { result: number; nextIndex: number } = decodeInt32(
-    dayAndNextIndex.nextIndex,
-    binary
-  );
-  const minuteAndNextIndex: { result: number; nextIndex: number } = decodeInt32(
-    hourAndNextIndex.nextIndex,
-    binary
-  );
-  const secondAndNextIndex: { result: number; nextIndex: number } = decodeInt32(
-    minuteAndNextIndex.nextIndex,
-    binary
-  );
+  const millisecondAndNextIndex: {
+    result: number;
+    nextIndex: number;
+  } = decodeInt32(dayAndNextIndex.nextIndex, binary);
   return {
     result: {
-      year: yearAndNextIndex.result,
-      month: monthAndNextIndex.result,
       day: dayAndNextIndex.result,
-      hour: hourAndNextIndex.result,
-      minute: minuteAndNextIndex.result,
-      second: secondAndNextIndex.result,
+      millisecond: millisecondAndNextIndex.result,
     },
-    nextIndex: secondAndNextIndex.nextIndex,
+    nextIndex: millisecondAndNextIndex.nextIndex,
   };
 };
 
@@ -1636,10 +1604,10 @@ export const decodeUser = (
     result: string;
     nextIndex: number;
   } = decodeString(imageHashAndNextIndex.nextIndex, binary);
-  const createdAtAndNextIndex: {
-    result: DateTime;
-    nextIndex: number;
-  } = decodeDateTime(introductionAndNextIndex.nextIndex, binary);
+  const createdAtAndNextIndex: { result: Time; nextIndex: number } = decodeTime(
+    introductionAndNextIndex.nextIndex,
+    binary
+  );
   const likedProjectIdListAndNextIndex: {
     result: ReadonlyArray<ProjectId>;
     nextIndex: number;
@@ -1741,10 +1709,10 @@ export const decodeProject = (
     iconAndNextIndex.nextIndex,
     binary
   );
-  const createdAtAndNextIndex: {
-    result: DateTime;
-    nextIndex: number;
-  } = decodeDateTime(imageAndNextIndex.nextIndex, binary);
+  const createdAtAndNextIndex: { result: Time; nextIndex: number } = decodeTime(
+    imageAndNextIndex.nextIndex,
+    binary
+  );
   const createdByAndNextIndex: {
     result: UserId;
     nextIndex: number;
@@ -1821,10 +1789,10 @@ export const decodeIdea = (
     result: string;
     nextIndex: number;
   } = decodeString(createdByAndNextIndex.nextIndex, binary);
-  const createdAtAndNextIndex: {
-    result: DateTime;
-    nextIndex: number;
-  } = decodeDateTime(descriptionAndNextIndex.nextIndex, binary);
+  const createdAtAndNextIndex: { result: Time; nextIndex: number } = decodeTime(
+    descriptionAndNextIndex.nextIndex,
+    binary
+  );
   const itemListAndNextIndex: {
     result: ReadonlyArray<IdeaItem>;
     nextIndex: number;
@@ -1898,10 +1866,10 @@ export const decodeComment = (
     bodyAndNextIndex.nextIndex,
     binary
   );
-  const createdAtAndNextIndex: {
-    result: DateTime;
-    nextIndex: number;
-  } = decodeDateTime(createdByAndNextIndex.nextIndex, binary);
+  const createdAtAndNextIndex: { result: Time; nextIndex: number } = decodeTime(
+    createdByAndNextIndex.nextIndex,
+    binary
+  );
   return {
     result: {
       body: bodyAndNextIndex.result,
@@ -1920,10 +1888,10 @@ export const decodeSuggestion = (
   index: number,
   binary: Uint8Array
 ): { result: Suggestion; nextIndex: number } => {
-  const createdAtAndNextIndex: {
-    result: DateTime;
-    nextIndex: number;
-  } = decodeDateTime(index, binary);
+  const createdAtAndNextIndex: { result: Time; nextIndex: number } = decodeTime(
+    index,
+    binary
+  );
   const descriptionAndNextIndex: {
     result: string;
     nextIndex: number;
@@ -2865,9 +2833,9 @@ export const decodeProjectCache = (
     nextIndex: number;
   } = decodeProject(index, binary);
   const respondTimeAndNextIndex: {
-    result: DateTime;
+    result: Time;
     nextIndex: number;
-  } = decodeDateTime(projectAndNextIndex.nextIndex, binary);
+  } = decodeTime(projectAndNextIndex.nextIndex, binary);
   return {
     result: {
       project: projectAndNextIndex.result,
@@ -2890,9 +2858,9 @@ export const decodeUserCache = (
     binary
   );
   const respondTimeAndNextIndex: {
-    result: DateTime;
+    result: Time;
     nextIndex: number;
-  } = decodeDateTime(userAndNextIndex.nextIndex, binary);
+  } = decodeTime(userAndNextIndex.nextIndex, binary);
   return {
     result: {
       user: userAndNextIndex.result,
