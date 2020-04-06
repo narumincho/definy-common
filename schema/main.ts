@@ -73,7 +73,7 @@ const time: type.CustomType = {
     },
     {
       name: "millisecond",
-      description: "日にちの中のミリ秒. 0 to 86400000 (=1000*60*60*24)",
+      description: "日にちの中のミリ秒. 0 to 86399999 (=1000*60*60*24-1)",
       memberType: type.typeInt32,
     },
   ]),
