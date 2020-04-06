@@ -18,10 +18,10 @@ export type Time = {
   /**
    * 1970-01-01からの経過日数. マイナスになることもある
    */
-  day: number
+  day: number;
   /**
    * 日にちの中のミリ秒. 0 to 86399999 (=1000*60*60*24-1)
-   */;
+   */
   millisecond: number;
 };
 
@@ -37,10 +37,10 @@ export type RequestLogInUrlRequestData = {
   /**
    * ログインに使用するプロバイダー
    */
-  openIdConnectProvider: OpenIdConnectProvider
+  openIdConnectProvider: OpenIdConnectProvider;
   /**
    * ログインした後に返ってくるURLに必要なデータ
-   */;
+   */
   urlData: UrlData;
 };
 
@@ -56,18 +56,18 @@ export type UrlData = {
   /**
    * クライアントモード
    */
-  clientMode: ClientMode
+  clientMode: ClientMode;
   /**
    * 場所
-   */;
-  location: Location
+   */
+  location: Location;
   /**
    * 言語
-   */;
-  language: Language
+   */
+  language: Language;
   /**
    * アクセストークン. ログインした後のリダイレクト先としてサーバーから渡される
-   */;
+   */
   accessToken: Maybe<AccessToken>;
 };
 
@@ -92,30 +92,30 @@ export type User = {
   /**
    * ユーザー名. 表示される名前。他のユーザーとかぶっても良い. 絵文字も使える. 全角英数は半角英数,半角カタカナは全角カタカナ, (株)の合字を分解するなどのNFKCの正規化がされる. U+0000-U+0019 と U+007F-U+00A0 の範囲の文字は入らない. 前後に空白を含められない. 間の空白は2文字以上連続しない. 文字数のカウント方法は正規化されたあとのCodePoint単位. Twitterと同じ、1文字以上50文字以下
    */
-  name: string
+  name: string;
   /**
    * プロフィール画像
-   */;
-  imageHash: FileHash
+   */
+  imageHash: FileHash;
   /**
    * 自己紹介文. 改行文字を含めることができる. Twitterと同じ 0～160文字
-   */;
-  introduction: string
+   */
+  introduction: string;
   /**
    * ユーザーが作成された日時
-   */;
-  createdAt: Time
+   */
+  createdAt: Time;
   /**
    * プロジェクトに対する いいね
-   */;
-  likedProjectIdList: ReadonlyArray<ProjectId>
+   */
+  likedProjectIdList: ReadonlyArray<ProjectId>;
   /**
    * 開発に参加した (書いたコードが使われた) プロジェクト
-   */;
-  developedProjectIdList: ReadonlyArray<ProjectId>
+   */
+  developedProjectIdList: ReadonlyArray<ProjectId>;
   /**
    * コメントをしたアイデア
-   */;
+   */
   commentedIdeaIdList: ReadonlyArray<IdeaId>;
 };
 
@@ -126,10 +126,10 @@ export type UserAndUserId = {
   /**
    * ユーザーID
    */
-  userId: UserId
+  userId: UserId;
   /**
    * ユーザーのデータ
-   */;
+   */
   user: User;
 };
 
@@ -140,22 +140,22 @@ export type Project = {
   /**
    * プロジェクト名
    */
-  name: string
+  name: string;
   /**
    * プロジェクトのアイコン画像
-   */;
-  icon: FileHash
+   */
+  icon: FileHash;
   /**
    * プロジェクトのカバー画像
-   */;
-  image: FileHash
+   */
+  image: FileHash;
   /**
    * 作成日時
-   */;
-  createdAt: Time
+   */
+  createdAt: Time;
   /**
    * 作成アカウント
-   */;
+   */
   createdBy: UserId;
 };
 
@@ -166,10 +166,10 @@ export type ProjectAndProjectId = {
   /**
    * プロジェクトID
    */
-  projectId: ProjectId
+  projectId: ProjectId;
   /**
    * プロジェクトのデータ
-   */;
+   */
   project: Project;
 };
 
@@ -180,22 +180,22 @@ export type Idea = {
   /**
    * アイデア名
    */
-  name: string
+  name: string;
   /**
    * 言い出しっぺ
-   */;
-  createdBy: UserId
+   */
+  createdBy: UserId;
   /**
    * アイデアの説明
-   */;
-  description: string
+   */
+  description: string;
   /**
    * 作成日時
-   */;
-  createdAt: Time
+   */
+  createdAt: Time;
   /**
    * アイデアの要素
-   */;
+   */
   itemList: ReadonlyArray<IdeaItem>;
 };
 
@@ -213,14 +213,14 @@ export type Comment = {
   /**
    * 本文
    */
-  body: string
+  body: string;
   /**
    * 作成者
-   */;
-  createdBy: UserId
+   */
+  createdBy: UserId;
   /**
    * 作成日時
-   */;
+   */
   createdAt: Time;
 };
 
@@ -231,14 +231,14 @@ export type Suggestion = {
   /**
    * アイデアに投稿した日時
    */
-  createdAt: Time
+  createdAt: Time;
   /**
    * なぜ,どんな変更をしたのかの説明
-   */;
-  description: string
+   */
+  description: string;
   /**
    * 変更点
-   */;
+   */
   change: Change;
 };
 
@@ -254,14 +254,14 @@ export type Module = {
   /**
    * モジュール名.階層構造を表現することができる
    */
-  name: ReadonlyArray<string>
+  name: ReadonlyArray<string>;
   /**
    * モジュールの説明
-   */;
-  description: string
+   */
+  description: string;
   /**
    * 外部のプロジェクトに公開するかどうか
-   */;
+   */
   export: boolean;
 };
 
@@ -272,14 +272,14 @@ export type TypeDefinition = {
   /**
    * 型の名前
    */
-  name: string
+  name: string;
   /**
    * この型の元
-   */;
-  parentList: ReadonlyArray<PartId>
+   */
+  parentList: ReadonlyArray<PartId>;
   /**
    * 型の説明
-   */;
+   */
   description: string;
 };
 
@@ -301,14 +301,14 @@ export type TypeBodyProductMember = {
   /**
    * メンバー名
    */
-  name: string
+  name: string;
   /**
    * 説明文
-   */;
-  description: string
+   */
+  description: string;
   /**
    * メンバー値の型
-   */;
+   */
   memberType: TypeId;
 };
 
@@ -319,14 +319,14 @@ export type TypeBodySumPattern = {
   /**
    * タグ名
    */
-  name: string
+  name: string;
   /**
    * 説明文
-   */;
-  description: string
+   */
+  description: string;
   /**
    * パラメーター
-   */;
+   */
   parameter: Maybe<TypeId>;
 };
 
@@ -342,26 +342,26 @@ export type PartDefinition = {
   /**
    * パーツの名前
    */
-  name: string
+  name: string;
   /**
    * このパーツの元
-   */;
-  parentList: ReadonlyArray<PartId>
+   */
+  parentList: ReadonlyArray<PartId>;
   /**
    * パーツの説明
-   */;
-  description: string
+   */
+  description: string;
   /**
    * パーツの型
-   */;
-  type: Type
+   */
+  type: Type;
   /**
    * パーツの式
-   */;
-  expr: Maybe<Expr>
+   */
+  expr: Maybe<Expr>;
   /**
    * 所属しているモジュール
-   */;
+   */
   moduleId: ModuleId;
 };
 
@@ -372,10 +372,10 @@ export type Type = {
   /**
    * 型の参照
    */
-  reference: TypeId
+  reference: TypeId;
   /**
    * 型のパラメーター
-   */;
+   */
   parameter: ReadonlyArray<Type>;
 };
 
@@ -408,10 +408,10 @@ export type KernelCall = {
   /**
    * 関数
    */
-  kernel: KernelExpr
+  kernel: KernelExpr;
   /**
    * 呼び出すパラメーター
-   */;
+   */
   expr: EvaluatedExpr;
 };
 
@@ -427,10 +427,10 @@ export type LocalPartReference = {
   /**
    * ローカルパスが定義されているパーツのID
    */
-  partId: PartId
+  partId: PartId;
   /**
    * ローカルパーツID
-   */;
+   */
   localPartId: LocalPartId;
 };
 
@@ -441,10 +441,10 @@ export type TagReferenceIndex = {
   /**
    * 型ID
    */
-  typeId: TypeId
+  typeId: TypeId;
   /**
    * タグIndex
-   */;
+   */
   tagIndex: number;
 };
 
@@ -455,10 +455,10 @@ export type FunctionCall = {
   /**
    * 関数
    */
-  function: Expr
+  function: Expr;
   /**
    * パラメーター
-   */;
+   */
   parameter: Expr;
 };
 
@@ -469,15 +469,15 @@ export type LambdaBranch = {
   /**
    * 入力値の条件を書くところ. Just x
    */
-  condition: Condition
+  condition: Condition;
   /**
    * ブランチの説明
-   */;
+   */
   description: string;
-  localPartList: ReadonlyArray<BranchPartDefinition>
+  localPartList: ReadonlyArray<BranchPartDefinition>;
   /**
    * 式
-   */;
+   */
   expr: Maybe<Expr>;
 };
 
@@ -497,10 +497,10 @@ export type ConditionTag = {
   /**
    * タグ
    */
-  tag: TagId
+  tag: TagId;
   /**
    * パラメーター
-   */;
+   */
   parameter: Maybe<Condition>;
 };
 
@@ -511,10 +511,10 @@ export type ConditionCapture = {
   /**
    * キャプチャパーツの名前
    */
-  name: string
+  name: string;
   /**
    * ローカルパーツId
-   */;
+   */
   localPartId: LocalPartId;
 };
 
@@ -525,22 +525,22 @@ export type BranchPartDefinition = {
   /**
    * ローカルパーツID
    */
-  localPartId: LocalPartId
+  localPartId: LocalPartId;
   /**
    * ブランチパーツの名前
-   */;
-  name: string
+   */
+  name: string;
   /**
    * ブランチパーツの説明
-   */;
-  description: string
+   */
+  description: string;
   /**
    * ローカルパーツの型
-   */;
-  type: Type
+   */
+  type: Type;
   /**
    * ローカルパーツの式
-   */;
+   */
   expr: Expr;
 };
 
@@ -571,10 +571,10 @@ export type CreateProjectParameter = {
   /**
    * プロジェクトを作るときのアカウント
    */
-  accessToken: AccessToken
+  accessToken: AccessToken;
   /**
    * プロジェクト名
-   */;
+   */
   projectName: string;
 };
 
@@ -592,10 +592,10 @@ export type ProjectCache = {
   /**
    * プロジェクト
    */
-  project: Project
+  project: Project;
   /**
    * 取得日時
-   */;
+   */
   respondTime: Time;
 };
 
@@ -606,10 +606,10 @@ export type UserCache = {
   /**
    * ユーザーのデータ
    */
-  user: User
+  user: User;
   /**
    * 取得日時
-   */;
+   */
   respondTime: Time;
 };
 
@@ -620,10 +620,10 @@ export type ProjectCacheWithId = {
   /**
    * プロジェクトのデータ
    */
-  projectCache: Maybe<ProjectCache>
+  projectCache: Maybe<ProjectCache>;
   /**
    * プロジェクトのID
-   */;
+   */
   projectId: ProjectId;
 };
 
@@ -634,10 +634,10 @@ export type UserCacheWithId = {
   /**
    * ユーザーのデータ
    */
-  userCache: Maybe<UserCache>
+  userCache: Maybe<UserCache>;
   /**
    * ユーザーID
-   */;
+   */
   userId: UserId;
 };
 
@@ -1469,8 +1469,8 @@ export const decodeInt32 = (
   index: number,
   binary: Uint8Array
 ): { result: number; nextIndex: number } => {
-  let result: number = 0;
-  let offset: number = 0;
+  let result = 0;
+  let offset = 0;
   while (true) {
     const byte: number = binary[index + offset];
     result |= (byte & 127) << (offset * 7);
