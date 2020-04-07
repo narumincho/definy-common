@@ -50,8 +50,10 @@ type Language
 type Location
     = LocationHome
     | LocationCreateProject
+    | LocationCreateIdea ProjectId
     | LocationUser UserId
     | LocationProject ProjectId
+    | LocationIdea IdeaId
 
 
 {-| ユーザーのデータのスナップショット
@@ -303,20 +305,20 @@ type AccessToken
     = AccessToken String
 
 
-type UserId
-    = UserId String
-
-
 type ProjectId
     = ProjectId String
 
 
-type FileHash
-    = FileHash String
+type UserId
+    = UserId String
 
 
 type IdeaId
     = IdeaId String
+
+
+type FileHash
+    = FileHash String
 
 
 type PartId
@@ -364,23 +366,23 @@ accessTokenToJsonValue (AccessToken string) =
     Je.string string
 
 
-userIdToJsonValue : UserId -> Je.Value
-userIdToJsonValue (UserId string) =
-    Je.string string
-
-
 projectIdToJsonValue : ProjectId -> Je.Value
 projectIdToJsonValue (ProjectId string) =
     Je.string string
 
 
-fileHashToJsonValue : FileHash -> Je.Value
-fileHashToJsonValue (FileHash string) =
+userIdToJsonValue : UserId -> Je.Value
+userIdToJsonValue (UserId string) =
     Je.string string
 
 
 ideaIdToJsonValue : IdeaId -> Je.Value
 ideaIdToJsonValue (IdeaId string) =
+    Je.string string
+
+
+fileHashToJsonValue : FileHash -> Je.Value
+fileHashToJsonValue (FileHash string) =
     Je.string string
 
 
@@ -491,11 +493,17 @@ locationToJsonValue location =
         LocationCreateProject ->
             Je.object [ ( "_", Je.string "CreateProject" ) ]
 
+        LocationCreateIdea parameter ->
+            Je.object [ ( "_", Je.string "CreateIdea" ), ( "projectId", projectIdToJsonValue parameter ) ]
+
         LocationUser parameter ->
             Je.object [ ( "_", Je.string "User" ), ( "userId", userIdToJsonValue parameter ) ]
 
         LocationProject parameter ->
             Je.object [ ( "_", Je.string "Project" ), ( "projectId", projectIdToJsonValue parameter ) ]
+
+        LocationIdea parameter ->
+            Je.object [ ( "_", Je.string "Idea" ), ( "ideaId", ideaIdToJsonValue parameter ) ]
 
 
 {-| UserSnapshotのJSONへのエンコーダ
@@ -1002,24 +1010,24 @@ accessTokenJsonDecoder =
     Jd.map AccessToken Jd.string
 
 
-userIdJsonDecoder : Jd.Decoder UserId
-userIdJsonDecoder =
-    Jd.map UserId Jd.string
-
-
 projectIdJsonDecoder : Jd.Decoder ProjectId
 projectIdJsonDecoder =
     Jd.map ProjectId Jd.string
 
 
-fileHashJsonDecoder : Jd.Decoder FileHash
-fileHashJsonDecoder =
-    Jd.map FileHash Jd.string
+userIdJsonDecoder : Jd.Decoder UserId
+userIdJsonDecoder =
+    Jd.map UserId Jd.string
 
 
 ideaIdJsonDecoder : Jd.Decoder IdeaId
 ideaIdJsonDecoder =
     Jd.map IdeaId Jd.string
+
+
+fileHashJsonDecoder : Jd.Decoder FileHash
+fileHashJsonDecoder =
+    Jd.map FileHash Jd.string
 
 
 partIdJsonDecoder : Jd.Decoder PartId
@@ -1167,11 +1175,17 @@ locationJsonDecoder =
                     "CreateProject" ->
                         Jd.succeed LocationCreateProject
 
+                    "CreateIdea" ->
+                        Jd.field "projectId" projectIdJsonDecoder |> Jd.map LocationCreateIdea
+
                     "User" ->
                         Jd.field "userId" userIdJsonDecoder |> Jd.map LocationUser
 
                     "Project" ->
                         Jd.field "projectId" projectIdJsonDecoder |> Jd.map LocationProject
+
+                    "Idea" ->
+                        Jd.field "ideaId" ideaIdJsonDecoder |> Jd.map LocationIdea
 
                     _ ->
                         Jd.fail ("Locationで不明なタグを受けたとった tag=" ++ tag)

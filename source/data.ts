@@ -82,8 +82,10 @@ export type Language = "Japanese" | "English" | "Esperanto";
 export type Location =
   | { _: "Home" }
   | { _: "CreateProject" }
+  | { _: "CreateIdea"; projectId: ProjectId }
   | { _: "User"; userId: UserId }
-  | { _: "Project"; projectId: ProjectId };
+  | { _: "Project"; projectId: ProjectId }
+  | { _: "Idea"; ideaId: IdeaId };
 
 /**
  * ユーザーのデータのスナップショット
@@ -663,13 +665,13 @@ export type IdeaSnapshotMaybeAndId = {
 
 export type AccessToken = string & { _accessToken: never };
 
-export type UserId = string & { _userId: never };
-
 export type ProjectId = string & { _projectId: never };
 
-export type FileHash = string & { _fileHash: never };
+export type UserId = string & { _userId: never };
 
 export type IdeaId = string & { _ideaId: never };
+
+export type FileHash = string & { _fileHash: never };
 
 export type PartId = string & { _partId: never };
 
@@ -722,6 +724,14 @@ export const locationHome: Location = { _: "Home" };
 export const locationCreateProject: Location = { _: "CreateProject" };
 
 /**
+ * アイデア作成ページ. パラメーターのprojectIdは対象のプロジェクト
+ */
+export const locationCreateIdea = (projectId: ProjectId): Location => ({
+  _: "CreateIdea",
+  projectId: projectId,
+});
+
+/**
  * ユーザーの詳細ページ
  */
 export const locationUser = (userId: UserId): Location => ({
@@ -735,6 +745,14 @@ export const locationUser = (userId: UserId): Location => ({
 export const locationProject = (projectId: ProjectId): Location => ({
   _: "Project",
   projectId: projectId,
+});
+
+/**
+ * アイデア詳細ページ
+ */
+export const locationIdea = (ideaId: IdeaId): Location => ({
+  _: "Idea",
+  ideaId: ideaId,
 });
 
 /**
@@ -1113,11 +1131,17 @@ export const encodeLocation = (location: Location): ReadonlyArray<number> => {
     case "CreateProject": {
       return [1];
     }
+    case "CreateIdea": {
+      return [2].concat(encodeId(location.projectId));
+    }
     case "User": {
-      return [2].concat(encodeId(location.userId));
+      return [3].concat(encodeId(location.userId));
     }
     case "Project": {
-      return [3].concat(encodeId(location.projectId));
+      return [4].concat(encodeId(location.projectId));
+    }
+    case "Idea": {
+      return [5].concat(encodeId(location.ideaId));
     }
   }
 };
@@ -1890,13 +1914,23 @@ export const decodeLocation = (
     return { result: locationCreateProject, nextIndex: patternIndex.nextIndex };
   }
   if (patternIndex.result === 2) {
+    const result: { result: ProjectId; nextIndex: number } = (
+      decodeId as
+      (a: number, b: Uint8Array) => { result: ProjectId; nextIndex: number }
+    )(patternIndex.nextIndex, binary);
+    return {
+      result: locationCreateIdea(result.result),
+      nextIndex: result.nextIndex,
+    };
+  }
+  if (patternIndex.result === 3) {
     const result: { result: UserId; nextIndex: number } = (
       decodeId as
       (a: number, b: Uint8Array) => { result: UserId; nextIndex: number }
     )(patternIndex.nextIndex, binary);
     return { result: locationUser(result.result), nextIndex: result.nextIndex };
   }
-  if (patternIndex.result === 3) {
+  if (patternIndex.result === 4) {
     const result: { result: ProjectId; nextIndex: number } = (
       decodeId as
       (a: number, b: Uint8Array) => { result: ProjectId; nextIndex: number }
@@ -1905,6 +1939,13 @@ export const decodeLocation = (
       result: locationProject(result.result),
       nextIndex: result.nextIndex,
     };
+  }
+  if (patternIndex.result === 5) {
+    const result: { result: IdeaId; nextIndex: number } = (
+      decodeId as
+      (a: number, b: Uint8Array) => { result: IdeaId; nextIndex: number }
+    )(patternIndex.nextIndex, binary);
+    return { result: locationIdea(result.result), nextIndex: result.nextIndex };
   }
   throw new Error("存在しないパターンを指定された 型を更新してください");
 };

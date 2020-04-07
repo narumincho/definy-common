@@ -38,12 +38,16 @@ const locationToPath = (location: data.Location): string => {
   switch (location._) {
     case "Home":
       return "/";
+    case "CreateProject":
+      return "/create-project";
+    case "CreateIdea":
+      return "/project/" + (location.projectId as string) + "/create-idea";
     case "User":
       return "/user/" + (location.userId as string);
     case "Project":
       return "/project/" + (location.projectId as string);
-    case "CreateProject":
-      return "/create-project";
+    case "Idea":
+      return "/idea/" + (location.ideaId as string);
   }
 };
 
@@ -89,6 +93,12 @@ const locationFromUrl = (pathName: string): data.Location => {
   if (pathName === "/create-project") {
     return data.locationCreateProject;
   }
+  const createIdeaResult = pathName.match(
+    /^\/project\/([0-9a-f]{32})\/create-idea$/
+  );
+  if (createIdeaResult !== null) {
+    return data.locationCreateIdea(createIdeaResult[1] as data.ProjectId);
+  }
   const projectResult = pathName.match(/^\/project\/([0-9a-f]{32})$/u);
   if (projectResult !== null) {
     return data.locationProject(projectResult[1] as data.ProjectId);
@@ -96,6 +106,10 @@ const locationFromUrl = (pathName: string): data.Location => {
   const userResult = pathName.match(/^\/user\/([0-9a-f]{32})$/u);
   if (userResult !== null) {
     return data.locationUser(userResult[1] as data.UserId);
+  }
+  const ideaResult = pathName.match(/^\/idea\/([0-9a-f]{32})$/);
+  if (ideaResult !== null) {
+    return data.locationIdea(ideaResult[1] as data.IdeaId);
   }
   return data.locationHome;
 };

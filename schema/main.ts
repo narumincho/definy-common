@@ -183,14 +183,25 @@ const location: type.CustomType = {
       parameter: type.maybeNothing(),
     },
     {
+      name: "CreateIdea",
+      description:
+        "アイデア作成ページ. パラメーターのprojectIdは対象のプロジェクト",
+      parameter: type.maybeJust(projectId),
+    },
+    {
       name: "User",
       description: "ユーザーの詳細ページ",
-      parameter: type.maybeJust(type.typeId("UserId")),
+      parameter: type.maybeJust(userId),
     },
     {
       name: "Project",
       description: "プロジェクトの詳細ページ",
-      parameter: type.maybeJust(type.typeId("ProjectId")),
+      parameter: type.maybeJust(projectId),
+    },
+    {
+      name: "Idea",
+      description: "アイデア詳細ページ",
+      parameter: type.maybeJust(ideaId),
     },
   ]),
 };
