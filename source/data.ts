@@ -150,11 +150,11 @@ export type ProjectSnapshot = {
   /**
    * プロジェクトのアイコン画像
    */
-  icon: FileHash;
+  iconHash: FileHash;
   /**
    * プロジェクトのカバー画像
    */
-  image: FileHash;
+  imageHash: FileHash;
   /**
    * 作成日時
    */
@@ -1169,8 +1169,8 @@ export const encodeProjectSnapshot = (
   projectSnapshot: ProjectSnapshot
 ): ReadonlyArray<number> =>
   encodeString(projectSnapshot.name)
-    .concat(encodeToken(projectSnapshot.icon))
-    .concat(encodeToken(projectSnapshot.image))
+    .concat(encodeToken(projectSnapshot.iconHash))
+    .concat(encodeToken(projectSnapshot.imageHash))
     .concat(encodeTime(projectSnapshot.createTime))
     .concat(encodeId(projectSnapshot.createUser))
     .concat(encodeTime(projectSnapshot.updateTime))
@@ -2051,18 +2051,18 @@ export const decodeProjectSnapshot = (
     index,
     binary
   );
-  const iconAndNextIndex: { result: FileHash; nextIndex: number } = (
+  const iconHashAndNextIndex: { result: FileHash; nextIndex: number } = (
     decodeToken as
     (a: number, b: Uint8Array) => { result: FileHash; nextIndex: number }
   )(nameAndNextIndex.nextIndex, binary);
-  const imageAndNextIndex: { result: FileHash; nextIndex: number } = (
+  const imageHashAndNextIndex: { result: FileHash; nextIndex: number } = (
     decodeToken as
     (a: number, b: Uint8Array) => { result: FileHash; nextIndex: number }
-  )(iconAndNextIndex.nextIndex, binary);
+  )(iconHashAndNextIndex.nextIndex, binary);
   const createTimeAndNextIndex: {
     result: Time;
     nextIndex: number;
-  } = decodeTime(imageAndNextIndex.nextIndex, binary);
+  } = decodeTime(imageHashAndNextIndex.nextIndex, binary);
   const createUserAndNextIndex: { result: UserId; nextIndex: number } = (
     decodeId as
     (a: number, b: Uint8Array) => { result: UserId; nextIndex: number }
@@ -2078,8 +2078,8 @@ export const decodeProjectSnapshot = (
   return {
     result: {
       name: nameAndNextIndex.result,
-      icon: iconAndNextIndex.result,
-      image: imageAndNextIndex.result,
+      iconHash: iconHashAndNextIndex.result,
+      imageHash: imageHashAndNextIndex.result,
       createTime: createTimeAndNextIndex.result,
       createUser: createUserAndNextIndex.result,
       updateTime: updateTimeAndNextIndex.result,

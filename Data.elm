@@ -71,7 +71,7 @@ type alias UserSnapshotAndId =
 {-| プロジェクト
 -}
 type alias ProjectSnapshot =
-    { name : String, icon : FileHash, image : FileHash, createTime : Time, createUser : UserId, updateTime : Time, getTime : Time }
+    { name : String, iconHash : FileHash, imageHash : FileHash, createTime : Time, createUser : UserId, updateTime : Time, getTime : Time }
 
 
 {-| プロジェクトを作成したときに返ってくるデータ
@@ -538,8 +538,8 @@ projectSnapshotToJsonValue : ProjectSnapshot -> Je.Value
 projectSnapshotToJsonValue projectSnapshot =
     Je.object
         [ ( "name", Je.string projectSnapshot.name )
-        , ( "icon", fileHashToJsonValue projectSnapshot.icon )
-        , ( "image", fileHashToJsonValue projectSnapshot.image )
+        , ( "iconHash", fileHashToJsonValue projectSnapshot.iconHash )
+        , ( "imageHash", fileHashToJsonValue projectSnapshot.imageHash )
         , ( "createTime", timeToJsonValue projectSnapshot.createTime )
         , ( "createUser", userIdToJsonValue projectSnapshot.createUser )
         , ( "updateTime", timeToJsonValue projectSnapshot.updateTime )
@@ -1237,10 +1237,10 @@ userSnapshotAndIdJsonDecoder =
 projectSnapshotJsonDecoder : Jd.Decoder ProjectSnapshot
 projectSnapshotJsonDecoder =
     Jd.succeed
-        (\name icon image createTime createUser updateTime getTime ->
+        (\name iconHash imageHash createTime createUser updateTime getTime ->
             { name = name
-            , icon = icon
-            , image = image
+            , iconHash = iconHash
+            , imageHash = imageHash
             , createTime = createTime
             , createUser = createUser
             , updateTime = updateTime
@@ -1248,8 +1248,8 @@ projectSnapshotJsonDecoder =
             }
         )
         |> Jdp.required "name" Jd.string
-        |> Jdp.required "icon" fileHashJsonDecoder
-        |> Jdp.required "image" fileHashJsonDecoder
+        |> Jdp.required "iconHash" fileHashJsonDecoder
+        |> Jdp.required "imageHash" fileHashJsonDecoder
         |> Jdp.required "createTime" timeJsonDecoder
         |> Jdp.required "createUser" userIdJsonDecoder
         |> Jdp.required "updateTime" timeJsonDecoder

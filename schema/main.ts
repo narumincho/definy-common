@@ -304,12 +304,12 @@ const projectSnapshot: type.CustomType = {
       memberType: type.typeString,
     },
     {
-      name: "icon",
+      name: "iconHash",
       description: "プロジェクトのアイコン画像",
       memberType: fileHash,
     },
     {
-      name: "image",
+      name: "imageHash",
       description: "プロジェクトのカバー画像",
       memberType: fileHash,
     },
