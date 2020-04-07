@@ -114,7 +114,7 @@ export type UserSnapshot = {
   /**
    * 開発に参加した (書いたコードが使われた) プロジェクト
    */
-  developeProjectIdList: ReadonlyArray<ProjectId>;
+  developProjectIdList: ReadonlyArray<ProjectId>;
   /**
    * コメントをしたアイデア
    */
@@ -1154,7 +1154,7 @@ export const encodeUserSnapshot = (
     .concat(encodeString(userSnapshot.introduction))
     .concat(encodeTime(userSnapshot.createTime))
     .concat(encodeList(encodeId)(userSnapshot.likeProjectIdList))
-    .concat(encodeList(encodeId)(userSnapshot.developeProjectIdList))
+    .concat(encodeList(encodeId)(userSnapshot.developProjectIdList))
     .concat(encodeList(encodeId)(userSnapshot.commentIdeaIdList))
     .concat(encodeTime(userSnapshot.getTime));
 
@@ -1981,7 +1981,7 @@ export const decodeUserSnapshot = (
     decodeId as
       (a: number, b: Uint8Array) => { result: ProjectId; nextIndex: number }
   )(createTimeAndNextIndex.nextIndex, binary);
-  const developeProjectIdListAndNextIndex: {
+  const developProjectIdListAndNextIndex: {
     result: ReadonlyArray<ProjectId>;
     nextIndex: number;
   } = decodeList(
@@ -1994,7 +1994,7 @@ export const decodeUserSnapshot = (
   } = decodeList(
     decodeId as
       (a: number, b: Uint8Array) => { result: IdeaId; nextIndex: number }
-  )(developeProjectIdListAndNextIndex.nextIndex, binary);
+  )(developProjectIdListAndNextIndex.nextIndex, binary);
   const getTimeAndNextIndex: { result: Time; nextIndex: number } = decodeTime(
     commentIdeaIdListAndNextIndex.nextIndex,
     binary
@@ -2006,7 +2006,7 @@ export const decodeUserSnapshot = (
       introduction: introductionAndNextIndex.result,
       createTime: createTimeAndNextIndex.result,
       likeProjectIdList: likeProjectIdListAndNextIndex.result,
-      developeProjectIdList: developeProjectIdListAndNextIndex.result,
+      developProjectIdList: developProjectIdListAndNextIndex.result,
       commentIdeaIdList: commentIdeaIdListAndNextIndex.result,
       getTime: getTimeAndNextIndex.result,
     },

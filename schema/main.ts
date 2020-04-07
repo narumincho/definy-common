@@ -260,7 +260,7 @@ const userSnapshot: type.CustomType = {
       memberType: type.typeList(projectId),
     },
     {
-      name: "developeProjectIdList",
+      name: "developProjectIdList",
       description: "開発に参加した (書いたコードが使われた) プロジェクト",
       memberType: type.typeList(projectId),
     },

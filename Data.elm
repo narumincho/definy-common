@@ -59,7 +59,7 @@ type Location
 {-| ユーザーのデータのスナップショット
 -}
 type alias UserSnapshot =
-    { name : String, imageHash : FileHash, introduction : String, createTime : Time, likeProjectIdList : List ProjectId, developeProjectIdList : List ProjectId, commentIdeaIdList : List IdeaId, getTime : Time }
+    { name : String, imageHash : FileHash, introduction : String, createTime : Time, likeProjectIdList : List ProjectId, developProjectIdList : List ProjectId, commentIdeaIdList : List IdeaId, getTime : Time }
 
 
 {-| 最初に自分の情報を得るときに返ってくるデータ
@@ -516,7 +516,7 @@ userSnapshotToJsonValue userSnapshot =
         , ( "introduction", Je.string userSnapshot.introduction )
         , ( "createTime", timeToJsonValue userSnapshot.createTime )
         , ( "likeProjectIdList", Je.list projectIdToJsonValue userSnapshot.likeProjectIdList )
-        , ( "developeProjectIdList", Je.list projectIdToJsonValue userSnapshot.developeProjectIdList )
+        , ( "developProjectIdList", Je.list projectIdToJsonValue userSnapshot.developProjectIdList )
         , ( "commentIdeaIdList", Je.list ideaIdToJsonValue userSnapshot.commentIdeaIdList )
         , ( "getTime", timeToJsonValue userSnapshot.getTime )
         ]
@@ -1197,13 +1197,13 @@ locationJsonDecoder =
 userSnapshotJsonDecoder : Jd.Decoder UserSnapshot
 userSnapshotJsonDecoder =
     Jd.succeed
-        (\name imageHash introduction createTime likeProjectIdList developeProjectIdList commentIdeaIdList getTime ->
+        (\name imageHash introduction createTime likeProjectIdList developProjectIdList commentIdeaIdList getTime ->
             { name = name
             , imageHash = imageHash
             , introduction = introduction
             , createTime = createTime
             , likeProjectIdList = likeProjectIdList
-            , developeProjectIdList = developeProjectIdList
+            , developProjectIdList = developProjectIdList
             , commentIdeaIdList = commentIdeaIdList
             , getTime = getTime
             }
@@ -1213,7 +1213,7 @@ userSnapshotJsonDecoder =
         |> Jdp.required "introduction" Jd.string
         |> Jdp.required "createTime" timeJsonDecoder
         |> Jdp.required "likeProjectIdList" (Jd.list projectIdJsonDecoder)
-        |> Jdp.required "developeProjectIdList" (Jd.list projectIdJsonDecoder)
+        |> Jdp.required "developProjectIdList" (Jd.list projectIdJsonDecoder)
         |> Jdp.required "commentIdeaIdList" (Jd.list ideaIdJsonDecoder)
         |> Jdp.required "getTime" timeJsonDecoder
 
