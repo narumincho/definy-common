@@ -24,13 +24,13 @@ const clientModeName = "ClientMode";
 const locationName = "Location";
 const languageName = "Language";
 
-const userName = "User";
-const userAndUserIdName = "UserAndUserId";
+const userSnapshotName = "UserSnapshot";
+const userSnapshotAndIdName = "UserSnapshotAndId";
 
-const projectName = "Project";
-const projectAndProjectIdName = "ProjectAndProjectId";
+const projectSnapshotName = "ProjectSnapshot";
+const projectSnapshotAndIdName = "ProjectSnapshotAndId";
 
-const ideaName = "Idea";
+const ideaSnapshotName = "Idea";
 const ideaSnapshotAndIdName = "IdeaSnapshotAndId";
 
 const ideaItemName = "IdeaItem";
@@ -62,11 +62,9 @@ const typeErrorName = "TypeError";
 const createProjectParameterName = "CreateProjectParameter";
 const accessTokenErrorName = "AccessTokenError";
 
-const projectCacheName = "ProjectCache";
-const userCacheName = "UserCache";
-
-const projectCacheWithIdName = "ProjectCacheWithId";
-const userCacheWithIdName = "UserCacheWithId";
+const projectSnapshotMaybeAndIdName = "ProjectSnapshotMaybeAndId";
+const userSnapshotMaybeAndIdName = "UserSnapshotMaybeAndId";
+const ideaSnapshotMaybeAndIdName = "IdeaSnapshotMaybeAndId";
 
 const time: type.CustomType = {
   name: timeName,
@@ -219,14 +217,14 @@ const language: type.CustomType = {
   ]),
 };
 
-const user: type.CustomType = {
-  name: userName,
-  description: "ユーザーが公開している情報",
+const userSnapshot: type.CustomType = {
+  name: userSnapshotName,
+  description: "ユーザーのデータのスナップショット",
   body: type.customTypeBodyProduct([
     {
       name: "name",
       description:
-        "ユーザー名. 表示される名前。他のユーザーとかぶっても良い. 絵文字も使える. 全角英数は半角英数,半角カタカナは全角カタカナ, (株)の合字を分解するなどのNFKCの正規化がされる. U+0000-U+0019 と U+007F-U+00A0 の範囲の文字は入らない. 前後に空白を含められない. 間の空白は2文字以上連続しない. 文字数のカウント方法は正規化されたあとのCodePoint単位. Twitterと同じ、1文字以上50文字以下",
+        "ユーザー名. 表示される名前. 他のユーザーとかぶっても良い. 絵文字も使える. 全角英数は半角英数,半角カタカナは全角カタカナ, (株)の合字を分解するなどのNFKCの正規化がされる. U+0000-U+0019 と U+007F-U+00A0 の範囲の文字は入らない. 前後に空白を含められない. 間の空白は2文字以上連続しない. 文字数のカウント方法は正規化されたあとのCodePoint単位. Twitterと同じ, 1文字以上50文字以下",
       memberType: type.typeString,
     },
     {
@@ -241,47 +239,52 @@ const user: type.CustomType = {
       memberType: type.typeString,
     },
     {
-      name: "createdAt",
-      description: "ユーザーが作成された日時",
+      name: "createTime",
+      description: "Definyでユーザーが作成された日時",
       memberType: type.typeCustom(timeName),
     },
     {
-      name: "likedProjectIdList",
+      name: "likeProjectIdList",
       description: "プロジェクトに対する いいね",
       memberType: type.typeList(projectId),
     },
     {
-      name: "developedProjectIdList",
+      name: "developeProjectIdList",
       description: "開発に参加した (書いたコードが使われた) プロジェクト",
       memberType: type.typeList(projectId),
     },
     {
-      name: "commentedIdeaIdList",
+      name: "commentIdeaIdList",
       description: "コメントをしたアイデア",
       memberType: type.typeList(ideaId),
+    },
+    {
+      name: "getTime",
+      description: "取得日時",
+      memberType: type.typeCustom(timeName),
     },
   ]),
 };
 
-const userAndUserId: type.CustomType = {
-  name: userAndUserIdName,
+const userSnapshotAndId: type.CustomType = {
+  name: userSnapshotAndIdName,
   description: "最初に自分の情報を得るときに返ってくるデータ",
   body: type.customTypeBodyProduct([
     {
-      name: "userId",
+      name: "id",
       description: "ユーザーID",
       memberType: userId,
     },
     {
-      name: "user",
-      description: "ユーザーのデータ",
-      memberType: type.typeCustom(userName),
+      name: "snapshot",
+      description: "ユーザーのスナップショット",
+      memberType: type.typeCustom(userSnapshotName),
     },
   ]),
 };
 
-const project: type.CustomType = {
-  name: projectName,
+const projectSnapshot: type.CustomType = {
+  name: projectSnapshotName,
   description: "プロジェクト",
   body: type.customTypeBodyProduct([
     {
@@ -300,37 +303,47 @@ const project: type.CustomType = {
       memberType: fileHash,
     },
     {
-      name: "createdAt",
+      name: "createTime",
       description: "作成日時",
       memberType: type.typeCustom(timeName),
     },
     {
-      name: "createdBy",
+      name: "createUser",
       description: "作成アカウント",
       memberType: userId,
+    },
+    {
+      name: "updateTime",
+      description: "更新日時",
+      memberType: type.typeCustom(timeName),
+    },
+    {
+      name: "getTime",
+      description: "取得日時",
+      memberType: type.typeCustom(timeName),
     },
   ]),
 };
 
-const projectAndProjectId: type.CustomType = {
-  name: projectAndProjectIdName,
+const projectSnapshotAndId: type.CustomType = {
+  name: projectSnapshotAndIdName,
   description: "プロジェクトを作成したときに返ってくるデータ",
   body: type.customTypeBodyProduct([
     {
-      name: "projectId",
+      name: "id",
       description: "プロジェクトID",
       memberType: projectId,
     },
     {
-      name: "project",
-      description: "プロジェクトのデータ",
-      memberType: type.typeCustom(projectName),
+      name: "snapshot",
+      description: "プロジェクトのスナップショット",
+      memberType: type.typeCustom(projectSnapshotName),
     },
   ]),
 };
 
-const idea: type.CustomType = {
-  name: ideaName,
+const ideaSnapshot: type.CustomType = {
+  name: ideaSnapshotName,
   description: "アイデア",
   body: type.customTypeBodyProduct([
     {
@@ -339,12 +352,12 @@ const idea: type.CustomType = {
       memberType: type.typeString,
     },
     {
-      name: "createdBy",
+      name: "createUser",
       description: "言い出しっぺ",
       memberType: userId,
     },
     {
-      name: "createdAt",
+      name: "createTime",
       description: "作成日時",
       memberType: type.typeCustom(timeName),
     },
@@ -358,6 +371,16 @@ const idea: type.CustomType = {
       description: "アイデアの要素",
       memberType: type.typeList(type.typeCustom(ideaItemName)),
     },
+    {
+      name: "updateTime",
+      description: "更新日時",
+      memberType: type.typeCustom(timeName),
+    },
+    {
+      name: "getTime",
+      description: "取得日時",
+      memberType: type.typeCustom(timeName),
+    },
   ]),
 };
 
@@ -366,14 +389,14 @@ const ideaSnapshotAndId: type.CustomType = {
   description: "アイデアとそのID. アイデア作成時に返ってくる",
   body: type.customTypeBodyProduct([
     {
-      name: "ideaId",
+      name: "id",
       description: "アイデアID",
       memberType: ideaId,
     },
     {
-      name: "idea",
-      description: "アイデアのデータ",
-      memberType: type.typeCustom(ideaName),
+      name: "snapshot",
+      description: "アイデアのスナップショット",
+      memberType: type.typeCustom(ideaSnapshotName),
     },
   ]),
 };
@@ -1008,70 +1031,55 @@ const createProjectError: type.CustomType = {
   ]),
 };
 
-const projectCache: type.CustomType = {
-  name: projectCacheName,
-  description: "indexDBに格納したりする取得日時も含めたProject",
+const projectSnapshotMaybeAndId: type.CustomType = {
+  name: projectSnapshotMaybeAndIdName,
+  description:
+    "Maybe プロジェクトのスナップショット と projectId. indexedDBからElmに渡す用",
   body: type.customTypeBodyProduct([
     {
-      name: "project",
-      description: "プロジェクト",
-      memberType: type.typeCustom(projectName),
-    },
-    {
-      name: "respondTime",
-      description: "取得日時",
-      memberType: type.typeCustom(timeName),
-    },
-  ]),
-};
-
-const userCache: type.CustomType = {
-  name: userCacheName,
-  description: "indexDBに格納したりする取得日も含めたUser",
-  body: type.customTypeBodyProduct([
-    {
-      name: "user",
-      description: "ユーザーのデータ",
-      memberType: type.typeCustom(userName),
-    },
-    {
-      name: "respondTime",
-      description: "取得日時",
-      memberType: type.typeCustom(timeName),
-    },
-  ]),
-};
-
-const projectCacheWithId: type.CustomType = {
-  name: projectCacheWithIdName,
-  description: "プロジェクトのキャッシュデータとID. indexedDBからElmに渡す用",
-  body: type.customTypeBodyProduct([
-    {
-      name: "projectCache",
-      description: "プロジェクトのデータ",
-      memberType: type.typeMaybe(type.typeCustom(projectCacheName)),
-    },
-    {
-      name: "projectId",
+      name: "id",
       description: "プロジェクトのID",
       memberType: projectId,
     },
+    {
+      name: "snapshot",
+      description: "プロジェクトのデータ",
+      memberType: type.typeMaybe(type.typeCustom(projectSnapshotName)),
+    },
   ]),
 };
 
-const userCacheWithId: type.CustomType = {
-  name: userCacheWithIdName,
-  description: "ユーザーのキャッシュデータとID. indexedDBからElmに渡す用",
+const userSnapshotMaybeAndId: type.CustomType = {
+  name: userSnapshotMaybeAndIdName,
+  description:
+    "Maybe プロジェクトのスナップショット と userId. indexedDBからElmに渡す用",
   body: type.customTypeBodyProduct([
     {
-      name: "userCache",
-      description: "ユーザーのデータ",
-      memberType: type.typeMaybe(type.typeCustom(userCacheName)),
-    },
-    {
-      name: "userId",
+      name: "id",
       description: "ユーザーID",
       memberType: userId,
+    },
+    {
+      name: "snapshot",
+      description: "ユーザーのデータ",
+      memberType: type.typeMaybe(type.typeCustom(userSnapshotName)),
+    },
+  ]),
+};
+
+const ideaSnapshotMaybeAndId: type.CustomType = {
+  name: ideaSnapshotMaybeAndIdName,
+  description: "Maybe アイデア と ideaId. indexedDBからElmに渡す用",
+  body: type.customTypeBodyProduct([
+    {
+      name: "id",
+      description: "アイデアID",
+      memberType: ideaId,
+    },
+    {
+      name: "snapshot",
+      description: "アイデアのスナップショット",
+      memberType: type.typeMaybe(type.typeCustom(ideaSnapshotName)),
     },
   ]),
 };
@@ -1084,11 +1092,11 @@ const listCustomType: ReadonlyArray<type.CustomType> = [
   urlData,
   language,
   location,
-  user,
-  userAndUserId,
-  project,
-  projectAndProjectId,
-  idea,
+  userSnapshot,
+  userSnapshotAndId,
+  projectSnapshot,
+  projectSnapshotAndId,
+  ideaSnapshot,
   ideaSnapshotAndId,
   ideaItem,
   ideaCommentText,
@@ -1118,10 +1126,9 @@ const listCustomType: ReadonlyArray<type.CustomType> = [
   typeError,
   createProjectParameter,
   createProjectError,
-  projectCache,
-  userCache,
-  projectCacheWithId,
-  userCacheWithId,
+  projectSnapshotMaybeAndId,
+  userSnapshotMaybeAndId,
+  ideaSnapshotMaybeAndId,
 ];
 
 const code = codeGen.generateCodeAsString(

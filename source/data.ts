@@ -86,11 +86,11 @@ export type Location =
   | { _: "Project"; projectId: ProjectId };
 
 /**
- * ユーザーが公開している情報
+ * ユーザーのデータのスナップショット
  */
-export type User = {
+export type UserSnapshot = {
   /**
-   * ユーザー名. 表示される名前。他のユーザーとかぶっても良い. 絵文字も使える. 全角英数は半角英数,半角カタカナは全角カタカナ, (株)の合字を分解するなどのNFKCの正規化がされる. U+0000-U+0019 と U+007F-U+00A0 の範囲の文字は入らない. 前後に空白を含められない. 間の空白は2文字以上連続しない. 文字数のカウント方法は正規化されたあとのCodePoint単位. Twitterと同じ、1文字以上50文字以下
+   * ユーザー名. 表示される名前. 他のユーザーとかぶっても良い. 絵文字も使える. 全角英数は半角英数,半角カタカナは全角カタカナ, (株)の合字を分解するなどのNFKCの正規化がされる. U+0000-U+0019 と U+007F-U+00A0 の範囲の文字は入らない. 前後に空白を含められない. 間の空白は2文字以上連続しない. 文字数のカウント方法は正規化されたあとのCodePoint単位. Twitterと同じ, 1文字以上50文字以下
    */
   name: string;
   /**
@@ -102,41 +102,45 @@ export type User = {
    */
   introduction: string;
   /**
-   * ユーザーが作成された日時
+   * Definyでユーザーが作成された日時
    */
-  createdAt: Time;
+  createTime: Time;
   /**
    * プロジェクトに対する いいね
    */
-  likedProjectIdList: ReadonlyArray<ProjectId>;
+  likeProjectIdList: ReadonlyArray<ProjectId>;
   /**
    * 開発に参加した (書いたコードが使われた) プロジェクト
    */
-  developedProjectIdList: ReadonlyArray<ProjectId>;
+  developeProjectIdList: ReadonlyArray<ProjectId>;
   /**
    * コメントをしたアイデア
    */
-  commentedIdeaIdList: ReadonlyArray<IdeaId>;
+  commentIdeaIdList: ReadonlyArray<IdeaId>;
+  /**
+   * 取得日時
+   */
+  getTime: Time;
 };
 
 /**
  * 最初に自分の情報を得るときに返ってくるデータ
  */
-export type UserAndUserId = {
+export type UserSnapshotAndId = {
   /**
    * ユーザーID
    */
-  userId: UserId;
+  id: UserId;
   /**
-   * ユーザーのデータ
+   * ユーザーのスナップショット
    */
-  user: User;
+  snapshot: UserSnapshot;
 };
 
 /**
  * プロジェクト
  */
-export type Project = {
+export type ProjectSnapshot = {
   /**
    * プロジェクト名
    */
@@ -152,25 +156,33 @@ export type Project = {
   /**
    * 作成日時
    */
-  createdAt: Time;
+  createTime: Time;
   /**
    * 作成アカウント
    */
-  createdBy: UserId;
+  createUser: UserId;
+  /**
+   * 更新日時
+   */
+  updateTime: Time;
+  /**
+   * 取得日時
+   */
+  getTime: Time;
 };
 
 /**
  * プロジェクトを作成したときに返ってくるデータ
  */
-export type ProjectAndProjectId = {
+export type ProjectSnapshotAndId = {
   /**
    * プロジェクトID
    */
-  projectId: ProjectId;
+  id: ProjectId;
   /**
-   * プロジェクトのデータ
+   * プロジェクトのスナップショット
    */
-  project: Project;
+  snapshot: ProjectSnapshot;
 };
 
 /**
@@ -184,11 +196,11 @@ export type Idea = {
   /**
    * 言い出しっぺ
    */
-  createdBy: UserId;
+  createUser: UserId;
   /**
    * 作成日時
    */
-  createdAt: Time;
+  createTime: Time;
   /**
    * 対象のプロジェクト
    */
@@ -197,6 +209,14 @@ export type Idea = {
    * アイデアの要素
    */
   itemList: ReadonlyArray<IdeaItem>;
+  /**
+   * 更新日時
+   */
+  updateTime: Time;
+  /**
+   * 取得日時
+   */
+  getTime: Time;
 };
 
 /**
@@ -206,11 +226,11 @@ export type IdeaSnapshotAndId = {
   /**
    * アイデアID
    */
-  ideaId: IdeaId;
+  id: IdeaId;
   /**
-   * アイデアのデータ
+   * アイデアのスナップショット
    */
-  idea: Idea;
+  snapshot: Idea;
 };
 
 /**
@@ -600,59 +620,45 @@ export type AccessTokenError =
   | "ProjectNameIsInvalid";
 
 /**
- * indexDBに格納したりする取得日時も含めたProject
+ * Maybe プロジェクトのスナップショット と projectId. indexedDBからElmに渡す用
  */
-export type ProjectCache = {
-  /**
-   * プロジェクト
-   */
-  project: Project;
-  /**
-   * 取得日時
-   */
-  respondTime: Time;
-};
-
-/**
- * indexDBに格納したりする取得日も含めたUser
- */
-export type UserCache = {
-  /**
-   * ユーザーのデータ
-   */
-  user: User;
-  /**
-   * 取得日時
-   */
-  respondTime: Time;
-};
-
-/**
- * プロジェクトのキャッシュデータとID. indexedDBからElmに渡す用
- */
-export type ProjectCacheWithId = {
-  /**
-   * プロジェクトのデータ
-   */
-  projectCache: Maybe<ProjectCache>;
+export type ProjectSnapshotMaybeAndId = {
   /**
    * プロジェクトのID
    */
-  projectId: ProjectId;
+  id: ProjectId;
+  /**
+   * プロジェクトのデータ
+   */
+  snapshot: Maybe<ProjectSnapshot>;
 };
 
 /**
- * ユーザーのキャッシュデータとID. indexedDBからElmに渡す用
+ * Maybe プロジェクトのスナップショット と userId. indexedDBからElmに渡す用
  */
-export type UserCacheWithId = {
-  /**
-   * ユーザーのデータ
-   */
-  userCache: Maybe<UserCache>;
+export type UserSnapshotMaybeAndId = {
   /**
    * ユーザーID
    */
-  userId: UserId;
+  id: UserId;
+  /**
+   * ユーザーのデータ
+   */
+  snapshot: Maybe<UserSnapshot>;
+};
+
+/**
+ * Maybe アイデア と ideaId. indexedDBからElmに渡す用
+ */
+export type IdeaSnapshotMaybeAndId = {
+  /**
+   * アイデアID
+   */
+  id: IdeaId;
+  /**
+   * アイデアのスナップショット
+   */
+  snapshot: Maybe<Idea>;
 };
 
 export type AccessToken = string & { _accessToken: never };
@@ -1116,45 +1122,56 @@ export const encodeLocation = (location: Location): ReadonlyArray<number> => {
   }
 };
 
-export const encodeUser = (user: User): ReadonlyArray<number> =>
-  encodeString(user.name)
-    .concat(encodeToken(user.imageHash))
-    .concat(encodeString(user.introduction))
-    .concat(encodeTime(user.createdAt))
-    .concat(encodeList(encodeId)(user.likedProjectIdList))
-    .concat(encodeList(encodeId)(user.developedProjectIdList))
-    .concat(encodeList(encodeId)(user.commentedIdeaIdList));
-
-export const encodeUserAndUserId = (
-  userAndUserId: UserAndUserId
+export const encodeUserSnapshot = (
+  userSnapshot: UserSnapshot
 ): ReadonlyArray<number> =>
-  encodeId(userAndUserId.userId).concat(encodeUser(userAndUserId.user));
+  encodeString(userSnapshot.name)
+    .concat(encodeToken(userSnapshot.imageHash))
+    .concat(encodeString(userSnapshot.introduction))
+    .concat(encodeTime(userSnapshot.createTime))
+    .concat(encodeList(encodeId)(userSnapshot.likeProjectIdList))
+    .concat(encodeList(encodeId)(userSnapshot.developeProjectIdList))
+    .concat(encodeList(encodeId)(userSnapshot.commentIdeaIdList))
+    .concat(encodeTime(userSnapshot.getTime));
 
-export const encodeProject = (project: Project): ReadonlyArray<number> =>
-  encodeString(project.name)
-    .concat(encodeToken(project.icon))
-    .concat(encodeToken(project.image))
-    .concat(encodeTime(project.createdAt))
-    .concat(encodeId(project.createdBy));
-
-export const encodeProjectAndProjectId = (
-  projectAndProjectId: ProjectAndProjectId
+export const encodeUserSnapshotAndId = (
+  userSnapshotAndId: UserSnapshotAndId
 ): ReadonlyArray<number> =>
-  encodeId(projectAndProjectId.projectId).concat(
-    encodeProject(projectAndProjectId.project)
+  encodeId(userSnapshotAndId.id).concat(
+    encodeUserSnapshot(userSnapshotAndId.snapshot)
+  );
+
+export const encodeProjectSnapshot = (
+  projectSnapshot: ProjectSnapshot
+): ReadonlyArray<number> =>
+  encodeString(projectSnapshot.name)
+    .concat(encodeToken(projectSnapshot.icon))
+    .concat(encodeToken(projectSnapshot.image))
+    .concat(encodeTime(projectSnapshot.createTime))
+    .concat(encodeId(projectSnapshot.createUser))
+    .concat(encodeTime(projectSnapshot.updateTime))
+    .concat(encodeTime(projectSnapshot.getTime));
+
+export const encodeProjectSnapshotAndId = (
+  projectSnapshotAndId: ProjectSnapshotAndId
+): ReadonlyArray<number> =>
+  encodeId(projectSnapshotAndId.id).concat(
+    encodeProjectSnapshot(projectSnapshotAndId.snapshot)
   );
 
 export const encodeIdea = (idea: Idea): ReadonlyArray<number> =>
   encodeString(idea.name)
-    .concat(encodeId(idea.createdBy))
-    .concat(encodeTime(idea.createdAt))
+    .concat(encodeId(idea.createUser))
+    .concat(encodeTime(idea.createTime))
     .concat(encodeId(idea.projectId))
-    .concat(encodeList(encodeIdeaItem)(idea.itemList));
+    .concat(encodeList(encodeIdeaItem)(idea.itemList))
+    .concat(encodeTime(idea.updateTime))
+    .concat(encodeTime(idea.getTime));
 
 export const encodeIdeaSnapshotAndId = (
   ideaSnapshotAndId: IdeaSnapshotAndId
 ): ReadonlyArray<number> =>
-  encodeId(ideaSnapshotAndId.ideaId).concat(encodeIdea(ideaSnapshotAndId.idea));
+  encodeId(ideaSnapshotAndId.id).concat(encodeIdea(ideaSnapshotAndId.snapshot));
 
 export const encodeIdeaItem = (ideaItem: IdeaItem): ReadonlyArray<number> => {
   switch (ideaItem._) {
@@ -1455,28 +1472,25 @@ export const encodeAccessTokenError = (
   }
 };
 
-export const encodeProjectCache = (
-  projectCache: ProjectCache
+export const encodeProjectSnapshotMaybeAndId = (
+  projectSnapshotMaybeAndId: ProjectSnapshotMaybeAndId
 ): ReadonlyArray<number> =>
-  encodeProject(projectCache.project).concat(
-    encodeTime(projectCache.respondTime)
+  encodeId(projectSnapshotMaybeAndId.id).concat(
+    encodeMaybe(encodeProjectSnapshot)(projectSnapshotMaybeAndId.snapshot)
   );
 
-export const encodeUserCache = (userCache: UserCache): ReadonlyArray<number> =>
-  encodeUser(userCache.user).concat(encodeTime(userCache.respondTime));
-
-export const encodeProjectCacheWithId = (
-  projectCacheWithId: ProjectCacheWithId
+export const encodeUserSnapshotMaybeAndId = (
+  userSnapshotMaybeAndId: UserSnapshotMaybeAndId
 ): ReadonlyArray<number> =>
-  encodeMaybe(encodeProjectCache)(projectCacheWithId.projectCache).concat(
-    encodeId(projectCacheWithId.projectId)
+  encodeId(userSnapshotMaybeAndId.id).concat(
+    encodeMaybe(encodeUserSnapshot)(userSnapshotMaybeAndId.snapshot)
   );
 
-export const encodeUserCacheWithId = (
-  userCacheWithId: UserCacheWithId
+export const encodeIdeaSnapshotMaybeAndId = (
+  ideaSnapshotMaybeAndId: IdeaSnapshotMaybeAndId
 ): ReadonlyArray<number> =>
-  encodeMaybe(encodeUserCache)(userCacheWithId.userCache).concat(
-    encodeId(userCacheWithId.userId)
+  encodeId(ideaSnapshotMaybeAndId.id).concat(
+    encodeMaybe(encodeIdea)(ideaSnapshotMaybeAndId.snapshot)
   );
 
 /**
@@ -1899,10 +1913,10 @@ export const decodeLocation = (
  * @param index バイナリを読み込み開始位置
  * @param binary バイナリ
  */
-export const decodeUser = (
+export const decodeUserSnapshot = (
   index: number,
   binary: Uint8Array
-): { result: User; nextIndex: number } => {
+): { result: UserSnapshot; nextIndex: number } => {
   const nameAndNextIndex: { result: string; nextIndex: number } = decodeString(
     index,
     binary
@@ -1915,42 +1929,47 @@ export const decodeUser = (
     result: string;
     nextIndex: number;
   } = decodeString(imageHashAndNextIndex.nextIndex, binary);
-  const createdAtAndNextIndex: { result: Time; nextIndex: number } = decodeTime(
-    introductionAndNextIndex.nextIndex,
-    binary
-  );
-  const likedProjectIdListAndNextIndex: {
+  const createTimeAndNextIndex: {
+    result: Time;
+    nextIndex: number;
+  } = decodeTime(introductionAndNextIndex.nextIndex, binary);
+  const likeProjectIdListAndNextIndex: {
     result: ReadonlyArray<ProjectId>;
     nextIndex: number;
   } = decodeList(
     decodeId as
       (a: number, b: Uint8Array) => { result: ProjectId; nextIndex: number }
-  )(createdAtAndNextIndex.nextIndex, binary);
-  const developedProjectIdListAndNextIndex: {
+  )(createTimeAndNextIndex.nextIndex, binary);
+  const developeProjectIdListAndNextIndex: {
     result: ReadonlyArray<ProjectId>;
     nextIndex: number;
   } = decodeList(
     decodeId as
       (a: number, b: Uint8Array) => { result: ProjectId; nextIndex: number }
-  )(likedProjectIdListAndNextIndex.nextIndex, binary);
-  const commentedIdeaIdListAndNextIndex: {
+  )(likeProjectIdListAndNextIndex.nextIndex, binary);
+  const commentIdeaIdListAndNextIndex: {
     result: ReadonlyArray<IdeaId>;
     nextIndex: number;
   } = decodeList(
     decodeId as
       (a: number, b: Uint8Array) => { result: IdeaId; nextIndex: number }
-  )(developedProjectIdListAndNextIndex.nextIndex, binary);
+  )(developeProjectIdListAndNextIndex.nextIndex, binary);
+  const getTimeAndNextIndex: { result: Time; nextIndex: number } = decodeTime(
+    commentIdeaIdListAndNextIndex.nextIndex,
+    binary
+  );
   return {
     result: {
       name: nameAndNextIndex.result,
       imageHash: imageHashAndNextIndex.result,
       introduction: introductionAndNextIndex.result,
-      createdAt: createdAtAndNextIndex.result,
-      likedProjectIdList: likedProjectIdListAndNextIndex.result,
-      developedProjectIdList: developedProjectIdListAndNextIndex.result,
-      commentedIdeaIdList: commentedIdeaIdListAndNextIndex.result,
+      createTime: createTimeAndNextIndex.result,
+      likeProjectIdList: likeProjectIdListAndNextIndex.result,
+      developeProjectIdList: developeProjectIdListAndNextIndex.result,
+      commentIdeaIdList: commentIdeaIdListAndNextIndex.result,
+      getTime: getTimeAndNextIndex.result,
     },
-    nextIndex: commentedIdeaIdListAndNextIndex.nextIndex,
+    nextIndex: getTimeAndNextIndex.nextIndex,
   };
 };
 
@@ -1958,24 +1977,24 @@ export const decodeUser = (
  * @param index バイナリを読み込み開始位置
  * @param binary バイナリ
  */
-export const decodeUserAndUserId = (
+export const decodeUserSnapshotAndId = (
   index: number,
   binary: Uint8Array
-): { result: UserAndUserId; nextIndex: number } => {
-  const userIdAndNextIndex: { result: UserId; nextIndex: number } = (
+): { result: UserSnapshotAndId; nextIndex: number } => {
+  const idAndNextIndex: { result: UserId; nextIndex: number } = (
     decodeId as
     (a: number, b: Uint8Array) => { result: UserId; nextIndex: number }
   )(index, binary);
-  const userAndNextIndex: { result: User; nextIndex: number } = decodeUser(
-    userIdAndNextIndex.nextIndex,
-    binary
-  );
+  const snapshotAndNextIndex: {
+    result: UserSnapshot;
+    nextIndex: number;
+  } = decodeUserSnapshot(idAndNextIndex.nextIndex, binary);
   return {
     result: {
-      userId: userIdAndNextIndex.result,
-      user: userAndNextIndex.result,
+      id: idAndNextIndex.result,
+      snapshot: snapshotAndNextIndex.result,
     },
-    nextIndex: userAndNextIndex.nextIndex,
+    nextIndex: snapshotAndNextIndex.nextIndex,
   };
 };
 
@@ -1983,10 +2002,10 @@ export const decodeUserAndUserId = (
  * @param index バイナリを読み込み開始位置
  * @param binary バイナリ
  */
-export const decodeProject = (
+export const decodeProjectSnapshot = (
   index: number,
   binary: Uint8Array
-): { result: Project; nextIndex: number } => {
+): { result: ProjectSnapshot; nextIndex: number } => {
   const nameAndNextIndex: { result: string; nextIndex: number } = decodeString(
     index,
     binary
@@ -1999,23 +2018,33 @@ export const decodeProject = (
     decodeToken as
     (a: number, b: Uint8Array) => { result: FileHash; nextIndex: number }
   )(iconAndNextIndex.nextIndex, binary);
-  const createdAtAndNextIndex: { result: Time; nextIndex: number } = decodeTime(
-    imageAndNextIndex.nextIndex,
-    binary
-  );
-  const createdByAndNextIndex: { result: UserId; nextIndex: number } = (
+  const createTimeAndNextIndex: {
+    result: Time;
+    nextIndex: number;
+  } = decodeTime(imageAndNextIndex.nextIndex, binary);
+  const createUserAndNextIndex: { result: UserId; nextIndex: number } = (
     decodeId as
     (a: number, b: Uint8Array) => { result: UserId; nextIndex: number }
-  )(createdAtAndNextIndex.nextIndex, binary);
+  )(createTimeAndNextIndex.nextIndex, binary);
+  const updateTimeAndNextIndex: {
+    result: Time;
+    nextIndex: number;
+  } = decodeTime(createUserAndNextIndex.nextIndex, binary);
+  const getTimeAndNextIndex: { result: Time; nextIndex: number } = decodeTime(
+    updateTimeAndNextIndex.nextIndex,
+    binary
+  );
   return {
     result: {
       name: nameAndNextIndex.result,
       icon: iconAndNextIndex.result,
       image: imageAndNextIndex.result,
-      createdAt: createdAtAndNextIndex.result,
-      createdBy: createdByAndNextIndex.result,
+      createTime: createTimeAndNextIndex.result,
+      createUser: createUserAndNextIndex.result,
+      updateTime: updateTimeAndNextIndex.result,
+      getTime: getTimeAndNextIndex.result,
     },
-    nextIndex: createdByAndNextIndex.nextIndex,
+    nextIndex: getTimeAndNextIndex.nextIndex,
   };
 };
 
@@ -2023,24 +2052,24 @@ export const decodeProject = (
  * @param index バイナリを読み込み開始位置
  * @param binary バイナリ
  */
-export const decodeProjectAndProjectId = (
+export const decodeProjectSnapshotAndId = (
   index: number,
   binary: Uint8Array
-): { result: ProjectAndProjectId; nextIndex: number } => {
-  const projectIdAndNextIndex: { result: ProjectId; nextIndex: number } = (
+): { result: ProjectSnapshotAndId; nextIndex: number } => {
+  const idAndNextIndex: { result: ProjectId; nextIndex: number } = (
     decodeId as
     (a: number, b: Uint8Array) => { result: ProjectId; nextIndex: number }
   )(index, binary);
-  const projectAndNextIndex: {
-    result: Project;
+  const snapshotAndNextIndex: {
+    result: ProjectSnapshot;
     nextIndex: number;
-  } = decodeProject(projectIdAndNextIndex.nextIndex, binary);
+  } = decodeProjectSnapshot(idAndNextIndex.nextIndex, binary);
   return {
     result: {
-      projectId: projectIdAndNextIndex.result,
-      project: projectAndNextIndex.result,
+      id: idAndNextIndex.result,
+      snapshot: snapshotAndNextIndex.result,
     },
-    nextIndex: projectAndNextIndex.nextIndex,
+    nextIndex: snapshotAndNextIndex.nextIndex,
   };
 };
 
@@ -2056,31 +2085,41 @@ export const decodeIdea = (
     index,
     binary
   );
-  const createdByAndNextIndex: { result: UserId; nextIndex: number } = (
+  const createUserAndNextIndex: { result: UserId; nextIndex: number } = (
     decodeId as
     (a: number, b: Uint8Array) => { result: UserId; nextIndex: number }
   )(nameAndNextIndex.nextIndex, binary);
-  const createdAtAndNextIndex: { result: Time; nextIndex: number } = decodeTime(
-    createdByAndNextIndex.nextIndex,
-    binary
-  );
+  const createTimeAndNextIndex: {
+    result: Time;
+    nextIndex: number;
+  } = decodeTime(createUserAndNextIndex.nextIndex, binary);
   const projectIdAndNextIndex: { result: ProjectId; nextIndex: number } = (
     decodeId as
     (a: number, b: Uint8Array) => { result: ProjectId; nextIndex: number }
-  )(createdAtAndNextIndex.nextIndex, binary);
+  )(createTimeAndNextIndex.nextIndex, binary);
   const itemListAndNextIndex: {
     result: ReadonlyArray<IdeaItem>;
     nextIndex: number;
   } = decodeList(decodeIdeaItem)(projectIdAndNextIndex.nextIndex, binary);
+  const updateTimeAndNextIndex: {
+    result: Time;
+    nextIndex: number;
+  } = decodeTime(itemListAndNextIndex.nextIndex, binary);
+  const getTimeAndNextIndex: { result: Time; nextIndex: number } = decodeTime(
+    updateTimeAndNextIndex.nextIndex,
+    binary
+  );
   return {
     result: {
       name: nameAndNextIndex.result,
-      createdBy: createdByAndNextIndex.result,
-      createdAt: createdAtAndNextIndex.result,
+      createUser: createUserAndNextIndex.result,
+      createTime: createTimeAndNextIndex.result,
       projectId: projectIdAndNextIndex.result,
       itemList: itemListAndNextIndex.result,
+      updateTime: updateTimeAndNextIndex.result,
+      getTime: getTimeAndNextIndex.result,
     },
-    nextIndex: itemListAndNextIndex.nextIndex,
+    nextIndex: getTimeAndNextIndex.nextIndex,
   };
 };
 
@@ -2092,20 +2131,20 @@ export const decodeIdeaSnapshotAndId = (
   index: number,
   binary: Uint8Array
 ): { result: IdeaSnapshotAndId; nextIndex: number } => {
-  const ideaIdAndNextIndex: { result: IdeaId; nextIndex: number } = (
+  const idAndNextIndex: { result: IdeaId; nextIndex: number } = (
     decodeId as
     (a: number, b: Uint8Array) => { result: IdeaId; nextIndex: number }
   )(index, binary);
-  const ideaAndNextIndex: { result: Idea; nextIndex: number } = decodeIdea(
-    ideaIdAndNextIndex.nextIndex,
+  const snapshotAndNextIndex: { result: Idea; nextIndex: number } = decodeIdea(
+    idAndNextIndex.nextIndex,
     binary
   );
   return {
     result: {
-      ideaId: ideaIdAndNextIndex.result,
-      idea: ideaAndNextIndex.result,
+      id: idAndNextIndex.result,
+      snapshot: snapshotAndNextIndex.result,
     },
-    nextIndex: ideaAndNextIndex.nextIndex,
+    nextIndex: snapshotAndNextIndex.nextIndex,
   };
 };
 
@@ -3073,74 +3112,24 @@ export const decodeAccessTokenError = (
  * @param index バイナリを読み込み開始位置
  * @param binary バイナリ
  */
-export const decodeProjectCache = (
+export const decodeProjectSnapshotMaybeAndId = (
   index: number,
   binary: Uint8Array
-): { result: ProjectCache; nextIndex: number } => {
-  const projectAndNextIndex: {
-    result: Project;
-    nextIndex: number;
-  } = decodeProject(index, binary);
-  const respondTimeAndNextIndex: {
-    result: Time;
-    nextIndex: number;
-  } = decodeTime(projectAndNextIndex.nextIndex, binary);
-  return {
-    result: {
-      project: projectAndNextIndex.result,
-      respondTime: respondTimeAndNextIndex.result,
-    },
-    nextIndex: respondTimeAndNextIndex.nextIndex,
-  };
-};
-
-/**
- * @param index バイナリを読み込み開始位置
- * @param binary バイナリ
- */
-export const decodeUserCache = (
-  index: number,
-  binary: Uint8Array
-): { result: UserCache; nextIndex: number } => {
-  const userAndNextIndex: { result: User; nextIndex: number } = decodeUser(
-    index,
-    binary
-  );
-  const respondTimeAndNextIndex: {
-    result: Time;
-    nextIndex: number;
-  } = decodeTime(userAndNextIndex.nextIndex, binary);
-  return {
-    result: {
-      user: userAndNextIndex.result,
-      respondTime: respondTimeAndNextIndex.result,
-    },
-    nextIndex: respondTimeAndNextIndex.nextIndex,
-  };
-};
-
-/**
- * @param index バイナリを読み込み開始位置
- * @param binary バイナリ
- */
-export const decodeProjectCacheWithId = (
-  index: number,
-  binary: Uint8Array
-): { result: ProjectCacheWithId; nextIndex: number } => {
-  const projectCacheAndNextIndex: {
-    result: Maybe<ProjectCache>;
-    nextIndex: number;
-  } = decodeMaybe(decodeProjectCache)(index, binary);
-  const projectIdAndNextIndex: { result: ProjectId; nextIndex: number } = (
+): { result: ProjectSnapshotMaybeAndId; nextIndex: number } => {
+  const idAndNextIndex: { result: ProjectId; nextIndex: number } = (
     decodeId as
     (a: number, b: Uint8Array) => { result: ProjectId; nextIndex: number }
-  )(projectCacheAndNextIndex.nextIndex, binary);
+  )(index, binary);
+  const snapshotAndNextIndex: {
+    result: Maybe<ProjectSnapshot>;
+    nextIndex: number;
+  } = decodeMaybe(decodeProjectSnapshot)(idAndNextIndex.nextIndex, binary);
   return {
     result: {
-      projectCache: projectCacheAndNextIndex.result,
-      projectId: projectIdAndNextIndex.result,
+      id: idAndNextIndex.result,
+      snapshot: snapshotAndNextIndex.result,
     },
-    nextIndex: projectIdAndNextIndex.nextIndex,
+    nextIndex: snapshotAndNextIndex.nextIndex,
   };
 };
 
@@ -3148,23 +3137,48 @@ export const decodeProjectCacheWithId = (
  * @param index バイナリを読み込み開始位置
  * @param binary バイナリ
  */
-export const decodeUserCacheWithId = (
+export const decodeUserSnapshotMaybeAndId = (
   index: number,
   binary: Uint8Array
-): { result: UserCacheWithId; nextIndex: number } => {
-  const userCacheAndNextIndex: {
-    result: Maybe<UserCache>;
-    nextIndex: number;
-  } = decodeMaybe(decodeUserCache)(index, binary);
-  const userIdAndNextIndex: { result: UserId; nextIndex: number } = (
+): { result: UserSnapshotMaybeAndId; nextIndex: number } => {
+  const idAndNextIndex: { result: UserId; nextIndex: number } = (
     decodeId as
     (a: number, b: Uint8Array) => { result: UserId; nextIndex: number }
-  )(userCacheAndNextIndex.nextIndex, binary);
+  )(index, binary);
+  const snapshotAndNextIndex: {
+    result: Maybe<UserSnapshot>;
+    nextIndex: number;
+  } = decodeMaybe(decodeUserSnapshot)(idAndNextIndex.nextIndex, binary);
   return {
     result: {
-      userCache: userCacheAndNextIndex.result,
-      userId: userIdAndNextIndex.result,
+      id: idAndNextIndex.result,
+      snapshot: snapshotAndNextIndex.result,
     },
-    nextIndex: userIdAndNextIndex.nextIndex,
+    nextIndex: snapshotAndNextIndex.nextIndex,
+  };
+};
+
+/**
+ * @param index バイナリを読み込み開始位置
+ * @param binary バイナリ
+ */
+export const decodeIdeaSnapshotMaybeAndId = (
+  index: number,
+  binary: Uint8Array
+): { result: IdeaSnapshotMaybeAndId; nextIndex: number } => {
+  const idAndNextIndex: { result: IdeaId; nextIndex: number } = (
+    decodeId as
+    (a: number, b: Uint8Array) => { result: IdeaId; nextIndex: number }
+  )(index, binary);
+  const snapshotAndNextIndex: {
+    result: Maybe<Idea>;
+    nextIndex: number;
+  } = decodeMaybe(decodeIdea)(idAndNextIndex.nextIndex, binary);
+  return {
+    result: {
+      id: idAndNextIndex.result,
+      snapshot: snapshotAndNextIndex.result,
+    },
+    nextIndex: snapshotAndNextIndex.nextIndex,
   };
 };
