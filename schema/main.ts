@@ -23,11 +23,16 @@ const urlDataName = "UrlData";
 const clientModeName = "ClientMode";
 const locationName = "Location";
 const languageName = "Language";
+
 const userName = "User";
 const userAndUserIdName = "UserAndUserId";
+
 const projectName = "Project";
 const projectAndProjectIdName = "ProjectAndProjectId";
+
 const ideaName = "Idea";
+const ideaSnapshotAndIdName = "IdeaSnapshotAndId";
+
 const ideaItemName = "IdeaItem";
 const commentName = "Comment";
 const suggestionName = "Suggestion";
@@ -56,8 +61,10 @@ const evaluateExprErrorName = "EvaluateExprError";
 const typeErrorName = "TypeError";
 const createProjectParameterName = "CreateProjectParameter";
 const accessTokenErrorName = "AccessTokenError";
+
 const projectCacheName = "ProjectCache";
 const userCacheName = "UserCache";
+
 const projectCacheWithIdName = "ProjectCacheWithId";
 const userCacheWithIdName = "UserCacheWithId";
 
@@ -350,6 +357,23 @@ const idea: type.CustomType = {
       name: "itemList",
       description: "アイデアの要素",
       memberType: type.typeList(type.typeCustom(ideaItemName)),
+    },
+  ]),
+};
+
+const ideaSnapshotAndId: type.CustomType = {
+  name: ideaSnapshotAndIdName,
+  description: "アイデアとそのID. アイデア作成時に返ってくる",
+  body: type.customTypeBodyProduct([
+    {
+      name: "ideaId",
+      description: "アイデアID",
+      memberType: ideaId,
+    },
+    {
+      name: "idea",
+      description: "アイデアのデータ",
+      memberType: type.typeCustom(ideaName),
     },
   ]),
 };
@@ -1065,6 +1089,7 @@ const listCustomType: ReadonlyArray<type.CustomType> = [
   project,
   projectAndProjectId,
   idea,
+  ideaSnapshotAndId,
   ideaItem,
   ideaCommentText,
   suggestion,

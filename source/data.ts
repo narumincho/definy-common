@@ -200,6 +200,20 @@ export type Idea = {
 };
 
 /**
+ * アイデアとそのID. アイデア作成時に返ってくる
+ */
+export type IdeaSnapshotAndId = {
+  /**
+   * アイデアID
+   */
+  ideaId: IdeaId;
+  /**
+   * アイデアのデータ
+   */
+  idea: Idea;
+};
+
+/**
  * アイデアのコメント
  */
 export type IdeaItem =
@@ -1137,6 +1151,11 @@ export const encodeIdea = (idea: Idea): ReadonlyArray<number> =>
     .concat(encodeId(idea.projectId))
     .concat(encodeList(encodeIdeaItem)(idea.itemList));
 
+export const encodeIdeaSnapshotAndId = (
+  ideaSnapshotAndId: IdeaSnapshotAndId
+): ReadonlyArray<number> =>
+  encodeId(ideaSnapshotAndId.ideaId).concat(encodeIdea(ideaSnapshotAndId.idea));
+
 export const encodeIdeaItem = (ideaItem: IdeaItem): ReadonlyArray<number> => {
   switch (ideaItem._) {
     case "Comment": {
@@ -2062,6 +2081,31 @@ export const decodeIdea = (
       itemList: itemListAndNextIndex.result,
     },
     nextIndex: itemListAndNextIndex.nextIndex,
+  };
+};
+
+/**
+ * @param index バイナリを読み込み開始位置
+ * @param binary バイナリ
+ */
+export const decodeIdeaSnapshotAndId = (
+  index: number,
+  binary: Uint8Array
+): { result: IdeaSnapshotAndId; nextIndex: number } => {
+  const ideaIdAndNextIndex: { result: IdeaId; nextIndex: number } = (
+    decodeId as
+    (a: number, b: Uint8Array) => { result: IdeaId; nextIndex: number }
+  )(index, binary);
+  const ideaAndNextIndex: { result: Idea; nextIndex: number } = decodeIdea(
+    ideaIdAndNextIndex.nextIndex,
+    binary
+  );
+  return {
+    result: {
+      ideaId: ideaIdAndNextIndex.result,
+      idea: ideaAndNextIndex.result,
+    },
+    nextIndex: ideaAndNextIndex.nextIndex,
   };
 };
 
