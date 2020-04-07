@@ -186,13 +186,13 @@ export type Idea = {
    */
   createdBy: UserId;
   /**
-   * アイデアの説明
-   */
-  description: string;
-  /**
    * 作成日時
    */
   createdAt: Time;
+  /**
+   * 対象のプロジェクト
+   */
+  projectId: ProjectId;
   /**
    * アイデアの要素
    */
@@ -1133,8 +1133,8 @@ export const encodeProjectAndProjectId = (
 export const encodeIdea = (idea: Idea): ReadonlyArray<number> =>
   encodeString(idea.name)
     .concat(encodeId(idea.createdBy))
-    .concat(encodeString(idea.description))
     .concat(encodeTime(idea.createdAt))
+    .concat(encodeId(idea.projectId))
     .concat(encodeList(encodeIdeaItem)(idea.itemList));
 
 export const encodeIdeaItem = (ideaItem: IdeaItem): ReadonlyArray<number> => {
@@ -2041,24 +2041,24 @@ export const decodeIdea = (
     decodeId as
     (a: number, b: Uint8Array) => { result: UserId; nextIndex: number }
   )(nameAndNextIndex.nextIndex, binary);
-  const descriptionAndNextIndex: {
-    result: string;
-    nextIndex: number;
-  } = decodeString(createdByAndNextIndex.nextIndex, binary);
   const createdAtAndNextIndex: { result: Time; nextIndex: number } = decodeTime(
-    descriptionAndNextIndex.nextIndex,
+    createdByAndNextIndex.nextIndex,
     binary
   );
+  const projectIdAndNextIndex: { result: ProjectId; nextIndex: number } = (
+    decodeId as
+    (a: number, b: Uint8Array) => { result: ProjectId; nextIndex: number }
+  )(createdAtAndNextIndex.nextIndex, binary);
   const itemListAndNextIndex: {
     result: ReadonlyArray<IdeaItem>;
     nextIndex: number;
-  } = decodeList(decodeIdeaItem)(createdAtAndNextIndex.nextIndex, binary);
+  } = decodeList(decodeIdeaItem)(projectIdAndNextIndex.nextIndex, binary);
   return {
     result: {
       name: nameAndNextIndex.result,
       createdBy: createdByAndNextIndex.result,
-      description: descriptionAndNextIndex.result,
       createdAt: createdAtAndNextIndex.result,
+      projectId: projectIdAndNextIndex.result,
       itemList: itemListAndNextIndex.result,
     },
     nextIndex: itemListAndNextIndex.nextIndex,

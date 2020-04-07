@@ -337,14 +337,14 @@ const idea: type.CustomType = {
       memberType: userId,
     },
     {
-      name: "description",
-      description: "アイデアの説明",
-      memberType: type.typeString,
-    },
-    {
       name: "createdAt",
       description: "作成日時",
       memberType: type.typeCustom(timeName),
+    },
+    {
+      name: "projectId",
+      description: "対象のプロジェクト",
+      memberType: projectId,
     },
     {
       name: "itemList",

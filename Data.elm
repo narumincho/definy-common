@@ -81,7 +81,7 @@ type alias ProjectAndProjectId =
 {-| アイデア
 -}
 type alias Idea =
-    { name : String, createdBy : UserId, description : String, createdAt : Time, itemList : List IdeaItem }
+    { name : String, createdBy : UserId, createdAt : Time, projectId : ProjectId, itemList : List IdeaItem }
 
 
 {-| アイデアのコメント
@@ -553,8 +553,8 @@ ideaToJsonValue idea =
     Je.object
         [ ( "name", Je.string idea.name )
         , ( "createdBy", userIdToJsonValue idea.createdBy )
-        , ( "description", Je.string idea.description )
         , ( "createdAt", timeToJsonValue idea.createdAt )
+        , ( "projectId", projectIdToJsonValue idea.projectId )
         , ( "itemList", Je.list ideaItemToJsonValue idea.itemList )
         ]
 
@@ -1250,18 +1250,18 @@ projectAndProjectIdJsonDecoder =
 ideaJsonDecoder : Jd.Decoder Idea
 ideaJsonDecoder =
     Jd.succeed
-        (\name createdBy description createdAt itemList ->
+        (\name createdBy createdAt projectId itemList ->
             { name = name
             , createdBy = createdBy
-            , description = description
             , createdAt = createdAt
+            , projectId = projectId
             , itemList = itemList
             }
         )
         |> Jdp.required "name" Jd.string
         |> Jdp.required "createdBy" userIdJsonDecoder
-        |> Jdp.required "description" Jd.string
         |> Jdp.required "createdAt" timeJsonDecoder
+        |> Jdp.required "projectId" projectIdJsonDecoder
         |> Jdp.required "itemList" (Jd.list ideaItemJsonDecoder)
 
 
