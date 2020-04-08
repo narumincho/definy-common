@@ -5,11 +5,12 @@ export { data };
 export { util };
 
 export const releaseOrigin = "https://definy.app";
+export const debugOrigin = "http://localhost:2520";
 
 export const clientModeToOriginUrl = (clientMode: data.ClientMode): URL => {
   switch (clientMode) {
     case "DebugMode": {
-      return new URL("http://localhost:2520");
+      return new URL(debugOrigin);
     }
     case "Release":
       return new URL(releaseOrigin);
@@ -75,7 +76,7 @@ export const urlDataAndAccessTokenFromUrl = (
     languageId === null ? defaultLanguage : languageFromIdString(languageId);
   return {
     urlData: {
-      clientMode: clientModeFromUrl(url.hostname),
+      clientMode: clientModeFromUrl(url.origin),
       location: locationFromUrl(url.pathname),
       language: language,
     },
@@ -83,12 +84,8 @@ export const urlDataAndAccessTokenFromUrl = (
   };
 };
 
-const clientModeFromUrl = (hostName: string): data.ClientMode => {
-  if (hostName === "localhost") {
-    return "DebugMode";
-  }
-  return "Release";
-};
+const clientModeFromUrl = (origin: string): data.ClientMode =>
+  origin === debugOrigin ? "DebugMode" : "Release";
 
 const locationFromUrl = (pathName: string): data.Location => {
   if (pathName === "/create-project") {
