@@ -149,13 +149,12 @@ const clientMode: type.CustomType = {
   body: type.customTypeBodySum([
     {
       name: "DebugMode",
-      description:
-        "デバッグモード. ポート番号を保持する. オリジンは http://localshot:2520",
-      parameter: type.maybeJust(type.typeInt32),
+      description: "デバッグモード. オリジンは http://localshot:2520",
+      parameter: type.maybeNothing(),
     },
     {
       name: "Release",
-      description: "リリースモード. https://definy.app ",
+      description: "リリースモード. オリジンは https://definy.app ",
       parameter: type.maybeNothing(),
     },
   ]),

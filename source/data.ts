@@ -28,7 +28,7 @@ export type Time = {
 /**
  * デバッグの状態と, デバッグ時ならアクセスしているポート番号
  */
-export type ClientMode = { _: "DebugMode"; int32: number } | { _: "Release" };
+export type ClientMode = "DebugMode" | "Release";
 
 /**
  * ログインのURLを発行するために必要なデータ
@@ -697,19 +697,6 @@ export const resultError = <ok, error>(error: error): Result<ok, error> => ({
 });
 
 /**
- * デバッグモード. ポート番号を保持する. オリジンは http://localshot:2520
- */
-export const clientModeDebugMode = (int32: number): ClientMode => ({
-  _: "DebugMode",
-  int32: int32,
-});
-
-/**
- * リリースモード. https://definy.app
- */
-export const clientModeRelease: ClientMode = { _: "Release" };
-
-/**
  * 最初のページ
  */
 export const locationHome: Location = { _: "Home" };
@@ -1069,9 +1056,9 @@ export const encodeTime = (time: Time): ReadonlyArray<number> =>
 export const encodeClientMode = (
   clientMode: ClientMode
 ): ReadonlyArray<number> => {
-  switch (clientMode._) {
+  switch (clientMode) {
     case "DebugMode": {
-      return [0].concat(encodeInt32(clientMode.int32));
+      return [0];
     }
     case "Release": {
       return [1];
@@ -1767,17 +1754,10 @@ export const decodeClientMode = (
     binary
   );
   if (patternIndex.result === 0) {
-    const result: { result: number; nextIndex: number } = decodeInt32(
-      patternIndex.nextIndex,
-      binary
-    );
-    return {
-      result: clientModeDebugMode(result.result),
-      nextIndex: result.nextIndex,
-    };
+    return { result: "DebugMode", nextIndex: patternIndex.nextIndex };
   }
   if (patternIndex.result === 1) {
-    return { result: clientModeRelease, nextIndex: patternIndex.nextIndex };
+    return { result: "Release", nextIndex: patternIndex.nextIndex };
   }
   throw new Error("存在しないパターンを指定された 型を更新してください");
 };

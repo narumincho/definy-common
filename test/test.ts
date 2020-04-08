@@ -6,7 +6,7 @@ describe("test", () => {
     expect(
       main.urlDataAndAccessTokenFromUrl(new URL("https://definy.app/")).urlData
     ).toEqual<data.UrlData>({
-      clientMode: data.clientModeRelease,
+      clientMode: "Release",
       location: data.locationHome,
       language: "English",
     });
@@ -19,7 +19,7 @@ describe("test", () => {
         )
       ).urlData
     ).toEqual<data.UrlData>({
-      clientMode: data.clientModeRelease,
+      clientMode: "Release",
       location: data.locationProject(
         "580d8d6a54cf43e4452a0bba6694a4ed" as data.ProjectId
       ),
@@ -33,7 +33,7 @@ describe("test", () => {
     expect(main.urlDataAndAccessTokenFromUrl(url).urlData).toEqual<
       data.UrlData
     >({
-      clientMode: data.clientModeDebugMode(2520),
+      clientMode: "DebugMode",
       location: data.locationUser(
         "580d8d6a54cf43e4452a0bba6694a4ed" as data.UserId
       ),
@@ -54,7 +54,7 @@ describe("test", () => {
   });
   it("encode, decode user url", () => {
     const languageAndLocation: data.UrlData = {
-      clientMode: data.clientModeDebugMode(123),
+      clientMode: "DebugMode",
       location: data.locationUser(
         "580d8d6a54cf43e4452a0bba6694a4ed" as data.UserId
       ),

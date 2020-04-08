@@ -14,7 +14,7 @@ type alias Time =
 {-| デバッグの状態と, デバッグ時ならアクセスしているポート番号
 -}
 type ClientMode
-    = ClientModeDebugMode Int
+    = ClientModeDebugMode
     | ClientModeRelease
 
 
@@ -426,11 +426,11 @@ timeToJsonValue time =
 clientModeToJsonValue : ClientMode -> Je.Value
 clientModeToJsonValue clientMode =
     case clientMode of
-        ClientModeDebugMode parameter ->
-            Je.object [ ( "_", Je.string "DebugMode" ), ( "int32", Je.int parameter ) ]
+        ClientModeDebugMode ->
+            Je.string "DebugMode"
 
         ClientModeRelease ->
-            Je.object [ ( "_", Je.string "Release" ) ]
+            Je.string "Release"
 
 
 {-| RequestLogInUrlRequestDataのJSONへのエンコーダ
@@ -1072,12 +1072,12 @@ timeJsonDecoder =
 -}
 clientModeJsonDecoder : Jd.Decoder ClientMode
 clientModeJsonDecoder =
-    Jd.field "_" Jd.string
+    Jd.string
         |> Jd.andThen
             (\tag ->
                 case tag of
                     "DebugMode" ->
-                        Jd.field "int32" Jd.int |> Jd.map ClientModeDebugMode
+                        Jd.succeed ClientModeDebugMode
 
                     "Release" ->
                         Jd.succeed ClientModeRelease
