@@ -28,10 +28,16 @@ export const urlDataToUrl = (urlData: data.UrlData): URL => {
     languageQueryKey,
     languageToIdString(urlData.language)
   );
-  if (urlData.accessToken._ === "Just") {
-    url.hash = "access-token=" + (urlData.accessToken.value as string);
-  }
   return url;
+};
+
+export const addAccessToken = (
+  accessToken: data.AccessToken,
+  url: URL
+): URL => {
+  const newUrl = new URL(url.toString());
+  newUrl.hash = "access-token=" + (accessToken as string);
+  return newUrl;
 };
 
 const locationToPath = (location: data.Location): string => {
@@ -74,9 +80,11 @@ export const urlDataFromUrl = (url: URL): data.UrlData => {
     clientMode: clientModeFromUrl(url.hostname, url.port),
     location: locationFromUrl(url.pathname),
     language: language,
-    accessToken: accessTokenFromUrl(url.hash),
   };
 };
+
+export const getAccessTokenFromUrl = (url: URL): data.Maybe<data.AccessToken> =>
+  accessTokenFromUrl(url.hash);
 
 const clientModeFromUrl = (
   hostName: string,

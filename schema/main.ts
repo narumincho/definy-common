@@ -20,6 +20,7 @@ const timeName = "Time";
 const requestLogInUrlRequestDataName = "RequestLogInUrlRequestData";
 const openIdConnectProviderName = "OpenIdConnectProvider";
 const urlDataName = "UrlData";
+const urlDataWithAccessTokenName = "UrlDataWithAccessToken";
 const clientModeName = "ClientMode";
 const locationName = "Location";
 const languageName = "Language";
@@ -123,7 +124,7 @@ const openIdConnectProvider: type.CustomType = {
 const urlData: type.CustomType = {
   name: urlDataName,
   description:
-    "デバッグモードかどうか,言語とページの場所. URLとして表現されるデータ. Googleなどの検索エンジンの都合( https://support.google.com/webmasters/answer/182192?hl=ja )で,URLにページの言語のを入れて,言語ごとに別のURLである必要がある. デバッグ時のホスト名は http://[::1] になる",
+    "デバッグモードかどうか,言語とページの場所. URLとして表現されるデータ. Googleなどの検索エンジンの都合( https://support.google.com/webmasters/answer/182192?hl=ja )で,URLにページの言語を入れて,言語ごとに別のURLである必要がある. デバッグ時のホスト名は http://[::1] になる",
   body: type.customTypeBodyProduct([
     {
       name: "clientMode",
@@ -139,12 +140,6 @@ const urlData: type.CustomType = {
       name: "language",
       description: "言語",
       memberType: type.typeCustom(languageName),
-    },
-    {
-      name: "accessToken",
-      description:
-        "アクセストークン. ログインした後のリダイレクト先としてサーバーから渡される",
-      memberType: type.typeMaybe(accessToken),
     },
   ]),
 };

@@ -9,7 +9,6 @@ describe("test", () => {
       clientMode: data.clientModeRelease,
       location: data.locationHome,
       language: "English",
-      accessToken: data.maybeNothing(),
     });
   });
   it("project url", () => {
@@ -25,27 +24,29 @@ describe("test", () => {
         "580d8d6a54cf43e4452a0bba6694a4ed" as data.ProjectId
       ),
       language: "Japanese",
-      accessToken: data.maybeNothing(),
     });
   });
-  it("local host and accessToken", () => {
-    expect(
-      main.urlDataFromUrl(
-        new URL(
-          "http://[::1]:2520/user/580d8d6a54cf43e4452a0bba6694a4ed?hl=eo#access-token=f81919b78537257302b50f776b77a90b984cc3d75fa899f9f460ff972dcc8cb0"
-        )
-      )
-    ).toEqual<data.UrlData>({
+  it("local host", () => {
+    const url = new URL(
+      "http://[::1]:2520/user/580d8d6a54cf43e4452a0bba6694a4ed?hl=eo#access-token=f81919b78537257302b50f776b77a90b984cc3d75fa899f9f460ff972dcc8cb0"
+    );
+    expect(main.urlDataFromUrl(url)).toEqual<data.UrlData>({
       clientMode: data.clientModeDebugMode(2520),
       location: data.locationUser(
         "580d8d6a54cf43e4452a0bba6694a4ed" as data.UserId
       ),
       language: "Esperanto",
-      accessToken: data.maybeJust(
-        "f81919b78537257302b50f776b77a90b984cc3d75fa899f9f460ff972dcc8cb0" as
-          data.AccessToken
-      ),
     });
+  });
+  it("accessToken", () => {
+    const url = new URL(
+      "http://[::1]:2520/user/580d8d6a54cf43e4452a0bba6694a4ed?hl=eo#access-token=f81919b78537257302b50f776b77a90b984cc3d75fa899f9f460ff972dcc8cb0"
+    );
+    expect(main.getAccessTokenFromUrl(url)).toEqual(
+      data.maybeJust(
+        "f81919b78537257302b50f776b77a90b984cc3d75fa899f9f460ff972dcc8cb0" as data.AccessToken
+      )
+    );
   });
   it("encode, decode user url", () => {
     const languageAndLocation: data.UrlData = {
@@ -54,7 +55,6 @@ describe("test", () => {
         "580d8d6a54cf43e4452a0bba6694a4ed" as data.UserId
       ),
       language: "Esperanto",
-      accessToken: data.maybeNothing(),
     };
     const url = main.urlDataToUrl(languageAndLocation);
     const decodedLanguageAndLocation: data.UrlData = main.urlDataFromUrl(url);

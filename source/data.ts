@@ -50,7 +50,7 @@ export type RequestLogInUrlRequestData = {
 export type OpenIdConnectProvider = "Google" | "GitHub";
 
 /**
- * デバッグモードかどうか,言語とページの場所. URLとして表現されるデータ. Googleなどの検索エンジンの都合( https://support.google.com/webmasters/answer/182192?hl=ja )で,URLにページの言語のを入れて,言語ごとに別のURLである必要がある. デバッグ時のホスト名は http://[::1] になる
+ * デバッグモードかどうか,言語とページの場所. URLとして表現されるデータ. Googleなどの検索エンジンの都合( https://support.google.com/webmasters/answer/182192?hl=ja )で,URLにページの言語を入れて,言語ごとに別のURLである必要がある. デバッグ時のホスト名は http://[::1] になる
  */
 export type UrlData = {
   /**
@@ -65,10 +65,6 @@ export type UrlData = {
    * 言語
    */
   language: Language;
-  /**
-   * アクセストークン. ログインした後のリダイレクト先としてサーバーから渡される
-   */
-  accessToken: Maybe<AccessToken>;
 };
 
 /**
@@ -663,8 +659,6 @@ export type IdeaSnapshotMaybeAndId = {
   snapshot: Maybe<Idea>;
 };
 
-export type AccessToken = string & { _accessToken: never };
-
 export type ProjectId = string & { _projectId: never };
 
 export type UserId = string & { _userId: never };
@@ -682,6 +676,8 @@ export type ModuleId = string & { _moduleId: never };
 export type LocalPartId = string & { _localPartId: never };
 
 export type TagId = string & { _tagId: never };
+
+export type AccessToken = string & { _accessToken: never };
 
 export const maybeJust = <T>(value: T): Maybe<T> => ({
   _: "Just",
@@ -1106,8 +1102,7 @@ export const encodeOpenIdConnectProvider = (
 export const encodeUrlData = (urlData: UrlData): ReadonlyArray<number> =>
   encodeClientMode(urlData.clientMode)
     .concat(encodeLocation(urlData.location))
-    .concat(encodeLanguage(urlData.language))
-    .concat(encodeMaybe(encodeToken)(urlData.accessToken));
+    .concat(encodeLanguage(urlData.language));
 
 export const encodeLanguage = (language: Language): ReadonlyArray<number> => {
   switch (language) {
@@ -1853,21 +1848,13 @@ export const decodeUrlData = (
     result: Language;
     nextIndex: number;
   } = decodeLanguage(locationAndNextIndex.nextIndex, binary);
-  const accessTokenAndNextIndex: {
-    result: Maybe<AccessToken>;
-    nextIndex: number;
-  } = decodeMaybe(
-    decodeToken as
-      (a: number, b: Uint8Array) => { result: AccessToken; nextIndex: number }
-  )(languageAndNextIndex.nextIndex, binary);
   return {
     result: {
       clientMode: clientModeAndNextIndex.result,
       location: locationAndNextIndex.result,
       language: languageAndNextIndex.result,
-      accessToken: accessTokenAndNextIndex.result,
     },
-    nextIndex: accessTokenAndNextIndex.nextIndex,
+    nextIndex: languageAndNextIndex.nextIndex,
   };
 };
 
@@ -1914,37 +1901,43 @@ export const decodeLocation = (
     return { result: locationCreateProject, nextIndex: patternIndex.nextIndex };
   }
   if (patternIndex.result === 2) {
-    const result: { result: ProjectId; nextIndex: number } = (
-      decodeId as
-      (a: number, b: Uint8Array) => { result: ProjectId; nextIndex: number }
-    )(patternIndex.nextIndex, binary);
+    const result: { result: ProjectId; nextIndex: number } = (decodeId as (
+      a: number,
+      b: Uint8Array
+    ) => { result: ProjectId; nextIndex: number })(
+      patternIndex.nextIndex,
+      binary
+    );
     return {
       result: locationCreateIdea(result.result),
       nextIndex: result.nextIndex,
     };
   }
   if (patternIndex.result === 3) {
-    const result: { result: UserId; nextIndex: number } = (
-      decodeId as
-      (a: number, b: Uint8Array) => { result: UserId; nextIndex: number }
-    )(patternIndex.nextIndex, binary);
+    const result: { result: UserId; nextIndex: number } = (decodeId as (
+      a: number,
+      b: Uint8Array
+    ) => { result: UserId; nextIndex: number })(patternIndex.nextIndex, binary);
     return { result: locationUser(result.result), nextIndex: result.nextIndex };
   }
   if (patternIndex.result === 4) {
-    const result: { result: ProjectId; nextIndex: number } = (
-      decodeId as
-      (a: number, b: Uint8Array) => { result: ProjectId; nextIndex: number }
-    )(patternIndex.nextIndex, binary);
+    const result: { result: ProjectId; nextIndex: number } = (decodeId as (
+      a: number,
+      b: Uint8Array
+    ) => { result: ProjectId; nextIndex: number })(
+      patternIndex.nextIndex,
+      binary
+    );
     return {
       result: locationProject(result.result),
       nextIndex: result.nextIndex,
     };
   }
   if (patternIndex.result === 5) {
-    const result: { result: IdeaId; nextIndex: number } = (
-      decodeId as
-      (a: number, b: Uint8Array) => { result: IdeaId; nextIndex: number }
-    )(patternIndex.nextIndex, binary);
+    const result: { result: IdeaId; nextIndex: number } = (decodeId as (
+      a: number,
+      b: Uint8Array
+    ) => { result: IdeaId; nextIndex: number })(patternIndex.nextIndex, binary);
     return { result: locationIdea(result.result), nextIndex: result.nextIndex };
   }
   throw new Error("存在しないパターンを指定された 型を更新してください");
@@ -1962,10 +1955,16 @@ export const decodeUserSnapshot = (
     index,
     binary
   );
-  const imageHashAndNextIndex: { result: FileHash; nextIndex: number } = (
-    decodeToken as
-    (a: number, b: Uint8Array) => { result: FileHash; nextIndex: number }
-  )(nameAndNextIndex.nextIndex, binary);
+  const imageHashAndNextIndex: {
+    result: FileHash;
+    nextIndex: number;
+  } = (decodeToken as (
+    a: number,
+    b: Uint8Array
+  ) => { result: FileHash; nextIndex: number })(
+    nameAndNextIndex.nextIndex,
+    binary
+  );
   const introductionAndNextIndex: {
     result: string;
     nextIndex: number;
@@ -1978,22 +1977,28 @@ export const decodeUserSnapshot = (
     result: ReadonlyArray<ProjectId>;
     nextIndex: number;
   } = decodeList(
-    decodeId as
-      (a: number, b: Uint8Array) => { result: ProjectId; nextIndex: number }
+    decodeId as (
+      a: number,
+      b: Uint8Array
+    ) => { result: ProjectId; nextIndex: number }
   )(createTimeAndNextIndex.nextIndex, binary);
   const developProjectIdListAndNextIndex: {
     result: ReadonlyArray<ProjectId>;
     nextIndex: number;
   } = decodeList(
-    decodeId as
-      (a: number, b: Uint8Array) => { result: ProjectId; nextIndex: number }
+    decodeId as (
+      a: number,
+      b: Uint8Array
+    ) => { result: ProjectId; nextIndex: number }
   )(likeProjectIdListAndNextIndex.nextIndex, binary);
   const commentIdeaIdListAndNextIndex: {
     result: ReadonlyArray<IdeaId>;
     nextIndex: number;
   } = decodeList(
-    decodeId as
-      (a: number, b: Uint8Array) => { result: IdeaId; nextIndex: number }
+    decodeId as (
+      a: number,
+      b: Uint8Array
+    ) => { result: IdeaId; nextIndex: number }
   )(developProjectIdListAndNextIndex.nextIndex, binary);
   const getTimeAndNextIndex: { result: Time; nextIndex: number } = decodeTime(
     commentIdeaIdListAndNextIndex.nextIndex,
@@ -2022,10 +2027,10 @@ export const decodeUserSnapshotAndId = (
   index: number,
   binary: Uint8Array
 ): { result: UserSnapshotAndId; nextIndex: number } => {
-  const idAndNextIndex: { result: UserId; nextIndex: number } = (
-    decodeId as
-    (a: number, b: Uint8Array) => { result: UserId; nextIndex: number }
-  )(index, binary);
+  const idAndNextIndex: { result: UserId; nextIndex: number } = (decodeId as (
+    a: number,
+    b: Uint8Array
+  ) => { result: UserId; nextIndex: number })(index, binary);
   const snapshotAndNextIndex: {
     result: UserSnapshot;
     nextIndex: number;
@@ -2051,22 +2056,40 @@ export const decodeProjectSnapshot = (
     index,
     binary
   );
-  const iconHashAndNextIndex: { result: FileHash; nextIndex: number } = (
-    decodeToken as
-    (a: number, b: Uint8Array) => { result: FileHash; nextIndex: number }
-  )(nameAndNextIndex.nextIndex, binary);
-  const imageHashAndNextIndex: { result: FileHash; nextIndex: number } = (
-    decodeToken as
-    (a: number, b: Uint8Array) => { result: FileHash; nextIndex: number }
-  )(iconHashAndNextIndex.nextIndex, binary);
+  const iconHashAndNextIndex: {
+    result: FileHash;
+    nextIndex: number;
+  } = (decodeToken as (
+    a: number,
+    b: Uint8Array
+  ) => { result: FileHash; nextIndex: number })(
+    nameAndNextIndex.nextIndex,
+    binary
+  );
+  const imageHashAndNextIndex: {
+    result: FileHash;
+    nextIndex: number;
+  } = (decodeToken as (
+    a: number,
+    b: Uint8Array
+  ) => { result: FileHash; nextIndex: number })(
+    iconHashAndNextIndex.nextIndex,
+    binary
+  );
   const createTimeAndNextIndex: {
     result: Time;
     nextIndex: number;
   } = decodeTime(imageHashAndNextIndex.nextIndex, binary);
-  const createUserAndNextIndex: { result: UserId; nextIndex: number } = (
-    decodeId as
-    (a: number, b: Uint8Array) => { result: UserId; nextIndex: number }
-  )(createTimeAndNextIndex.nextIndex, binary);
+  const createUserAndNextIndex: {
+    result: UserId;
+    nextIndex: number;
+  } = (decodeId as (
+    a: number,
+    b: Uint8Array
+  ) => { result: UserId; nextIndex: number })(
+    createTimeAndNextIndex.nextIndex,
+    binary
+  );
   const updateTimeAndNextIndex: {
     result: Time;
     nextIndex: number;
@@ -2097,10 +2120,13 @@ export const decodeProjectSnapshotAndId = (
   index: number,
   binary: Uint8Array
 ): { result: ProjectSnapshotAndId; nextIndex: number } => {
-  const idAndNextIndex: { result: ProjectId; nextIndex: number } = (
-    decodeId as
-    (a: number, b: Uint8Array) => { result: ProjectId; nextIndex: number }
-  )(index, binary);
+  const idAndNextIndex: {
+    result: ProjectId;
+    nextIndex: number;
+  } = (decodeId as (
+    a: number,
+    b: Uint8Array
+  ) => { result: ProjectId; nextIndex: number })(index, binary);
   const snapshotAndNextIndex: {
     result: ProjectSnapshot;
     nextIndex: number;
@@ -2126,18 +2152,30 @@ export const decodeIdea = (
     index,
     binary
   );
-  const createUserAndNextIndex: { result: UserId; nextIndex: number } = (
-    decodeId as
-    (a: number, b: Uint8Array) => { result: UserId; nextIndex: number }
-  )(nameAndNextIndex.nextIndex, binary);
+  const createUserAndNextIndex: {
+    result: UserId;
+    nextIndex: number;
+  } = (decodeId as (
+    a: number,
+    b: Uint8Array
+  ) => { result: UserId; nextIndex: number })(
+    nameAndNextIndex.nextIndex,
+    binary
+  );
   const createTimeAndNextIndex: {
     result: Time;
     nextIndex: number;
   } = decodeTime(createUserAndNextIndex.nextIndex, binary);
-  const projectIdAndNextIndex: { result: ProjectId; nextIndex: number } = (
-    decodeId as
-    (a: number, b: Uint8Array) => { result: ProjectId; nextIndex: number }
-  )(createTimeAndNextIndex.nextIndex, binary);
+  const projectIdAndNextIndex: {
+    result: ProjectId;
+    nextIndex: number;
+  } = (decodeId as (
+    a: number,
+    b: Uint8Array
+  ) => { result: ProjectId; nextIndex: number })(
+    createTimeAndNextIndex.nextIndex,
+    binary
+  );
   const itemListAndNextIndex: {
     result: ReadonlyArray<IdeaItem>;
     nextIndex: number;
@@ -2172,10 +2210,10 @@ export const decodeIdeaSnapshotAndId = (
   index: number,
   binary: Uint8Array
 ): { result: IdeaSnapshotAndId; nextIndex: number } => {
-  const idAndNextIndex: { result: IdeaId; nextIndex: number } = (
-    decodeId as
-    (a: number, b: Uint8Array) => { result: IdeaId; nextIndex: number }
-  )(index, binary);
+  const idAndNextIndex: { result: IdeaId; nextIndex: number } = (decodeId as (
+    a: number,
+    b: Uint8Array
+  ) => { result: IdeaId; nextIndex: number })(index, binary);
   const snapshotAndNextIndex: { result: Idea; nextIndex: number } = decodeIdea(
     idAndNextIndex.nextIndex,
     binary
@@ -2236,10 +2274,16 @@ export const decodeComment = (
     index,
     binary
   );
-  const createdByAndNextIndex: { result: UserId; nextIndex: number } = (
-    decodeId as
-    (a: number, b: Uint8Array) => { result: UserId; nextIndex: number }
-  )(bodyAndNextIndex.nextIndex, binary);
+  const createdByAndNextIndex: {
+    result: UserId;
+    nextIndex: number;
+  } = (decodeId as (
+    a: number,
+    b: Uint8Array
+  ) => { result: UserId; nextIndex: number })(
+    bodyAndNextIndex.nextIndex,
+    binary
+  );
   const createdAtAndNextIndex: { result: Time; nextIndex: number } = decodeTime(
     createdByAndNextIndex.nextIndex,
     binary
@@ -2355,8 +2399,10 @@ export const decodeTypeDefinition = (
     result: ReadonlyArray<PartId>;
     nextIndex: number;
   } = decodeList(
-    decodeId as
-      (a: number, b: Uint8Array) => { result: PartId; nextIndex: number }
+    decodeId as (
+      a: number,
+      b: Uint8Array
+    ) => { result: PartId; nextIndex: number }
   )(nameAndNextIndex.nextIndex, binary);
   const descriptionAndNextIndex: {
     result: string;
@@ -2430,10 +2476,16 @@ export const decodeTypeBodyProductMember = (
     result: string;
     nextIndex: number;
   } = decodeString(nameAndNextIndex.nextIndex, binary);
-  const memberTypeAndNextIndex: { result: TypeId; nextIndex: number } = (
-    decodeId as
-    (a: number, b: Uint8Array) => { result: TypeId; nextIndex: number }
-  )(descriptionAndNextIndex.nextIndex, binary);
+  const memberTypeAndNextIndex: {
+    result: TypeId;
+    nextIndex: number;
+  } = (decodeId as (
+    a: number,
+    b: Uint8Array
+  ) => { result: TypeId; nextIndex: number })(
+    descriptionAndNextIndex.nextIndex,
+    binary
+  );
   return {
     result: {
       name: nameAndNextIndex.result,
@@ -2464,8 +2516,10 @@ export const decodeTypeBodySumPattern = (
     result: Maybe<TypeId>;
     nextIndex: number;
   } = decodeMaybe(
-    decodeId as
-      (a: number, b: Uint8Array) => { result: TypeId; nextIndex: number }
+    decodeId as (
+      a: number,
+      b: Uint8Array
+    ) => { result: TypeId; nextIndex: number }
   )(descriptionAndNextIndex.nextIndex, binary);
   return {
     result: {
@@ -2517,8 +2571,10 @@ export const decodePartDefinition = (
     result: ReadonlyArray<PartId>;
     nextIndex: number;
   } = decodeList(
-    decodeId as
-      (a: number, b: Uint8Array) => { result: PartId; nextIndex: number }
+    decodeId as (
+      a: number,
+      b: Uint8Array
+    ) => { result: PartId; nextIndex: number }
   )(nameAndNextIndex.nextIndex, binary);
   const descriptionAndNextIndex: {
     result: string;
@@ -2532,10 +2588,16 @@ export const decodePartDefinition = (
     result: Maybe<Expr>;
     nextIndex: number;
   } = decodeMaybe(decodeExpr)(typeAndNextIndex.nextIndex, binary);
-  const moduleIdAndNextIndex: { result: ModuleId; nextIndex: number } = (
-    decodeId as
-    (a: number, b: Uint8Array) => { result: ModuleId; nextIndex: number }
-  )(exprAndNextIndex.nextIndex, binary);
+  const moduleIdAndNextIndex: {
+    result: ModuleId;
+    nextIndex: number;
+  } = (decodeId as (
+    a: number,
+    b: Uint8Array
+  ) => { result: ModuleId; nextIndex: number })(
+    exprAndNextIndex.nextIndex,
+    binary
+  );
   return {
     result: {
       name: nameAndNextIndex.result,
@@ -2557,10 +2619,13 @@ export const decodeType = (
   index: number,
   binary: Uint8Array
 ): { result: Type; nextIndex: number } => {
-  const referenceAndNextIndex: { result: TypeId; nextIndex: number } = (
-    decodeId as
-    (a: number, b: Uint8Array) => { result: TypeId; nextIndex: number }
-  )(index, binary);
+  const referenceAndNextIndex: {
+    result: TypeId;
+    nextIndex: number;
+  } = (decodeId as (
+    a: number,
+    b: Uint8Array
+  ) => { result: TypeId; nextIndex: number })(index, binary);
   const parameterAndNextIndex: {
     result: ReadonlyArray<Type>;
     nextIndex: number;
@@ -2604,10 +2669,10 @@ export const decodeExpr = (
     };
   }
   if (patternIndex.result === 2) {
-    const result: { result: PartId; nextIndex: number } = (
-      decodeId as
-      (a: number, b: Uint8Array) => { result: PartId; nextIndex: number }
-    )(patternIndex.nextIndex, binary);
+    const result: { result: PartId; nextIndex: number } = (decodeId as (
+      a: number,
+      b: Uint8Array
+    ) => { result: PartId; nextIndex: number })(patternIndex.nextIndex, binary);
     return {
       result: exprPartReference(result.result),
       nextIndex: result.nextIndex,
@@ -2775,14 +2840,23 @@ export const decodeLocalPartReference = (
   index: number,
   binary: Uint8Array
 ): { result: LocalPartReference; nextIndex: number } => {
-  const partIdAndNextIndex: { result: PartId; nextIndex: number } = (
-    decodeId as
-    (a: number, b: Uint8Array) => { result: PartId; nextIndex: number }
-  )(index, binary);
-  const localPartIdAndNextIndex: { result: LocalPartId; nextIndex: number } = (
-    decodeId as
-    (a: number, b: Uint8Array) => { result: LocalPartId; nextIndex: number }
-  )(partIdAndNextIndex.nextIndex, binary);
+  const partIdAndNextIndex: {
+    result: PartId;
+    nextIndex: number;
+  } = (decodeId as (
+    a: number,
+    b: Uint8Array
+  ) => { result: PartId; nextIndex: number })(index, binary);
+  const localPartIdAndNextIndex: {
+    result: LocalPartId;
+    nextIndex: number;
+  } = (decodeId as (
+    a: number,
+    b: Uint8Array
+  ) => { result: LocalPartId; nextIndex: number })(
+    partIdAndNextIndex.nextIndex,
+    binary
+  );
   return {
     result: {
       partId: partIdAndNextIndex.result,
@@ -2800,10 +2874,13 @@ export const decodeTagReferenceIndex = (
   index: number,
   binary: Uint8Array
 ): { result: TagReferenceIndex; nextIndex: number } => {
-  const typeIdAndNextIndex: { result: TypeId; nextIndex: number } = (
-    decodeId as
-    (a: number, b: Uint8Array) => { result: TypeId; nextIndex: number }
-  )(index, binary);
+  const typeIdAndNextIndex: {
+    result: TypeId;
+    nextIndex: number;
+  } = (decodeId as (
+    a: number,
+    b: Uint8Array
+  ) => { result: TypeId; nextIndex: number })(index, binary);
   const tagIndexAndNextIndex: {
     result: number;
     nextIndex: number;
@@ -2936,10 +3013,10 @@ export const decodeConditionTag = (
   index: number,
   binary: Uint8Array
 ): { result: ConditionTag; nextIndex: number } => {
-  const tagAndNextIndex: { result: TagId; nextIndex: number } = (
-    decodeId as
-    (a: number, b: Uint8Array) => { result: TagId; nextIndex: number }
-  )(index, binary);
+  const tagAndNextIndex: { result: TagId; nextIndex: number } = (decodeId as (
+    a: number,
+    b: Uint8Array
+  ) => { result: TagId; nextIndex: number })(index, binary);
   const parameterAndNextIndex: {
     result: Maybe<Condition>;
     nextIndex: number;
@@ -2965,10 +3042,16 @@ export const decodeConditionCapture = (
     index,
     binary
   );
-  const localPartIdAndNextIndex: { result: LocalPartId; nextIndex: number } = (
-    decodeId as
-    (a: number, b: Uint8Array) => { result: LocalPartId; nextIndex: number }
-  )(nameAndNextIndex.nextIndex, binary);
+  const localPartIdAndNextIndex: {
+    result: LocalPartId;
+    nextIndex: number;
+  } = (decodeId as (
+    a: number,
+    b: Uint8Array
+  ) => { result: LocalPartId; nextIndex: number })(
+    nameAndNextIndex.nextIndex,
+    binary
+  );
   return {
     result: {
       name: nameAndNextIndex.result,
@@ -2986,10 +3069,13 @@ export const decodeBranchPartDefinition = (
   index: number,
   binary: Uint8Array
 ): { result: BranchPartDefinition; nextIndex: number } => {
-  const localPartIdAndNextIndex: { result: LocalPartId; nextIndex: number } = (
-    decodeId as
-    (a: number, b: Uint8Array) => { result: LocalPartId; nextIndex: number }
-  )(index, binary);
+  const localPartIdAndNextIndex: {
+    result: LocalPartId;
+    nextIndex: number;
+  } = (decodeId as (
+    a: number,
+    b: Uint8Array
+  ) => { result: LocalPartId; nextIndex: number })(index, binary);
   const nameAndNextIndex: { result: string; nextIndex: number } = decodeString(
     localPartIdAndNextIndex.nextIndex,
     binary
@@ -3031,20 +3117,20 @@ export const decodeEvaluateExprError = (
     binary
   );
   if (patternIndex.result === 0) {
-    const result: { result: PartId; nextIndex: number } = (
-      decodeId as
-      (a: number, b: Uint8Array) => { result: PartId; nextIndex: number }
-    )(patternIndex.nextIndex, binary);
+    const result: { result: PartId; nextIndex: number } = (decodeId as (
+      a: number,
+      b: Uint8Array
+    ) => { result: PartId; nextIndex: number })(patternIndex.nextIndex, binary);
     return {
       result: evaluateExprErrorNeedPartDefinition(result.result),
       nextIndex: result.nextIndex,
     };
   }
   if (patternIndex.result === 1) {
-    const result: { result: PartId; nextIndex: number } = (
-      decodeId as
-      (a: number, b: Uint8Array) => { result: PartId; nextIndex: number }
-    )(patternIndex.nextIndex, binary);
+    const result: { result: PartId; nextIndex: number } = (decodeId as (
+      a: number,
+      b: Uint8Array
+    ) => { result: PartId; nextIndex: number })(patternIndex.nextIndex, binary);
     return {
       result: evaluateExprErrorPartExprIsNothing(result.result),
       nextIndex: result.nextIndex,
@@ -3105,10 +3191,13 @@ export const decodeCreateProjectParameter = (
   index: number,
   binary: Uint8Array
 ): { result: CreateProjectParameter; nextIndex: number } => {
-  const accessTokenAndNextIndex: { result: AccessToken; nextIndex: number } = (
-    decodeToken as
-    (a: number, b: Uint8Array) => { result: AccessToken; nextIndex: number }
-  )(index, binary);
+  const accessTokenAndNextIndex: {
+    result: AccessToken;
+    nextIndex: number;
+  } = (decodeToken as (
+    a: number,
+    b: Uint8Array
+  ) => { result: AccessToken; nextIndex: number })(index, binary);
   const projectNameAndNextIndex: {
     result: string;
     nextIndex: number;
@@ -3157,10 +3246,13 @@ export const decodeProjectSnapshotMaybeAndId = (
   index: number,
   binary: Uint8Array
 ): { result: ProjectSnapshotMaybeAndId; nextIndex: number } => {
-  const idAndNextIndex: { result: ProjectId; nextIndex: number } = (
-    decodeId as
-    (a: number, b: Uint8Array) => { result: ProjectId; nextIndex: number }
-  )(index, binary);
+  const idAndNextIndex: {
+    result: ProjectId;
+    nextIndex: number;
+  } = (decodeId as (
+    a: number,
+    b: Uint8Array
+  ) => { result: ProjectId; nextIndex: number })(index, binary);
   const snapshotAndNextIndex: {
     result: Maybe<ProjectSnapshot>;
     nextIndex: number;
@@ -3182,10 +3274,10 @@ export const decodeUserSnapshotMaybeAndId = (
   index: number,
   binary: Uint8Array
 ): { result: UserSnapshotMaybeAndId; nextIndex: number } => {
-  const idAndNextIndex: { result: UserId; nextIndex: number } = (
-    decodeId as
-    (a: number, b: Uint8Array) => { result: UserId; nextIndex: number }
-  )(index, binary);
+  const idAndNextIndex: { result: UserId; nextIndex: number } = (decodeId as (
+    a: number,
+    b: Uint8Array
+  ) => { result: UserId; nextIndex: number })(index, binary);
   const snapshotAndNextIndex: {
     result: Maybe<UserSnapshot>;
     nextIndex: number;
@@ -3207,10 +3299,10 @@ export const decodeIdeaSnapshotMaybeAndId = (
   index: number,
   binary: Uint8Array
 ): { result: IdeaSnapshotMaybeAndId; nextIndex: number } => {
-  const idAndNextIndex: { result: IdeaId; nextIndex: number } = (
-    decodeId as
-    (a: number, b: Uint8Array) => { result: IdeaId; nextIndex: number }
-  )(index, binary);
+  const idAndNextIndex: { result: IdeaId; nextIndex: number } = (decodeId as (
+    a: number,
+    b: Uint8Array
+  ) => { result: IdeaId; nextIndex: number })(index, binary);
   const snapshotAndNextIndex: {
     result: Maybe<Idea>;
     nextIndex: number;
