@@ -21,23 +21,20 @@ export const clientModeToOriginUrl = (clientMode: data.ClientMode): URL => {
 const languageQueryKey = "hl";
 export const defaultLanguage: data.Language = "English";
 
-export const urlDataToUrl = (urlData: data.UrlData): URL => {
+export const urlDataAndAccessTokenToUrl = (
+  urlData: data.UrlData,
+  accessToken: data.Maybe<data.AccessToken>
+): URL => {
   const url = clientModeToOriginUrl(urlData.clientMode);
   url.pathname = locationToPath(urlData.location);
   url.searchParams.append(
     languageQueryKey,
     languageToIdString(urlData.language)
   );
+  if (accessToken._ === "Just") {
+    url.hash = "access-token=" + (accessToken.value as string);
+  }
   return url;
-};
-
-export const addAccessToken = (
-  accessToken: data.AccessToken,
-  url: URL
-): URL => {
-  const newUrl = new URL(url.toString());
-  newUrl.hash = "access-token=" + (accessToken as string);
-  return newUrl;
 };
 
 const locationToPath = (location: data.Location): string => {
@@ -72,19 +69,21 @@ const languageToIdString = (language: data.Language): string => {
  * URLのパスを場所のデータに変換する
  * @param url `https://definy.app/project/580d8d6a54cf43e4452a0bba6694a4ed?hl=ja` のようなURL
  */
-export const urlDataFromUrl = (url: URL): data.UrlData => {
+export const urlDataAndAccessTokenFromUrl = (
+  url: URL
+): { urlData: data.UrlData; accessToken: data.Maybe<data.AccessToken> } => {
   const languageId = url.searchParams.get(languageQueryKey);
   const language: data.Language =
     languageId === null ? defaultLanguage : languageFromIdString(languageId);
   return {
-    clientMode: clientModeFromUrl(url.hostname, url.port),
-    location: locationFromUrl(url.pathname),
-    language: language,
+    urlData: {
+      clientMode: clientModeFromUrl(url.hostname, url.port),
+      location: locationFromUrl(url.pathname),
+      language: language,
+    },
+    accessToken: accessTokenFromUrl(url.hash),
   };
 };
-
-export const getAccessTokenFromUrl = (url: URL): data.Maybe<data.AccessToken> =>
-  accessTokenFromUrl(url.hash);
 
 const clientModeFromUrl = (
   hostName: string,

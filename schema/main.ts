@@ -20,7 +20,6 @@ const timeName = "Time";
 const requestLogInUrlRequestDataName = "RequestLogInUrlRequestData";
 const openIdConnectProviderName = "OpenIdConnectProvider";
 const urlDataName = "UrlData";
-const urlDataWithAccessTokenName = "UrlDataWithAccessToken";
 const clientModeName = "ClientMode";
 const locationName = "Location";
 const languageName = "Language";

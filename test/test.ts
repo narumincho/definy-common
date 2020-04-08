@@ -3,9 +3,9 @@ import { data } from "../source/main";
 
 describe("test", () => {
   it("https://definy.app/ is Home in English", () => {
-    expect(main.urlDataFromUrl(new URL("https://definy.app/"))).toEqual<
-      data.UrlData
-    >({
+    expect(
+      main.urlDataAndAccessTokenFromUrl(new URL("https://definy.app/")).urlData
+    ).toEqual<data.UrlData>({
       clientMode: data.clientModeRelease,
       location: data.locationHome,
       language: "English",
@@ -13,11 +13,11 @@ describe("test", () => {
   });
   it("project url", () => {
     expect(
-      main.urlDataFromUrl(
+      main.urlDataAndAccessTokenFromUrl(
         new URL(
           "https://definy.app/project/580d8d6a54cf43e4452a0bba6694a4ed?hl=ja"
         )
-      )
+      ).urlData
     ).toEqual<data.UrlData>({
       clientMode: data.clientModeRelease,
       location: data.locationProject(
@@ -30,7 +30,9 @@ describe("test", () => {
     const url = new URL(
       "http://[::1]:2520/user/580d8d6a54cf43e4452a0bba6694a4ed?hl=eo#access-token=f81919b78537257302b50f776b77a90b984cc3d75fa899f9f460ff972dcc8cb0"
     );
-    expect(main.urlDataFromUrl(url)).toEqual<data.UrlData>({
+    expect(main.urlDataAndAccessTokenFromUrl(url).urlData).toEqual<
+      data.UrlData
+    >({
       clientMode: data.clientModeDebugMode(2520),
       location: data.locationUser(
         "580d8d6a54cf43e4452a0bba6694a4ed" as data.UserId
@@ -42,7 +44,9 @@ describe("test", () => {
     const url = new URL(
       "http://[::1]:2520/user/580d8d6a54cf43e4452a0bba6694a4ed?hl=eo#access-token=f81919b78537257302b50f776b77a90b984cc3d75fa899f9f460ff972dcc8cb0"
     );
-    expect(main.getAccessTokenFromUrl(url)).toEqual(
+    expect(main.urlDataAndAccessTokenFromUrl(url).accessToken).toEqual<
+      data.Maybe<data.AccessToken>
+    >(
       data.maybeJust(
         "f81919b78537257302b50f776b77a90b984cc3d75fa899f9f460ff972dcc8cb0" as data.AccessToken
       )
@@ -56,8 +60,13 @@ describe("test", () => {
       ),
       language: "Esperanto",
     };
-    const url = main.urlDataToUrl(languageAndLocation);
-    const decodedLanguageAndLocation: data.UrlData = main.urlDataFromUrl(url);
+    const url = main.urlDataAndAccessTokenToUrl(
+      languageAndLocation,
+      data.maybeNothing()
+    );
+    const decodedLanguageAndLocation: data.UrlData = main.urlDataAndAccessTokenFromUrl(
+      url
+    ).urlData;
     expect(languageAndLocation).toEqual(decodedLanguageAndLocation);
   });
   it("dateTime and js Date conversion", () => {
