@@ -186,7 +186,7 @@ export type ProjectSnapshotAndId = {
 /**
  * アイデア
  */
-export type Idea = {
+export type IdeaSnapshot = {
   /**
    * アイデア名
    */
@@ -228,7 +228,7 @@ export type IdeaSnapshotAndId = {
   /**
    * アイデアのスナップショット
    */;
-  snapshot: Idea;
+  snapshot: IdeaSnapshot;
 };
 
 /**
@@ -656,7 +656,7 @@ export type IdeaSnapshotMaybeAndId = {
   /**
    * アイデアのスナップショット
    */;
-  snapshot: Maybe<Idea>;
+  snapshot: Maybe<IdeaSnapshot>;
 };
 
 export type ProjectId = string & { _projectId: never };
@@ -1165,19 +1165,23 @@ export const encodeProjectSnapshotAndId = (
     encodeProjectSnapshot(projectSnapshotAndId.snapshot)
   );
 
-export const encodeIdea = (idea: Idea): ReadonlyArray<number> =>
-  encodeString(idea.name)
-    .concat(encodeId(idea.createUser))
-    .concat(encodeTime(idea.createTime))
-    .concat(encodeId(idea.projectId))
-    .concat(encodeList(encodeIdeaItem)(idea.itemList))
-    .concat(encodeTime(idea.updateTime))
-    .concat(encodeTime(idea.getTime));
+export const encodeIdeaSnapshot = (
+  ideaSnapshot: IdeaSnapshot
+): ReadonlyArray<number> =>
+  encodeString(ideaSnapshot.name)
+    .concat(encodeId(ideaSnapshot.createUser))
+    .concat(encodeTime(ideaSnapshot.createTime))
+    .concat(encodeId(ideaSnapshot.projectId))
+    .concat(encodeList(encodeIdeaItem)(ideaSnapshot.itemList))
+    .concat(encodeTime(ideaSnapshot.updateTime))
+    .concat(encodeTime(ideaSnapshot.getTime));
 
 export const encodeIdeaSnapshotAndId = (
   ideaSnapshotAndId: IdeaSnapshotAndId
 ): ReadonlyArray<number> =>
-  encodeId(ideaSnapshotAndId.id).concat(encodeIdea(ideaSnapshotAndId.snapshot));
+  encodeId(ideaSnapshotAndId.id).concat(
+    encodeIdeaSnapshot(ideaSnapshotAndId.snapshot)
+  );
 
 export const encodeIdeaItem = (ideaItem: IdeaItem): ReadonlyArray<number> => {
   switch (ideaItem._) {
@@ -1496,7 +1500,7 @@ export const encodeIdeaSnapshotMaybeAndId = (
   ideaSnapshotMaybeAndId: IdeaSnapshotMaybeAndId
 ): ReadonlyArray<number> =>
   encodeId(ideaSnapshotMaybeAndId.id).concat(
-    encodeMaybe(encodeIdea)(ideaSnapshotMaybeAndId.snapshot)
+    encodeMaybe(encodeIdeaSnapshot)(ideaSnapshotMaybeAndId.snapshot)
   );
 
 /**
@@ -2124,10 +2128,10 @@ export const decodeProjectSnapshotAndId = (
  * @param index バイナリを読み込み開始位置
  * @param binary バイナリ
  */
-export const decodeIdea = (
+export const decodeIdeaSnapshot = (
   index: number,
   binary: Uint8Array
-): { result: Idea; nextIndex: number } => {
+): { result: IdeaSnapshot; nextIndex: number } => {
   const nameAndNextIndex: { result: string; nextIndex: number } = decodeString(
     index,
     binary
@@ -2194,10 +2198,10 @@ export const decodeIdeaSnapshotAndId = (
     a: number,
     b: Uint8Array
   ) => { result: IdeaId; nextIndex: number })(index, binary);
-  const snapshotAndNextIndex: { result: Idea; nextIndex: number } = decodeIdea(
-    idAndNextIndex.nextIndex,
-    binary
-  );
+  const snapshotAndNextIndex: {
+    result: IdeaSnapshot;
+    nextIndex: number;
+  } = decodeIdeaSnapshot(idAndNextIndex.nextIndex, binary);
   return {
     result: {
       id: idAndNextIndex.result,
@@ -3284,9 +3288,9 @@ export const decodeIdeaSnapshotMaybeAndId = (
     b: Uint8Array
   ) => { result: IdeaId; nextIndex: number })(index, binary);
   const snapshotAndNextIndex: {
-    result: Maybe<Idea>;
+    result: Maybe<IdeaSnapshot>;
     nextIndex: number;
-  } = decodeMaybe(decodeIdea)(idAndNextIndex.nextIndex, binary);
+  } = decodeMaybe(decodeIdeaSnapshot)(idAndNextIndex.nextIndex, binary);
   return {
     result: {
       id: idAndNextIndex.result,

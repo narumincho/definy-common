@@ -30,7 +30,7 @@ const userSnapshotAndIdName = "UserSnapshotAndId";
 const projectSnapshotName = "ProjectSnapshot";
 const projectSnapshotAndIdName = "ProjectSnapshotAndId";
 
-const ideaSnapshotName = "Idea";
+const ideaSnapshotName = "IdeaSnapshot";
 const ideaSnapshotAndIdName = "IdeaSnapshotAndId";
 
 const ideaItemName = "IdeaItem";
