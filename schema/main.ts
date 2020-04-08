@@ -103,7 +103,7 @@ const requestLogInUrlRequestData: type.CustomType = {
 
 const openIdConnectProvider: type.CustomType = {
   name: openIdConnectProviderName,
-  description: "プロバイダー (例: LINE, Google, GitHub)",
+  description: "ソーシャルログインを提供するプロバイダー (例: Google, GitHub)",
   body: type.customTypeBodySum([
     {
       name: "Google",

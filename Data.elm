@@ -24,7 +24,7 @@ type alias RequestLogInUrlRequestData =
     { openIdConnectProvider : OpenIdConnectProvider, urlData : UrlData }
 
 
-{-| プロバイダー (例: LINE, Google, GitHub)
+{-| ソーシャルログインを提供するプロバイダー (例: Google, GitHub)
 -}
 type OpenIdConnectProvider
     = OpenIdConnectProviderGoogle

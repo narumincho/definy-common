@@ -45,7 +45,7 @@ export type RequestLogInUrlRequestData = {
 };
 
 /**
- * プロバイダー (例: LINE, Google, GitHub)
+ * ソーシャルログインを提供するプロバイダー (例: Google, GitHub)
  */
 export type OpenIdConnectProvider = "Google" | "GitHub";
 
