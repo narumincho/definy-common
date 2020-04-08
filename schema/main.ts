@@ -123,7 +123,7 @@ const openIdConnectProvider: type.CustomType = {
 const urlData: type.CustomType = {
   name: urlDataName,
   description:
-    "デバッグモードかどうか,言語とページの場所. URLとして表現されるデータ. Googleなどの検索エンジンの都合( https://support.google.com/webmasters/answer/182192?hl=ja )で,URLにページの言語を入れて,言語ごとに別のURLである必要がある. デバッグ時のホスト名は http://[::1] になる",
+    "デバッグモードかどうか,言語とページの場所. URLとして表現されるデータ. Googleなどの検索エンジンの都合( https://support.google.com/webmasters/answer/182192?hl=ja )で,URLにページの言語を入れて,言語ごとに別のURLである必要がある. デバッグ時のホスト名は http://localhost になる",
   body: type.customTypeBodyProduct([
     {
       name: "clientMode",
@@ -150,7 +150,7 @@ const clientMode: type.CustomType = {
     {
       name: "DebugMode",
       description:
-        "デバッグモード. ポート番号を保持する. オリジンは http://[::1]:2520 のようなもの",
+        "デバッグモード. ポート番号を保持する. オリジンは http://localshot:2520",
       parameter: type.maybeJust(type.typeInt32),
     },
     {

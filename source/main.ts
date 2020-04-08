@@ -9,7 +9,7 @@ export const releaseOrigin = "https://definy.app";
 export const clientModeToOriginUrl = (clientMode: data.ClientMode): URL => {
   switch (clientMode._) {
     case "DebugMode": {
-      const originUrl = new URL("http://[::1]");
+      const originUrl = new URL("http://localhost");
       originUrl.port = clientMode.int32.toString();
       return originUrl;
     }
@@ -89,7 +89,7 @@ const clientModeFromUrl = (
   hostName: string,
   portAsString: string
 ): data.ClientMode => {
-  if (hostName === "[::1]") {
+  if (hostName === "localhost") {
     const portNumber = Number.parseInt(portAsString);
     return data.clientModeDebugMode(isNaN(portNumber) ? 443 : portNumber);
   }

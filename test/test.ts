@@ -28,7 +28,7 @@ describe("test", () => {
   });
   it("local host", () => {
     const url = new URL(
-      "http://[::1]:2520/user/580d8d6a54cf43e4452a0bba6694a4ed?hl=eo#access-token=f81919b78537257302b50f776b77a90b984cc3d75fa899f9f460ff972dcc8cb0"
+      "http://localhost:2520/user/580d8d6a54cf43e4452a0bba6694a4ed?hl=eo#access-token=f81919b78537257302b50f776b77a90b984cc3d75fa899f9f460ff972dcc8cb0"
     );
     expect(main.urlDataAndAccessTokenFromUrl(url).urlData).toEqual<
       data.UrlData
@@ -42,7 +42,7 @@ describe("test", () => {
   });
   it("accessToken", () => {
     const url = new URL(
-      "http://[::1]:2520/user/580d8d6a54cf43e4452a0bba6694a4ed?hl=eo#access-token=f81919b78537257302b50f776b77a90b984cc3d75fa899f9f460ff972dcc8cb0"
+      "http://localhost:2520/user/580d8d6a54cf43e4452a0bba6694a4ed?hl=eo#access-token=f81919b78537257302b50f776b77a90b984cc3d75fa899f9f460ff972dcc8cb0"
     );
     expect(main.urlDataAndAccessTokenFromUrl(url).accessToken).toEqual<
       data.Maybe<data.AccessToken>
