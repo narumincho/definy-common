@@ -629,6 +629,24 @@ export type CreateIdeaParameter = {
 };
 
 /**
+ * アイデアにコメントを追加するときに必要なパラメーター
+ */
+export type AddCommentParameter = {
+  /**
+   * プロジェクトを作るときのアカウント
+   */
+  accessToken: AccessToken;
+  /**
+   * コメントを追加するアイデア
+   */
+  ideaId: IdeaId;
+  /**
+   * コメント本文
+   */
+  comment: string;
+};
+
+/**
  * アクセストークンに関するエラー
  */
 export type AccessTokenError =
@@ -1493,6 +1511,13 @@ export const encodeCreateIdeaParameter = (
   encodeToken(createIdeaParameter.accessToken)
     .concat(encodeString(createIdeaParameter.ideaName))
     .concat(encodeId(createIdeaParameter.projectId));
+
+export const encodeAddCommentParameter = (
+  addCommentParameter: AddCommentParameter
+): ReadonlyArray<number> =>
+  encodeToken(addCommentParameter.accessToken)
+    .concat(encodeId(addCommentParameter.ideaId))
+    .concat(encodeString(addCommentParameter.comment));
 
 export const encodeAccessTokenError = (
   accessTokenError: AccessTokenError
@@ -3256,6 +3281,45 @@ export const decodeCreateIdeaParameter = (
       projectId: projectIdAndNextIndex.result,
     },
     nextIndex: projectIdAndNextIndex.nextIndex,
+  };
+};
+
+/**
+ * @param index バイナリを読み込み開始位置
+ * @param binary バイナリ
+ */
+export const decodeAddCommentParameter = (
+  index: number,
+  binary: Uint8Array
+): { result: AddCommentParameter; nextIndex: number } => {
+  const accessTokenAndNextIndex: {
+    result: AccessToken;
+    nextIndex: number;
+  } = (decodeToken as (
+    a: number,
+    b: Uint8Array
+  ) => { result: AccessToken; nextIndex: number })(index, binary);
+  const ideaIdAndNextIndex: {
+    result: IdeaId;
+    nextIndex: number;
+  } = (decodeId as (
+    a: number,
+    b: Uint8Array
+  ) => { result: IdeaId; nextIndex: number })(
+    accessTokenAndNextIndex.nextIndex,
+    binary
+  );
+  const commentAndNextIndex: {
+    result: string;
+    nextIndex: number;
+  } = decodeString(ideaIdAndNextIndex.nextIndex, binary);
+  return {
+    result: {
+      accessToken: accessTokenAndNextIndex.result,
+      ideaId: ideaIdAndNextIndex.result,
+      comment: commentAndNextIndex.result,
+    },
+    nextIndex: commentAndNextIndex.nextIndex,
   };
 };
 

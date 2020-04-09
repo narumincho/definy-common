@@ -59,8 +59,11 @@ const branchPartDefinitionName = "BranchPartDefinition";
 const conditionCaptureName = "ConditionCapture";
 const evaluateExprErrorName = "EvaluateExprError";
 const typeErrorName = "TypeError";
+
 const createProjectParameterName = "CreateProjectParameter";
 const createIdeaParameterName = "CreateIdeaParameter";
+const addCommentParameterName = "AddCommentParameter";
+
 const accessTokenErrorName = "AccessTokenError";
 
 const projectSnapshotMaybeAndIdName = "ProjectSnapshotMaybeAndId";
@@ -998,6 +1001,27 @@ const listCustomType: ReadonlyArray<type.CustomType> = [
         name: "projectId",
         description: "対象のプロジェクトID",
         memberType: projectId,
+      },
+    ]),
+  },
+  {
+    name: addCommentParameterName,
+    description: "アイデアにコメントを追加するときに必要なパラメーター",
+    body: type.customTypeBodyProduct([
+      {
+        name: "accessToken",
+        description: "プロジェクトを作るときのアカウント",
+        memberType: accessToken,
+      },
+      {
+        name: "ideaId",
+        description: "コメントを追加するアイデア",
+        memberType: ideaId,
+      },
+      {
+        name: "comment",
+        description: "コメント本文",
+        memberType: type.typeString,
       },
     ]),
   },
