@@ -60,6 +60,7 @@ const conditionCaptureName = "ConditionCapture";
 const evaluateExprErrorName = "EvaluateExprError";
 const typeErrorName = "TypeError";
 const createProjectParameterName = "CreateProjectParameter";
+const createIdeaParameterName = "CreateIdeaParameter";
 const accessTokenErrorName = "AccessTokenError";
 
 const projectSnapshotMaybeAndIdName = "ProjectSnapshotMaybeAndId";
@@ -1017,6 +1018,28 @@ const createProjectParameter: type.CustomType = {
   ]),
 };
 
+const createIdeaParameter: type.CustomType = {
+  name: createIdeaParameterName,
+  description: "アイデアを作成時に必要なパラメーター",
+  body: type.customTypeBodyProduct([
+    {
+      name: "accessToken",
+      description: "プロジェクトを作るときのアカウント",
+      memberType: accessToken,
+    },
+    {
+      name: "ideaName",
+      description: "アイデア名",
+      memberType: type.typeString,
+    },
+    {
+      name: "projectId",
+      description: "対象のプロジェクトID",
+      memberType: projectId,
+    },
+  ]),
+};
+
 const createProjectError: type.CustomType = {
   name: accessTokenErrorName,
   description: "アクセストークンに関するエラー",
@@ -1130,6 +1153,7 @@ const listCustomType: ReadonlyArray<type.CustomType> = [
   typeError,
   createProjectParameter,
   createProjectError,
+  createIdeaParameter,
   projectSnapshotMaybeAndId,
   userSnapshotMaybeAndId,
   ideaSnapshotMaybeAndId,
