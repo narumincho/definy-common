@@ -139,10 +139,21 @@ export const stringToValidUserName = (userName: string): string | null => {
   return normalized;
 };
 
-export const stringToValidProjectName = (userName: string): string | null => {
-  const normalized = normalizeString(userName);
+export const stringToValidProjectName = (
+  projectName: string
+): string | null => {
+  const normalized = normalizeString(projectName);
   const length = [...normalized].length;
   if (length <= 0 || 50 < length) {
+    return null;
+  }
+  return normalized;
+};
+
+export const stringToValidIdeaName = (ideaName: string): string | null => {
+  const normalized = normalizeString(ideaName);
+  const length = [...normalized].length;
+  if (length <= 0 || 100 < length) {
     return null;
   }
   return normalized;
