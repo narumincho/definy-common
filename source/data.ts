@@ -26,11 +26,6 @@ export type Time = {
 };
 
 /**
- * デバッグの状態と, デバッグ時ならアクセスしているポート番号
- */
-export type ClientMode = "DebugMode" | "Release";
-
-/**
  * ログインのURLを発行するために必要なデータ
  */
 export type RequestLogInUrlRequestData = {
@@ -68,9 +63,9 @@ export type UrlData = {
 };
 
 /**
- * 英語,日本語,エスペラント語などの言語
+ * デバッグの状態と, デバッグ時ならアクセスしているポート番号
  */
-export type Language = "Japanese" | "English" | "Esperanto";
+export type ClientMode = "DebugMode" | "Release";
 
 /**
  * DefinyWebアプリ内での場所を示すもの. URLから求められる. URLに変換できる
@@ -82,6 +77,11 @@ export type Location =
   | { _: "User"; userId: UserId }
   | { _: "Project"; projectId: ProjectId }
   | { _: "Idea"; ideaId: IdeaId };
+
+/**
+ * 英語,日本語,エスペラント語などの言語
+ */
+export type Language = "Japanese" | "English" | "Esperanto";
 
 /**
  * ユーザーのデータのスナップショット
@@ -316,6 +316,36 @@ export type TypeDefinition = {
 };
 
 /**
+ * パーツの定義
+ */
+export type PartDefinition = {
+  /**
+   * パーツの名前
+   */
+  name: string;
+  /**
+   * このパーツの元
+   */
+  parentList: ReadonlyArray<PartId>;
+  /**
+   * パーツの説明
+   */
+  description: string;
+  /**
+   * パーツの型
+   */
+  type: Type;
+  /**
+   * パーツの式
+   */
+  expr: Maybe<Expr>;
+  /**
+   * 所属しているモジュール
+   */
+  moduleId: ModuleId;
+};
+
+/**
  * 型の定義本体
  */
 export type TypeBody =
@@ -366,36 +396,6 @@ export type TypeBodySumPattern = {
  * Definyだけでは表現できないデータ型
  */
 export type TypeBodyKernel = "Function" | "Int32" | "List";
-
-/**
- * パーツの定義
- */
-export type PartDefinition = {
-  /**
-   * パーツの名前
-   */
-  name: string;
-  /**
-   * このパーツの元
-   */
-  parentList: ReadonlyArray<PartId>;
-  /**
-   * パーツの説明
-   */
-  description: string;
-  /**
-   * パーツの型
-   */
-  type: Type;
-  /**
-   * パーツの式
-   */
-  expr: Maybe<Expr>;
-  /**
-   * 所属しているモジュール
-   */
-  moduleId: ModuleId;
-};
 
 /**
  * 型
@@ -611,13 +611,6 @@ export type CreateProjectParameter = {
 };
 
 /**
- * アクセストークンに関するエラー
- */
-export type AccessTokenError =
-  | "AccessTokenExpiredOrInvalid"
-  | "ProjectNameIsInvalid";
-
-/**
  * アイデアを作成時に必要なパラメーター
  */
 export type CreateIdeaParameter = {
@@ -634,6 +627,13 @@ export type CreateIdeaParameter = {
    */
   projectId: ProjectId;
 };
+
+/**
+ * アクセストークンに関するエラー
+ */
+export type AccessTokenError =
+  | "AccessTokenExpiredOrInvalid"
+  | "ProjectNameIsInvalid";
 
 /**
  * Maybe プロジェクトのスナップショット と projectId. indexedDBからElmに渡す用
@@ -687,9 +687,9 @@ export type FileHash = string & { _fileHash: never };
 
 export type PartId = string & { _partId: never };
 
-export type TypeId = string & { _typeId: never };
-
 export type ModuleId = string & { _moduleId: never };
+
+export type TypeId = string & { _typeId: never };
 
 export type LocalPartId = string & { _localPartId: never };
 
@@ -1071,19 +1071,6 @@ export const encodeToken = (id: string): ReadonlyArray<number> => {
 export const encodeTime = (time: Time): ReadonlyArray<number> =>
   encodeInt32(time.day).concat(encodeInt32(time.millisecond));
 
-export const encodeClientMode = (
-  clientMode: ClientMode
-): ReadonlyArray<number> => {
-  switch (clientMode) {
-    case "DebugMode": {
-      return [0];
-    }
-    case "Release": {
-      return [1];
-    }
-  }
-};
-
 export const encodeRequestLogInUrlRequestData = (
   requestLogInUrlRequestData: RequestLogInUrlRequestData
 ): ReadonlyArray<number> =>
@@ -1109,16 +1096,15 @@ export const encodeUrlData = (urlData: UrlData): ReadonlyArray<number> =>
     .concat(encodeLocation(urlData.location))
     .concat(encodeLanguage(urlData.language));
 
-export const encodeLanguage = (language: Language): ReadonlyArray<number> => {
-  switch (language) {
-    case "Japanese": {
+export const encodeClientMode = (
+  clientMode: ClientMode
+): ReadonlyArray<number> => {
+  switch (clientMode) {
+    case "DebugMode": {
       return [0];
     }
-    case "English": {
+    case "Release": {
       return [1];
-    }
-    case "Esperanto": {
-      return [2];
     }
   }
 };
@@ -1142,6 +1128,20 @@ export const encodeLocation = (location: Location): ReadonlyArray<number> => {
     }
     case "Idea": {
       return [5].concat(encodeId(location.ideaId));
+    }
+  }
+};
+
+export const encodeLanguage = (language: Language): ReadonlyArray<number> => {
+  switch (language) {
+    case "Japanese": {
+      return [0];
+    }
+    case "English": {
+      return [1];
+    }
+    case "Esperanto": {
+      return [2];
     }
   }
 };
@@ -1244,6 +1244,16 @@ export const encodeTypeDefinition = (
     .concat(encodeList(encodeId)(typeDefinition.parentList))
     .concat(encodeString(typeDefinition.description));
 
+export const encodePartDefinition = (
+  partDefinition: PartDefinition
+): ReadonlyArray<number> =>
+  encodeString(partDefinition.name)
+    .concat(encodeList(encodeId)(partDefinition.parentList))
+    .concat(encodeString(partDefinition.description))
+    .concat(encodeType(partDefinition["type"]))
+    .concat(encodeMaybe(encodeExpr)(partDefinition.expr))
+    .concat(encodeId(partDefinition.moduleId));
+
 export const encodeTypeBody = (typeBody: TypeBody): ReadonlyArray<number> => {
   switch (typeBody._) {
     case "Product": {
@@ -1293,16 +1303,6 @@ export const encodeTypeBodyKernel = (
     }
   }
 };
-
-export const encodePartDefinition = (
-  partDefinition: PartDefinition
-): ReadonlyArray<number> =>
-  encodeString(partDefinition.name)
-    .concat(encodeList(encodeId)(partDefinition.parentList))
-    .concat(encodeString(partDefinition.description))
-    .concat(encodeType(partDefinition["type"]))
-    .concat(encodeMaybe(encodeExpr)(partDefinition.expr))
-    .concat(encodeId(partDefinition.moduleId));
 
 export const encodeType = (type_: Type): ReadonlyArray<number> =>
   encodeId(type_.reference).concat(encodeList(encodeType)(type_.parameter));
@@ -1487,6 +1487,13 @@ export const encodeCreateProjectParameter = (
     encodeString(createProjectParameter.projectName)
   );
 
+export const encodeCreateIdeaParameter = (
+  createIdeaParameter: CreateIdeaParameter
+): ReadonlyArray<number> =>
+  encodeToken(createIdeaParameter.accessToken)
+    .concat(encodeString(createIdeaParameter.ideaName))
+    .concat(encodeId(createIdeaParameter.projectId));
+
 export const encodeAccessTokenError = (
   accessTokenError: AccessTokenError
 ): ReadonlyArray<number> => {
@@ -1499,13 +1506,6 @@ export const encodeAccessTokenError = (
     }
   }
 };
-
-export const encodeCreateIdeaParameter = (
-  createIdeaParameter: CreateIdeaParameter
-): ReadonlyArray<number> =>
-  encodeToken(createIdeaParameter.accessToken)
-    .concat(encodeString(createIdeaParameter.ideaName))
-    .concat(encodeId(createIdeaParameter.projectId));
 
 export const encodeProjectSnapshotMaybeAndId = (
   projectSnapshotMaybeAndId: ProjectSnapshotMaybeAndId
@@ -1774,27 +1774,6 @@ export const decodeTime = (
  * @param index バイナリを読み込み開始位置
  * @param binary バイナリ
  */
-export const decodeClientMode = (
-  index: number,
-  binary: Uint8Array
-): { result: ClientMode; nextIndex: number } => {
-  const patternIndex: { result: number; nextIndex: number } = decodeInt32(
-    index,
-    binary
-  );
-  if (patternIndex.result === 0) {
-    return { result: "DebugMode", nextIndex: patternIndex.nextIndex };
-  }
-  if (patternIndex.result === 1) {
-    return { result: "Release", nextIndex: patternIndex.nextIndex };
-  }
-  throw new Error("存在しないパターンを指定された 型を更新してください");
-};
-
-/**
- * @param index バイナリを読み込み開始位置
- * @param binary バイナリ
- */
 export const decodeRequestLogInUrlRequestData = (
   index: number,
   binary: Uint8Array
@@ -1871,22 +1850,19 @@ export const decodeUrlData = (
  * @param index バイナリを読み込み開始位置
  * @param binary バイナリ
  */
-export const decodeLanguage = (
+export const decodeClientMode = (
   index: number,
   binary: Uint8Array
-): { result: Language; nextIndex: number } => {
+): { result: ClientMode; nextIndex: number } => {
   const patternIndex: { result: number; nextIndex: number } = decodeInt32(
     index,
     binary
   );
   if (patternIndex.result === 0) {
-    return { result: "Japanese", nextIndex: patternIndex.nextIndex };
+    return { result: "DebugMode", nextIndex: patternIndex.nextIndex };
   }
   if (patternIndex.result === 1) {
-    return { result: "English", nextIndex: patternIndex.nextIndex };
-  }
-  if (patternIndex.result === 2) {
-    return { result: "Esperanto", nextIndex: patternIndex.nextIndex };
+    return { result: "Release", nextIndex: patternIndex.nextIndex };
   }
   throw new Error("存在しないパターンを指定された 型を更新してください");
 };
@@ -1948,6 +1924,30 @@ export const decodeLocation = (
       b: Uint8Array
     ) => { result: IdeaId; nextIndex: number })(patternIndex.nextIndex, binary);
     return { result: locationIdea(result.result), nextIndex: result.nextIndex };
+  }
+  throw new Error("存在しないパターンを指定された 型を更新してください");
+};
+
+/**
+ * @param index バイナリを読み込み開始位置
+ * @param binary バイナリ
+ */
+export const decodeLanguage = (
+  index: number,
+  binary: Uint8Array
+): { result: Language; nextIndex: number } => {
+  const patternIndex: { result: number; nextIndex: number } = decodeInt32(
+    index,
+    binary
+  );
+  if (patternIndex.result === 0) {
+    return { result: "Japanese", nextIndex: patternIndex.nextIndex };
+  }
+  if (patternIndex.result === 1) {
+    return { result: "English", nextIndex: patternIndex.nextIndex };
+  }
+  if (patternIndex.result === 2) {
+    return { result: "Esperanto", nextIndex: patternIndex.nextIndex };
   }
   throw new Error("存在しないパターンを指定された 型を更新してください");
 };
@@ -2431,6 +2431,62 @@ export const decodeTypeDefinition = (
  * @param index バイナリを読み込み開始位置
  * @param binary バイナリ
  */
+export const decodePartDefinition = (
+  index: number,
+  binary: Uint8Array
+): { result: PartDefinition; nextIndex: number } => {
+  const nameAndNextIndex: { result: string; nextIndex: number } = decodeString(
+    index,
+    binary
+  );
+  const parentListAndNextIndex: {
+    result: ReadonlyArray<PartId>;
+    nextIndex: number;
+  } = decodeList(
+    decodeId as (
+      a: number,
+      b: Uint8Array
+    ) => { result: PartId; nextIndex: number }
+  )(nameAndNextIndex.nextIndex, binary);
+  const descriptionAndNextIndex: {
+    result: string;
+    nextIndex: number;
+  } = decodeString(parentListAndNextIndex.nextIndex, binary);
+  const typeAndNextIndex: { result: Type; nextIndex: number } = decodeType(
+    descriptionAndNextIndex.nextIndex,
+    binary
+  );
+  const exprAndNextIndex: {
+    result: Maybe<Expr>;
+    nextIndex: number;
+  } = decodeMaybe(decodeExpr)(typeAndNextIndex.nextIndex, binary);
+  const moduleIdAndNextIndex: {
+    result: ModuleId;
+    nextIndex: number;
+  } = (decodeId as (
+    a: number,
+    b: Uint8Array
+  ) => { result: ModuleId; nextIndex: number })(
+    exprAndNextIndex.nextIndex,
+    binary
+  );
+  return {
+    result: {
+      name: nameAndNextIndex.result,
+      parentList: parentListAndNextIndex.result,
+      description: descriptionAndNextIndex.result,
+      type: typeAndNextIndex.result,
+      expr: exprAndNextIndex.result,
+      moduleId: moduleIdAndNextIndex.result,
+    },
+    nextIndex: moduleIdAndNextIndex.nextIndex,
+  };
+};
+
+/**
+ * @param index バイナリを読み込み開始位置
+ * @param binary バイナリ
+ */
 export const decodeTypeBody = (
   index: number,
   binary: Uint8Array
@@ -2562,62 +2618,6 @@ export const decodeTypeBodyKernel = (
     return { result: "List", nextIndex: patternIndex.nextIndex };
   }
   throw new Error("存在しないパターンを指定された 型を更新してください");
-};
-
-/**
- * @param index バイナリを読み込み開始位置
- * @param binary バイナリ
- */
-export const decodePartDefinition = (
-  index: number,
-  binary: Uint8Array
-): { result: PartDefinition; nextIndex: number } => {
-  const nameAndNextIndex: { result: string; nextIndex: number } = decodeString(
-    index,
-    binary
-  );
-  const parentListAndNextIndex: {
-    result: ReadonlyArray<PartId>;
-    nextIndex: number;
-  } = decodeList(
-    decodeId as (
-      a: number,
-      b: Uint8Array
-    ) => { result: PartId; nextIndex: number }
-  )(nameAndNextIndex.nextIndex, binary);
-  const descriptionAndNextIndex: {
-    result: string;
-    nextIndex: number;
-  } = decodeString(parentListAndNextIndex.nextIndex, binary);
-  const typeAndNextIndex: { result: Type; nextIndex: number } = decodeType(
-    descriptionAndNextIndex.nextIndex,
-    binary
-  );
-  const exprAndNextIndex: {
-    result: Maybe<Expr>;
-    nextIndex: number;
-  } = decodeMaybe(decodeExpr)(typeAndNextIndex.nextIndex, binary);
-  const moduleIdAndNextIndex: {
-    result: ModuleId;
-    nextIndex: number;
-  } = (decodeId as (
-    a: number,
-    b: Uint8Array
-  ) => { result: ModuleId; nextIndex: number })(
-    exprAndNextIndex.nextIndex,
-    binary
-  );
-  return {
-    result: {
-      name: nameAndNextIndex.result,
-      parentList: parentListAndNextIndex.result,
-      description: descriptionAndNextIndex.result,
-      type: typeAndNextIndex.result,
-      expr: exprAndNextIndex.result,
-      moduleId: moduleIdAndNextIndex.result,
-    },
-    nextIndex: moduleIdAndNextIndex.nextIndex,
-  };
 };
 
 /**
@@ -3224,33 +3224,6 @@ export const decodeCreateProjectParameter = (
  * @param index バイナリを読み込み開始位置
  * @param binary バイナリ
  */
-export const decodeAccessTokenError = (
-  index: number,
-  binary: Uint8Array
-): { result: AccessTokenError; nextIndex: number } => {
-  const patternIndex: { result: number; nextIndex: number } = decodeInt32(
-    index,
-    binary
-  );
-  if (patternIndex.result === 0) {
-    return {
-      result: "AccessTokenExpiredOrInvalid",
-      nextIndex: patternIndex.nextIndex,
-    };
-  }
-  if (patternIndex.result === 1) {
-    return {
-      result: "ProjectNameIsInvalid",
-      nextIndex: patternIndex.nextIndex,
-    };
-  }
-  throw new Error("存在しないパターンを指定された 型を更新してください");
-};
-
-/**
- * @param index バイナリを読み込み開始位置
- * @param binary バイナリ
- */
 export const decodeCreateIdeaParameter = (
   index: number,
   binary: Uint8Array
@@ -3284,6 +3257,33 @@ export const decodeCreateIdeaParameter = (
     },
     nextIndex: projectIdAndNextIndex.nextIndex,
   };
+};
+
+/**
+ * @param index バイナリを読み込み開始位置
+ * @param binary バイナリ
+ */
+export const decodeAccessTokenError = (
+  index: number,
+  binary: Uint8Array
+): { result: AccessTokenError; nextIndex: number } => {
+  const patternIndex: { result: number; nextIndex: number } = decodeInt32(
+    index,
+    binary
+  );
+  if (patternIndex.result === 0) {
+    return {
+      result: "AccessTokenExpiredOrInvalid",
+      nextIndex: patternIndex.nextIndex,
+    };
+  }
+  if (patternIndex.result === 1) {
+    return {
+      result: "ProjectNameIsInvalid",
+      nextIndex: patternIndex.nextIndex,
+    };
+  }
+  throw new Error("存在しないパターンを指定された 型を更新してください");
 };
 
 /**
