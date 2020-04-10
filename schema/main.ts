@@ -147,7 +147,7 @@ const listCustomType: ReadonlyArray<type.CustomType> = [
   },
   {
     name: clientModeName,
-    description: "デバッグの状態と, デバッグ時ならアクセスしているポート番号",
+    description: "デバッグモードか, リリースモード",
     body: type.customTypeBodySum([
       {
         name: "DebugMode",

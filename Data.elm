@@ -30,7 +30,7 @@ type alias UrlData =
     { clientMode : ClientMode, location : Location, language : Language }
 
 
-{-| デバッグの状態と, デバッグ時ならアクセスしているポート番号
+{-| デバッグモードか, リリースモード
 -}
 type ClientMode
     = ClientModeDebugMode

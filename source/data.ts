@@ -63,7 +63,7 @@ export type UrlData = {
 };
 
 /**
- * デバッグの状態と, デバッグ時ならアクセスしているポート番号
+ * デバッグモードか, リリースモード
  */
 export type ClientMode = "DebugMode" | "Release";
 
