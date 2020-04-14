@@ -69,7 +69,7 @@ const accessTokenErrorName = "AccessTokenError";
 const projectResponseName = "ProjectResponse";
 const userResponseName = "UserResponse";
 const ideaResponseName = "IdeaResponse";
-const ResponseIdeaListByProjectIdName = "ResponseIdeaListByProjectId";
+const IdeaListByProjectIdResponseName = "IdeaListByProjectIdResponse";
 
 const listCustomType: ReadonlyArray<type.CustomType> = [
   {
@@ -1094,7 +1094,7 @@ const listCustomType: ReadonlyArray<type.CustomType> = [
     ]),
   },
   {
-    name: ResponseIdeaListByProjectIdName,
+    name: IdeaListByProjectIdResponseName,
     description: "プロジェクトからアイデアの一覧を取得したときにElmに渡すもの",
     body: type.customTypeBodyProduct([
       {

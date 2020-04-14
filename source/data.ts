@@ -698,7 +698,7 @@ export type IdeaResponse = {
 /**
  * プロジェクトからアイデアの一覧を取得したときにElmに渡すもの
  */
-export type ResponseIdeaListByProjectId = {
+export type IdeaListByProjectIdResponse = {
   /**
    * プロジェクトID
    */
@@ -1567,12 +1567,12 @@ export const encodeIdeaResponse = (
     encodeMaybe(encodeIdeaSnapshot)(ideaResponse.snapshotMaybe)
   );
 
-export const encodeResponseIdeaListByProjectId = (
-  responseIdeaListByProjectId: ResponseIdeaListByProjectId
+export const encodeIdeaListByProjectIdResponse = (
+  ideaListByProjectIdResponse: IdeaListByProjectIdResponse
 ): ReadonlyArray<number> =>
-  encodeId(responseIdeaListByProjectId.projectId).concat(
+  encodeId(ideaListByProjectIdResponse.projectId).concat(
     encodeList(encodeIdeaSnapshotAndId)(
-      responseIdeaListByProjectId.ideaSnapshotAndIdList
+      ideaListByProjectIdResponse.ideaSnapshotAndIdList
     )
   );
 
@@ -3455,10 +3455,10 @@ export const decodeIdeaResponse = (
  * @param index バイナリを読み込み開始位置
  * @param binary バイナリ
  */
-export const decodeResponseIdeaListByProjectId = (
+export const decodeIdeaListByProjectIdResponse = (
   index: number,
   binary: Uint8Array
-): { result: ResponseIdeaListByProjectId; nextIndex: number } => {
+): { result: IdeaListByProjectIdResponse; nextIndex: number } => {
   const projectIdAndNextIndex: {
     result: ProjectId;
     nextIndex: number;
