@@ -66,9 +66,9 @@ const addCommentParameterName = "AddCommentParameter";
 
 const accessTokenErrorName = "AccessTokenError";
 
-const projectSnapshotMaybeAndIdName = "ProjectSnapshotMaybeAndId";
-const userSnapshotMaybeAndIdName = "UserSnapshotMaybeAndId";
-const ideaSnapshotMaybeAndIdName = "IdeaSnapshotMaybeAndId";
+const projectResponseName = "ProjectResponse";
+const userResponseName = "UserResponse";
+const ideaResponseName = "IdeaResponse";
 
 const listCustomType: ReadonlyArray<type.CustomType> = [
   {
@@ -1043,7 +1043,7 @@ const listCustomType: ReadonlyArray<type.CustomType> = [
     ]),
   },
   {
-    name: projectSnapshotMaybeAndIdName,
+    name: projectResponseName,
     description:
       "Maybe プロジェクトのスナップショット と projectId. indexedDBからElmに渡す用",
     body: type.customTypeBodyProduct([
@@ -1053,14 +1053,14 @@ const listCustomType: ReadonlyArray<type.CustomType> = [
         memberType: projectId,
       },
       {
-        name: "snapshot",
+        name: "snapshotMaybe",
         description: "プロジェクトのデータ",
         memberType: type.typeMaybe(type.typeCustom(projectSnapshotName)),
       },
     ]),
   },
   {
-    name: userSnapshotMaybeAndIdName,
+    name: userResponseName,
     description:
       "Maybe プロジェクトのスナップショット と userId. indexedDBからElmに渡す用",
     body: type.customTypeBodyProduct([
@@ -1070,14 +1070,14 @@ const listCustomType: ReadonlyArray<type.CustomType> = [
         memberType: userId,
       },
       {
-        name: "snapshot",
+        name: "snapshotMaybe",
         description: "ユーザーのデータ",
         memberType: type.typeMaybe(type.typeCustom(userSnapshotName)),
       },
     ]),
   },
   {
-    name: ideaSnapshotMaybeAndIdName,
+    name: ideaResponseName,
     description: "Maybe アイデア と ideaId. indexedDBからElmに渡す用",
     body: type.customTypeBodyProduct([
       {
@@ -1086,7 +1086,7 @@ const listCustomType: ReadonlyArray<type.CustomType> = [
         memberType: ideaId,
       },
       {
-        name: "snapshot",
+        name: "snapshotMaybe",
         description: "アイデアのスナップショット",
         memberType: type.typeMaybe(type.typeCustom(ideaSnapshotName)),
       },

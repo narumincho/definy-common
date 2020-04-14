@@ -656,7 +656,7 @@ export type AccessTokenError =
 /**
  * Maybe プロジェクトのスナップショット と projectId. indexedDBからElmに渡す用
  */
-export type ProjectSnapshotMaybeAndId = {
+export type ProjectResponse = {
   /**
    * プロジェクトのID
    */
@@ -664,13 +664,13 @@ export type ProjectSnapshotMaybeAndId = {
   /**
    * プロジェクトのデータ
    */
-  snapshot: Maybe<ProjectSnapshot>;
+  snapshotMaybe: Maybe<ProjectSnapshot>;
 };
 
 /**
  * Maybe プロジェクトのスナップショット と userId. indexedDBからElmに渡す用
  */
-export type UserSnapshotMaybeAndId = {
+export type UserResponse = {
   /**
    * ユーザーID
    */
@@ -678,13 +678,13 @@ export type UserSnapshotMaybeAndId = {
   /**
    * ユーザーのデータ
    */
-  snapshot: Maybe<UserSnapshot>;
+  snapshotMaybe: Maybe<UserSnapshot>;
 };
 
 /**
  * Maybe アイデア と ideaId. indexedDBからElmに渡す用
  */
-export type IdeaSnapshotMaybeAndId = {
+export type IdeaResponse = {
   /**
    * アイデアID
    */
@@ -692,7 +692,7 @@ export type IdeaSnapshotMaybeAndId = {
   /**
    * アイデアのスナップショット
    */
-  snapshot: Maybe<IdeaSnapshot>;
+  snapshotMaybe: Maybe<IdeaSnapshot>;
 };
 
 export type ProjectId = string & { _projectId: never };
@@ -1532,25 +1532,25 @@ export const encodeAccessTokenError = (
   }
 };
 
-export const encodeProjectSnapshotMaybeAndId = (
-  projectSnapshotMaybeAndId: ProjectSnapshotMaybeAndId
+export const encodeProjectResponse = (
+  projectResponse: ProjectResponse
 ): ReadonlyArray<number> =>
-  encodeId(projectSnapshotMaybeAndId.id).concat(
-    encodeMaybe(encodeProjectSnapshot)(projectSnapshotMaybeAndId.snapshot)
+  encodeId(projectResponse.id).concat(
+    encodeMaybe(encodeProjectSnapshot)(projectResponse.snapshotMaybe)
   );
 
-export const encodeUserSnapshotMaybeAndId = (
-  userSnapshotMaybeAndId: UserSnapshotMaybeAndId
+export const encodeUserResponse = (
+  userResponse: UserResponse
 ): ReadonlyArray<number> =>
-  encodeId(userSnapshotMaybeAndId.id).concat(
-    encodeMaybe(encodeUserSnapshot)(userSnapshotMaybeAndId.snapshot)
+  encodeId(userResponse.id).concat(
+    encodeMaybe(encodeUserSnapshot)(userResponse.snapshotMaybe)
   );
 
-export const encodeIdeaSnapshotMaybeAndId = (
-  ideaSnapshotMaybeAndId: IdeaSnapshotMaybeAndId
+export const encodeIdeaResponse = (
+  ideaResponse: IdeaResponse
 ): ReadonlyArray<number> =>
-  encodeId(ideaSnapshotMaybeAndId.id).concat(
-    encodeMaybe(encodeIdeaSnapshot)(ideaSnapshotMaybeAndId.snapshot)
+  encodeId(ideaResponse.id).concat(
+    encodeMaybe(encodeIdeaSnapshot)(ideaResponse.snapshotMaybe)
   );
 
 /**
@@ -3354,10 +3354,10 @@ export const decodeAccessTokenError = (
  * @param index バイナリを読み込み開始位置
  * @param binary バイナリ
  */
-export const decodeProjectSnapshotMaybeAndId = (
+export const decodeProjectResponse = (
   index: number,
   binary: Uint8Array
-): { result: ProjectSnapshotMaybeAndId; nextIndex: number } => {
+): { result: ProjectResponse; nextIndex: number } => {
   const idAndNextIndex: {
     result: ProjectId;
     nextIndex: number;
@@ -3365,16 +3365,16 @@ export const decodeProjectSnapshotMaybeAndId = (
     a: number,
     b: Uint8Array
   ) => { result: ProjectId; nextIndex: number })(index, binary);
-  const snapshotAndNextIndex: {
+  const snapshotMaybeAndNextIndex: {
     result: Maybe<ProjectSnapshot>;
     nextIndex: number;
   } = decodeMaybe(decodeProjectSnapshot)(idAndNextIndex.nextIndex, binary);
   return {
     result: {
       id: idAndNextIndex.result,
-      snapshot: snapshotAndNextIndex.result,
+      snapshotMaybe: snapshotMaybeAndNextIndex.result,
     },
-    nextIndex: snapshotAndNextIndex.nextIndex,
+    nextIndex: snapshotMaybeAndNextIndex.nextIndex,
   };
 };
 
@@ -3382,24 +3382,24 @@ export const decodeProjectSnapshotMaybeAndId = (
  * @param index バイナリを読み込み開始位置
  * @param binary バイナリ
  */
-export const decodeUserSnapshotMaybeAndId = (
+export const decodeUserResponse = (
   index: number,
   binary: Uint8Array
-): { result: UserSnapshotMaybeAndId; nextIndex: number } => {
+): { result: UserResponse; nextIndex: number } => {
   const idAndNextIndex: { result: UserId; nextIndex: number } = (decodeId as (
     a: number,
     b: Uint8Array
   ) => { result: UserId; nextIndex: number })(index, binary);
-  const snapshotAndNextIndex: {
+  const snapshotMaybeAndNextIndex: {
     result: Maybe<UserSnapshot>;
     nextIndex: number;
   } = decodeMaybe(decodeUserSnapshot)(idAndNextIndex.nextIndex, binary);
   return {
     result: {
       id: idAndNextIndex.result,
-      snapshot: snapshotAndNextIndex.result,
+      snapshotMaybe: snapshotMaybeAndNextIndex.result,
     },
-    nextIndex: snapshotAndNextIndex.nextIndex,
+    nextIndex: snapshotMaybeAndNextIndex.nextIndex,
   };
 };
 
@@ -3407,23 +3407,23 @@ export const decodeUserSnapshotMaybeAndId = (
  * @param index バイナリを読み込み開始位置
  * @param binary バイナリ
  */
-export const decodeIdeaSnapshotMaybeAndId = (
+export const decodeIdeaResponse = (
   index: number,
   binary: Uint8Array
-): { result: IdeaSnapshotMaybeAndId; nextIndex: number } => {
+): { result: IdeaResponse; nextIndex: number } => {
   const idAndNextIndex: { result: IdeaId; nextIndex: number } = (decodeId as (
     a: number,
     b: Uint8Array
   ) => { result: IdeaId; nextIndex: number })(index, binary);
-  const snapshotAndNextIndex: {
+  const snapshotMaybeAndNextIndex: {
     result: Maybe<IdeaSnapshot>;
     nextIndex: number;
   } = decodeMaybe(decodeIdeaSnapshot)(idAndNextIndex.nextIndex, binary);
   return {
     result: {
       id: idAndNextIndex.result,
-      snapshot: snapshotAndNextIndex.result,
+      snapshotMaybe: snapshotMaybeAndNextIndex.result,
     },
-    nextIndex: snapshotAndNextIndex.nextIndex,
+    nextIndex: snapshotMaybeAndNextIndex.nextIndex,
   };
 };
