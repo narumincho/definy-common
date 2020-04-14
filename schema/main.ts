@@ -69,6 +69,7 @@ const accessTokenErrorName = "AccessTokenError";
 const projectResponseName = "ProjectResponse";
 const userResponseName = "UserResponse";
 const ideaResponseName = "IdeaResponse";
+const ResponseIdeaListByProjectIdName = "ResponseIdeaListByProjectId";
 
 const listCustomType: ReadonlyArray<type.CustomType> = [
   {
@@ -1089,6 +1090,22 @@ const listCustomType: ReadonlyArray<type.CustomType> = [
         name: "snapshotMaybe",
         description: "アイデアのスナップショット",
         memberType: type.typeMaybe(type.typeCustom(ideaSnapshotName)),
+      },
+    ]),
+  },
+  {
+    name: ResponseIdeaListByProjectIdName,
+    description: "プロジェクトからアイデアの一覧を取得したときにElmに渡すもの",
+    body: type.customTypeBodyProduct([
+      {
+        name: "projectId",
+        description: "プロジェクトID",
+        memberType: projectId,
+      },
+      {
+        name: "ideaSnapshotAndIdList",
+        description: "アイデアの一覧",
+        memberType: type.typeList(type.typeCustom(ideaSnapshotAndIdName)),
       },
     ]),
   },

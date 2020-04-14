@@ -695,6 +695,20 @@ export type IdeaResponse = {
   snapshotMaybe: Maybe<IdeaSnapshot>;
 };
 
+/**
+ * プロジェクトからアイデアの一覧を取得したときにElmに渡すもの
+ */
+export type ResponseIdeaListByProjectId = {
+  /**
+   * プロジェクトID
+   */
+  projectId: ProjectId;
+  /**
+   * アイデアの一覧
+   */
+  ideaSnapshotAndIdList: ReadonlyArray<IdeaSnapshotAndId>;
+};
+
 export type ProjectId = string & { _projectId: never };
 
 export type UserId = string & { _userId: never };
@@ -1551,6 +1565,15 @@ export const encodeIdeaResponse = (
 ): ReadonlyArray<number> =>
   encodeId(ideaResponse.id).concat(
     encodeMaybe(encodeIdeaSnapshot)(ideaResponse.snapshotMaybe)
+  );
+
+export const encodeResponseIdeaListByProjectId = (
+  responseIdeaListByProjectId: ResponseIdeaListByProjectId
+): ReadonlyArray<number> =>
+  encodeId(responseIdeaListByProjectId.projectId).concat(
+    encodeList(encodeIdeaSnapshotAndId)(
+      responseIdeaListByProjectId.ideaSnapshotAndIdList
+    )
   );
 
 /**
@@ -3425,5 +3448,36 @@ export const decodeIdeaResponse = (
       snapshotMaybe: snapshotMaybeAndNextIndex.result,
     },
     nextIndex: snapshotMaybeAndNextIndex.nextIndex,
+  };
+};
+
+/**
+ * @param index バイナリを読み込み開始位置
+ * @param binary バイナリ
+ */
+export const decodeResponseIdeaListByProjectId = (
+  index: number,
+  binary: Uint8Array
+): { result: ResponseIdeaListByProjectId; nextIndex: number } => {
+  const projectIdAndNextIndex: {
+    result: ProjectId;
+    nextIndex: number;
+  } = (decodeId as (
+    a: number,
+    b: Uint8Array
+  ) => { result: ProjectId; nextIndex: number })(index, binary);
+  const ideaSnapshotAndIdListAndNextIndex: {
+    result: ReadonlyArray<IdeaSnapshotAndId>;
+    nextIndex: number;
+  } = decodeList(decodeIdeaSnapshotAndId)(
+    projectIdAndNextIndex.nextIndex,
+    binary
+  );
+  return {
+    result: {
+      projectId: projectIdAndNextIndex.result,
+      ideaSnapshotAndIdList: ideaSnapshotAndIdListAndNextIndex.result,
+    },
+    nextIndex: ideaSnapshotAndIdListAndNextIndex.nextIndex,
   };
 };
