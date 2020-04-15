@@ -102,7 +102,10 @@ type alias IdeaItem =
 -}
 type ItemBody
     = ItemBodyComment String
-    | ItemBodySuggestion SuggestionId
+    | ItemBodySuggestionCreate SuggestionId
+    | ItemBodySuggestionApprovalPending SuggestionId
+    | ItemBodySuggestionApproved SuggestionId
+    | ItemBodySuggestionRejected SuggestionId
 
 
 {-| 編集提案
@@ -636,8 +639,17 @@ itemBodyToJsonValue itemBody =
         ItemBodyComment parameter ->
             Je.object [ ( "_", Je.string "Comment" ), ( "string_", Je.string parameter ) ]
 
-        ItemBodySuggestion parameter ->
-            Je.object [ ( "_", Je.string "Suggestion" ), ( "suggestionId", suggestionIdToJsonValue parameter ) ]
+        ItemBodySuggestionCreate parameter ->
+            Je.object [ ( "_", Je.string "SuggestionCreate" ), ( "suggestionId", suggestionIdToJsonValue parameter ) ]
+
+        ItemBodySuggestionApprovalPending parameter ->
+            Je.object [ ( "_", Je.string "SuggestionApprovalPending" ), ( "suggestionId", suggestionIdToJsonValue parameter ) ]
+
+        ItemBodySuggestionApproved parameter ->
+            Je.object [ ( "_", Je.string "SuggestionApproved" ), ( "suggestionId", suggestionIdToJsonValue parameter ) ]
+
+        ItemBodySuggestionRejected parameter ->
+            Je.object [ ( "_", Je.string "SuggestionRejected" ), ( "suggestionId", suggestionIdToJsonValue parameter ) ]
 
 
 {-| SuggestionのJSONへのエンコーダ
@@ -1424,8 +1436,17 @@ itemBodyJsonDecoder =
                     "Comment" ->
                         Jd.field "string_" Jd.string |> Jd.map ItemBodyComment
 
-                    "Suggestion" ->
-                        Jd.field "suggestionId" suggestionIdJsonDecoder |> Jd.map ItemBodySuggestion
+                    "SuggestionCreate" ->
+                        Jd.field "suggestionId" suggestionIdJsonDecoder |> Jd.map ItemBodySuggestionCreate
+
+                    "SuggestionApprovalPending" ->
+                        Jd.field "suggestionId" suggestionIdJsonDecoder |> Jd.map ItemBodySuggestionApprovalPending
+
+                    "SuggestionApproved" ->
+                        Jd.field "suggestionId" suggestionIdJsonDecoder |> Jd.map ItemBodySuggestionApproved
+
+                    "SuggestionRejected" ->
+                        Jd.field "suggestionId" suggestionIdJsonDecoder |> Jd.map ItemBodySuggestionRejected
 
                     _ ->
                         Jd.fail ("ItemBodyで不明なタグを受けたとった tag=" ++ tag)

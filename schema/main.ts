@@ -432,8 +432,23 @@ const listCustomType: ReadonlyArray<type.CustomType> = [
         parameter: type.maybeJust(type.typeString),
       },
       {
-        name: "Suggestion",
-        description: "編集提案",
+        name: "SuggestionCreate",
+        description: "編集提案を作成した",
+        parameter: type.maybeJust(suggestionId),
+      },
+      {
+        name: "SuggestionApprovalPending",
+        description: "編集提案が作成されて承認待ちになった",
+        parameter: type.maybeJust(suggestionId),
+      },
+      {
+        name: "SuggestionApproved",
+        description: "編集提案が承認された",
+        parameter: type.maybeJust(suggestionId),
+      },
+      {
+        name: "SuggestionRejected",
+        description: "編集提案が拒否された",
         parameter: type.maybeJust(suggestionId),
       },
     ]),

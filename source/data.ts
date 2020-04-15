@@ -254,7 +254,10 @@ export type IdeaItem = {
  */
 export type ItemBody =
   | { _: "Comment"; string_: string }
-  | { _: "Suggestion"; suggestionId: SuggestionId };
+  | { _: "SuggestionCreate"; suggestionId: SuggestionId }
+  | { _: "SuggestionApprovalPending"; suggestionId: SuggestionId }
+  | { _: "SuggestionApproved"; suggestionId: SuggestionId }
+  | { _: "SuggestionRejected"; suggestionId: SuggestionId };
 
 /**
  * 編集提案
@@ -812,12 +815,32 @@ export const itemBodyComment = (string_: string): ItemBody => ({
 });
 
 /**
- * 編集提案
+ * 編集提案を作成した
  */
-export const itemBodySuggestion = (suggestionId: SuggestionId): ItemBody => ({
-  _: "Suggestion",
-  suggestionId: suggestionId,
-});
+export const itemBodySuggestionCreate = (
+  suggestionId: SuggestionId
+): ItemBody => ({ _: "SuggestionCreate", suggestionId: suggestionId });
+
+/**
+ * 編集提案が作成されて承認待ちになった
+ */
+export const itemBodySuggestionApprovalPending = (
+  suggestionId: SuggestionId
+): ItemBody => ({ _: "SuggestionApprovalPending", suggestionId: suggestionId });
+
+/**
+ * 編集提案が承認された
+ */
+export const itemBodySuggestionApproved = (
+  suggestionId: SuggestionId
+): ItemBody => ({ _: "SuggestionApproved", suggestionId: suggestionId });
+
+/**
+ * 編集提案が拒否された
+ */
+export const itemBodySuggestionRejected = (
+  suggestionId: SuggestionId
+): ItemBody => ({ _: "SuggestionRejected", suggestionId: suggestionId });
 
 /**
  * プロジェクト名の変更
@@ -1258,8 +1281,17 @@ export const encodeItemBody = (itemBody: ItemBody): ReadonlyArray<number> => {
     case "Comment": {
       return [0].concat(encodeString(itemBody.string_));
     }
-    case "Suggestion": {
+    case "SuggestionCreate": {
       return [1].concat(encodeId(itemBody.suggestionId));
+    }
+    case "SuggestionApprovalPending": {
+      return [2].concat(encodeId(itemBody.suggestionId));
+    }
+    case "SuggestionApproved": {
+      return [3].concat(encodeId(itemBody.suggestionId));
+    }
+    case "SuggestionRejected": {
+      return [4].concat(encodeId(itemBody.suggestionId));
     }
   }
 };
@@ -2383,7 +2415,46 @@ export const decodeItemBody = (
       binary
     );
     return {
-      result: itemBodySuggestion(result.result),
+      result: itemBodySuggestionCreate(result.result),
+      nextIndex: result.nextIndex,
+    };
+  }
+  if (patternIndex.result === 2) {
+    const result: { result: SuggestionId; nextIndex: number } = (decodeId as (
+      a: number,
+      b: Uint8Array
+    ) => { result: SuggestionId; nextIndex: number })(
+      patternIndex.nextIndex,
+      binary
+    );
+    return {
+      result: itemBodySuggestionApprovalPending(result.result),
+      nextIndex: result.nextIndex,
+    };
+  }
+  if (patternIndex.result === 3) {
+    const result: { result: SuggestionId; nextIndex: number } = (decodeId as (
+      a: number,
+      b: Uint8Array
+    ) => { result: SuggestionId; nextIndex: number })(
+      patternIndex.nextIndex,
+      binary
+    );
+    return {
+      result: itemBodySuggestionApproved(result.result),
+      nextIndex: result.nextIndex,
+    };
+  }
+  if (patternIndex.result === 4) {
+    const result: { result: SuggestionId; nextIndex: number } = (decodeId as (
+      a: number,
+      b: Uint8Array
+    ) => { result: SuggestionId; nextIndex: number })(
+      patternIndex.nextIndex,
+      binary
+    );
+    return {
+      result: itemBodySuggestionRejected(result.result),
       nextIndex: result.nextIndex,
     };
   }
