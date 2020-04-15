@@ -249,11 +249,11 @@ export type Comment = {
   /**
    * 作成者
    */
-  createdBy: UserId;
+  createUserId: UserId;
   /**
    * 作成日時
    */
-  createdAt: Time;
+  createTime: Time;
 };
 
 /**
@@ -263,7 +263,7 @@ export type Suggestion = {
   /**
    * アイデアに投稿した日時
    */
-  createdAt: Time;
+  createTime: Time;
   /**
    * なぜ,どんな変更をしたのかの説明
    */
@@ -1246,13 +1246,13 @@ export const encodeIdeaItem = (ideaItem: IdeaItem): ReadonlyArray<number> => {
 
 export const encodeComment = (comment: Comment): ReadonlyArray<number> =>
   encodeString(comment.body)
-    .concat(encodeId(comment.createdBy))
-    .concat(encodeTime(comment.createdAt));
+    .concat(encodeId(comment.createUserId))
+    .concat(encodeTime(comment.createTime));
 
 export const encodeSuggestion = (
   suggestion: Suggestion
 ): ReadonlyArray<number> =>
-  encodeTime(suggestion.createdAt)
+  encodeTime(suggestion.createTime)
     .concat(encodeString(suggestion.description))
     .concat(encodeChange(suggestion.change));
 
@@ -2331,7 +2331,7 @@ export const decodeComment = (
     index,
     binary
   );
-  const createdByAndNextIndex: {
+  const createUserIdAndNextIndex: {
     result: UserId;
     nextIndex: number;
   } = (decodeId as (
@@ -2341,17 +2341,17 @@ export const decodeComment = (
     bodyAndNextIndex.nextIndex,
     binary
   );
-  const createdAtAndNextIndex: { result: Time; nextIndex: number } = decodeTime(
-    createdByAndNextIndex.nextIndex,
-    binary
-  );
+  const createTimeAndNextIndex: {
+    result: Time;
+    nextIndex: number;
+  } = decodeTime(createUserIdAndNextIndex.nextIndex, binary);
   return {
     result: {
       body: bodyAndNextIndex.result,
-      createdBy: createdByAndNextIndex.result,
-      createdAt: createdAtAndNextIndex.result,
+      createUserId: createUserIdAndNextIndex.result,
+      createTime: createTimeAndNextIndex.result,
     },
-    nextIndex: createdAtAndNextIndex.nextIndex,
+    nextIndex: createTimeAndNextIndex.nextIndex,
   };
 };
 
@@ -2363,21 +2363,21 @@ export const decodeSuggestion = (
   index: number,
   binary: Uint8Array
 ): { result: Suggestion; nextIndex: number } => {
-  const createdAtAndNextIndex: { result: Time; nextIndex: number } = decodeTime(
-    index,
-    binary
-  );
+  const createTimeAndNextIndex: {
+    result: Time;
+    nextIndex: number;
+  } = decodeTime(index, binary);
   const descriptionAndNextIndex: {
     result: string;
     nextIndex: number;
-  } = decodeString(createdAtAndNextIndex.nextIndex, binary);
+  } = decodeString(createTimeAndNextIndex.nextIndex, binary);
   const changeAndNextIndex: {
     result: Change;
     nextIndex: number;
   } = decodeChange(descriptionAndNextIndex.nextIndex, binary);
   return {
     result: {
-      createdAt: createdAtAndNextIndex.result,
+      createTime: createTimeAndNextIndex.result,
       description: descriptionAndNextIndex.result,
       change: changeAndNextIndex.result,
     },

@@ -102,13 +102,13 @@ type IdeaItem
 {-| 文章でのコメント
 -}
 type alias Comment =
-    { body : String, createdBy : UserId, createdAt : Time }
+    { body : String, createUserId : UserId, createTime : Time }
 
 
 {-| 編集提案
 -}
 type alias Suggestion =
-    { createdAt : Time, description : String, change : Change }
+    { createTime : Time, description : String, change : Change }
 
 
 {-| 変更点
@@ -617,8 +617,8 @@ commentToJsonValue : Comment -> Je.Value
 commentToJsonValue comment =
     Je.object
         [ ( "body", Je.string comment.body )
-        , ( "createdBy", userIdToJsonValue comment.createdBy )
-        , ( "createdAt", timeToJsonValue comment.createdAt )
+        , ( "createUserId", userIdToJsonValue comment.createUserId )
+        , ( "createTime", timeToJsonValue comment.createTime )
         ]
 
 
@@ -627,7 +627,7 @@ commentToJsonValue comment =
 suggestionToJsonValue : Suggestion -> Je.Value
 suggestionToJsonValue suggestion =
     Je.object
-        [ ( "createdAt", timeToJsonValue suggestion.createdAt )
+        [ ( "createTime", timeToJsonValue suggestion.createTime )
         , ( "description", Je.string suggestion.description )
         , ( "change", changeToJsonValue suggestion.change )
         ]
@@ -1379,15 +1379,15 @@ ideaItemJsonDecoder =
 commentJsonDecoder : Jd.Decoder Comment
 commentJsonDecoder =
     Jd.succeed
-        (\body createdBy createdAt ->
+        (\body createUserId createTime ->
             { body = body
-            , createdBy = createdBy
-            , createdAt = createdAt
+            , createUserId = createUserId
+            , createTime = createTime
             }
         )
         |> Jdp.required "body" Jd.string
-        |> Jdp.required "createdBy" userIdJsonDecoder
-        |> Jdp.required "createdAt" timeJsonDecoder
+        |> Jdp.required "createUserId" userIdJsonDecoder
+        |> Jdp.required "createTime" timeJsonDecoder
 
 
 {-| SuggestionのJSON Decoder
@@ -1395,13 +1395,13 @@ commentJsonDecoder =
 suggestionJsonDecoder : Jd.Decoder Suggestion
 suggestionJsonDecoder =
     Jd.succeed
-        (\createdAt description change ->
-            { createdAt = createdAt
+        (\createTime description change ->
+            { createTime = createTime
             , description = description
             , change = change
             }
         )
-        |> Jdp.required "createdAt" timeJsonDecoder
+        |> Jdp.required "createTime" timeJsonDecoder
         |> Jdp.required "description" Jd.string
         |> Jdp.required "change" changeJsonDecoder
 

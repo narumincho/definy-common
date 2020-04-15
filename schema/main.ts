@@ -425,12 +425,12 @@ const listCustomType: ReadonlyArray<type.CustomType> = [
         memberType: type.typeString,
       },
       {
-        name: "createdBy",
+        name: "createUserId",
         description: "作成者",
         memberType: userId,
       },
       {
-        name: "createdAt",
+        name: "createTime",
         description: "作成日時",
         memberType: type.typeCustom(timeName),
       },
@@ -441,7 +441,7 @@ const listCustomType: ReadonlyArray<type.CustomType> = [
     description: "編集提案",
     body: type.customTypeBodyProduct([
       {
-        name: "createdAt",
+        name: "createTime",
         description: "アイデアに投稿した日時",
         memberType: type.typeCustom(timeName),
       },
