@@ -261,14 +261,31 @@ export type ItemBody =
  */
 export type Suggestion = {
   /**
+   * 変更概要
+   */
+  name: string;
+  /**
    * 変更理由
    */
   reason: string;
+  /**
+   * 承認状態
+   */
+  state: SuggestionState;
   /**
    * 変更
    */
   changeList: ReadonlyArray<Change>;
 };
+
+/**
+ * 提案の状況
+ */
+export type SuggestionState =
+  | "Creating"
+  | "ApprovalPending"
+  | "Approved"
+  | "Rejected";
 
 /**
  * 変更点
@@ -1250,9 +1267,29 @@ export const encodeItemBody = (itemBody: ItemBody): ReadonlyArray<number> => {
 export const encodeSuggestion = (
   suggestion: Suggestion
 ): ReadonlyArray<number> =>
-  encodeString(suggestion.reason).concat(
-    encodeList(encodeChange)(suggestion.changeList)
-  );
+  encodeString(suggestion.name)
+    .concat(encodeString(suggestion.reason))
+    .concat(encodeSuggestionState(suggestion.state))
+    .concat(encodeList(encodeChange)(suggestion.changeList));
+
+export const encodeSuggestionState = (
+  suggestionState: SuggestionState
+): ReadonlyArray<number> => {
+  switch (suggestionState) {
+    case "Creating": {
+      return [0];
+    }
+    case "ApprovalPending": {
+      return [1];
+    }
+    case "Approved": {
+      return [2];
+    }
+    case "Rejected": {
+      return [3];
+    }
+  }
+};
 
 export const encodeChange = (change: Change): ReadonlyArray<number> => {
   switch (change._) {
@@ -2361,21 +2398,58 @@ export const decodeSuggestion = (
   index: number,
   binary: Uint8Array
 ): { result: Suggestion; nextIndex: number } => {
+  const nameAndNextIndex: { result: string; nextIndex: number } = decodeString(
+    index,
+    binary
+  );
   const reasonAndNextIndex: {
     result: string;
     nextIndex: number;
-  } = decodeString(index, binary);
+  } = decodeString(nameAndNextIndex.nextIndex, binary);
+  const stateAndNextIndex: {
+    result: SuggestionState;
+    nextIndex: number;
+  } = decodeSuggestionState(reasonAndNextIndex.nextIndex, binary);
   const changeListAndNextIndex: {
     result: ReadonlyArray<Change>;
     nextIndex: number;
-  } = decodeList(decodeChange)(reasonAndNextIndex.nextIndex, binary);
+  } = decodeList(decodeChange)(stateAndNextIndex.nextIndex, binary);
   return {
     result: {
+      name: nameAndNextIndex.result,
       reason: reasonAndNextIndex.result,
+      state: stateAndNextIndex.result,
       changeList: changeListAndNextIndex.result,
     },
     nextIndex: changeListAndNextIndex.nextIndex,
   };
+};
+
+/**
+ * @param index バイナリを読み込み開始位置
+ * @param binary バイナリ
+ */
+export const decodeSuggestionState = (
+  index: number,
+  binary: Uint8Array
+): { result: SuggestionState; nextIndex: number } => {
+  const patternIndex: { result: number; nextIndex: number } = decodeInt32(
+    index,
+    binary
+  );
+  if (patternIndex.result === 0) {
+    return { result: "Creating", nextIndex: patternIndex.nextIndex };
+  }
+  if (patternIndex.result === 1) {
+    return { result: "ApprovalPending", nextIndex: patternIndex.nextIndex };
+  }
+  if (patternIndex.result === 2) {
+    return { result: "Approved", nextIndex: patternIndex.nextIndex };
+  }
+  if (patternIndex.result === 3) {
+    return { result: "Rejected", nextIndex: patternIndex.nextIndex };
+  }
+  throw new Error("存在しないパターンを指定された 型を更新してください");
 };
 
 /**

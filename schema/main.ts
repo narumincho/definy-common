@@ -37,6 +37,7 @@ const ideaSnapshotAndIdName = "IdeaSnapshotAndId";
 const ideaItemName = "IdeaItem";
 const itemBodyName = "ItemBody";
 const suggestionName = "Suggestion";
+const suggestionStateName = "SuggestionState";
 const changeName = "Change";
 const moduleName = "Module";
 const typeDefinitionName = "TypeDefinition";
@@ -442,14 +443,50 @@ const listCustomType: ReadonlyArray<type.CustomType> = [
     description: "編集提案",
     body: type.customTypeBodyProduct([
       {
+        name: "name",
+        description: "変更概要",
+        memberType: type.typeString,
+      },
+      {
         name: "reason",
         description: "変更理由",
         memberType: type.typeString,
       },
       {
+        name: "state",
+        description: "承認状態",
+        memberType: type.typeCustom(suggestionStateName),
+      },
+      {
         name: "changeList",
         description: "変更",
         memberType: type.typeList(type.typeCustom(changeName)),
+      },
+    ]),
+  },
+  {
+    name: suggestionStateName,
+    description: "提案の状況",
+    body: type.customTypeBodySum([
+      {
+        name: "Creating",
+        description: "作成中",
+        parameter: type.maybeNothing(),
+      },
+      {
+        name: "ApprovalPending",
+        description: "承認待ち",
+        parameter: type.maybeNothing(),
+      },
+      {
+        name: "Approved",
+        description: "承認済み",
+        parameter: type.maybeNothing(),
+      },
+      {
+        name: "Rejected",
+        description: "拒否された",
+        parameter: type.maybeNothing(),
       },
     ]),
   },
