@@ -74,9 +74,11 @@ export type Location =
   | { _: "Home" }
   | { _: "CreateProject" }
   | { _: "CreateIdea"; projectId: ProjectId }
+  | { _: "EditSuggestion"; suggestionId: SuggestionId }
   | { _: "User"; userId: UserId }
   | { _: "Project"; projectId: ProjectId }
-  | { _: "Idea"; ideaId: IdeaId };
+  | { _: "Idea"; ideaId: IdeaId }
+  | { _: "Suggestion"; suggestionId: SuggestionId };
 
 /**
  * 英語,日本語,エスペラント語などの言語
@@ -727,13 +729,13 @@ export type IdeaListByProjectIdResponse = {
 
 export type ProjectId = string & { _projectId: never };
 
+export type SuggestionId = string & { _suggestionId: never };
+
 export type UserId = string & { _userId: never };
 
 export type IdeaId = string & { _ideaId: never };
 
 export type FileHash = string & { _fileHash: never };
-
-export type SuggestionId = string & { _suggestionId: never };
 
 export type PartId = string & { _partId: never };
 
@@ -783,6 +785,13 @@ export const locationCreateIdea = (projectId: ProjectId): Location => ({
 });
 
 /**
+ * 編集提案を編集するページ
+ */
+export const locationEditSuggestion = (
+  suggestionId: SuggestionId
+): Location => ({ _: "EditSuggestion", suggestionId: suggestionId });
+
+/**
  * ユーザーの詳細ページ
  */
 export const locationUser = (userId: UserId): Location => ({
@@ -804,6 +813,14 @@ export const locationProject = (projectId: ProjectId): Location => ({
 export const locationIdea = (ideaId: IdeaId): Location => ({
   _: "Idea",
   ideaId: ideaId,
+});
+
+/**
+ * 編集提案詳細ページ
+ */
+export const locationSuggestion = (suggestionId: SuggestionId): Location => ({
+  _: "Suggestion",
+  suggestionId: suggestionId,
 });
 
 /**
@@ -1190,14 +1207,20 @@ export const encodeLocation = (location: Location): ReadonlyArray<number> => {
     case "CreateIdea": {
       return [2].concat(encodeId(location.projectId));
     }
+    case "EditSuggestion": {
+      return [3].concat(encodeId(location.suggestionId));
+    }
     case "User": {
-      return [3].concat(encodeId(location.userId));
+      return [4].concat(encodeId(location.userId));
     }
     case "Project": {
-      return [4].concat(encodeId(location.projectId));
+      return [5].concat(encodeId(location.projectId));
     }
     case "Idea": {
-      return [5].concat(encodeId(location.ideaId));
+      return [6].concat(encodeId(location.ideaId));
+    }
+    case "Suggestion": {
+      return [7].concat(encodeId(location.suggestionId));
     }
   }
 };
@@ -2014,13 +2037,26 @@ export const decodeLocation = (
     };
   }
   if (patternIndex.result === 3) {
+    const result: { result: SuggestionId; nextIndex: number } = (decodeId as (
+      a: number,
+      b: Uint8Array
+    ) => { result: SuggestionId; nextIndex: number })(
+      patternIndex.nextIndex,
+      binary
+    );
+    return {
+      result: locationEditSuggestion(result.result),
+      nextIndex: result.nextIndex,
+    };
+  }
+  if (patternIndex.result === 4) {
     const result: { result: UserId; nextIndex: number } = (decodeId as (
       a: number,
       b: Uint8Array
     ) => { result: UserId; nextIndex: number })(patternIndex.nextIndex, binary);
     return { result: locationUser(result.result), nextIndex: result.nextIndex };
   }
-  if (patternIndex.result === 4) {
+  if (patternIndex.result === 5) {
     const result: { result: ProjectId; nextIndex: number } = (decodeId as (
       a: number,
       b: Uint8Array
@@ -2033,12 +2069,25 @@ export const decodeLocation = (
       nextIndex: result.nextIndex,
     };
   }
-  if (patternIndex.result === 5) {
+  if (patternIndex.result === 6) {
     const result: { result: IdeaId; nextIndex: number } = (decodeId as (
       a: number,
       b: Uint8Array
     ) => { result: IdeaId; nextIndex: number })(patternIndex.nextIndex, binary);
     return { result: locationIdea(result.result), nextIndex: result.nextIndex };
+  }
+  if (patternIndex.result === 7) {
+    const result: { result: SuggestionId; nextIndex: number } = (decodeId as (
+      a: number,
+      b: Uint8Array
+    ) => { result: SuggestionId; nextIndex: number })(
+      patternIndex.nextIndex,
+      binary
+    );
+    return {
+      result: locationSuggestion(result.result),
+      nextIndex: result.nextIndex,
+    };
   }
   throw new Error("存在しないパターンを指定された 型を更新してください");
 };

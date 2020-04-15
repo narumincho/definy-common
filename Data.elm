@@ -43,9 +43,11 @@ type Location
     = LocationHome
     | LocationCreateProject
     | LocationCreateIdea ProjectId
+    | LocationEditSuggestion SuggestionId
     | LocationUser UserId
     | LocationProject ProjectId
     | LocationIdea IdeaId
+    | LocationSuggestion SuggestionId
 
 
 {-| 英語,日本語,エスペラント語などの言語
@@ -335,6 +337,10 @@ type ProjectId
     = ProjectId String
 
 
+type SuggestionId
+    = SuggestionId String
+
+
 type UserId
     = UserId String
 
@@ -345,10 +351,6 @@ type IdeaId
 
 type FileHash
     = FileHash String
-
-
-type SuggestionId
-    = SuggestionId String
 
 
 type PartId
@@ -400,6 +402,11 @@ projectIdToJsonValue (ProjectId string) =
     Je.string string
 
 
+suggestionIdToJsonValue : SuggestionId -> Je.Value
+suggestionIdToJsonValue (SuggestionId string) =
+    Je.string string
+
+
 userIdToJsonValue : UserId -> Je.Value
 userIdToJsonValue (UserId string) =
     Je.string string
@@ -412,11 +419,6 @@ ideaIdToJsonValue (IdeaId string) =
 
 fileHashToJsonValue : FileHash -> Je.Value
 fileHashToJsonValue (FileHash string) =
-    Je.string string
-
-
-suggestionIdToJsonValue : SuggestionId -> Je.Value
-suggestionIdToJsonValue (SuggestionId string) =
     Je.string string
 
 
@@ -519,6 +521,9 @@ locationToJsonValue location =
         LocationCreateIdea parameter ->
             Je.object [ ( "_", Je.string "CreateIdea" ), ( "projectId", projectIdToJsonValue parameter ) ]
 
+        LocationEditSuggestion parameter ->
+            Je.object [ ( "_", Je.string "EditSuggestion" ), ( "suggestionId", suggestionIdToJsonValue parameter ) ]
+
         LocationUser parameter ->
             Je.object [ ( "_", Je.string "User" ), ( "userId", userIdToJsonValue parameter ) ]
 
@@ -527,6 +532,9 @@ locationToJsonValue location =
 
         LocationIdea parameter ->
             Je.object [ ( "_", Je.string "Idea" ), ( "ideaId", ideaIdToJsonValue parameter ) ]
+
+        LocationSuggestion parameter ->
+            Je.object [ ( "_", Je.string "Suggestion" ), ( "suggestionId", suggestionIdToJsonValue parameter ) ]
 
 
 {-| LanguageのJSONへのエンコーダ
@@ -1108,6 +1116,11 @@ projectIdJsonDecoder =
     Jd.map ProjectId Jd.string
 
 
+suggestionIdJsonDecoder : Jd.Decoder SuggestionId
+suggestionIdJsonDecoder =
+    Jd.map SuggestionId Jd.string
+
+
 userIdJsonDecoder : Jd.Decoder UserId
 userIdJsonDecoder =
     Jd.map UserId Jd.string
@@ -1121,11 +1134,6 @@ ideaIdJsonDecoder =
 fileHashJsonDecoder : Jd.Decoder FileHash
 fileHashJsonDecoder =
     Jd.map FileHash Jd.string
-
-
-suggestionIdJsonDecoder : Jd.Decoder SuggestionId
-suggestionIdJsonDecoder =
-    Jd.map SuggestionId Jd.string
 
 
 partIdJsonDecoder : Jd.Decoder PartId
@@ -1257,6 +1265,9 @@ locationJsonDecoder =
                     "CreateIdea" ->
                         Jd.field "projectId" projectIdJsonDecoder |> Jd.map LocationCreateIdea
 
+                    "EditSuggestion" ->
+                        Jd.field "suggestionId" suggestionIdJsonDecoder |> Jd.map LocationEditSuggestion
+
                     "User" ->
                         Jd.field "userId" userIdJsonDecoder |> Jd.map LocationUser
 
@@ -1265,6 +1276,9 @@ locationJsonDecoder =
 
                     "Idea" ->
                         Jd.field "ideaId" ideaIdJsonDecoder |> Jd.map LocationIdea
+
+                    "Suggestion" ->
+                        Jd.field "suggestionId" suggestionIdJsonDecoder |> Jd.map LocationSuggestion
 
                     _ ->
                         Jd.fail ("Locationで不明なタグを受けたとった tag=" ++ tag)

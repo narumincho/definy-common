@@ -186,6 +186,11 @@ const listCustomType: ReadonlyArray<type.CustomType> = [
         parameter: type.maybeJust(projectId),
       },
       {
+        name: "EditSuggestion",
+        description: "編集提案を編集するページ",
+        parameter: type.maybeJust(suggestionId),
+      },
+      {
         name: "User",
         description: "ユーザーの詳細ページ",
         parameter: type.maybeJust(userId),
@@ -199,6 +204,11 @@ const listCustomType: ReadonlyArray<type.CustomType> = [
         name: "Idea",
         description: "アイデア詳細ページ",
         parameter: type.maybeJust(ideaId),
+      },
+      {
+        name: "Suggestion",
+        description: "編集提案詳細ページ",
+        parameter: type.maybeJust(suggestionId),
       },
     ]),
   },
