@@ -327,7 +327,7 @@ export type TypeDefinition = {
 /**
  * パーツの定義
  */
-export type PartDefinition = {
+export type Part = {
   /**
    * パーツの名前
    */
@@ -1348,14 +1348,12 @@ export const encodeTypeDefinition = (
     .concat(encodeList(encodeId)(typeDefinition.parentList))
     .concat(encodeString(typeDefinition.description));
 
-export const encodePartDefinition = (
-  partDefinition: PartDefinition
-): ReadonlyArray<number> =>
-  encodeString(partDefinition.name)
-    .concat(encodeList(encodeId)(partDefinition.parentList))
-    .concat(encodeString(partDefinition.description))
-    .concat(encodeType(partDefinition["type"]))
-    .concat(encodeMaybe(encodeExpr)(partDefinition.expr));
+export const encodePart = (part: Part): ReadonlyArray<number> =>
+  encodeString(part.name)
+    .concat(encodeList(encodeId)(part.parentList))
+    .concat(encodeString(part.description))
+    .concat(encodeType(part["type"]))
+    .concat(encodeMaybe(encodeExpr)(part.expr));
 
 export const encodeTypeBody = (typeBody: TypeBody): ReadonlyArray<number> => {
   switch (typeBody._) {
@@ -1656,8 +1654,8 @@ export const decodeInt32 = (
   index: number,
   binary: Uint8Array
 ): { result: number; nextIndex: number } => {
-  let result = 0;
-  let offset = 0;
+  let result: number = 0;
+  let offset: number = 0;
   while (true) {
     const byte: number = binary[index + offset];
     result |= (byte & 127) << (offset * 7);
@@ -2637,10 +2635,10 @@ export const decodeTypeDefinition = (
  * @param index バイナリを読み込み開始位置
  * @param binary バイナリ
  */
-export const decodePartDefinition = (
+export const decodePart = (
   index: number,
   binary: Uint8Array
-): { result: PartDefinition; nextIndex: number } => {
+): { result: Part; nextIndex: number } => {
   const nameAndNextIndex: { result: string; nextIndex: number } = decodeString(
     index,
     binary
