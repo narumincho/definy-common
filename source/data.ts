@@ -170,13 +170,13 @@ export type ProjectSnapshot = {
    */
   getTime: Time;
   /**
-   * パーツのリスト
+   * 所属しているのパーツのIDのリスト
    */
-  partList: ReadonlyArray<PartDefinition>;
+  partIdList: ReadonlyArray<PartId>;
   /**
-   * 型のリスト
+   * 所属している型のIDのリスト
    */
-  typeList: ReadonlyArray<TypeDefinition>;
+  typeIdList: ReadonlyArray<TypeId>;
 };
 
 /**
@@ -1252,8 +1252,8 @@ export const encodeProjectSnapshot = (
     .concat(encodeId(projectSnapshot.createUser))
     .concat(encodeTime(projectSnapshot.updateTime))
     .concat(encodeTime(projectSnapshot.getTime))
-    .concat(encodeList(encodePartDefinition)(projectSnapshot.partList))
-    .concat(encodeList(encodeTypeDefinition)(projectSnapshot.typeList));
+    .concat(encodeList(encodeId)(projectSnapshot.partIdList))
+    .concat(encodeList(encodeId)(projectSnapshot.typeIdList));
 
 export const encodeProjectSnapshotAndId = (
   projectSnapshotAndId: ProjectSnapshotAndId
@@ -2251,14 +2251,24 @@ export const decodeProjectSnapshot = (
     updateTimeAndNextIndex.nextIndex,
     binary
   );
-  const partListAndNextIndex: {
-    result: ReadonlyArray<PartDefinition>;
+  const partIdListAndNextIndex: {
+    result: ReadonlyArray<PartId>;
     nextIndex: number;
-  } = decodeList(decodePartDefinition)(getTimeAndNextIndex.nextIndex, binary);
-  const typeListAndNextIndex: {
-    result: ReadonlyArray<TypeDefinition>;
+  } = decodeList(
+    decodeId as (
+      a: number,
+      b: Uint8Array
+    ) => { result: PartId; nextIndex: number }
+  )(getTimeAndNextIndex.nextIndex, binary);
+  const typeIdListAndNextIndex: {
+    result: ReadonlyArray<TypeId>;
     nextIndex: number;
-  } = decodeList(decodeTypeDefinition)(partListAndNextIndex.nextIndex, binary);
+  } = decodeList(
+    decodeId as (
+      a: number,
+      b: Uint8Array
+    ) => { result: TypeId; nextIndex: number }
+  )(partIdListAndNextIndex.nextIndex, binary);
   return {
     result: {
       name: nameAndNextIndex.result,
@@ -2268,10 +2278,10 @@ export const decodeProjectSnapshot = (
       createUser: createUserAndNextIndex.result,
       updateTime: updateTimeAndNextIndex.result,
       getTime: getTimeAndNextIndex.result,
-      partList: partListAndNextIndex.result,
-      typeList: typeListAndNextIndex.result,
+      partIdList: partIdListAndNextIndex.result,
+      typeIdList: typeIdListAndNextIndex.result,
     },
-    nextIndex: typeListAndNextIndex.nextIndex,
+    nextIndex: typeIdListAndNextIndex.nextIndex,
   };
 };
 

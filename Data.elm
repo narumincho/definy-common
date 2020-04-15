@@ -73,7 +73,7 @@ type alias UserSnapshotAndId =
 {-| プロジェクト
 -}
 type alias ProjectSnapshot =
-    { name : String, iconHash : FileHash, imageHash : FileHash, createTime : Time, createUser : UserId, updateTime : Time, getTime : Time, partList : List PartDefinition, typeList : List TypeDefinition }
+    { name : String, iconHash : FileHash, imageHash : FileHash, createTime : Time, createUser : UserId, updateTime : Time, getTime : Time, partIdList : List PartId, typeIdList : List TypeId }
 
 
 {-| プロジェクトを作成したときに返ってくるデータ
@@ -575,8 +575,8 @@ projectSnapshotToJsonValue projectSnapshot =
         , ( "createUser", userIdToJsonValue projectSnapshot.createUser )
         , ( "updateTime", timeToJsonValue projectSnapshot.updateTime )
         , ( "getTime", timeToJsonValue projectSnapshot.getTime )
-        , ( "partList", Je.list partDefinitionToJsonValue projectSnapshot.partList )
-        , ( "typeList", Je.list typeDefinitionToJsonValue projectSnapshot.typeList )
+        , ( "partIdList", Je.list partIdToJsonValue projectSnapshot.partIdList )
+        , ( "typeIdList", Je.list typeIdToJsonValue projectSnapshot.typeIdList )
         ]
 
 
@@ -1322,7 +1322,7 @@ userSnapshotAndIdJsonDecoder =
 projectSnapshotJsonDecoder : Jd.Decoder ProjectSnapshot
 projectSnapshotJsonDecoder =
     Jd.succeed
-        (\name iconHash imageHash createTime createUser updateTime getTime partList typeList ->
+        (\name iconHash imageHash createTime createUser updateTime getTime partIdList typeIdList ->
             { name = name
             , iconHash = iconHash
             , imageHash = imageHash
@@ -1330,8 +1330,8 @@ projectSnapshotJsonDecoder =
             , createUser = createUser
             , updateTime = updateTime
             , getTime = getTime
-            , partList = partList
-            , typeList = typeList
+            , partIdList = partIdList
+            , typeIdList = typeIdList
             }
         )
         |> Jdp.required "name" Jd.string
@@ -1341,8 +1341,8 @@ projectSnapshotJsonDecoder =
         |> Jdp.required "createUser" userIdJsonDecoder
         |> Jdp.required "updateTime" timeJsonDecoder
         |> Jdp.required "getTime" timeJsonDecoder
-        |> Jdp.required "partList" (Jd.list partDefinitionJsonDecoder)
-        |> Jdp.required "typeList" (Jd.list typeDefinitionJsonDecoder)
+        |> Jdp.required "partIdList" (Jd.list partIdJsonDecoder)
+        |> Jdp.required "typeIdList" (Jd.list typeIdJsonDecoder)
 
 
 {-| ProjectSnapshotAndIdのJSON Decoder
