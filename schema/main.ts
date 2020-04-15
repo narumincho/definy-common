@@ -11,7 +11,6 @@ const projectId = type.typeId("ProjectId");
 const ideaId = type.typeId("IdeaId");
 const fileHash = type.typeToken("FileHash");
 const suggestionId = type.typeId("SuggestionId");
-const moduleId = type.typeId("ModuleId");
 const typeId = type.typeId("TypeId");
 const tagId = type.typeId("TagId");
 const partId = type.typeId("PartId");
@@ -39,7 +38,6 @@ const itemBodyName = "ItemBody";
 const suggestionName = "Suggestion";
 const suggestionStateName = "SuggestionState";
 const changeName = "Change";
-const moduleName = "Module";
 const typeDefinitionName = "TypeDefinition";
 const partDefinitionName = "PartDefinition";
 const typeBodyName = "TypeBody";
@@ -336,6 +334,16 @@ const listCustomType: ReadonlyArray<type.CustomType> = [
         description: "取得日時",
         memberType: type.typeCustom(timeName),
       },
+      {
+        name: "partList",
+        description: "パーツのリスト",
+        memberType: type.typeList(type.typeCustom(partDefinitionName)),
+      },
+      {
+        name: "typeList",
+        description: "型のリスト",
+        memberType: type.typeList(type.typeCustom(typeDefinitionName)),
+      },
     ]),
   },
   {
@@ -527,27 +535,6 @@ const listCustomType: ReadonlyArray<type.CustomType> = [
     ]),
   },
   {
-    name: moduleName,
-    description: "モジュール",
-    body: type.customTypeBodyProduct([
-      {
-        name: "name",
-        description: "モジュール名.階層構造を表現することができる",
-        memberType: type.typeList(type.typeString),
-      },
-      {
-        name: "description",
-        description: "モジュールの説明",
-        memberType: type.typeString,
-      },
-      {
-        name: "export",
-        description: "外部のプロジェクトに公開するかどうか",
-        memberType: type.typeBool,
-      },
-    ]),
-  },
-  {
     name: typeDefinitionName,
     description: "型の定義",
     body: type.customTypeBodyProduct([
@@ -596,11 +583,6 @@ const listCustomType: ReadonlyArray<type.CustomType> = [
         name: "expr",
         description: "パーツの式",
         memberType: type.typeMaybe(type.typeCustom(exprName)),
-      },
-      {
-        name: "moduleId",
-        description: "所属しているモジュール",
-        memberType: moduleId,
       },
     ]),
   },

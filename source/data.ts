@@ -169,6 +169,14 @@ export type ProjectSnapshot = {
    * 取得日時
    */
   getTime: Time;
+  /**
+   * パーツのリスト
+   */
+  partList: ReadonlyArray<PartDefinition>;
+  /**
+   * 型のリスト
+   */
+  typeList: ReadonlyArray<TypeDefinition>;
 };
 
 /**
@@ -298,24 +306,6 @@ export type SuggestionState =
 export type Change = { _: "ProjectName"; string_: string };
 
 /**
- * モジュール
- */
-export type Module = {
-  /**
-   * モジュール名.階層構造を表現することができる
-   */
-  name: ReadonlyArray<string>;
-  /**
-   * モジュールの説明
-   */
-  description: string;
-  /**
-   * 外部のプロジェクトに公開するかどうか
-   */
-  export: boolean;
-};
-
-/**
  * 型の定義
  */
 export type TypeDefinition = {
@@ -357,10 +347,6 @@ export type PartDefinition = {
    * パーツの式
    */
   expr: Maybe<Expr>;
-  /**
-   * 所属しているモジュール
-   */
-  moduleId: ModuleId;
 };
 
 /**
@@ -738,8 +724,6 @@ export type IdeaId = string & { _ideaId: never };
 export type FileHash = string & { _fileHash: never };
 
 export type PartId = string & { _partId: never };
-
-export type ModuleId = string & { _moduleId: never };
 
 export type TypeId = string & { _typeId: never };
 
@@ -1267,7 +1251,9 @@ export const encodeProjectSnapshot = (
     .concat(encodeTime(projectSnapshot.createTime))
     .concat(encodeId(projectSnapshot.createUser))
     .concat(encodeTime(projectSnapshot.updateTime))
-    .concat(encodeTime(projectSnapshot.getTime));
+    .concat(encodeTime(projectSnapshot.getTime))
+    .concat(encodeList(encodePartDefinition)(projectSnapshot.partList))
+    .concat(encodeList(encodeTypeDefinition)(projectSnapshot.typeList));
 
 export const encodeProjectSnapshotAndId = (
   projectSnapshotAndId: ProjectSnapshotAndId
@@ -1354,11 +1340,6 @@ export const encodeChange = (change: Change): ReadonlyArray<number> => {
   }
 };
 
-export const encodeModule = (module_: Module): ReadonlyArray<number> =>
-  encodeList(encodeString)(module_.name)
-    .concat(encodeString(module_.description))
-    .concat(encodeBool(module_["export"]));
-
 export const encodeTypeDefinition = (
   typeDefinition: TypeDefinition
 ): ReadonlyArray<number> =>
@@ -1373,8 +1354,7 @@ export const encodePartDefinition = (
     .concat(encodeList(encodeId)(partDefinition.parentList))
     .concat(encodeString(partDefinition.description))
     .concat(encodeType(partDefinition["type"]))
-    .concat(encodeMaybe(encodeExpr)(partDefinition.expr))
-    .concat(encodeId(partDefinition.moduleId));
+    .concat(encodeMaybe(encodeExpr)(partDefinition.expr));
 
 export const encodeTypeBody = (typeBody: TypeBody): ReadonlyArray<number> => {
   switch (typeBody._) {
@@ -2271,6 +2251,14 @@ export const decodeProjectSnapshot = (
     updateTimeAndNextIndex.nextIndex,
     binary
   );
+  const partListAndNextIndex: {
+    result: ReadonlyArray<PartDefinition>;
+    nextIndex: number;
+  } = decodeList(decodePartDefinition)(getTimeAndNextIndex.nextIndex, binary);
+  const typeListAndNextIndex: {
+    result: ReadonlyArray<TypeDefinition>;
+    nextIndex: number;
+  } = decodeList(decodeTypeDefinition)(partListAndNextIndex.nextIndex, binary);
   return {
     result: {
       name: nameAndNextIndex.result,
@@ -2280,8 +2268,10 @@ export const decodeProjectSnapshot = (
       createUser: createUserAndNextIndex.result,
       updateTime: updateTimeAndNextIndex.result,
       getTime: getTimeAndNextIndex.result,
+      partList: partListAndNextIndex.result,
+      typeList: typeListAndNextIndex.result,
     },
-    nextIndex: getTimeAndNextIndex.nextIndex,
+    nextIndex: typeListAndNextIndex.nextIndex,
   };
 };
 
@@ -2601,36 +2591,6 @@ export const decodeChange = (
  * @param index バイナリを読み込み開始位置
  * @param binary バイナリ
  */
-export const decodeModule = (
-  index: number,
-  binary: Uint8Array
-): { result: Module; nextIndex: number } => {
-  const nameAndNextIndex: {
-    result: ReadonlyArray<string>;
-    nextIndex: number;
-  } = decodeList(decodeString)(index, binary);
-  const descriptionAndNextIndex: {
-    result: string;
-    nextIndex: number;
-  } = decodeString(nameAndNextIndex.nextIndex, binary);
-  const exportAndNextIndex: { result: boolean; nextIndex: number } = decodeBool(
-    descriptionAndNextIndex.nextIndex,
-    binary
-  );
-  return {
-    result: {
-      name: nameAndNextIndex.result,
-      description: descriptionAndNextIndex.result,
-      export: exportAndNextIndex.result,
-    },
-    nextIndex: exportAndNextIndex.nextIndex,
-  };
-};
-
-/**
- * @param index バイナリを読み込み開始位置
- * @param binary バイナリ
- */
 export const decodeTypeDefinition = (
   index: number,
   binary: Uint8Array
@@ -2695,16 +2655,6 @@ export const decodePartDefinition = (
     result: Maybe<Expr>;
     nextIndex: number;
   } = decodeMaybe(decodeExpr)(typeAndNextIndex.nextIndex, binary);
-  const moduleIdAndNextIndex: {
-    result: ModuleId;
-    nextIndex: number;
-  } = (decodeId as (
-    a: number,
-    b: Uint8Array
-  ) => { result: ModuleId; nextIndex: number })(
-    exprAndNextIndex.nextIndex,
-    binary
-  );
   return {
     result: {
       name: nameAndNextIndex.result,
@@ -2712,9 +2662,8 @@ export const decodePartDefinition = (
       description: descriptionAndNextIndex.result,
       type: typeAndNextIndex.result,
       expr: exprAndNextIndex.result,
-      moduleId: moduleIdAndNextIndex.result,
     },
-    nextIndex: moduleIdAndNextIndex.nextIndex,
+    nextIndex: exprAndNextIndex.nextIndex,
   };
 };
 
