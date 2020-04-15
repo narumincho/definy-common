@@ -234,18 +234,7 @@ export type IdeaSnapshotAndId = {
 /**
  * アイデアのコメント
  */
-export type IdeaItem =
-  | { _: "Comment"; comment: Comment }
-  | { _: "Suggestion"; suggestion: Suggestion };
-
-/**
- * 文章でのコメント
- */
-export type Comment = {
-  /**
-   * 本文
-   */
-  body: string;
+export type IdeaItem = {
   /**
    * 作成者
    */
@@ -254,24 +243,31 @@ export type Comment = {
    * 作成日時
    */
   createTime: Time;
+  /**
+   * 本文
+   */
+  body: ItemBody;
 };
+
+/**
+ * アイデアのアイテム
+ */
+export type ItemBody =
+  | { _: "Comment"; string_: string }
+  | { _: "Suggestion"; suggestionId: SuggestionId };
 
 /**
  * 編集提案
  */
 export type Suggestion = {
   /**
-   * アイデアに投稿した日時
+   * 変更理由
    */
-  createTime: Time;
+  reason: string;
   /**
-   * なぜ,どんな変更をしたのかの説明
+   * 変更
    */
-  description: string;
-  /**
-   * 変更点
-   */
-  change: Change;
+  changeList: ReadonlyArray<Change>;
 };
 
 /**
@@ -717,6 +713,8 @@ export type IdeaId = string & { _ideaId: never };
 
 export type FileHash = string & { _fileHash: never };
 
+export type SuggestionId = string & { _suggestionId: never };
+
 export type PartId = string & { _partId: never };
 
 export type ModuleId = string & { _moduleId: never };
@@ -791,17 +789,17 @@ export const locationIdea = (ideaId: IdeaId): Location => ({
 /**
  * 文章でのコメント
  */
-export const ideaItemComment = (comment: Comment): IdeaItem => ({
+export const itemBodyComment = (string_: string): ItemBody => ({
   _: "Comment",
-  comment: comment,
+  string_: string_,
 });
 
 /**
- * 編集提案をする
+ * 編集提案
  */
-export const ideaItemSuggestion = (suggestion: Suggestion): IdeaItem => ({
+export const itemBodySuggestion = (suggestionId: SuggestionId): ItemBody => ({
   _: "Suggestion",
-  suggestion: suggestion,
+  suggestionId: suggestionId,
 });
 
 /**
@@ -1233,28 +1231,28 @@ export const encodeIdeaSnapshotAndId = (
     encodeIdeaSnapshot(ideaSnapshotAndId.snapshot)
   );
 
-export const encodeIdeaItem = (ideaItem: IdeaItem): ReadonlyArray<number> => {
-  switch (ideaItem._) {
+export const encodeIdeaItem = (ideaItem: IdeaItem): ReadonlyArray<number> =>
+  encodeId(ideaItem.createUserId)
+    .concat(encodeTime(ideaItem.createTime))
+    .concat(encodeItemBody(ideaItem.body));
+
+export const encodeItemBody = (itemBody: ItemBody): ReadonlyArray<number> => {
+  switch (itemBody._) {
     case "Comment": {
-      return [0].concat(encodeComment(ideaItem.comment));
+      return [0].concat(encodeString(itemBody.string_));
     }
     case "Suggestion": {
-      return [1].concat(encodeSuggestion(ideaItem.suggestion));
+      return [1].concat(encodeId(itemBody.suggestionId));
     }
   }
 };
 
-export const encodeComment = (comment: Comment): ReadonlyArray<number> =>
-  encodeString(comment.body)
-    .concat(encodeId(comment.createUserId))
-    .concat(encodeTime(comment.createTime));
-
 export const encodeSuggestion = (
   suggestion: Suggestion
 ): ReadonlyArray<number> =>
-  encodeTime(suggestion.createTime)
-    .concat(encodeString(suggestion.description))
-    .concat(encodeChange(suggestion.change));
+  encodeString(suggestion.reason).concat(
+    encodeList(encodeChange)(suggestion.changeList)
+  );
 
 export const encodeChange = (change: Change): ReadonlyArray<number> => {
   switch (change._) {
@@ -2292,27 +2290,63 @@ export const decodeIdeaItem = (
   index: number,
   binary: Uint8Array
 ): { result: IdeaItem; nextIndex: number } => {
+  const createUserIdAndNextIndex: {
+    result: UserId;
+    nextIndex: number;
+  } = (decodeId as (
+    a: number,
+    b: Uint8Array
+  ) => { result: UserId; nextIndex: number })(index, binary);
+  const createTimeAndNextIndex: {
+    result: Time;
+    nextIndex: number;
+  } = decodeTime(createUserIdAndNextIndex.nextIndex, binary);
+  const bodyAndNextIndex: {
+    result: ItemBody;
+    nextIndex: number;
+  } = decodeItemBody(createTimeAndNextIndex.nextIndex, binary);
+  return {
+    result: {
+      createUserId: createUserIdAndNextIndex.result,
+      createTime: createTimeAndNextIndex.result,
+      body: bodyAndNextIndex.result,
+    },
+    nextIndex: bodyAndNextIndex.nextIndex,
+  };
+};
+
+/**
+ * @param index バイナリを読み込み開始位置
+ * @param binary バイナリ
+ */
+export const decodeItemBody = (
+  index: number,
+  binary: Uint8Array
+): { result: ItemBody; nextIndex: number } => {
   const patternIndex: { result: number; nextIndex: number } = decodeInt32(
     index,
     binary
   );
   if (patternIndex.result === 0) {
-    const result: { result: Comment; nextIndex: number } = decodeComment(
+    const result: { result: string; nextIndex: number } = decodeString(
       patternIndex.nextIndex,
       binary
     );
     return {
-      result: ideaItemComment(result.result),
+      result: itemBodyComment(result.result),
       nextIndex: result.nextIndex,
     };
   }
   if (patternIndex.result === 1) {
-    const result: { result: Suggestion; nextIndex: number } = decodeSuggestion(
+    const result: { result: SuggestionId; nextIndex: number } = (decodeId as (
+      a: number,
+      b: Uint8Array
+    ) => { result: SuggestionId; nextIndex: number })(
       patternIndex.nextIndex,
       binary
     );
     return {
-      result: ideaItemSuggestion(result.result),
+      result: itemBodySuggestion(result.result),
       nextIndex: result.nextIndex,
     };
   }
@@ -2323,65 +2357,24 @@ export const decodeIdeaItem = (
  * @param index バイナリを読み込み開始位置
  * @param binary バイナリ
  */
-export const decodeComment = (
-  index: number,
-  binary: Uint8Array
-): { result: Comment; nextIndex: number } => {
-  const bodyAndNextIndex: { result: string; nextIndex: number } = decodeString(
-    index,
-    binary
-  );
-  const createUserIdAndNextIndex: {
-    result: UserId;
-    nextIndex: number;
-  } = (decodeId as (
-    a: number,
-    b: Uint8Array
-  ) => { result: UserId; nextIndex: number })(
-    bodyAndNextIndex.nextIndex,
-    binary
-  );
-  const createTimeAndNextIndex: {
-    result: Time;
-    nextIndex: number;
-  } = decodeTime(createUserIdAndNextIndex.nextIndex, binary);
-  return {
-    result: {
-      body: bodyAndNextIndex.result,
-      createUserId: createUserIdAndNextIndex.result,
-      createTime: createTimeAndNextIndex.result,
-    },
-    nextIndex: createTimeAndNextIndex.nextIndex,
-  };
-};
-
-/**
- * @param index バイナリを読み込み開始位置
- * @param binary バイナリ
- */
 export const decodeSuggestion = (
   index: number,
   binary: Uint8Array
 ): { result: Suggestion; nextIndex: number } => {
-  const createTimeAndNextIndex: {
-    result: Time;
-    nextIndex: number;
-  } = decodeTime(index, binary);
-  const descriptionAndNextIndex: {
+  const reasonAndNextIndex: {
     result: string;
     nextIndex: number;
-  } = decodeString(createTimeAndNextIndex.nextIndex, binary);
-  const changeAndNextIndex: {
-    result: Change;
+  } = decodeString(index, binary);
+  const changeListAndNextIndex: {
+    result: ReadonlyArray<Change>;
     nextIndex: number;
-  } = decodeChange(descriptionAndNextIndex.nextIndex, binary);
+  } = decodeList(decodeChange)(reasonAndNextIndex.nextIndex, binary);
   return {
     result: {
-      createTime: createTimeAndNextIndex.result,
-      description: descriptionAndNextIndex.result,
-      change: changeAndNextIndex.result,
+      reason: reasonAndNextIndex.result,
+      changeList: changeListAndNextIndex.result,
     },
-    nextIndex: changeAndNextIndex.nextIndex,
+    nextIndex: changeListAndNextIndex.nextIndex,
   };
 };
 

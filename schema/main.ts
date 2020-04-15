@@ -10,6 +10,7 @@ const userId = type.typeId("UserId");
 const projectId = type.typeId("ProjectId");
 const ideaId = type.typeId("IdeaId");
 const fileHash = type.typeToken("FileHash");
+const suggestionId = type.typeId("SuggestionId");
 const moduleId = type.typeId("ModuleId");
 const typeId = type.typeId("TypeId");
 const tagId = type.typeId("TagId");
@@ -34,7 +35,7 @@ const ideaSnapshotName = "IdeaSnapshot";
 const ideaSnapshotAndIdName = "IdeaSnapshotAndId";
 
 const ideaItemName = "IdeaItem";
-const commentName = "Comment";
+const itemBodyName = "ItemBody";
 const suggestionName = "Suggestion";
 const changeName = "Change";
 const moduleName = "Module";
@@ -402,28 +403,7 @@ const listCustomType: ReadonlyArray<type.CustomType> = [
   {
     name: ideaItemName,
     description: "アイデアのコメント",
-    body: type.customTypeBodySum([
-      {
-        name: "Comment",
-        description: "文章でのコメント",
-        parameter: type.maybeJust(type.typeCustom(commentName)),
-      },
-      {
-        name: "Suggestion",
-        description: "編集提案をする",
-        parameter: type.maybeJust(type.typeCustom(suggestionName)),
-      },
-    ]),
-  },
-  {
-    name: commentName,
-    description: "文章でのコメント",
     body: type.customTypeBodyProduct([
-      {
-        name: "body",
-        description: "本文",
-        memberType: type.typeString,
-      },
       {
         name: "createUserId",
         description: "作成者",
@@ -434,6 +414,27 @@ const listCustomType: ReadonlyArray<type.CustomType> = [
         description: "作成日時",
         memberType: type.typeCustom(timeName),
       },
+      {
+        name: "body",
+        description: "本文",
+        memberType: type.typeCustom(itemBodyName),
+      },
+    ]),
+  },
+  {
+    name: itemBodyName,
+    description: "アイデアのアイテム",
+    body: type.customTypeBodySum([
+      {
+        name: "Comment",
+        description: "文章でのコメント",
+        parameter: type.maybeJust(type.typeString),
+      },
+      {
+        name: "Suggestion",
+        description: "編集提案",
+        parameter: type.maybeJust(suggestionId),
+      },
     ]),
   },
   {
@@ -441,19 +442,14 @@ const listCustomType: ReadonlyArray<type.CustomType> = [
     description: "編集提案",
     body: type.customTypeBodyProduct([
       {
-        name: "createTime",
-        description: "アイデアに投稿した日時",
-        memberType: type.typeCustom(timeName),
-      },
-      {
-        name: "description",
-        description: "なぜ,どんな変更をしたのかの説明",
+        name: "reason",
+        description: "変更理由",
         memberType: type.typeString,
       },
       {
-        name: "change",
-        description: "変更点",
-        memberType: type.typeCustom(changeName),
+        name: "changeList",
+        description: "変更",
+        memberType: type.typeList(type.typeCustom(changeName)),
       },
     ]),
   },
