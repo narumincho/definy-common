@@ -44,12 +44,16 @@ const locationToPath = (location: data.Location): string => {
       return "/create-project";
     case "CreateIdea":
       return "/create-idea/" + (location.projectId as string);
+    case "EditSuggestion":
+      return "/edit-suggestion/" + (location.suggestionId as string);
     case "User":
       return "/user/" + (location.userId as string);
     case "Project":
       return "/project/" + (location.projectId as string);
     case "Idea":
       return "/idea/" + (location.ideaId as string);
+    case "Suggestion":
+      return "/suggestion/" + (location.suggestionId as string);
   }
 };
 
@@ -95,6 +99,14 @@ const locationFromUrl = (pathName: string): data.Location => {
   if (createIdeaResult !== null) {
     return data.locationCreateIdea(createIdeaResult[1] as data.ProjectId);
   }
+  const editSuggestionResult = pathName.match(
+    /^\/edit-suggestion\/([0-9a-f]{32})$/u
+  );
+  if (editSuggestionResult !== null) {
+    return data.locationEditSuggestion(
+      editSuggestionResult[1] as data.SuggestionId
+    );
+  }
   const projectResult = pathName.match(/^\/project\/([0-9a-f]{32})$/u);
   if (projectResult !== null) {
     return data.locationProject(projectResult[1] as data.ProjectId);
@@ -106,6 +118,10 @@ const locationFromUrl = (pathName: string): data.Location => {
   const ideaResult = pathName.match(/^\/idea\/([0-9a-f]{32})$/);
   if (ideaResult !== null) {
     return data.locationIdea(ideaResult[1] as data.IdeaId);
+  }
+  const suggestionResult = pathName.match(/^\/suggestion\/([0-9a-f]{32})$/);
+  if (suggestionResult !== null) {
+    return data.locationSuggestion(suggestionResult[1] as data.SuggestionId);
   }
   return data.locationHome;
 };

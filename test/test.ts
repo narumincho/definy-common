@@ -132,7 +132,6 @@ describe("test", () => {
             {
               name: "one",
               description: "1を表す",
-              moduleId: "0" as data.ModuleId,
               parentList: [],
               type: intType,
               expr: data.maybeJust(data.exprInt32Literal(1)),
@@ -143,7 +142,6 @@ describe("test", () => {
             {
               name: "addOneHundred",
               description: "100を足す関数",
-              moduleId: "0" as data.ModuleId,
               parentList: [],
               type: intType,
               expr: data.maybeJust(
