@@ -343,7 +343,7 @@ export type Part = {
   /**
    * パーツの型
    */
-  type: Type;
+  typeExpr: TypeExpr;
   /**
    * パーツの式
    */
@@ -405,7 +405,7 @@ export type TypeBodyKernel = "Function" | "Int32" | "List";
 /**
  * 型
  */
-export type Type = {
+export type TypeExpr = {
   /**
    * 型の参照
    */
@@ -413,7 +413,7 @@ export type Type = {
   /**
    * 型のパラメーター
    */
-  parameter: ReadonlyArray<Type>;
+  parameter: ReadonlyArray<TypeExpr>;
 };
 
 /**
@@ -574,7 +574,7 @@ export type BranchPartDefinition = {
   /**
    * ローカルパーツの型
    */
-  type: Type;
+  typeExpr: TypeExpr;
   /**
    * ローカルパーツの式
    */
@@ -1352,7 +1352,7 @@ export const encodePart = (part: Part): ReadonlyArray<number> =>
   encodeString(part.name)
     .concat(encodeList(encodeId)(part.parentList))
     .concat(encodeString(part.description))
-    .concat(encodeType(part["type"]))
+    .concat(encodeTypeExpr(part.typeExpr))
     .concat(encodeMaybe(encodeExpr)(part.expr));
 
 export const encodeTypeBody = (typeBody: TypeBody): ReadonlyArray<number> => {
@@ -1405,8 +1405,10 @@ export const encodeTypeBodyKernel = (
   }
 };
 
-export const encodeType = (type_: Type): ReadonlyArray<number> =>
-  encodeId(type_.reference).concat(encodeList(encodeType)(type_.parameter));
+export const encodeTypeExpr = (typeExpr: TypeExpr): ReadonlyArray<number> =>
+  encodeId(typeExpr.reference).concat(
+    encodeList(encodeTypeExpr)(typeExpr.parameter)
+  );
 
 export const encodeExpr = (expr: Expr): ReadonlyArray<number> => {
   switch (expr._) {
@@ -1551,7 +1553,7 @@ export const encodeBranchPartDefinition = (
   encodeId(branchPartDefinition.localPartId)
     .concat(encodeString(branchPartDefinition.name))
     .concat(encodeString(branchPartDefinition.description))
-    .concat(encodeType(branchPartDefinition["type"]))
+    .concat(encodeTypeExpr(branchPartDefinition.typeExpr))
     .concat(encodeExpr(branchPartDefinition.expr));
 
 export const encodeEvaluateExprError = (
@@ -2656,20 +2658,20 @@ export const decodePart = (
     result: string;
     nextIndex: number;
   } = decodeString(parentListAndNextIndex.nextIndex, binary);
-  const typeAndNextIndex: { result: Type; nextIndex: number } = decodeType(
-    descriptionAndNextIndex.nextIndex,
-    binary
-  );
+  const typeExprAndNextIndex: {
+    result: TypeExpr;
+    nextIndex: number;
+  } = decodeTypeExpr(descriptionAndNextIndex.nextIndex, binary);
   const exprAndNextIndex: {
     result: Maybe<Expr>;
     nextIndex: number;
-  } = decodeMaybe(decodeExpr)(typeAndNextIndex.nextIndex, binary);
+  } = decodeMaybe(decodeExpr)(typeExprAndNextIndex.nextIndex, binary);
   return {
     result: {
       name: nameAndNextIndex.result,
       parentList: parentListAndNextIndex.result,
       description: descriptionAndNextIndex.result,
-      type: typeAndNextIndex.result,
+      typeExpr: typeExprAndNextIndex.result,
       expr: exprAndNextIndex.result,
     },
     nextIndex: exprAndNextIndex.nextIndex,
@@ -2817,10 +2819,10 @@ export const decodeTypeBodyKernel = (
  * @param index バイナリを読み込み開始位置
  * @param binary バイナリ
  */
-export const decodeType = (
+export const decodeTypeExpr = (
   index: number,
   binary: Uint8Array
-): { result: Type; nextIndex: number } => {
+): { result: TypeExpr; nextIndex: number } => {
   const referenceAndNextIndex: {
     result: TypeId;
     nextIndex: number;
@@ -2829,9 +2831,9 @@ export const decodeType = (
     b: Uint8Array
   ) => { result: TypeId; nextIndex: number })(index, binary);
   const parameterAndNextIndex: {
-    result: ReadonlyArray<Type>;
+    result: ReadonlyArray<TypeExpr>;
     nextIndex: number;
-  } = decodeList(decodeType)(referenceAndNextIndex.nextIndex, binary);
+  } = decodeList(decodeTypeExpr)(referenceAndNextIndex.nextIndex, binary);
   return {
     result: {
       reference: referenceAndNextIndex.result,
@@ -3286,12 +3288,12 @@ export const decodeBranchPartDefinition = (
     result: string;
     nextIndex: number;
   } = decodeString(nameAndNextIndex.nextIndex, binary);
-  const typeAndNextIndex: { result: Type; nextIndex: number } = decodeType(
-    descriptionAndNextIndex.nextIndex,
-    binary
-  );
+  const typeExprAndNextIndex: {
+    result: TypeExpr;
+    nextIndex: number;
+  } = decodeTypeExpr(descriptionAndNextIndex.nextIndex, binary);
   const exprAndNextIndex: { result: Expr; nextIndex: number } = decodeExpr(
-    typeAndNextIndex.nextIndex,
+    typeExprAndNextIndex.nextIndex,
     binary
   );
   return {
@@ -3299,7 +3301,7 @@ export const decodeBranchPartDefinition = (
       localPartId: localPartIdAndNextIndex.result,
       name: nameAndNextIndex.result,
       description: descriptionAndNextIndex.result,
-      type: typeAndNextIndex.result,
+      typeExpr: typeExprAndNextIndex.result,
       expr: exprAndNextIndex.result,
     },
     nextIndex: exprAndNextIndex.nextIndex,

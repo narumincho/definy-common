@@ -44,7 +44,7 @@ const typeBodyName = "TypeBody";
 const typeBodyProductMemberName = "TypeBodyProductMember";
 const typeBodySumPatternName = "TypeBodySumPattern";
 const typeBodyKernelName = "TypeBodyKernel";
-const typeName = "Type";
+const typeExprName = "TypeExpr";
 const exprName = "Expr";
 const evaluatedExprName = "EvaluatedExpr";
 const kernelCallName = "KernelCall";
@@ -575,9 +575,9 @@ const listCustomType: ReadonlyArray<type.CustomType> = [
         memberType: type.typeString,
       },
       {
-        name: "type",
+        name: "typeExpr",
         description: "パーツの型",
-        memberType: type.typeCustom(typeName),
+        memberType: type.typeCustom(typeExprName),
       },
       {
         name: "expr",
@@ -675,7 +675,7 @@ const listCustomType: ReadonlyArray<type.CustomType> = [
     ]),
   },
   {
-    name: "Type",
+    name: typeExprName,
     description: "型",
     body: type.customTypeBodyProduct([
       {
@@ -686,7 +686,7 @@ const listCustomType: ReadonlyArray<type.CustomType> = [
       {
         name: "parameter",
         description: "型のパラメーター",
-        memberType: type.typeList(type.typeCustom(typeName)),
+        memberType: type.typeList(type.typeCustom(typeExprName)),
       },
     ]),
   },
@@ -955,9 +955,9 @@ const listCustomType: ReadonlyArray<type.CustomType> = [
         memberType: type.typeString,
       },
       {
-        name: "type",
+        name: "typeExpr",
         description: "ローカルパーツの型",
-        memberType: type.typeCustom(typeName),
+        memberType: type.typeCustom(typeExprName),
       },
       {
         name: "expr",

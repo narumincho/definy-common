@@ -1,4 +1,4 @@
-module Data exposing (AccessToken(..), AccessTokenError(..), AddCommentParameter, BranchPartDefinition, Change(..), ClientMode(..), Condition(..), ConditionCapture, ConditionTag, CreateIdeaParameter, CreateProjectParameter, EvaluateExprError(..), EvaluatedExpr(..), Expr(..), FileHash(..), FunctionCall, IdeaId(..), IdeaItem, IdeaListByProjectIdResponse, IdeaResponse, IdeaSnapshot, IdeaSnapshotAndId, ItemBody(..), KernelCall, KernelExpr(..), LambdaBranch, Language(..), LocalPartId(..), LocalPartReference, Location(..), OpenIdConnectProvider(..), Part, PartId(..), ProjectId(..), ProjectResponse, ProjectSnapshot, ProjectSnapshotAndId, RequestLogInUrlRequestData, Suggestion, SuggestionId(..), SuggestionState(..), TagId(..), TagReferenceIndex, Time, Type, TypeBody(..), TypeBodyKernel(..), TypeBodyProductMember, TypeBodySumPattern, TypeDefinition, TypeError, TypeId(..), UrlData, UserId(..), UserResponse, UserSnapshot, UserSnapshotAndId, accessTokenErrorJsonDecoder, accessTokenErrorToJsonValue, accessTokenJsonDecoder, accessTokenToJsonValue, addCommentParameterJsonDecoder, addCommentParameterToJsonValue, branchPartDefinitionJsonDecoder, branchPartDefinitionToJsonValue, changeJsonDecoder, changeToJsonValue, clientModeJsonDecoder, clientModeToJsonValue, conditionCaptureJsonDecoder, conditionCaptureToJsonValue, conditionJsonDecoder, conditionTagJsonDecoder, conditionTagToJsonValue, conditionToJsonValue, createIdeaParameterJsonDecoder, createIdeaParameterToJsonValue, createProjectParameterJsonDecoder, createProjectParameterToJsonValue, evaluateExprErrorJsonDecoder, evaluateExprErrorToJsonValue, evaluatedExprJsonDecoder, evaluatedExprToJsonValue, exprJsonDecoder, exprToJsonValue, fileHashJsonDecoder, fileHashToJsonValue, functionCallJsonDecoder, functionCallToJsonValue, ideaIdJsonDecoder, ideaIdToJsonValue, ideaItemJsonDecoder, ideaItemToJsonValue, ideaListByProjectIdResponseJsonDecoder, ideaListByProjectIdResponseToJsonValue, ideaResponseJsonDecoder, ideaResponseToJsonValue, ideaSnapshotAndIdJsonDecoder, ideaSnapshotAndIdToJsonValue, ideaSnapshotJsonDecoder, ideaSnapshotToJsonValue, itemBodyJsonDecoder, itemBodyToJsonValue, kernelCallJsonDecoder, kernelCallToJsonValue, kernelExprJsonDecoder, kernelExprToJsonValue, lambdaBranchJsonDecoder, lambdaBranchToJsonValue, languageJsonDecoder, languageToJsonValue, localPartIdJsonDecoder, localPartIdToJsonValue, localPartReferenceJsonDecoder, localPartReferenceToJsonValue, locationJsonDecoder, locationToJsonValue, maybeJsonDecoder, maybeToJsonValue, openIdConnectProviderJsonDecoder, openIdConnectProviderToJsonValue, partIdJsonDecoder, partIdToJsonValue, partJsonDecoder, partToJsonValue, projectIdJsonDecoder, projectIdToJsonValue, projectResponseJsonDecoder, projectResponseToJsonValue, projectSnapshotAndIdJsonDecoder, projectSnapshotAndIdToJsonValue, projectSnapshotJsonDecoder, projectSnapshotToJsonValue, requestLogInUrlRequestDataJsonDecoder, requestLogInUrlRequestDataToJsonValue, resultJsonDecoder, resultToJsonValue, suggestionIdJsonDecoder, suggestionIdToJsonValue, suggestionJsonDecoder, suggestionStateJsonDecoder, suggestionStateToJsonValue, suggestionToJsonValue, tagIdJsonDecoder, tagIdToJsonValue, tagReferenceIndexJsonDecoder, tagReferenceIndexToJsonValue, timeJsonDecoder, timeToJsonValue, typeBodyJsonDecoder, typeBodyKernelJsonDecoder, typeBodyKernelToJsonValue, typeBodyProductMemberJsonDecoder, typeBodyProductMemberToJsonValue, typeBodySumPatternJsonDecoder, typeBodySumPatternToJsonValue, typeBodyToJsonValue, typeDefinitionJsonDecoder, typeDefinitionToJsonValue, typeErrorJsonDecoder, typeErrorToJsonValue, typeIdJsonDecoder, typeIdToJsonValue, typeJsonDecoder, typeToJsonValue, urlDataJsonDecoder, urlDataToJsonValue, userIdJsonDecoder, userIdToJsonValue, userResponseJsonDecoder, userResponseToJsonValue, userSnapshotAndIdJsonDecoder, userSnapshotAndIdToJsonValue, userSnapshotJsonDecoder, userSnapshotToJsonValue)
+module Data exposing (AccessToken(..), AccessTokenError(..), AddCommentParameter, BranchPartDefinition, Change(..), ClientMode(..), Condition(..), ConditionCapture, ConditionTag, CreateIdeaParameter, CreateProjectParameter, EvaluateExprError(..), EvaluatedExpr(..), Expr(..), FileHash(..), FunctionCall, IdeaId(..), IdeaItem, IdeaListByProjectIdResponse, IdeaResponse, IdeaSnapshot, IdeaSnapshotAndId, ItemBody(..), KernelCall, KernelExpr(..), LambdaBranch, Language(..), LocalPartId(..), LocalPartReference, Location(..), OpenIdConnectProvider(..), Part, PartId(..), ProjectId(..), ProjectResponse, ProjectSnapshot, ProjectSnapshotAndId, RequestLogInUrlRequestData, Suggestion, SuggestionId(..), SuggestionState(..), TagId(..), TagReferenceIndex, Time, TypeBody(..), TypeBodyKernel(..), TypeBodyProductMember, TypeBodySumPattern, TypeDefinition, TypeError, TypeExpr, TypeId(..), UrlData, UserId(..), UserResponse, UserSnapshot, UserSnapshotAndId, accessTokenErrorJsonDecoder, accessTokenErrorToJsonValue, accessTokenJsonDecoder, accessTokenToJsonValue, addCommentParameterJsonDecoder, addCommentParameterToJsonValue, branchPartDefinitionJsonDecoder, branchPartDefinitionToJsonValue, changeJsonDecoder, changeToJsonValue, clientModeJsonDecoder, clientModeToJsonValue, conditionCaptureJsonDecoder, conditionCaptureToJsonValue, conditionJsonDecoder, conditionTagJsonDecoder, conditionTagToJsonValue, conditionToJsonValue, createIdeaParameterJsonDecoder, createIdeaParameterToJsonValue, createProjectParameterJsonDecoder, createProjectParameterToJsonValue, evaluateExprErrorJsonDecoder, evaluateExprErrorToJsonValue, evaluatedExprJsonDecoder, evaluatedExprToJsonValue, exprJsonDecoder, exprToJsonValue, fileHashJsonDecoder, fileHashToJsonValue, functionCallJsonDecoder, functionCallToJsonValue, ideaIdJsonDecoder, ideaIdToJsonValue, ideaItemJsonDecoder, ideaItemToJsonValue, ideaListByProjectIdResponseJsonDecoder, ideaListByProjectIdResponseToJsonValue, ideaResponseJsonDecoder, ideaResponseToJsonValue, ideaSnapshotAndIdJsonDecoder, ideaSnapshotAndIdToJsonValue, ideaSnapshotJsonDecoder, ideaSnapshotToJsonValue, itemBodyJsonDecoder, itemBodyToJsonValue, kernelCallJsonDecoder, kernelCallToJsonValue, kernelExprJsonDecoder, kernelExprToJsonValue, lambdaBranchJsonDecoder, lambdaBranchToJsonValue, languageJsonDecoder, languageToJsonValue, localPartIdJsonDecoder, localPartIdToJsonValue, localPartReferenceJsonDecoder, localPartReferenceToJsonValue, locationJsonDecoder, locationToJsonValue, maybeJsonDecoder, maybeToJsonValue, openIdConnectProviderJsonDecoder, openIdConnectProviderToJsonValue, partIdJsonDecoder, partIdToJsonValue, partJsonDecoder, partToJsonValue, projectIdJsonDecoder, projectIdToJsonValue, projectResponseJsonDecoder, projectResponseToJsonValue, projectSnapshotAndIdJsonDecoder, projectSnapshotAndIdToJsonValue, projectSnapshotJsonDecoder, projectSnapshotToJsonValue, requestLogInUrlRequestDataJsonDecoder, requestLogInUrlRequestDataToJsonValue, resultJsonDecoder, resultToJsonValue, suggestionIdJsonDecoder, suggestionIdToJsonValue, suggestionJsonDecoder, suggestionStateJsonDecoder, suggestionStateToJsonValue, suggestionToJsonValue, tagIdJsonDecoder, tagIdToJsonValue, tagReferenceIndexJsonDecoder, tagReferenceIndexToJsonValue, timeJsonDecoder, timeToJsonValue, typeBodyJsonDecoder, typeBodyKernelJsonDecoder, typeBodyKernelToJsonValue, typeBodyProductMemberJsonDecoder, typeBodyProductMemberToJsonValue, typeBodySumPatternJsonDecoder, typeBodySumPatternToJsonValue, typeBodyToJsonValue, typeDefinitionJsonDecoder, typeDefinitionToJsonValue, typeErrorJsonDecoder, typeErrorToJsonValue, typeExprJsonDecoder, typeExprToJsonValue, typeIdJsonDecoder, typeIdToJsonValue, urlDataJsonDecoder, urlDataToJsonValue, userIdJsonDecoder, userIdToJsonValue, userResponseJsonDecoder, userResponseToJsonValue, userSnapshotAndIdJsonDecoder, userSnapshotAndIdToJsonValue, userSnapshotJsonDecoder, userSnapshotToJsonValue)
 
 import Json.Decode as Jd
 import Json.Decode.Pipeline as Jdp
@@ -140,7 +140,7 @@ type alias TypeDefinition =
 {-| パーツの定義
 -}
 type alias Part =
-    { name : String, parentList : List PartId, description : String, type_ : Type, expr : Maybe Expr }
+    { name : String, parentList : List PartId, description : String, typeExpr : TypeExpr, expr : Maybe Expr }
 
 
 {-| 型の定義本体
@@ -173,8 +173,8 @@ type TypeBodyKernel
 
 {-| 型
 -}
-type alias Type =
-    { reference : TypeId, parameter : List Type }
+type alias TypeExpr =
+    { reference : TypeId, parameter : List TypeExpr }
 
 
 {-| 式
@@ -261,7 +261,7 @@ type alias ConditionCapture =
 {-| ラムダのブランチで使えるパーツを定義する部分
 -}
 type alias BranchPartDefinition =
-    { localPartId : LocalPartId, name : String, description : String, type_ : Type, expr : Expr }
+    { localPartId : LocalPartId, name : String, description : String, typeExpr : TypeExpr, expr : Expr }
 
 
 type EvaluateExprError
@@ -705,7 +705,7 @@ partToJsonValue part =
         [ ( "name", Je.string part.name )
         , ( "parentList", Je.list partIdToJsonValue part.parentList )
         , ( "description", Je.string part.description )
-        , ( "type", typeToJsonValue part.type_ )
+        , ( "typeExpr", typeExprToJsonValue part.typeExpr )
         , ( "expr", maybeToJsonValue exprToJsonValue part.expr )
         ]
 
@@ -762,13 +762,13 @@ typeBodyKernelToJsonValue typeBodyKernel =
             Je.string "List"
 
 
-{-| TypeのJSONへのエンコーダ
+{-| TypeExprのJSONへのエンコーダ
 -}
-typeToJsonValue : Type -> Je.Value
-typeToJsonValue type_ =
+typeExprToJsonValue : TypeExpr -> Je.Value
+typeExprToJsonValue typeExpr =
     Je.object
-        [ ( "reference", typeIdToJsonValue type_.reference )
-        , ( "parameter", Je.list typeToJsonValue type_.parameter )
+        [ ( "reference", typeIdToJsonValue typeExpr.reference )
+        , ( "parameter", Je.list typeExprToJsonValue typeExpr.parameter )
         ]
 
 
@@ -933,7 +933,7 @@ branchPartDefinitionToJsonValue branchPartDefinition =
         [ ( "localPartId", localPartIdToJsonValue branchPartDefinition.localPartId )
         , ( "name", Je.string branchPartDefinition.name )
         , ( "description", Je.string branchPartDefinition.description )
-        , ( "type", typeToJsonValue branchPartDefinition.type_ )
+        , ( "typeExpr", typeExprToJsonValue branchPartDefinition.typeExpr )
         , ( "expr", exprToJsonValue branchPartDefinition.expr )
         ]
 
@@ -1521,18 +1521,18 @@ typeDefinitionJsonDecoder =
 partJsonDecoder : Jd.Decoder Part
 partJsonDecoder =
     Jd.succeed
-        (\name parentList description type_ expr ->
+        (\name parentList description typeExpr expr ->
             { name = name
             , parentList = parentList
             , description = description
-            , type_ = type_
+            , typeExpr = typeExpr
             , expr = expr
             }
         )
         |> Jdp.required "name" Jd.string
         |> Jdp.required "parentList" (Jd.list partIdJsonDecoder)
         |> Jdp.required "description" Jd.string
-        |> Jdp.required "type" typeJsonDecoder
+        |> Jdp.required "typeExpr" typeExprJsonDecoder
         |> Jdp.required "expr" (maybeJsonDecoder exprJsonDecoder)
 
 
@@ -1612,10 +1612,10 @@ typeBodyKernelJsonDecoder =
             )
 
 
-{-| TypeのJSON Decoder
+{-| TypeExprのJSON Decoder
 -}
-typeJsonDecoder : Jd.Decoder Type
-typeJsonDecoder =
+typeExprJsonDecoder : Jd.Decoder TypeExpr
+typeExprJsonDecoder =
     Jd.succeed
         (\reference parameter ->
             { reference = reference
@@ -1623,7 +1623,7 @@ typeJsonDecoder =
             }
         )
         |> Jdp.required "reference" typeIdJsonDecoder
-        |> Jdp.required "parameter" (Jd.list typeJsonDecoder)
+        |> Jdp.required "parameter" (Jd.list typeExprJsonDecoder)
 
 
 {-| ExprのJSON Decoder
@@ -1842,18 +1842,18 @@ conditionCaptureJsonDecoder =
 branchPartDefinitionJsonDecoder : Jd.Decoder BranchPartDefinition
 branchPartDefinitionJsonDecoder =
     Jd.succeed
-        (\localPartId name description type_ expr ->
+        (\localPartId name description typeExpr expr ->
             { localPartId = localPartId
             , name = name
             , description = description
-            , type_ = type_
+            , typeExpr = typeExpr
             , expr = expr
             }
         )
         |> Jdp.required "localPartId" localPartIdJsonDecoder
         |> Jdp.required "name" Jd.string
         |> Jdp.required "description" Jd.string
-        |> Jdp.required "type" typeJsonDecoder
+        |> Jdp.required "typeExpr" typeExprJsonDecoder
         |> Jdp.required "expr" exprJsonDecoder
 
 
