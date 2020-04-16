@@ -154,13 +154,13 @@ type TypePartBody
 {-| 直積型のメンバー
 -}
 type alias TypePartBodyProductMember =
-    { name : String, description : String, memberType : TypeId }
+    { name : String, description : String, memberType : Type }
 
 
 {-| 直積型のパターン
 -}
 type alias TypePartBodySumPattern =
-    { name : String, description : String, parameter : Maybe TypeId }
+    { name : String, description : String, parameter : Type }
 
 
 {-| Definyだけでは表現できないデータ型
@@ -738,7 +738,7 @@ typePartBodyProductMemberToJsonValue typePartBodyProductMember =
     Je.object
         [ ( "name", Je.string typePartBodyProductMember.name )
         , ( "description", Je.string typePartBodyProductMember.description )
-        , ( "memberType", typeIdToJsonValue typePartBodyProductMember.memberType )
+        , ( "memberType", typeToJsonValue typePartBodyProductMember.memberType )
         ]
 
 
@@ -749,7 +749,7 @@ typePartBodySumPatternToJsonValue typePartBodySumPattern =
     Je.object
         [ ( "name", Je.string typePartBodySumPattern.name )
         , ( "description", Je.string typePartBodySumPattern.description )
-        , ( "parameter", maybeToJsonValue typeIdToJsonValue typePartBodySumPattern.parameter )
+        , ( "parameter", typeToJsonValue typePartBodySumPattern.parameter )
         ]
 
 
@@ -1589,7 +1589,7 @@ typePartBodyProductMemberJsonDecoder =
         )
         |> Jdp.required "name" Jd.string
         |> Jdp.required "description" Jd.string
-        |> Jdp.required "memberType" typeIdJsonDecoder
+        |> Jdp.required "memberType" typeJsonDecoder
 
 
 {-| TypePartBodySumPatternのJSON Decoder
@@ -1605,7 +1605,7 @@ typePartBodySumPatternJsonDecoder =
         )
         |> Jdp.required "name" Jd.string
         |> Jdp.required "description" Jd.string
-        |> Jdp.required "parameter" (maybeJsonDecoder typeIdJsonDecoder)
+        |> Jdp.required "parameter" typeJsonDecoder
 
 
 {-| TypePartBodyKernelのJSON Decoder

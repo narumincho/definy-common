@@ -658,7 +658,7 @@ const listCustomType: ReadonlyArray<type.CustomType> = [
       {
         name: "memberType",
         description: "メンバー値の型",
-        memberType: typePartId,
+        memberType: type.typeCustom(typeName),
       },
     ]),
   },
@@ -679,7 +679,7 @@ const listCustomType: ReadonlyArray<type.CustomType> = [
       {
         name: "parameter",
         description: "パラメーター",
-        memberType: type.typeMaybe(typePartId),
+        memberType: type.typeCustom(typeName),
       },
     ]),
   },

@@ -403,7 +403,7 @@ export type TypePartBodyProductMember = {
   /**
    * メンバー値の型
    */
-  memberType: TypeId;
+  memberType: Type;
 };
 
 /**
@@ -421,7 +421,7 @@ export type TypePartBodySumPattern = {
   /**
    * パラメーター
    */
-  parameter: Maybe<TypeId>;
+  parameter: Type;
 };
 
 /**
@@ -1423,14 +1423,14 @@ export const encodeTypePartBodyProductMember = (
 ): ReadonlyArray<number> =>
   encodeString(typePartBodyProductMember.name)
     .concat(encodeString(typePartBodyProductMember.description))
-    .concat(encodeId(typePartBodyProductMember.memberType));
+    .concat(encodeType(typePartBodyProductMember.memberType));
 
 export const encodeTypePartBodySumPattern = (
   typePartBodySumPattern: TypePartBodySumPattern
 ): ReadonlyArray<number> =>
   encodeString(typePartBodySumPattern.name)
     .concat(encodeString(typePartBodySumPattern.description))
-    .concat(encodeMaybe(encodeId)(typePartBodySumPattern.parameter));
+    .concat(encodeType(typePartBodySumPattern.parameter));
 
 export const encodeTypePartBodyKernel = (
   typePartBodyKernel: TypePartBodyKernel
@@ -2841,15 +2841,9 @@ export const decodeTypePartBodyProductMember = (
     nextIndex: number;
   } = decodeString(nameAndNextIndex.nextIndex, binary);
   const memberTypeAndNextIndex: {
-    result: TypeId;
+    result: Type;
     nextIndex: number;
-  } = (decodeId as (
-    a: number,
-    b: Uint8Array
-  ) => { result: TypeId; nextIndex: number })(
-    descriptionAndNextIndex.nextIndex,
-    binary
-  );
+  } = decodeType(descriptionAndNextIndex.nextIndex, binary);
   return {
     result: {
       name: nameAndNextIndex.result,
@@ -2876,15 +2870,10 @@ export const decodeTypePartBodySumPattern = (
     result: string;
     nextIndex: number;
   } = decodeString(nameAndNextIndex.nextIndex, binary);
-  const parameterAndNextIndex: {
-    result: Maybe<TypeId>;
-    nextIndex: number;
-  } = decodeMaybe(
-    decodeId as (
-      a: number,
-      b: Uint8Array
-    ) => { result: TypeId; nextIndex: number }
-  )(descriptionAndNextIndex.nextIndex, binary);
+  const parameterAndNextIndex: { result: Type; nextIndex: number } = decodeType(
+    descriptionAndNextIndex.nextIndex,
+    binary
+  );
   return {
     result: {
       name: nameAndNextIndex.result,
