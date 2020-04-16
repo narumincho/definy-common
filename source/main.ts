@@ -240,8 +240,8 @@ const normalizeOneLineString = (text: string): string => {
 };
 
 type SourceAndCache = {
-  typeDefinitionMap: ReadonlyMap<data.TypeId, data.TypeDefinition>;
-  partDefinitionMap: ReadonlyMap<data.PartId, data.PartDefinition>;
+  typePartMap: ReadonlyMap<data.TypeId, data.TypePartSnapshot>;
+  partMap: ReadonlyMap<data.PartId, data.PartSnapshot>;
   /** パーツ内に含まれるローカルパーツの式を格納する. キーはPartIdをLocalPartIdを結合したもの */
   localPartMap: ReadonlyMap<string, data.Expr>;
 
@@ -334,7 +334,7 @@ const evaluatePartReference = (
       evaluatedLocalPartMap: new Map(),
     };
   }
-  const part = sourceAndCache.partDefinitionMap.get(partId);
+  const part = sourceAndCache.partMap.get(partId);
   if (part !== undefined) {
     const expr = part.expr;
     switch (expr._) {
@@ -618,8 +618,8 @@ const concatCache = (
   result: EvaluationResult
 ): SourceAndCache => {
   return {
-    typeDefinitionMap: sourceAndCache.typeDefinitionMap,
-    partDefinitionMap: sourceAndCache.partDefinitionMap,
+    typePartMap: sourceAndCache.typePartMap,
+    partMap: sourceAndCache.partMap,
     localPartMap: sourceAndCache.localPartMap,
     evaluatedPartMap: new Map([
       ...sourceAndCache.evaluatedPartMap,

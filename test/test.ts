@@ -83,8 +83,8 @@ describe("test", () => {
      */
     const result = main.evaluateExpr(
       {
-        typeDefinitionMap: new Map(),
-        partDefinitionMap: new Map(),
+        typePartMap: new Map(),
+        partMap: new Map(),
         localPartMap: new Map(),
         evaluatedLocalPartMap: new Map(),
         evaluatedPartMap: new Map(),
@@ -118,15 +118,15 @@ describe("test", () => {
      * = (add (addOneHundred one)) one
      */
     const intType: data.Type = {
-      reference: "" as data.TypeId,
+      typePartId: "" as data.TypeId,
       parameter: [],
     };
     const oneName = "0" as data.PartId;
     const addOneHundredName = "1" as data.PartId;
     const result = main.evaluateExpr(
       {
-        typeDefinitionMap: new Map(),
-        partDefinitionMap: new Map<data.PartId, data.PartDefinition>([
+        typePartMap: new Map(),
+        partMap: new Map<data.PartId, data.PartSnapshot>([
           [
             oneName,
             {
@@ -135,6 +135,12 @@ describe("test", () => {
               parentList: [],
               type: intType,
               expr: data.maybeJust(data.exprInt32Literal(1)),
+              createSuggestionId: "oneCreateSuggestionId" as data.SuggestionId,
+              getTime: {
+                day: 0,
+                millisecond: 0,
+              },
+              projectId: "sampleProject" as data.ProjectId,
             },
           ],
           [
@@ -150,6 +156,12 @@ describe("test", () => {
                   parameter: data.exprInt32Literal(100),
                 })
               ),
+              createSuggestionId: "addOneHundredCreateSuggestionId" as data.SuggestionId,
+              getTime: {
+                day: 0,
+                millisecond: 0,
+              },
+              projectId: "sampleProject" as data.ProjectId,
             },
           ],
         ]),
