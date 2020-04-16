@@ -175,9 +175,9 @@ export type ProjectSnapshot = {
    */
   partIdList: ReadonlyArray<PartId>;
   /**
-   * 所属している型のIDのリスト
+   * 所属している型パーツのIDのリスト
    */
-  typeIdList: ReadonlyArray<TypeId>;
+  typePartIdList: ReadonlyArray<TypeId>;
 };
 
 /**
@@ -355,7 +355,7 @@ export type PartSnapshot = {
   /**
    * パーツの型
    */
-  typeExpr: TypeExpr;
+  type: Type;
   /**
    * パーツの式
    */
@@ -432,15 +432,15 @@ export type TypePartBodyKernel = "Function" | "Int32" | "List";
 /**
  * 型
  */
-export type TypeExpr = {
+export type Type = {
   /**
    * 型の参照
    */
-  reference: TypeId;
+  typePartId: TypeId;
   /**
    * 型のパラメーター
    */
-  parameter: ReadonlyArray<TypeExpr>;
+  parameter: ReadonlyArray<Type>;
 };
 
 /**
@@ -505,7 +505,7 @@ export type TagReferenceIndex = {
   /**
    * 型ID
    */
-  typeId: TypeId;
+  typePartId: TypeId;
   /**
    * タグIndex
    */
@@ -601,7 +601,7 @@ export type BranchPartDefinition = {
   /**
    * ローカルパーツの型
    */
-  typeExpr: TypeExpr;
+  type: Type;
   /**
    * ローカルパーツの式
    */
@@ -1283,7 +1283,7 @@ export const encodeProjectSnapshot = (
     .concat(encodeTime(projectSnapshot.updateTime))
     .concat(encodeTime(projectSnapshot.getTime))
     .concat(encodeList(encodeId)(projectSnapshot.partIdList))
-    .concat(encodeList(encodeId)(projectSnapshot.typeIdList));
+    .concat(encodeList(encodeId)(projectSnapshot.typePartIdList));
 
 export const encodeProjectSnapshotAndId = (
   projectSnapshotAndId: ProjectSnapshotAndId
@@ -1386,7 +1386,7 @@ export const encodePartSnapshot = (
   encodeString(partSnapshot.name)
     .concat(encodeList(encodeId)(partSnapshot.parentList))
     .concat(encodeString(partSnapshot.description))
-    .concat(encodeTypeExpr(partSnapshot.typeExpr))
+    .concat(encodeType(partSnapshot["type"]))
     .concat(encodeMaybe(encodeExpr)(partSnapshot.expr))
     .concat(encodeId(partSnapshot.projectId))
     .concat(encodeId(partSnapshot.createSuggestionId))
@@ -1448,10 +1448,8 @@ export const encodeTypePartBodyKernel = (
   }
 };
 
-export const encodeTypeExpr = (typeExpr: TypeExpr): ReadonlyArray<number> =>
-  encodeId(typeExpr.reference).concat(
-    encodeList(encodeTypeExpr)(typeExpr.parameter)
-  );
+export const encodeType = (type_: Type): ReadonlyArray<number> =>
+  encodeId(type_.typePartId).concat(encodeList(encodeType)(type_.parameter));
 
 export const encodeExpr = (expr: Expr): ReadonlyArray<number> => {
   switch (expr._) {
@@ -1538,7 +1536,7 @@ export const encodeLocalPartReference = (
 export const encodeTagReferenceIndex = (
   tagReferenceIndex: TagReferenceIndex
 ): ReadonlyArray<number> =>
-  encodeId(tagReferenceIndex.typeId).concat(
+  encodeId(tagReferenceIndex.typePartId).concat(
     encodeInt32(tagReferenceIndex.tagIndex)
   );
 
@@ -1596,7 +1594,7 @@ export const encodeBranchPartDefinition = (
   encodeId(branchPartDefinition.localPartId)
     .concat(encodeString(branchPartDefinition.name))
     .concat(encodeString(branchPartDefinition.description))
-    .concat(encodeTypeExpr(branchPartDefinition.typeExpr))
+    .concat(encodeType(branchPartDefinition["type"]))
     .concat(encodeExpr(branchPartDefinition.expr));
 
 export const encodeEvaluateExprError = (
@@ -2304,7 +2302,7 @@ export const decodeProjectSnapshot = (
       b: Uint8Array
     ) => { result: PartId; nextIndex: number }
   )(getTimeAndNextIndex.nextIndex, binary);
-  const typeIdListAndNextIndex: {
+  const typePartIdListAndNextIndex: {
     result: ReadonlyArray<TypeId>;
     nextIndex: number;
   } = decodeList(
@@ -2323,9 +2321,9 @@ export const decodeProjectSnapshot = (
       updateTime: updateTimeAndNextIndex.result,
       getTime: getTimeAndNextIndex.result,
       partIdList: partIdListAndNextIndex.result,
-      typeIdList: typeIdListAndNextIndex.result,
+      typePartIdList: typePartIdListAndNextIndex.result,
     },
-    nextIndex: typeIdListAndNextIndex.nextIndex,
+    nextIndex: typePartIdListAndNextIndex.nextIndex,
   };
 };
 
@@ -2728,14 +2726,14 @@ export const decodePartSnapshot = (
     result: string;
     nextIndex: number;
   } = decodeString(parentListAndNextIndex.nextIndex, binary);
-  const typeExprAndNextIndex: {
-    result: TypeExpr;
-    nextIndex: number;
-  } = decodeTypeExpr(descriptionAndNextIndex.nextIndex, binary);
+  const typeAndNextIndex: { result: Type; nextIndex: number } = decodeType(
+    descriptionAndNextIndex.nextIndex,
+    binary
+  );
   const exprAndNextIndex: {
     result: Maybe<Expr>;
     nextIndex: number;
-  } = decodeMaybe(decodeExpr)(typeExprAndNextIndex.nextIndex, binary);
+  } = decodeMaybe(decodeExpr)(typeAndNextIndex.nextIndex, binary);
   const projectIdAndNextIndex: {
     result: ProjectId;
     nextIndex: number;
@@ -2765,7 +2763,7 @@ export const decodePartSnapshot = (
       name: nameAndNextIndex.result,
       parentList: parentListAndNextIndex.result,
       description: descriptionAndNextIndex.result,
-      typeExpr: typeExprAndNextIndex.result,
+      type: typeAndNextIndex.result,
       expr: exprAndNextIndex.result,
       projectId: projectIdAndNextIndex.result,
       createSuggestionId: createSuggestionIdAndNextIndex.result,
@@ -2925,11 +2923,11 @@ export const decodeTypePartBodyKernel = (
  * @param index バイナリを読み込み開始位置
  * @param binary バイナリ
  */
-export const decodeTypeExpr = (
+export const decodeType = (
   index: number,
   binary: Uint8Array
-): { result: TypeExpr; nextIndex: number } => {
-  const referenceAndNextIndex: {
+): { result: Type; nextIndex: number } => {
+  const typePartIdAndNextIndex: {
     result: TypeId;
     nextIndex: number;
   } = (decodeId as (
@@ -2937,12 +2935,12 @@ export const decodeTypeExpr = (
     b: Uint8Array
   ) => { result: TypeId; nextIndex: number })(index, binary);
   const parameterAndNextIndex: {
-    result: ReadonlyArray<TypeExpr>;
+    result: ReadonlyArray<Type>;
     nextIndex: number;
-  } = decodeList(decodeTypeExpr)(referenceAndNextIndex.nextIndex, binary);
+  } = decodeList(decodeType)(typePartIdAndNextIndex.nextIndex, binary);
   return {
     result: {
-      reference: referenceAndNextIndex.result,
+      typePartId: typePartIdAndNextIndex.result,
       parameter: parameterAndNextIndex.result,
     },
     nextIndex: parameterAndNextIndex.nextIndex,
@@ -3184,7 +3182,7 @@ export const decodeTagReferenceIndex = (
   index: number,
   binary: Uint8Array
 ): { result: TagReferenceIndex; nextIndex: number } => {
-  const typeIdAndNextIndex: {
+  const typePartIdAndNextIndex: {
     result: TypeId;
     nextIndex: number;
   } = (decodeId as (
@@ -3194,10 +3192,10 @@ export const decodeTagReferenceIndex = (
   const tagIndexAndNextIndex: {
     result: number;
     nextIndex: number;
-  } = decodeInt32(typeIdAndNextIndex.nextIndex, binary);
+  } = decodeInt32(typePartIdAndNextIndex.nextIndex, binary);
   return {
     result: {
-      typeId: typeIdAndNextIndex.result,
+      typePartId: typePartIdAndNextIndex.result,
       tagIndex: tagIndexAndNextIndex.result,
     },
     nextIndex: tagIndexAndNextIndex.nextIndex,
@@ -3394,12 +3392,12 @@ export const decodeBranchPartDefinition = (
     result: string;
     nextIndex: number;
   } = decodeString(nameAndNextIndex.nextIndex, binary);
-  const typeExprAndNextIndex: {
-    result: TypeExpr;
-    nextIndex: number;
-  } = decodeTypeExpr(descriptionAndNextIndex.nextIndex, binary);
+  const typeAndNextIndex: { result: Type; nextIndex: number } = decodeType(
+    descriptionAndNextIndex.nextIndex,
+    binary
+  );
   const exprAndNextIndex: { result: Expr; nextIndex: number } = decodeExpr(
-    typeExprAndNextIndex.nextIndex,
+    typeAndNextIndex.nextIndex,
     binary
   );
   return {
@@ -3407,7 +3405,7 @@ export const decodeBranchPartDefinition = (
       localPartId: localPartIdAndNextIndex.result,
       name: nameAndNextIndex.result,
       description: descriptionAndNextIndex.result,
-      typeExpr: typeExprAndNextIndex.result,
+      type: typeAndNextIndex.result,
       expr: exprAndNextIndex.result,
     },
     nextIndex: exprAndNextIndex.nextIndex,

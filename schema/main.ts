@@ -11,7 +11,7 @@ const projectId = type.typeId("ProjectId");
 const ideaId = type.typeId("IdeaId");
 const fileHash = type.typeToken("FileHash");
 const suggestionId = type.typeId("SuggestionId");
-const typeId = type.typeId("TypeId");
+const typePartId = type.typeId("TypeId");
 const tagId = type.typeId("TagId");
 const partId = type.typeId("PartId");
 const localPartId = type.typeId("LocalPartId");
@@ -44,7 +44,7 @@ const typePartBodyName = "TypePartBody";
 const typePartBodyProductMemberName = "TypePartBodyProductMember";
 const typePartBodySumPatternName = "TypePartBodySumPattern";
 const typePartBodyKernelName = "TypePartBodyKernel";
-const typeExprName = "TypeExpr";
+const typeName = "Type";
 const exprName = "Expr";
 const evaluatedExprName = "EvaluatedExpr";
 const kernelCallName = "KernelCall";
@@ -340,9 +340,9 @@ const listCustomType: ReadonlyArray<type.CustomType> = [
         memberType: type.typeList(partId),
       },
       {
-        name: "typeIdList",
-        description: "所属している型のIDのリスト",
-        memberType: type.typeList(typeId),
+        name: "typePartIdList",
+        description: "所属している型パーツのIDのリスト",
+        memberType: type.typeList(typePartId),
       },
     ]),
   },
@@ -590,9 +590,9 @@ const listCustomType: ReadonlyArray<type.CustomType> = [
         memberType: type.typeString,
       },
       {
-        name: "typeExpr",
+        name: "type",
         description: "パーツの型",
-        memberType: type.typeCustom(typeExprName),
+        memberType: type.typeCustom(typeName),
       },
       {
         name: "expr",
@@ -658,7 +658,7 @@ const listCustomType: ReadonlyArray<type.CustomType> = [
       {
         name: "memberType",
         description: "メンバー値の型",
-        memberType: typeId,
+        memberType: typePartId,
       },
     ]),
   },
@@ -679,7 +679,7 @@ const listCustomType: ReadonlyArray<type.CustomType> = [
       {
         name: "parameter",
         description: "パラメーター",
-        memberType: type.typeMaybe(typeId),
+        memberType: type.typeMaybe(typePartId),
       },
     ]),
   },
@@ -705,18 +705,18 @@ const listCustomType: ReadonlyArray<type.CustomType> = [
     ]),
   },
   {
-    name: typeExprName,
+    name: typeName,
     description: "型",
     body: type.customTypeBodyProduct([
       {
-        name: "reference",
+        name: "typePartId",
         description: "型の参照",
-        memberType: typeId,
+        memberType: typePartId,
       },
       {
         name: "parameter",
         description: "型のパラメーター",
-        memberType: type.typeList(type.typeCustom(typeExprName)),
+        memberType: type.typeList(type.typeCustom(typeName)),
       },
     ]),
   },
@@ -854,9 +854,9 @@ const listCustomType: ReadonlyArray<type.CustomType> = [
     description: "タグの参照を表す",
     body: type.customTypeBodyProduct([
       {
-        name: "typeId",
+        name: "typePartId",
         description: "型ID",
-        memberType: typeId,
+        memberType: typePartId,
       },
       {
         name: "tagIndex",
@@ -985,9 +985,9 @@ const listCustomType: ReadonlyArray<type.CustomType> = [
         memberType: type.typeString,
       },
       {
-        name: "typeExpr",
+        name: "type",
         description: "ローカルパーツの型",
-        memberType: type.typeCustom(typeExprName),
+        memberType: type.typeCustom(typeName),
       },
       {
         name: "expr",
