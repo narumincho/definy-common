@@ -134,13 +134,13 @@ type Change
 {-| 型の定義
 -}
 type alias Type =
-    { name : String, parentList : List PartId, description : String }
+    { name : String, parentList : List PartId, description : String, projectId : ProjectId, createSuggestionId : SuggestionId, getTime : Time }
 
 
 {-| パーツの定義
 -}
 type alias Part =
-    { name : String, parentList : List PartId, description : String, typeExpr : TypeExpr, expr : Maybe Expr }
+    { name : String, parentList : List PartId, description : String, typeExpr : TypeExpr, expr : Maybe Expr, projectId : ProjectId, createSuggestionId : SuggestionId, getTime : Time }
 
 
 {-| 型の定義本体
@@ -694,6 +694,9 @@ typeToJsonValue type_ =
         [ ( "name", Je.string type_.name )
         , ( "parentList", Je.list partIdToJsonValue type_.parentList )
         , ( "description", Je.string type_.description )
+        , ( "projectId", projectIdToJsonValue type_.projectId )
+        , ( "createSuggestionId", suggestionIdToJsonValue type_.createSuggestionId )
+        , ( "getTime", timeToJsonValue type_.getTime )
         ]
 
 
@@ -707,6 +710,9 @@ partToJsonValue part =
         , ( "description", Je.string part.description )
         , ( "typeExpr", typeExprToJsonValue part.typeExpr )
         , ( "expr", maybeToJsonValue exprToJsonValue part.expr )
+        , ( "projectId", projectIdToJsonValue part.projectId )
+        , ( "createSuggestionId", suggestionIdToJsonValue part.createSuggestionId )
+        , ( "getTime", timeToJsonValue part.getTime )
         ]
 
 
@@ -1505,15 +1511,21 @@ changeJsonDecoder =
 typeJsonDecoder : Jd.Decoder Type
 typeJsonDecoder =
     Jd.succeed
-        (\name parentList description ->
+        (\name parentList description projectId createSuggestionId getTime ->
             { name = name
             , parentList = parentList
             , description = description
+            , projectId = projectId
+            , createSuggestionId = createSuggestionId
+            , getTime = getTime
             }
         )
         |> Jdp.required "name" Jd.string
         |> Jdp.required "parentList" (Jd.list partIdJsonDecoder)
         |> Jdp.required "description" Jd.string
+        |> Jdp.required "projectId" projectIdJsonDecoder
+        |> Jdp.required "createSuggestionId" suggestionIdJsonDecoder
+        |> Jdp.required "getTime" timeJsonDecoder
 
 
 {-| PartのJSON Decoder
@@ -1521,12 +1533,15 @@ typeJsonDecoder =
 partJsonDecoder : Jd.Decoder Part
 partJsonDecoder =
     Jd.succeed
-        (\name parentList description typeExpr expr ->
+        (\name parentList description typeExpr expr projectId createSuggestionId getTime ->
             { name = name
             , parentList = parentList
             , description = description
             , typeExpr = typeExpr
             , expr = expr
+            , projectId = projectId
+            , createSuggestionId = createSuggestionId
+            , getTime = getTime
             }
         )
         |> Jdp.required "name" Jd.string
@@ -1534,6 +1549,9 @@ partJsonDecoder =
         |> Jdp.required "description" Jd.string
         |> Jdp.required "typeExpr" typeExprJsonDecoder
         |> Jdp.required "expr" (maybeJsonDecoder exprJsonDecoder)
+        |> Jdp.required "projectId" projectIdJsonDecoder
+        |> Jdp.required "createSuggestionId" suggestionIdJsonDecoder
+        |> Jdp.required "getTime" timeJsonDecoder
 
 
 {-| TypeBodyのJSON Decoder

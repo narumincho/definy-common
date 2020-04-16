@@ -322,6 +322,18 @@ export type Type = {
    * 型の説明
    */
   description: string;
+  /**
+   * 所属しているプロジェクトのID
+   */
+  projectId: ProjectId;
+  /**
+   * この型が作成された提案
+   */
+  createSuggestionId: SuggestionId;
+  /**
+   * 取得日時
+   */
+  getTime: Time;
 };
 
 /**
@@ -348,6 +360,18 @@ export type Part = {
    * パーツの式
    */
   expr: Maybe<Expr>;
+  /**
+   * 所属しているプロジェクトのID
+   */
+  projectId: ProjectId;
+  /**
+   * このパーツが作成された提案
+   */
+  createSuggestionId: SuggestionId;
+  /**
+   * 取得日時
+   */
+  getTime: Time;
 };
 
 /**
@@ -1344,14 +1368,20 @@ export const encodeChange = (change: Change): ReadonlyArray<number> => {
 export const encodeType = (type_: Type): ReadonlyArray<number> =>
   encodeString(type_.name)
     .concat(encodeList(encodeId)(type_.parentList))
-    .concat(encodeString(type_.description));
+    .concat(encodeString(type_.description))
+    .concat(encodeId(type_.projectId))
+    .concat(encodeId(type_.createSuggestionId))
+    .concat(encodeTime(type_.getTime));
 
 export const encodePart = (part: Part): ReadonlyArray<number> =>
   encodeString(part.name)
     .concat(encodeList(encodeId)(part.parentList))
     .concat(encodeString(part.description))
     .concat(encodeTypeExpr(part.typeExpr))
-    .concat(encodeMaybe(encodeExpr)(part.expr));
+    .concat(encodeMaybe(encodeExpr)(part.expr))
+    .concat(encodeId(part.projectId))
+    .concat(encodeId(part.createSuggestionId))
+    .concat(encodeTime(part.getTime));
 
 export const encodeTypeBody = (typeBody: TypeBody): ReadonlyArray<number> => {
   switch (typeBody._) {
@@ -2621,13 +2651,40 @@ export const decodeType = (
     result: string;
     nextIndex: number;
   } = decodeString(parentListAndNextIndex.nextIndex, binary);
+  const projectIdAndNextIndex: {
+    result: ProjectId;
+    nextIndex: number;
+  } = (decodeId as (
+    a: number,
+    b: Uint8Array
+  ) => { result: ProjectId; nextIndex: number })(
+    descriptionAndNextIndex.nextIndex,
+    binary
+  );
+  const createSuggestionIdAndNextIndex: {
+    result: SuggestionId;
+    nextIndex: number;
+  } = (decodeId as (
+    a: number,
+    b: Uint8Array
+  ) => { result: SuggestionId; nextIndex: number })(
+    projectIdAndNextIndex.nextIndex,
+    binary
+  );
+  const getTimeAndNextIndex: { result: Time; nextIndex: number } = decodeTime(
+    createSuggestionIdAndNextIndex.nextIndex,
+    binary
+  );
   return {
     result: {
       name: nameAndNextIndex.result,
       parentList: parentListAndNextIndex.result,
       description: descriptionAndNextIndex.result,
+      projectId: projectIdAndNextIndex.result,
+      createSuggestionId: createSuggestionIdAndNextIndex.result,
+      getTime: getTimeAndNextIndex.result,
     },
-    nextIndex: descriptionAndNextIndex.nextIndex,
+    nextIndex: getTimeAndNextIndex.nextIndex,
   };
 };
 
@@ -2664,6 +2721,30 @@ export const decodePart = (
     result: Maybe<Expr>;
     nextIndex: number;
   } = decodeMaybe(decodeExpr)(typeExprAndNextIndex.nextIndex, binary);
+  const projectIdAndNextIndex: {
+    result: ProjectId;
+    nextIndex: number;
+  } = (decodeId as (
+    a: number,
+    b: Uint8Array
+  ) => { result: ProjectId; nextIndex: number })(
+    exprAndNextIndex.nextIndex,
+    binary
+  );
+  const createSuggestionIdAndNextIndex: {
+    result: SuggestionId;
+    nextIndex: number;
+  } = (decodeId as (
+    a: number,
+    b: Uint8Array
+  ) => { result: SuggestionId; nextIndex: number })(
+    projectIdAndNextIndex.nextIndex,
+    binary
+  );
+  const getTimeAndNextIndex: { result: Time; nextIndex: number } = decodeTime(
+    createSuggestionIdAndNextIndex.nextIndex,
+    binary
+  );
   return {
     result: {
       name: nameAndNextIndex.result,
@@ -2671,8 +2752,11 @@ export const decodePart = (
       description: descriptionAndNextIndex.result,
       typeExpr: typeExprAndNextIndex.result,
       expr: exprAndNextIndex.result,
+      projectId: projectIdAndNextIndex.result,
+      createSuggestionId: createSuggestionIdAndNextIndex.result,
+      getTime: getTimeAndNextIndex.result,
     },
-    nextIndex: exprAndNextIndex.nextIndex,
+    nextIndex: getTimeAndNextIndex.nextIndex,
   };
 };
 

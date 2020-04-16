@@ -553,6 +553,21 @@ const listCustomType: ReadonlyArray<type.CustomType> = [
         description: "型の説明",
         memberType: type.typeString,
       },
+      {
+        name: "projectId",
+        description: "所属しているプロジェクトのID",
+        memberType: projectId,
+      },
+      {
+        name: "createSuggestionId",
+        description: "この型が作成された提案",
+        memberType: suggestionId,
+      },
+      {
+        name: "getTime",
+        description: "取得日時",
+        memberType: type.typeCustom(timeName),
+      },
     ]),
   },
   {
@@ -583,6 +598,21 @@ const listCustomType: ReadonlyArray<type.CustomType> = [
         name: "expr",
         description: "パーツの式",
         memberType: type.typeMaybe(type.typeCustom(exprName)),
+      },
+      {
+        name: "projectId",
+        description: "所属しているプロジェクトのID",
+        memberType: projectId,
+      },
+      {
+        name: "createSuggestionId",
+        description: "このパーツが作成された提案",
+        memberType: suggestionId,
+      },
+      {
+        name: "getTime",
+        description: "取得日時",
+        memberType: type.typeCustom(timeName),
       },
     ]),
   },
