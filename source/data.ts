@@ -304,7 +304,74 @@ export type SuggestionState =
 /**
  * 変更点
  */
-export type Change = { _: "ProjectName"; string_: string };
+export type Change =
+  | { _: "ProjectName"; string_: string }
+  | { _: "AddPart"; addPart: AddPart };
+
+/**
+ * パーツを追加するのに必要なもの
+ */
+export type AddPart = {
+  /**
+   * 新しいパーツの名前
+   */
+  name: string;
+  /**
+   * 新しいパーツの説明
+   */
+  description: string;
+  /**
+   * 新しいパーツの型
+   */
+  type: SuggestionType;
+};
+
+/**
+ * ChangeのAddPartなどで使われる提案で作成した型を使えるType
+ */
+export type SuggestionType =
+  | { _: "Function"; suggestionTypeFunction: SuggestionTypeFunction }
+  | {
+      _: "TypePartWithParameter";
+      suggestionTypeTypePartWithParameter: SuggestionTypeTypePartWithParameter;
+    }
+  | {
+      _: "SuggestionTypePartWithParameter";
+      suggestionTypeTypePartWithParameter: SuggestionTypeTypePartWithParameter;
+    };
+
+export type SuggestionTypeFunction = {
+  /**
+   * 入力の型
+   */
+  inputType: SuggestionType;
+  /**
+   * 出力の型
+   */
+  outputType: SuggestionType;
+};
+
+export type SuggestionTypeTypePartWithParameter = {
+  /**
+   * 型の参照
+   */
+  typePartId: TypeId;
+  /**
+   * 型のパラメーター
+   */
+  parameter: ReadonlyArray<SuggestionType>;
+};
+
+export type SuggestionTypeSuggestionTypePartWithParameter = {
+  /**
+   * 提案内での定義した型パーツの番号
+   */
+  suggestTypePartIndex: TypeId;
+  /**
+   * 型のパラメーター
+   */
+  parameter: ReadonlyArray<SuggestionType>;
+};
 
 /**
  * 型パーツ
@@ -427,12 +494,30 @@ export type TypePartBodySumPattern = {
 /**
  * Definyだけでは表現できないデータ型
  */
-export type TypePartBodyKernel = "Function" | "Int32" | "List";
+export type TypePartBodyKernel = "Int32" | "List";
 
 /**
  * 型
  */
-export type Type = {
+export type Type =
+  | { _: "Function"; typeFunction: TypeFunction }
+  | {
+      _: "TypePartWithParameter";
+      typeTypePartWithParameter: TypeTypePartWithParameter;
+    };
+
+export type TypeFunction = {
+  /**
+   * 入力の型
+   */
+  inputType: Type;
+  /**
+   * 出力の型
+   */
+  outputType: Type;
+};
+
+export type TypeTypePartWithParameter = {
   /**
    * 型の参照
    */
@@ -880,6 +965,44 @@ export const changeProjectName = (string_: string): Change => ({
 });
 
 /**
+ * パーツの追加
+ */
+export const changeAddPart = (addPart: AddPart): Change => ({
+  _: "AddPart",
+  addPart: addPart,
+});
+
+/**
+ * 関数
+ */
+export const suggestionTypeFunction = (
+  suggestionTypeFunction: SuggestionTypeFunction
+): SuggestionType => ({
+  _: "Function",
+  suggestionTypeFunction: suggestionTypeFunction,
+});
+
+/**
+ * 提案前に作られた型パーツとパラメーター
+ */
+export const suggestionTypeTypePartWithParameter = (
+  suggestionTypeTypePartWithParameter: SuggestionTypeTypePartWithParameter
+): SuggestionType => ({
+  _: "TypePartWithParameter",
+  suggestionTypeTypePartWithParameter: suggestionTypeTypePartWithParameter,
+});
+
+/**
+ * 提案時に作られた型パーツとパラメーター
+ */
+export const suggestionTypeSuggestionTypePartWithParameter = (
+  suggestionTypeTypePartWithParameter: SuggestionTypeTypePartWithParameter
+): SuggestionType => ({
+  _: "SuggestionTypePartWithParameter",
+  suggestionTypeTypePartWithParameter: suggestionTypeTypePartWithParameter,
+});
+
+/**
  * 直積型
  */
 export const typePartBodyProduct = (
@@ -905,6 +1028,24 @@ export const typePartBodySum = (
 export const typePartBodyKernel = (
   typePartBodyKernel: TypePartBodyKernel
 ): TypePartBody => ({ _: "Kernel", typePartBodyKernel: typePartBodyKernel });
+
+/**
+ * 関数
+ */
+export const typeFunction = (typeFunction: TypeFunction): Type => ({
+  _: "Function",
+  typeFunction: typeFunction,
+});
+
+/**
+ * 型パーツと, パラメーターのリスト
+ */
+export const typeTypePartWithParameter = (
+  typeTypePartWithParameter: TypeTypePartWithParameter
+): Type => ({
+  _: "TypePartWithParameter",
+  typeTypePartWithParameter: typeTypePartWithParameter,
+});
 
 /**
  * Definyだけでは表現できない式
@@ -1367,8 +1508,69 @@ export const encodeChange = (change: Change): ReadonlyArray<number> => {
     case "ProjectName": {
       return [0].concat(encodeString(change.string_));
     }
+    case "AddPart": {
+      return [1].concat(encodeAddPart(change.addPart));
+    }
   }
 };
+
+export const encodeAddPart = (addPart: AddPart): ReadonlyArray<number> =>
+  encodeString(addPart.name)
+    .concat(encodeString(addPart.description))
+    .concat(encodeSuggestionType(addPart["type"]));
+
+export const encodeSuggestionType = (
+  suggestionType: SuggestionType
+): ReadonlyArray<number> => {
+  switch (suggestionType._) {
+    case "Function": {
+      return [0].concat(
+        encodeSuggestionTypeFunction(suggestionType.suggestionTypeFunction)
+      );
+    }
+    case "TypePartWithParameter": {
+      return [1].concat(
+        encodeSuggestionTypeTypePartWithParameter(
+          suggestionType.suggestionTypeTypePartWithParameter
+        )
+      );
+    }
+    case "SuggestionTypePartWithParameter": {
+      return [2].concat(
+        encodeSuggestionTypeTypePartWithParameter(
+          suggestionType.suggestionTypeTypePartWithParameter
+        )
+      );
+    }
+  }
+};
+
+export const encodeSuggestionTypeFunction = (
+  suggestionTypeFunction: SuggestionTypeFunction
+): ReadonlyArray<number> =>
+  encodeSuggestionType(suggestionTypeFunction.inputType).concat(
+    encodeSuggestionType(suggestionTypeFunction.outputType)
+  );
+
+export const encodeSuggestionTypeTypePartWithParameter = (
+  suggestionTypeTypePartWithParameter: SuggestionTypeTypePartWithParameter
+): ReadonlyArray<number> =>
+  encodeId(suggestionTypeTypePartWithParameter.typePartId).concat(
+    encodeList(encodeSuggestionType)(
+      suggestionTypeTypePartWithParameter.parameter
+    )
+  );
+
+export const encodeSuggestionTypeSuggestionTypePartWithParameter = (
+  suggestionTypeSuggestionTypePartWithParameter: SuggestionTypeSuggestionTypePartWithParameter
+): ReadonlyArray<number> =>
+  encodeId(
+    suggestionTypeSuggestionTypePartWithParameter.suggestTypePartIndex
+  ).concat(
+    encodeList(encodeSuggestionType)(
+      suggestionTypeSuggestionTypePartWithParameter.parameter
+    )
+  );
 
 export const encodeTypePartSnapshot = (
   typePartSnapshot: TypePartSnapshot
@@ -1436,20 +1638,41 @@ export const encodeTypePartBodyKernel = (
   typePartBodyKernel: TypePartBodyKernel
 ): ReadonlyArray<number> => {
   switch (typePartBodyKernel) {
-    case "Function": {
+    case "Int32": {
       return [0];
     }
-    case "Int32": {
-      return [1];
-    }
     case "List": {
-      return [2];
+      return [1];
     }
   }
 };
 
-export const encodeType = (type_: Type): ReadonlyArray<number> =>
-  encodeId(type_.typePartId).concat(encodeList(encodeType)(type_.parameter));
+export const encodeType = (type_: Type): ReadonlyArray<number> => {
+  switch (type_._) {
+    case "Function": {
+      return [0].concat(encodeTypeFunction(type_.typeFunction));
+    }
+    case "TypePartWithParameter": {
+      return [1].concat(
+        encodeTypeTypePartWithParameter(type_.typeTypePartWithParameter)
+      );
+    }
+  }
+};
+
+export const encodeTypeFunction = (
+  typeFunction: TypeFunction
+): ReadonlyArray<number> =>
+  encodeType(typeFunction.inputType).concat(
+    encodeType(typeFunction.outputType)
+  );
+
+export const encodeTypeTypePartWithParameter = (
+  typeTypePartWithParameter: TypeTypePartWithParameter
+): ReadonlyArray<number> =>
+  encodeId(typeTypePartWithParameter.typePartId).concat(
+    encodeList(encodeType)(typeTypePartWithParameter.parameter)
+  );
 
 export const encodeExpr = (expr: Expr): ReadonlyArray<number> => {
   switch (expr._) {
@@ -2636,7 +2859,188 @@ export const decodeChange = (
       nextIndex: result.nextIndex,
     };
   }
+  if (patternIndex.result === 1) {
+    const result: { result: AddPart; nextIndex: number } = decodeAddPart(
+      patternIndex.nextIndex,
+      binary
+    );
+    return {
+      result: changeAddPart(result.result),
+      nextIndex: result.nextIndex,
+    };
+  }
   throw new Error("存在しないパターンを指定された 型を更新してください");
+};
+
+/**
+ * @param index バイナリを読み込み開始位置
+ * @param binary バイナリ
+ */
+export const decodeAddPart = (
+  index: number,
+  binary: Uint8Array
+): { result: AddPart; nextIndex: number } => {
+  const nameAndNextIndex: { result: string; nextIndex: number } = decodeString(
+    index,
+    binary
+  );
+  const descriptionAndNextIndex: {
+    result: string;
+    nextIndex: number;
+  } = decodeString(nameAndNextIndex.nextIndex, binary);
+  const typeAndNextIndex: {
+    result: SuggestionType;
+    nextIndex: number;
+  } = decodeSuggestionType(descriptionAndNextIndex.nextIndex, binary);
+  return {
+    result: {
+      name: nameAndNextIndex.result,
+      description: descriptionAndNextIndex.result,
+      type: typeAndNextIndex.result,
+    },
+    nextIndex: typeAndNextIndex.nextIndex,
+  };
+};
+
+/**
+ * @param index バイナリを読み込み開始位置
+ * @param binary バイナリ
+ */
+export const decodeSuggestionType = (
+  index: number,
+  binary: Uint8Array
+): { result: SuggestionType; nextIndex: number } => {
+  const patternIndex: { result: number; nextIndex: number } = decodeInt32(
+    index,
+    binary
+  );
+  if (patternIndex.result === 0) {
+    const result: {
+      result: SuggestionTypeFunction;
+      nextIndex: number;
+    } = decodeSuggestionTypeFunction(patternIndex.nextIndex, binary);
+    return {
+      result: suggestionTypeFunction(result.result),
+      nextIndex: result.nextIndex,
+    };
+  }
+  if (patternIndex.result === 1) {
+    const result: {
+      result: SuggestionTypeTypePartWithParameter;
+      nextIndex: number;
+    } = decodeSuggestionTypeTypePartWithParameter(
+      patternIndex.nextIndex,
+      binary
+    );
+    return {
+      result: suggestionTypeTypePartWithParameter(result.result),
+      nextIndex: result.nextIndex,
+    };
+  }
+  if (patternIndex.result === 2) {
+    const result: {
+      result: SuggestionTypeTypePartWithParameter;
+      nextIndex: number;
+    } = decodeSuggestionTypeTypePartWithParameter(
+      patternIndex.nextIndex,
+      binary
+    );
+    return {
+      result: suggestionTypeSuggestionTypePartWithParameter(result.result),
+      nextIndex: result.nextIndex,
+    };
+  }
+  throw new Error("存在しないパターンを指定された 型を更新してください");
+};
+
+/**
+ * @param index バイナリを読み込み開始位置
+ * @param binary バイナリ
+ */
+export const decodeSuggestionTypeFunction = (
+  index: number,
+  binary: Uint8Array
+): { result: SuggestionTypeFunction; nextIndex: number } => {
+  const inputTypeAndNextIndex: {
+    result: SuggestionType;
+    nextIndex: number;
+  } = decodeSuggestionType(index, binary);
+  const outputTypeAndNextIndex: {
+    result: SuggestionType;
+    nextIndex: number;
+  } = decodeSuggestionType(inputTypeAndNextIndex.nextIndex, binary);
+  return {
+    result: {
+      inputType: inputTypeAndNextIndex.result,
+      outputType: outputTypeAndNextIndex.result,
+    },
+    nextIndex: outputTypeAndNextIndex.nextIndex,
+  };
+};
+
+/**
+ * @param index バイナリを読み込み開始位置
+ * @param binary バイナリ
+ */
+export const decodeSuggestionTypeTypePartWithParameter = (
+  index: number,
+  binary: Uint8Array
+): { result: SuggestionTypeTypePartWithParameter; nextIndex: number } => {
+  const typePartIdAndNextIndex: {
+    result: TypeId;
+    nextIndex: number;
+  } = (decodeId as (
+    a: number,
+    b: Uint8Array
+  ) => { result: TypeId; nextIndex: number })(index, binary);
+  const parameterAndNextIndex: {
+    result: ReadonlyArray<SuggestionType>;
+    nextIndex: number;
+  } = decodeList(decodeSuggestionType)(
+    typePartIdAndNextIndex.nextIndex,
+    binary
+  );
+  return {
+    result: {
+      typePartId: typePartIdAndNextIndex.result,
+      parameter: parameterAndNextIndex.result,
+    },
+    nextIndex: parameterAndNextIndex.nextIndex,
+  };
+};
+
+/**
+ * @param index バイナリを読み込み開始位置
+ * @param binary バイナリ
+ */
+export const decodeSuggestionTypeSuggestionTypePartWithParameter = (
+  index: number,
+  binary: Uint8Array
+): {
+  result: SuggestionTypeSuggestionTypePartWithParameter;
+  nextIndex: number;
+} => {
+  const suggestTypePartIndexAndNextIndex: {
+    result: TypeId;
+    nextIndex: number;
+  } = (decodeId as (
+    a: number,
+    b: Uint8Array
+  ) => { result: TypeId; nextIndex: number })(index, binary);
+  const parameterAndNextIndex: {
+    result: ReadonlyArray<SuggestionType>;
+    nextIndex: number;
+  } = decodeList(decodeSuggestionType)(
+    suggestTypePartIndexAndNextIndex.nextIndex,
+    binary
+  );
+  return {
+    result: {
+      suggestTypePartIndex: suggestTypePartIndexAndNextIndex.result,
+      parameter: parameterAndNextIndex.result,
+    },
+    nextIndex: parameterAndNextIndex.nextIndex,
+  };
 };
 
 /**
@@ -2897,12 +3301,9 @@ export const decodeTypePartBodyKernel = (
     binary
   );
   if (patternIndex.result === 0) {
-    return { result: "Function", nextIndex: patternIndex.nextIndex };
-  }
-  if (patternIndex.result === 1) {
     return { result: "Int32", nextIndex: patternIndex.nextIndex };
   }
-  if (patternIndex.result === 2) {
+  if (patternIndex.result === 1) {
     return { result: "List", nextIndex: patternIndex.nextIndex };
   }
   throw new Error("存在しないパターンを指定された 型を更新してください");
@@ -2916,6 +3317,63 @@ export const decodeType = (
   index: number,
   binary: Uint8Array
 ): { result: Type; nextIndex: number } => {
+  const patternIndex: { result: number; nextIndex: number } = decodeInt32(
+    index,
+    binary
+  );
+  if (patternIndex.result === 0) {
+    const result: {
+      result: TypeFunction;
+      nextIndex: number;
+    } = decodeTypeFunction(patternIndex.nextIndex, binary);
+    return { result: typeFunction(result.result), nextIndex: result.nextIndex };
+  }
+  if (patternIndex.result === 1) {
+    const result: {
+      result: TypeTypePartWithParameter;
+      nextIndex: number;
+    } = decodeTypeTypePartWithParameter(patternIndex.nextIndex, binary);
+    return {
+      result: typeTypePartWithParameter(result.result),
+      nextIndex: result.nextIndex,
+    };
+  }
+  throw new Error("存在しないパターンを指定された 型を更新してください");
+};
+
+/**
+ * @param index バイナリを読み込み開始位置
+ * @param binary バイナリ
+ */
+export const decodeTypeFunction = (
+  index: number,
+  binary: Uint8Array
+): { result: TypeFunction; nextIndex: number } => {
+  const inputTypeAndNextIndex: { result: Type; nextIndex: number } = decodeType(
+    index,
+    binary
+  );
+  const outputTypeAndNextIndex: {
+    result: Type;
+    nextIndex: number;
+  } = decodeType(inputTypeAndNextIndex.nextIndex, binary);
+  return {
+    result: {
+      inputType: inputTypeAndNextIndex.result,
+      outputType: outputTypeAndNextIndex.result,
+    },
+    nextIndex: outputTypeAndNextIndex.nextIndex,
+  };
+};
+
+/**
+ * @param index バイナリを読み込み開始位置
+ * @param binary バイナリ
+ */
+export const decodeTypeTypePartWithParameter = (
+  index: number,
+  binary: Uint8Array
+): { result: TypeTypePartWithParameter; nextIndex: number } => {
   const typePartIdAndNextIndex: {
     result: TypeId;
     nextIndex: number;

@@ -38,6 +38,16 @@ const itemBodyName = "ItemBody";
 const suggestionName = "Suggestion";
 const suggestionStateName = "SuggestionState";
 const changeName = "Change";
+const addPartName = "AddPart";
+const suggestionTypeName = "SuggestionType";
+const suggestionTypeFunctionName = "SuggestionTypeFunction";
+const suggestionTypeTypePartWithParameterName =
+  "SuggestionTypeTypePartWithParameter";
+const suggestionTypeSuggestionTypePartWithParameterName =
+  "SuggestionTypeSuggestionTypePartWithParameter";
+
+const suggestionExpr = "SuggestionExpr";
+
 const typePartSnapshotName = "TypePartSnapshot";
 const partSnapshotName = "PartSnapshot";
 const typePartBodyName = "TypePartBody";
@@ -45,6 +55,9 @@ const typePartBodyProductMemberName = "TypePartBodyProductMember";
 const typePartBodySumPatternName = "TypePartBodySumPattern";
 const typePartBodyKernelName = "TypePartBodyKernel";
 const typeName = "Type";
+const typeFunctionName = "TypeFunction";
+const typeTypePartWithParameterName = "TypeTypePartWithParameter";
+
 const exprName = "Expr";
 const evaluatedExprName = "EvaluatedExpr";
 const kernelCallName = "KernelCall";
@@ -532,6 +545,105 @@ const listCustomType: ReadonlyArray<type.CustomType> = [
         description: "プロジェクト名の変更",
         parameter: type.maybeJust(type.typeString),
       },
+      {
+        name: "AddPart",
+        description: "パーツの追加",
+        parameter: type.maybeJust(type.typeCustom(addPartName)),
+      },
+    ]),
+  },
+  {
+    name: addPartName,
+    description: "パーツを追加するのに必要なもの",
+    body: type.customTypeBodyProduct([
+      {
+        name: "name",
+        description: "新しいパーツの名前",
+        memberType: type.typeString,
+      },
+      {
+        name: "description",
+        description: "新しいパーツの説明",
+        memberType: type.typeString,
+      },
+      {
+        name: "type",
+        description: "新しいパーツの型",
+        memberType: type.typeCustom(suggestionTypeName),
+      },
+    ]),
+  },
+  {
+    name: suggestionTypeName,
+    description: "ChangeのAddPartなどで使われる提案で作成した型を使えるType",
+    body: type.customTypeBodySum([
+      {
+        name: "Function",
+        description: "関数",
+        parameter: type.maybeJust(type.typeCustom(suggestionTypeFunctionName)),
+      },
+      {
+        name: "TypePartWithParameter",
+        description: "提案前に作られた型パーツとパラメーター",
+        parameter: type.maybeJust(
+          type.typeCustom(suggestionTypeTypePartWithParameterName)
+        ),
+      },
+      {
+        name: "SuggestionTypePartWithParameter",
+        description: "提案時に作られた型パーツとパラメーター",
+        parameter: type.maybeJust(
+          type.typeCustom(suggestionTypeTypePartWithParameterName)
+        ),
+      },
+    ]),
+  },
+  {
+    name: suggestionTypeFunctionName,
+    description: "",
+    body: type.customTypeBodyProduct([
+      {
+        name: "inputType",
+        description: "入力の型",
+        memberType: type.typeCustom(suggestionTypeName),
+      },
+      {
+        name: "outputType",
+        description: "出力の型",
+        memberType: type.typeCustom(suggestionTypeName),
+      },
+    ]),
+  },
+  {
+    name: suggestionTypeTypePartWithParameterName,
+    description: "",
+    body: type.customTypeBodyProduct([
+      {
+        name: "typePartId",
+        description: "型の参照",
+        memberType: typePartId,
+      },
+      {
+        name: "parameter",
+        description: "型のパラメーター",
+        memberType: type.typeList(type.typeCustom(suggestionTypeName)),
+      },
+    ]),
+  },
+  {
+    name: suggestionTypeSuggestionTypePartWithParameterName,
+    description: "",
+    body: type.customTypeBodyProduct([
+      {
+        name: "suggestTypePartIndex",
+        description: "提案内での定義した型パーツの番号",
+        memberType: typePartId,
+      },
+      {
+        name: "parameter",
+        description: "型のパラメーター",
+        memberType: type.typeList(type.typeCustom(suggestionTypeName)),
+      },
     ]),
   },
   {
@@ -688,11 +800,6 @@ const listCustomType: ReadonlyArray<type.CustomType> = [
     description: "Definyだけでは表現できないデータ型",
     body: type.customTypeBodySum([
       {
-        name: "Function",
-        description: "関数",
-        parameter: type.maybeNothing(),
-      },
-      {
         name: "Int32",
         description: "32bit整数",
         parameter: type.maybeNothing(),
@@ -707,6 +814,40 @@ const listCustomType: ReadonlyArray<type.CustomType> = [
   {
     name: typeName,
     description: "型",
+    body: type.customTypeBodySum([
+      {
+        name: "Function",
+        description: "関数",
+        parameter: type.maybeJust(type.typeCustom(typeFunctionName)),
+      },
+      {
+        name: "TypePartWithParameter",
+        description: "型パーツと, パラメーターのリスト",
+        parameter: type.maybeJust(
+          type.typeCustom(typeTypePartWithParameterName)
+        ),
+      },
+    ]),
+  },
+  {
+    name: typeFunctionName,
+    description: "",
+    body: type.customTypeBodyProduct([
+      {
+        name: "inputType",
+        description: "入力の型",
+        memberType: type.typeCustom(typeName),
+      },
+      {
+        name: "outputType",
+        description: "出力の型",
+        memberType: type.typeCustom(typeName),
+      },
+    ]),
+  },
+  {
+    name: typeTypePartWithParameterName,
+    description: "",
     body: type.customTypeBodyProduct([
       {
         name: "typePartId",
