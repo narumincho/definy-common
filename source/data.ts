@@ -309,7 +309,7 @@ export type Change = { _: "ProjectName"; string_: string };
 /**
  * 型の定義
  */
-export type Type = {
+export type TypePartSnapshot = {
   /**
    * 型の名前
    */
@@ -339,7 +339,7 @@ export type Type = {
 /**
  * パーツの定義
  */
-export type Part = {
+export type PartSnapshot = {
   /**
    * パーツの名前
    */
@@ -377,18 +377,21 @@ export type Part = {
 /**
  * 型の定義本体
  */
-export type TypeBody =
+export type TypePartBody =
   | {
       _: "Product";
-      typeBodyProductMemberList: ReadonlyArray<TypeBodyProductMember>;
+      typePartBodyProductMemberList: ReadonlyArray<TypePartBodyProductMember>;
     }
-  | { _: "Sum"; typeBodySumPatternList: ReadonlyArray<TypeBodySumPattern> }
-  | { _: "Kernel"; typeBodyKernel: TypeBodyKernel };
+  | {
+      _: "Sum";
+      typePartBodySumPatternList: ReadonlyArray<TypePartBodySumPattern>;
+    }
+  | { _: "Kernel"; typePartBodyKernel: TypePartBodyKernel };
 
 /**
  * 直積型のメンバー
  */
-export type TypeBodyProductMember = {
+export type TypePartBodyProductMember = {
   /**
    * メンバー名
    */
@@ -406,7 +409,7 @@ export type TypeBodyProductMember = {
 /**
  * 直積型のパターン
  */
-export type TypeBodySumPattern = {
+export type TypePartBodySumPattern = {
   /**
    * タグ名
    */
@@ -424,7 +427,7 @@ export type TypeBodySumPattern = {
 /**
  * Definyだけでは表現できないデータ型
  */
-export type TypeBodyKernel = "Function" | "Int32" | "List";
+export type TypePartBodyKernel = "Function" | "Int32" | "List";
 
 /**
  * 型
@@ -879,27 +882,29 @@ export const changeProjectName = (string_: string): Change => ({
 /**
  * 直積型
  */
-export const typeBodyProduct = (
-  typeBodyProductMemberList: ReadonlyArray<TypeBodyProductMember>
-): TypeBody => ({
+export const typePartBodyProduct = (
+  typePartBodyProductMemberList: ReadonlyArray<TypePartBodyProductMember>
+): TypePartBody => ({
   _: "Product",
-  typeBodyProductMemberList: typeBodyProductMemberList,
+  typePartBodyProductMemberList: typePartBodyProductMemberList,
 });
 
 /**
  * 直和型
  */
-export const typeBodySum = (
-  typeBodySumPatternList: ReadonlyArray<TypeBodySumPattern>
-): TypeBody => ({ _: "Sum", typeBodySumPatternList: typeBodySumPatternList });
+export const typePartBodySum = (
+  typePartBodySumPatternList: ReadonlyArray<TypePartBodySumPattern>
+): TypePartBody => ({
+  _: "Sum",
+  typePartBodySumPatternList: typePartBodySumPatternList,
+});
 
 /**
  * Definyだけでは表現できないデータ型
  */
-export const typeBodyKernel = (typeBodyKernel: TypeBodyKernel): TypeBody => ({
-  _: "Kernel",
-  typeBodyKernel: typeBodyKernel,
-});
+export const typePartBodyKernel = (
+  typePartBodyKernel: TypePartBodyKernel
+): TypePartBody => ({ _: "Kernel", typePartBodyKernel: typePartBodyKernel });
 
 /**
  * Definyだけでは表現できない式
@@ -1365,62 +1370,72 @@ export const encodeChange = (change: Change): ReadonlyArray<number> => {
   }
 };
 
-export const encodeType = (type_: Type): ReadonlyArray<number> =>
-  encodeString(type_.name)
-    .concat(encodeList(encodeId)(type_.parentList))
-    .concat(encodeString(type_.description))
-    .concat(encodeId(type_.projectId))
-    .concat(encodeId(type_.createSuggestionId))
-    .concat(encodeTime(type_.getTime));
+export const encodeTypePartSnapshot = (
+  typePartSnapshot: TypePartSnapshot
+): ReadonlyArray<number> =>
+  encodeString(typePartSnapshot.name)
+    .concat(encodeList(encodeId)(typePartSnapshot.parentList))
+    .concat(encodeString(typePartSnapshot.description))
+    .concat(encodeId(typePartSnapshot.projectId))
+    .concat(encodeId(typePartSnapshot.createSuggestionId))
+    .concat(encodeTime(typePartSnapshot.getTime));
 
-export const encodePart = (part: Part): ReadonlyArray<number> =>
-  encodeString(part.name)
-    .concat(encodeList(encodeId)(part.parentList))
-    .concat(encodeString(part.description))
-    .concat(encodeTypeExpr(part.typeExpr))
-    .concat(encodeMaybe(encodeExpr)(part.expr))
-    .concat(encodeId(part.projectId))
-    .concat(encodeId(part.createSuggestionId))
-    .concat(encodeTime(part.getTime));
+export const encodePartSnapshot = (
+  partSnapshot: PartSnapshot
+): ReadonlyArray<number> =>
+  encodeString(partSnapshot.name)
+    .concat(encodeList(encodeId)(partSnapshot.parentList))
+    .concat(encodeString(partSnapshot.description))
+    .concat(encodeTypeExpr(partSnapshot.typeExpr))
+    .concat(encodeMaybe(encodeExpr)(partSnapshot.expr))
+    .concat(encodeId(partSnapshot.projectId))
+    .concat(encodeId(partSnapshot.createSuggestionId))
+    .concat(encodeTime(partSnapshot.getTime));
 
-export const encodeTypeBody = (typeBody: TypeBody): ReadonlyArray<number> => {
-  switch (typeBody._) {
+export const encodeTypePartBody = (
+  typePartBody: TypePartBody
+): ReadonlyArray<number> => {
+  switch (typePartBody._) {
     case "Product": {
       return [0].concat(
-        encodeList(encodeTypeBodyProductMember)(
-          typeBody.typeBodyProductMemberList
+        encodeList(encodeTypePartBodyProductMember)(
+          typePartBody.typePartBodyProductMemberList
         )
       );
     }
     case "Sum": {
       return [1].concat(
-        encodeList(encodeTypeBodySumPattern)(typeBody.typeBodySumPatternList)
+        encodeList(encodeTypePartBodySumPattern)(
+          typePartBody.typePartBodySumPatternList
+        )
       );
     }
     case "Kernel": {
-      return [2].concat(encodeTypeBodyKernel(typeBody.typeBodyKernel));
+      return [2].concat(
+        encodeTypePartBodyKernel(typePartBody.typePartBodyKernel)
+      );
     }
   }
 };
 
-export const encodeTypeBodyProductMember = (
-  typeBodyProductMember: TypeBodyProductMember
+export const encodeTypePartBodyProductMember = (
+  typePartBodyProductMember: TypePartBodyProductMember
 ): ReadonlyArray<number> =>
-  encodeString(typeBodyProductMember.name)
-    .concat(encodeString(typeBodyProductMember.description))
-    .concat(encodeId(typeBodyProductMember.memberType));
+  encodeString(typePartBodyProductMember.name)
+    .concat(encodeString(typePartBodyProductMember.description))
+    .concat(encodeId(typePartBodyProductMember.memberType));
 
-export const encodeTypeBodySumPattern = (
-  typeBodySumPattern: TypeBodySumPattern
+export const encodeTypePartBodySumPattern = (
+  typePartBodySumPattern: TypePartBodySumPattern
 ): ReadonlyArray<number> =>
-  encodeString(typeBodySumPattern.name)
-    .concat(encodeString(typeBodySumPattern.description))
-    .concat(encodeMaybe(encodeId)(typeBodySumPattern.parameter));
+  encodeString(typePartBodySumPattern.name)
+    .concat(encodeString(typePartBodySumPattern.description))
+    .concat(encodeMaybe(encodeId)(typePartBodySumPattern.parameter));
 
-export const encodeTypeBodyKernel = (
-  typeBodyKernel: TypeBodyKernel
+export const encodeTypePartBodyKernel = (
+  typePartBodyKernel: TypePartBodyKernel
 ): ReadonlyArray<number> => {
-  switch (typeBodyKernel) {
+  switch (typePartBodyKernel) {
     case "Function": {
       return [0];
     }
@@ -2630,10 +2645,10 @@ export const decodeChange = (
  * @param index バイナリを読み込み開始位置
  * @param binary バイナリ
  */
-export const decodeType = (
+export const decodeTypePartSnapshot = (
   index: number,
   binary: Uint8Array
-): { result: Type; nextIndex: number } => {
+): { result: TypePartSnapshot; nextIndex: number } => {
   const nameAndNextIndex: { result: string; nextIndex: number } = decodeString(
     index,
     binary
@@ -2692,10 +2707,10 @@ export const decodeType = (
  * @param index バイナリを読み込み開始位置
  * @param binary バイナリ
  */
-export const decodePart = (
+export const decodePartSnapshot = (
   index: number,
   binary: Uint8Array
-): { result: Part; nextIndex: number } => {
+): { result: PartSnapshot; nextIndex: number } => {
   const nameAndNextIndex: { result: string; nextIndex: number } = decodeString(
     index,
     binary
@@ -2764,38 +2779,47 @@ export const decodePart = (
  * @param index バイナリを読み込み開始位置
  * @param binary バイナリ
  */
-export const decodeTypeBody = (
+export const decodeTypePartBody = (
   index: number,
   binary: Uint8Array
-): { result: TypeBody; nextIndex: number } => {
+): { result: TypePartBody; nextIndex: number } => {
   const patternIndex: { result: number; nextIndex: number } = decodeInt32(
     index,
     binary
   );
   if (patternIndex.result === 0) {
     const result: {
-      result: ReadonlyArray<TypeBodyProductMember>;
+      result: ReadonlyArray<TypePartBodyProductMember>;
       nextIndex: number;
-    } = decodeList(decodeTypeBodyProductMember)(patternIndex.nextIndex, binary);
+    } = decodeList(decodeTypePartBodyProductMember)(
+      patternIndex.nextIndex,
+      binary
+    );
     return {
-      result: typeBodyProduct(result.result),
+      result: typePartBodyProduct(result.result),
       nextIndex: result.nextIndex,
     };
   }
   if (patternIndex.result === 1) {
     const result: {
-      result: ReadonlyArray<TypeBodySumPattern>;
+      result: ReadonlyArray<TypePartBodySumPattern>;
       nextIndex: number;
-    } = decodeList(decodeTypeBodySumPattern)(patternIndex.nextIndex, binary);
-    return { result: typeBodySum(result.result), nextIndex: result.nextIndex };
+    } = decodeList(decodeTypePartBodySumPattern)(
+      patternIndex.nextIndex,
+      binary
+    );
+    return {
+      result: typePartBodySum(result.result),
+      nextIndex: result.nextIndex,
+    };
   }
   if (patternIndex.result === 2) {
     const result: {
-      result: TypeBodyKernel;
+      result: TypePartBodyKernel;
       nextIndex: number;
-    } = decodeTypeBodyKernel(patternIndex.nextIndex, binary);
+    } = decodeTypePartBodyKernel(patternIndex.nextIndex, binary);
     return {
-      result: typeBodyKernel(result.result),
+      result: typePartBodyKernel(result.result),
       nextIndex: result.nextIndex,
     };
   }
@@ -2806,10 +2830,10 @@ export const decodeTypeBody = (
  * @param index バイナリを読み込み開始位置
  * @param binary バイナリ
  */
-export const decodeTypeBodyProductMember = (
+export const decodeTypePartBodyProductMember = (
   index: number,
   binary: Uint8Array
-): { result: TypeBodyProductMember; nextIndex: number } => {
+): { result: TypePartBodyProductMember; nextIndex: number } => {
   const nameAndNextIndex: { result: string; nextIndex: number } = decodeString(
     index,
     binary
@@ -2842,10 +2866,10 @@ export const decodeTypeBodyProductMember = (
  * @param index バイナリを読み込み開始位置
  * @param binary バイナリ
  */
-export const decodeTypeBodySumPattern = (
+export const decodeTypePartBodySumPattern = (
   index: number,
   binary: Uint8Array
-): { result: TypeBodySumPattern; nextIndex: number } => {
+): { result: TypePartBodySumPattern; nextIndex: number } => {
   const nameAndNextIndex: { result: string; nextIndex: number } = decodeString(
     index,
     binary
@@ -2877,10 +2901,10 @@ export const decodeTypeBodySumPattern = (
  * @param index バイナリを読み込み開始位置
  * @param binary バイナリ
  */
-export const decodeTypeBodyKernel = (
+export const decodeTypePartBodyKernel = (
   index: number,
   binary: Uint8Array
-): { result: TypeBodyKernel; nextIndex: number } => {
+): { result: TypePartBodyKernel; nextIndex: number } => {
   const patternIndex: { result: number; nextIndex: number } = decodeInt32(
     index,
     binary

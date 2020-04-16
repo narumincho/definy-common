@@ -38,12 +38,12 @@ const itemBodyName = "ItemBody";
 const suggestionName = "Suggestion";
 const suggestionStateName = "SuggestionState";
 const changeName = "Change";
-const typeName = "Type";
-const partName = "Part";
-const typeBodyName = "TypeBody";
-const typeBodyProductMemberName = "TypeBodyProductMember";
-const typeBodySumPatternName = "TypeBodySumPattern";
-const typeBodyKernelName = "TypeBodyKernel";
+const typePartSnapshotName = "TypePartSnapshot";
+const partSnapshotName = "PartSnapshot";
+const typePartBodyName = "TypePartBody";
+const typePartBodyProductMemberName = "TypePartBodyProductMember";
+const typePartBodySumPatternName = "TypePartBodySumPattern";
+const typePartBodyKernelName = "TypePartBodyKernel";
 const typeExprName = "TypeExpr";
 const exprName = "Expr";
 const evaluatedExprName = "EvaluatedExpr";
@@ -535,7 +535,7 @@ const listCustomType: ReadonlyArray<type.CustomType> = [
     ]),
   },
   {
-    name: typeName,
+    name: typePartSnapshotName,
     description: "型の定義",
     body: type.customTypeBodyProduct([
       {
@@ -571,7 +571,7 @@ const listCustomType: ReadonlyArray<type.CustomType> = [
     ]),
   },
   {
-    name: partName,
+    name: partSnapshotName,
     description: "パーツの定義",
     body: type.customTypeBodyProduct([
       {
@@ -617,32 +617,32 @@ const listCustomType: ReadonlyArray<type.CustomType> = [
     ]),
   },
   {
-    name: typeBodyName,
+    name: typePartBodyName,
     description: "型の定義本体",
     body: type.customTypeBodySum([
       {
         name: "Product",
         description: "直積型",
         parameter: type.maybeJust(
-          type.typeList(type.typeCustom(typeBodyProductMemberName))
+          type.typeList(type.typeCustom(typePartBodyProductMemberName))
         ),
       },
       {
         name: "Sum",
         description: "直和型",
         parameter: type.maybeJust(
-          type.typeList(type.typeCustom(typeBodySumPatternName))
+          type.typeList(type.typeCustom(typePartBodySumPatternName))
         ),
       },
       {
         name: "Kernel",
         description: "Definyだけでは表現できないデータ型",
-        parameter: type.maybeJust(type.typeCustom(typeBodyKernelName)),
+        parameter: type.maybeJust(type.typeCustom(typePartBodyKernelName)),
       },
     ]),
   },
   {
-    name: typeBodyProductMemberName,
+    name: typePartBodyProductMemberName,
     description: "直積型のメンバー",
     body: type.customTypeBodyProduct([
       {
@@ -663,7 +663,7 @@ const listCustomType: ReadonlyArray<type.CustomType> = [
     ]),
   },
   {
-    name: typeBodySumPatternName,
+    name: typePartBodySumPatternName,
     description: "直積型のパターン",
     body: type.customTypeBodyProduct([
       {
@@ -684,7 +684,7 @@ const listCustomType: ReadonlyArray<type.CustomType> = [
     ]),
   },
   {
-    name: typeBodyKernelName,
+    name: typePartBodyKernelName,
     description: "Definyだけでは表現できないデータ型",
     body: type.customTypeBodySum([
       {
