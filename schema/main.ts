@@ -536,21 +536,21 @@ const listCustomType: ReadonlyArray<type.CustomType> = [
   },
   {
     name: typePartSnapshotName,
-    description: "型の定義",
+    description: "型パーツ",
     body: type.customTypeBodyProduct([
       {
         name: "name",
-        description: "型の名前",
+        description: "型パーツの名前",
         memberType: type.typeString,
       },
       {
         name: "parentList",
-        description: "この型の元",
+        description: "この型パーツの元",
         memberType: type.typeList(partId),
       },
       {
         name: "description",
-        description: "型の説明",
+        description: "型パーツの説明",
         memberType: type.typeString,
       },
       {
@@ -560,7 +560,7 @@ const listCustomType: ReadonlyArray<type.CustomType> = [
       },
       {
         name: "createSuggestionId",
-        description: "この型が作成された提案",
+        description: "この型パーツが作成された提案",
         memberType: suggestionId,
       },
       {

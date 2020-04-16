@@ -307,19 +307,19 @@ export type SuggestionState =
 export type Change = { _: "ProjectName"; string_: string };
 
 /**
- * 型の定義
+ * 型パーツ
  */
 export type TypePartSnapshot = {
   /**
-   * 型の名前
+   * 型パーツの名前
    */
   name: string;
   /**
-   * この型の元
+   * この型パーツの元
    */
   parentList: ReadonlyArray<PartId>;
   /**
-   * 型の説明
+   * 型パーツの説明
    */
   description: string;
   /**
@@ -327,7 +327,7 @@ export type TypePartSnapshot = {
    */
   projectId: ProjectId;
   /**
-   * この型が作成された提案
+   * この型パーツが作成された提案
    */
   createSuggestionId: SuggestionId;
   /**

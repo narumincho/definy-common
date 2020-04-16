@@ -131,7 +131,7 @@ type Change
     = ChangeProjectName String
 
 
-{-| 型の定義
+{-| 型パーツ
 -}
 type alias TypePartSnapshot =
     { name : String, parentList : List PartId, description : String, projectId : ProjectId, createSuggestionId : SuggestionId, getTime : Time }
