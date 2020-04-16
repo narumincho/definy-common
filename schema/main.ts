@@ -38,7 +38,7 @@ const itemBodyName = "ItemBody";
 const suggestionName = "Suggestion";
 const suggestionStateName = "SuggestionState";
 const changeName = "Change";
-const typeDefinitionName = "TypeDefinition";
+const typeName = "Type";
 const partName = "Part";
 const typeBodyName = "TypeBody";
 const typeBodyProductMemberName = "TypeBodyProductMember";
@@ -535,7 +535,7 @@ const listCustomType: ReadonlyArray<type.CustomType> = [
     ]),
   },
   {
-    name: typeDefinitionName,
+    name: typeName,
     description: "型の定義",
     body: type.customTypeBodyProduct([
       {

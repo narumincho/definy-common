@@ -309,7 +309,7 @@ export type Change = { _: "ProjectName"; string_: string };
 /**
  * 型の定義
  */
-export type TypeDefinition = {
+export type Type = {
   /**
    * 型の名前
    */
@@ -1341,12 +1341,10 @@ export const encodeChange = (change: Change): ReadonlyArray<number> => {
   }
 };
 
-export const encodeTypeDefinition = (
-  typeDefinition: TypeDefinition
-): ReadonlyArray<number> =>
-  encodeString(typeDefinition.name)
-    .concat(encodeList(encodeId)(typeDefinition.parentList))
-    .concat(encodeString(typeDefinition.description));
+export const encodeType = (type_: Type): ReadonlyArray<number> =>
+  encodeString(type_.name)
+    .concat(encodeList(encodeId)(type_.parentList))
+    .concat(encodeString(type_.description));
 
 export const encodePart = (part: Part): ReadonlyArray<number> =>
   encodeString(part.name)
@@ -2602,10 +2600,10 @@ export const decodeChange = (
  * @param index バイナリを読み込み開始位置
  * @param binary バイナリ
  */
-export const decodeTypeDefinition = (
+export const decodeType = (
   index: number,
   binary: Uint8Array
-): { result: TypeDefinition; nextIndex: number } => {
+): { result: Type; nextIndex: number } => {
   const nameAndNextIndex: { result: string; nextIndex: number } = decodeString(
     index,
     binary
