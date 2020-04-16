@@ -4,17 +4,8 @@ import * as codeGen from "js-ts-code-generator";
 import * as fs from "fs";
 import * as childProcess from "child_process";
 import * as prettier from "prettier";
-
-const accessToken = type.typeToken("AccessToken");
-const userId = type.typeId("UserId");
-const projectId = type.typeId("ProjectId");
-const ideaId = type.typeId("IdeaId");
-const fileHash = type.typeToken("FileHash");
-const suggestionId = type.typeId("SuggestionId");
-const typePartId = type.typeId("TypeId");
-const tagId = type.typeId("TagId");
-const partId = type.typeId("PartId");
-const localPartId = type.typeId("LocalPartId");
+import * as suggestion from "./suggestion";
+import * as idAndToken from "./idAndToken";
 
 const timeName = "Time";
 const requestLogInUrlRequestDataName = "RequestLogInUrlRequestData";
@@ -35,18 +26,6 @@ const ideaSnapshotAndIdName = "IdeaSnapshotAndId";
 
 const ideaItemName = "IdeaItem";
 const itemBodyName = "ItemBody";
-const suggestionName = "Suggestion";
-const suggestionStateName = "SuggestionState";
-const changeName = "Change";
-const addPartName = "AddPart";
-const suggestionTypeName = "SuggestionType";
-const suggestionTypeFunctionName = "SuggestionTypeFunction";
-const suggestionTypeTypePartWithParameterName =
-  "SuggestionTypeTypePartWithParameter";
-const suggestionTypeSuggestionTypePartWithParameterName =
-  "SuggestionTypeSuggestionTypePartWithParameter";
-
-const suggestionExpr = "SuggestionExpr";
 
 const typePartSnapshotName = "TypePartSnapshot";
 const partSnapshotName = "PartSnapshot";
@@ -194,32 +173,32 @@ const listCustomType: ReadonlyArray<type.CustomType> = [
         name: "CreateIdea",
         description:
           "アイデア作成ページ. パラメーターのprojectIdは対象のプロジェクト",
-        parameter: type.maybeJust(projectId),
+        parameter: type.maybeJust(idAndToken.projectId),
       },
       {
         name: "EditSuggestion",
         description: "編集提案を編集するページ",
-        parameter: type.maybeJust(suggestionId),
+        parameter: type.maybeJust(idAndToken.suggestionId),
       },
       {
         name: "User",
         description: "ユーザーの詳細ページ",
-        parameter: type.maybeJust(userId),
+        parameter: type.maybeJust(idAndToken.userId),
       },
       {
         name: "Project",
         description: "プロジェクトの詳細ページ",
-        parameter: type.maybeJust(projectId),
+        parameter: type.maybeJust(idAndToken.projectId),
       },
       {
         name: "Idea",
         description: "アイデア詳細ページ",
-        parameter: type.maybeJust(ideaId),
+        parameter: type.maybeJust(idAndToken.ideaId),
       },
       {
         name: "Suggestion",
         description: "編集提案詳細ページ",
-        parameter: type.maybeJust(suggestionId),
+        parameter: type.maybeJust(idAndToken.suggestionId),
       },
     ]),
   },
@@ -257,7 +236,7 @@ const listCustomType: ReadonlyArray<type.CustomType> = [
       {
         name: "imageHash",
         description: "プロフィール画像",
-        memberType: fileHash,
+        memberType: idAndToken.fileHash,
       },
       {
         name: "introduction",
@@ -273,17 +252,17 @@ const listCustomType: ReadonlyArray<type.CustomType> = [
       {
         name: "likeProjectIdList",
         description: "プロジェクトに対する いいね",
-        memberType: type.typeList(projectId),
+        memberType: type.typeList(idAndToken.projectId),
       },
       {
         name: "developProjectIdList",
         description: "開発に参加した (書いたコードが使われた) プロジェクト",
-        memberType: type.typeList(projectId),
+        memberType: type.typeList(idAndToken.projectId),
       },
       {
         name: "commentIdeaIdList",
         description: "コメントをしたアイデア",
-        memberType: type.typeList(ideaId),
+        memberType: type.typeList(idAndToken.ideaId),
       },
       {
         name: "getTime",
@@ -299,7 +278,7 @@ const listCustomType: ReadonlyArray<type.CustomType> = [
       {
         name: "id",
         description: "ユーザーID",
-        memberType: userId,
+        memberType: idAndToken.userId,
       },
       {
         name: "snapshot",
@@ -320,12 +299,12 @@ const listCustomType: ReadonlyArray<type.CustomType> = [
       {
         name: "iconHash",
         description: "プロジェクトのアイコン画像",
-        memberType: fileHash,
+        memberType: idAndToken.fileHash,
       },
       {
         name: "imageHash",
         description: "プロジェクトのカバー画像",
-        memberType: fileHash,
+        memberType: idAndToken.fileHash,
       },
       {
         name: "createTime",
@@ -335,7 +314,7 @@ const listCustomType: ReadonlyArray<type.CustomType> = [
       {
         name: "createUser",
         description: "作成アカウント",
-        memberType: userId,
+        memberType: idAndToken.userId,
       },
       {
         name: "updateTime",
@@ -350,12 +329,12 @@ const listCustomType: ReadonlyArray<type.CustomType> = [
       {
         name: "partIdList",
         description: "所属しているのパーツのIDのリスト",
-        memberType: type.typeList(partId),
+        memberType: type.typeList(idAndToken.partId),
       },
       {
         name: "typePartIdList",
         description: "所属している型パーツのIDのリスト",
-        memberType: type.typeList(typePartId),
+        memberType: type.typeList(idAndToken.typePartId),
       },
     ]),
   },
@@ -366,7 +345,7 @@ const listCustomType: ReadonlyArray<type.CustomType> = [
       {
         name: "id",
         description: "プロジェクトID",
-        memberType: projectId,
+        memberType: idAndToken.projectId,
       },
       {
         name: "snapshot",
@@ -387,7 +366,7 @@ const listCustomType: ReadonlyArray<type.CustomType> = [
       {
         name: "createUser",
         description: "言い出しっぺ",
-        memberType: userId,
+        memberType: idAndToken.userId,
       },
       {
         name: "createTime",
@@ -397,7 +376,7 @@ const listCustomType: ReadonlyArray<type.CustomType> = [
       {
         name: "projectId",
         description: "対象のプロジェクト",
-        memberType: projectId,
+        memberType: idAndToken.projectId,
       },
       {
         name: "itemList",
@@ -423,7 +402,7 @@ const listCustomType: ReadonlyArray<type.CustomType> = [
       {
         name: "id",
         description: "アイデアID",
-        memberType: ideaId,
+        memberType: idAndToken.ideaId,
       },
       {
         name: "snapshot",
@@ -439,7 +418,7 @@ const listCustomType: ReadonlyArray<type.CustomType> = [
       {
         name: "createUserId",
         description: "作成者",
-        memberType: userId,
+        memberType: idAndToken.userId,
       },
       {
         name: "createTime",
@@ -465,194 +444,22 @@ const listCustomType: ReadonlyArray<type.CustomType> = [
       {
         name: "SuggestionCreate",
         description: "編集提案を作成した",
-        parameter: type.maybeJust(suggestionId),
+        parameter: type.maybeJust(idAndToken.suggestionId),
       },
       {
         name: "SuggestionApprovalPending",
         description: "編集提案が作成されて承認待ちになった",
-        parameter: type.maybeJust(suggestionId),
+        parameter: type.maybeJust(idAndToken.suggestionId),
       },
       {
         name: "SuggestionApproved",
         description: "編集提案が承認された",
-        parameter: type.maybeJust(suggestionId),
+        parameter: type.maybeJust(idAndToken.suggestionId),
       },
       {
         name: "SuggestionRejected",
         description: "編集提案が拒否された",
-        parameter: type.maybeJust(suggestionId),
-      },
-    ]),
-  },
-  {
-    name: suggestionName,
-    description: "編集提案",
-    body: type.customTypeBodyProduct([
-      {
-        name: "name",
-        description: "変更概要",
-        memberType: type.typeString,
-      },
-      {
-        name: "reason",
-        description: "変更理由",
-        memberType: type.typeString,
-      },
-      {
-        name: "state",
-        description: "承認状態",
-        memberType: type.typeCustom(suggestionStateName),
-      },
-      {
-        name: "changeList",
-        description: "変更",
-        memberType: type.typeList(type.typeCustom(changeName)),
-      },
-      {
-        name: "projectId",
-        description: "変更をするプロジェクト",
-        memberType: projectId,
-      },
-      {
-        name: "ideaId",
-        description: "投稿したアイデアID",
-        memberType: ideaId,
-      },
-    ]),
-  },
-  {
-    name: suggestionStateName,
-    description: "提案の状況",
-    body: type.customTypeBodySum([
-      {
-        name: "Creating",
-        description: "作成中",
-        parameter: type.maybeNothing(),
-      },
-      {
-        name: "ApprovalPending",
-        description: "承認待ち",
-        parameter: type.maybeNothing(),
-      },
-      {
-        name: "Approved",
-        description: "承認済み",
-        parameter: type.maybeNothing(),
-      },
-      {
-        name: "Rejected",
-        description: "拒否された",
-        parameter: type.maybeNothing(),
-      },
-    ]),
-  },
-  {
-    name: changeName,
-    description: "変更点",
-    body: type.customTypeBodySum([
-      {
-        name: "ProjectName",
-        description: "プロジェクト名の変更",
-        parameter: type.maybeJust(type.typeString),
-      },
-      {
-        name: "AddPart",
-        description: "パーツの追加",
-        parameter: type.maybeJust(type.typeCustom(addPartName)),
-      },
-    ]),
-  },
-  {
-    name: addPartName,
-    description: "パーツを追加するのに必要なもの",
-    body: type.customTypeBodyProduct([
-      {
-        name: "name",
-        description: "新しいパーツの名前",
-        memberType: type.typeString,
-      },
-      {
-        name: "description",
-        description: "新しいパーツの説明",
-        memberType: type.typeString,
-      },
-      {
-        name: "type",
-        description: "新しいパーツの型",
-        memberType: type.typeCustom(suggestionTypeName),
-      },
-    ]),
-  },
-  {
-    name: suggestionTypeName,
-    description: "ChangeのAddPartなどで使われる提案で作成した型を使えるType",
-    body: type.customTypeBodySum([
-      {
-        name: "Function",
-        description: "関数",
-        parameter: type.maybeJust(type.typeCustom(suggestionTypeFunctionName)),
-      },
-      {
-        name: "TypePartWithParameter",
-        description: "提案前に作られた型パーツとパラメーター",
-        parameter: type.maybeJust(
-          type.typeCustom(suggestionTypeTypePartWithParameterName)
-        ),
-      },
-      {
-        name: "SuggestionTypePartWithParameter",
-        description: "提案時に作られた型パーツとパラメーター",
-        parameter: type.maybeJust(
-          type.typeCustom(suggestionTypeTypePartWithParameterName)
-        ),
-      },
-    ]),
-  },
-  {
-    name: suggestionTypeFunctionName,
-    description: "",
-    body: type.customTypeBodyProduct([
-      {
-        name: "inputType",
-        description: "入力の型",
-        memberType: type.typeCustom(suggestionTypeName),
-      },
-      {
-        name: "outputType",
-        description: "出力の型",
-        memberType: type.typeCustom(suggestionTypeName),
-      },
-    ]),
-  },
-  {
-    name: suggestionTypeTypePartWithParameterName,
-    description: "",
-    body: type.customTypeBodyProduct([
-      {
-        name: "typePartId",
-        description: "型の参照",
-        memberType: typePartId,
-      },
-      {
-        name: "parameter",
-        description: "型のパラメーター",
-        memberType: type.typeList(type.typeCustom(suggestionTypeName)),
-      },
-    ]),
-  },
-  {
-    name: suggestionTypeSuggestionTypePartWithParameterName,
-    description: "",
-    body: type.customTypeBodyProduct([
-      {
-        name: "suggestTypePartIndex",
-        description: "提案内での定義した型パーツの番号",
-        memberType: typePartId,
-      },
-      {
-        name: "parameter",
-        description: "型のパラメーター",
-        memberType: type.typeList(type.typeCustom(suggestionTypeName)),
+        parameter: type.maybeJust(idAndToken.suggestionId),
       },
     ]),
   },
@@ -668,7 +475,7 @@ const listCustomType: ReadonlyArray<type.CustomType> = [
       {
         name: "parentList",
         description: "この型パーツの元",
-        memberType: type.typeList(partId),
+        memberType: type.typeList(idAndToken.partId),
       },
       {
         name: "description",
@@ -678,12 +485,12 @@ const listCustomType: ReadonlyArray<type.CustomType> = [
       {
         name: "projectId",
         description: "所属しているプロジェクトのID",
-        memberType: projectId,
+        memberType: idAndToken.projectId,
       },
       {
         name: "createSuggestionId",
         description: "この型パーツが作成された提案",
-        memberType: suggestionId,
+        memberType: idAndToken.suggestionId,
       },
       {
         name: "getTime",
@@ -704,7 +511,7 @@ const listCustomType: ReadonlyArray<type.CustomType> = [
       {
         name: "parentList",
         description: "このパーツの元",
-        memberType: type.typeList(partId),
+        memberType: type.typeList(idAndToken.partId),
       },
       {
         name: "description",
@@ -724,12 +531,12 @@ const listCustomType: ReadonlyArray<type.CustomType> = [
       {
         name: "projectId",
         description: "所属しているプロジェクトのID",
-        memberType: projectId,
+        memberType: idAndToken.projectId,
       },
       {
         name: "createSuggestionId",
         description: "このパーツが作成された提案",
-        memberType: suggestionId,
+        memberType: idAndToken.suggestionId,
       },
       {
         name: "getTime",
@@ -862,7 +669,7 @@ const listCustomType: ReadonlyArray<type.CustomType> = [
       {
         name: "typePartId",
         description: "型の参照",
-        memberType: typePartId,
+        memberType: idAndToken.typePartId,
       },
       {
         name: "parameter",
@@ -888,7 +695,7 @@ const listCustomType: ReadonlyArray<type.CustomType> = [
       {
         name: "PartReference",
         description: "パーツの値を参照",
-        parameter: type.maybeJust(partId),
+        parameter: type.maybeJust(idAndToken.partId),
       },
       {
         name: "LocalPartReference",
@@ -991,12 +798,12 @@ const listCustomType: ReadonlyArray<type.CustomType> = [
       {
         name: "partId",
         description: "ローカルパスが定義されているパーツのID",
-        memberType: partId,
+        memberType: idAndToken.partId,
       },
       {
         name: "localPartId",
         description: "ローカルパーツID",
-        memberType: localPartId,
+        memberType: idAndToken.localPartId,
       },
     ]),
   },
@@ -1007,7 +814,7 @@ const listCustomType: ReadonlyArray<type.CustomType> = [
       {
         name: "typePartId",
         description: "型ID",
-        memberType: typePartId,
+        memberType: idAndToken.typePartId,
       },
       {
         name: "tagIndex",
@@ -1091,7 +898,7 @@ const listCustomType: ReadonlyArray<type.CustomType> = [
       {
         name: "tag",
         description: "タグ",
-        memberType: tagId,
+        memberType: idAndToken.tagId,
       },
       {
         name: "parameter",
@@ -1112,7 +919,7 @@ const listCustomType: ReadonlyArray<type.CustomType> = [
       {
         name: "localPartId",
         description: "ローカルパーツId",
-        memberType: localPartId,
+        memberType: idAndToken.localPartId,
       },
     ]),
   },
@@ -1123,7 +930,7 @@ const listCustomType: ReadonlyArray<type.CustomType> = [
       {
         name: "localPartId",
         description: "ローカルパーツID",
-        memberType: localPartId,
+        memberType: idAndToken.localPartId,
       },
       {
         name: "name",
@@ -1154,12 +961,12 @@ const listCustomType: ReadonlyArray<type.CustomType> = [
       {
         name: "NeedPartDefinition",
         description: "式を評価するには,このパーツの定義が必要だと言っている",
-        parameter: type.maybeJust(partId),
+        parameter: type.maybeJust(idAndToken.partId),
       },
       {
         name: "PartExprIsNothing",
         description: "パーツの式が空だと言っている",
-        parameter: type.maybeJust(partId),
+        parameter: type.maybeJust(idAndToken.partId),
       },
       {
         name: "CannotFindLocalPartDefinition",
@@ -1196,7 +1003,7 @@ const listCustomType: ReadonlyArray<type.CustomType> = [
       {
         name: "accessToken",
         description: "プロジェクトを作るときのアカウント",
-        memberType: accessToken,
+        memberType: idAndToken.accessToken,
       },
       {
         name: "projectName",
@@ -1212,7 +1019,7 @@ const listCustomType: ReadonlyArray<type.CustomType> = [
       {
         name: "accessToken",
         description: "プロジェクトを作るときのアカウント",
-        memberType: accessToken,
+        memberType: idAndToken.accessToken,
       },
       {
         name: "ideaName",
@@ -1222,7 +1029,7 @@ const listCustomType: ReadonlyArray<type.CustomType> = [
       {
         name: "projectId",
         description: "対象のプロジェクトID",
-        memberType: projectId,
+        memberType: idAndToken.projectId,
       },
     ]),
   },
@@ -1233,12 +1040,12 @@ const listCustomType: ReadonlyArray<type.CustomType> = [
       {
         name: "accessToken",
         description: "プロジェクトを作るときのアカウント",
-        memberType: accessToken,
+        memberType: idAndToken.accessToken,
       },
       {
         name: "ideaId",
         description: "コメントを追加するアイデア",
-        memberType: ideaId,
+        memberType: idAndToken.ideaId,
       },
       {
         name: "comment",
@@ -1272,7 +1079,7 @@ const listCustomType: ReadonlyArray<type.CustomType> = [
       {
         name: "id",
         description: "プロジェクトのID",
-        memberType: projectId,
+        memberType: idAndToken.projectId,
       },
       {
         name: "snapshotMaybe",
@@ -1289,7 +1096,7 @@ const listCustomType: ReadonlyArray<type.CustomType> = [
       {
         name: "id",
         description: "ユーザーID",
-        memberType: userId,
+        memberType: idAndToken.userId,
       },
       {
         name: "snapshotMaybe",
@@ -1305,7 +1112,7 @@ const listCustomType: ReadonlyArray<type.CustomType> = [
       {
         name: "id",
         description: "アイデアID",
-        memberType: ideaId,
+        memberType: idAndToken.ideaId,
       },
       {
         name: "snapshotMaybe",
@@ -1321,7 +1128,7 @@ const listCustomType: ReadonlyArray<type.CustomType> = [
       {
         name: "projectId",
         description: "プロジェクトID",
-        memberType: projectId,
+        memberType: idAndToken.projectId,
       },
       {
         name: "ideaSnapshotAndIdList",
@@ -1330,6 +1137,7 @@ const listCustomType: ReadonlyArray<type.CustomType> = [
       },
     ]),
   },
+  ...suggestion.customTypeList,
 ];
 
 const code = codeGen.generateCodeAsString(

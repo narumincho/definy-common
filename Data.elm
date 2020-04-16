@@ -110,54 +110,6 @@ type ItemBody
     | ItemBodySuggestionRejected SuggestionId
 
 
-{-| 編集提案
--}
-type alias Suggestion =
-    { name : String, reason : String, state : SuggestionState, changeList : List Change, projectId : ProjectId, ideaId : IdeaId }
-
-
-{-| 提案の状況
--}
-type SuggestionState
-    = SuggestionStateCreating
-    | SuggestionStateApprovalPending
-    | SuggestionStateApproved
-    | SuggestionStateRejected
-
-
-{-| 変更点
--}
-type Change
-    = ChangeProjectName String
-    | ChangeAddPart AddPart
-
-
-{-| パーツを追加するのに必要なもの
--}
-type alias AddPart =
-    { name : String, description : String, type_ : SuggestionType }
-
-
-{-| ChangeのAddPartなどで使われる提案で作成した型を使えるType
--}
-type SuggestionType
-    = SuggestionTypeFunction SuggestionTypeFunction
-    | SuggestionTypeTypePartWithParameter SuggestionTypeTypePartWithParameter
-    | SuggestionTypeSuggestionTypePartWithParameter SuggestionTypeTypePartWithParameter
-
-
-type alias SuggestionTypeFunction =
-    { inputType : SuggestionType, outputType : SuggestionType }
-
-
-type alias SuggestionTypeTypePartWithParameter =
-    { typePartId : TypeId, parameter : List SuggestionType }
-
-
-type alias SuggestionTypeSuggestionTypePartWithParameter =
-    { suggestTypePartIndex : TypeId, parameter : List SuggestionType }
-
-
 {-| 型パーツ
 -}
 type alias TypePartSnapshot =
@@ -360,6 +312,54 @@ type alias IdeaResponse =
 -}
 type alias IdeaListByProjectIdResponse =
     { projectId : ProjectId, ideaSnapshotAndIdList : List IdeaSnapshotAndId }
+
+
+{-| 編集提案
+-}
+type alias Suggestion =
+    { name : String, reason : String, state : SuggestionState, changeList : List Change, projectId : ProjectId, ideaId : IdeaId }
+
+
+{-| 提案の状況
+-}
+type SuggestionState
+    = SuggestionStateCreating
+    | SuggestionStateApprovalPending
+    | SuggestionStateApproved
+    | SuggestionStateRejected
+
+
+{-| 変更点
+-}
+type Change
+    = ChangeProjectName String
+    | ChangeAddPart AddPart
+
+
+{-| パーツを追加するのに必要なもの
+-}
+type alias AddPart =
+    { name : String, description : String, type_ : SuggestionType }
+
+
+{-| ChangeのAddPartなどで使われる提案で作成した型を使えるType
+-}
+type SuggestionType
+    = SuggestionTypeFunction SuggestionTypeFunction
+    | SuggestionTypeTypePartWithParameter SuggestionTypeTypePartWithParameter
+    | SuggestionTypeSuggestionTypePartWithParameter SuggestionTypeTypePartWithParameter
+
+
+type alias SuggestionTypeFunction =
+    { inputType : SuggestionType, outputType : SuggestionType }
+
+
+type alias SuggestionTypeTypePartWithParameter =
+    { typePartId : TypeId, parameter : List SuggestionType }
+
+
+type alias SuggestionTypeSuggestionTypePartWithParameter =
+    { suggestTypePartIndex : TypeId, parameter : List SuggestionType }
 
 
 type ProjectId
@@ -680,106 +680,6 @@ itemBodyToJsonValue itemBody =
 
         ItemBodySuggestionRejected parameter ->
             Je.object [ ( "_", Je.string "SuggestionRejected" ), ( "suggestionId", suggestionIdToJsonValue parameter ) ]
-
-
-{-| SuggestionのJSONへのエンコーダ
--}
-suggestionToJsonValue : Suggestion -> Je.Value
-suggestionToJsonValue suggestion =
-    Je.object
-        [ ( "name", Je.string suggestion.name )
-        , ( "reason", Je.string suggestion.reason )
-        , ( "state", suggestionStateToJsonValue suggestion.state )
-        , ( "changeList", Je.list changeToJsonValue suggestion.changeList )
-        , ( "projectId", projectIdToJsonValue suggestion.projectId )
-        , ( "ideaId", ideaIdToJsonValue suggestion.ideaId )
-        ]
-
-
-{-| SuggestionStateのJSONへのエンコーダ
--}
-suggestionStateToJsonValue : SuggestionState -> Je.Value
-suggestionStateToJsonValue suggestionState =
-    case suggestionState of
-        SuggestionStateCreating ->
-            Je.string "Creating"
-
-        SuggestionStateApprovalPending ->
-            Je.string "ApprovalPending"
-
-        SuggestionStateApproved ->
-            Je.string "Approved"
-
-        SuggestionStateRejected ->
-            Je.string "Rejected"
-
-
-{-| ChangeのJSONへのエンコーダ
--}
-changeToJsonValue : Change -> Je.Value
-changeToJsonValue change =
-    case change of
-        ChangeProjectName parameter ->
-            Je.object [ ( "_", Je.string "ProjectName" ), ( "string_", Je.string parameter ) ]
-
-        ChangeAddPart parameter ->
-            Je.object [ ( "_", Je.string "AddPart" ), ( "addPart", addPartToJsonValue parameter ) ]
-
-
-{-| AddPartのJSONへのエンコーダ
--}
-addPartToJsonValue : AddPart -> Je.Value
-addPartToJsonValue addPart =
-    Je.object
-        [ ( "name", Je.string addPart.name )
-        , ( "description", Je.string addPart.description )
-        , ( "type", suggestionTypeToJsonValue addPart.type_ )
-        ]
-
-
-{-| SuggestionTypeのJSONへのエンコーダ
--}
-suggestionTypeToJsonValue : SuggestionType -> Je.Value
-suggestionTypeToJsonValue suggestionType =
-    case suggestionType of
-        SuggestionTypeFunction parameter ->
-            Je.object [ ( "_", Je.string "Function" ), ( "suggestionTypeFunction", suggestionTypeFunctionToJsonValue parameter ) ]
-
-        SuggestionTypeTypePartWithParameter parameter ->
-            Je.object [ ( "_", Je.string "TypePartWithParameter" ), ( "suggestionTypeTypePartWithParameter", suggestionTypeTypePartWithParameterToJsonValue parameter ) ]
-
-        SuggestionTypeSuggestionTypePartWithParameter parameter ->
-            Je.object [ ( "_", Je.string "SuggestionTypePartWithParameter" ), ( "suggestionTypeTypePartWithParameter", suggestionTypeTypePartWithParameterToJsonValue parameter ) ]
-
-
-{-| SuggestionTypeFunctionのJSONへのエンコーダ
--}
-suggestionTypeFunctionToJsonValue : SuggestionTypeFunction -> Je.Value
-suggestionTypeFunctionToJsonValue suggestionTypeFunction =
-    Je.object
-        [ ( "inputType", suggestionTypeToJsonValue suggestionTypeFunction.inputType )
-        , ( "outputType", suggestionTypeToJsonValue suggestionTypeFunction.outputType )
-        ]
-
-
-{-| SuggestionTypeTypePartWithParameterのJSONへのエンコーダ
--}
-suggestionTypeTypePartWithParameterToJsonValue : SuggestionTypeTypePartWithParameter -> Je.Value
-suggestionTypeTypePartWithParameterToJsonValue suggestionTypeTypePartWithParameter =
-    Je.object
-        [ ( "typePartId", typeIdToJsonValue suggestionTypeTypePartWithParameter.typePartId )
-        , ( "parameter", Je.list suggestionTypeToJsonValue suggestionTypeTypePartWithParameter.parameter )
-        ]
-
-
-{-| SuggestionTypeSuggestionTypePartWithParameterのJSONへのエンコーダ
--}
-suggestionTypeSuggestionTypePartWithParameterToJsonValue : SuggestionTypeSuggestionTypePartWithParameter -> Je.Value
-suggestionTypeSuggestionTypePartWithParameterToJsonValue suggestionTypeSuggestionTypePartWithParameter =
-    Je.object
-        [ ( "suggestTypePartIndex", typeIdToJsonValue suggestionTypeSuggestionTypePartWithParameter.suggestTypePartIndex )
-        , ( "parameter", Je.list suggestionTypeToJsonValue suggestionTypeSuggestionTypePartWithParameter.parameter )
-        ]
 
 
 {-| TypePartSnapshotのJSONへのエンコーダ
@@ -1173,6 +1073,106 @@ ideaListByProjectIdResponseToJsonValue ideaListByProjectIdResponse =
         ]
 
 
+{-| SuggestionのJSONへのエンコーダ
+-}
+suggestionToJsonValue : Suggestion -> Je.Value
+suggestionToJsonValue suggestion =
+    Je.object
+        [ ( "name", Je.string suggestion.name )
+        , ( "reason", Je.string suggestion.reason )
+        , ( "state", suggestionStateToJsonValue suggestion.state )
+        , ( "changeList", Je.list changeToJsonValue suggestion.changeList )
+        , ( "projectId", projectIdToJsonValue suggestion.projectId )
+        , ( "ideaId", ideaIdToJsonValue suggestion.ideaId )
+        ]
+
+
+{-| SuggestionStateのJSONへのエンコーダ
+-}
+suggestionStateToJsonValue : SuggestionState -> Je.Value
+suggestionStateToJsonValue suggestionState =
+    case suggestionState of
+        SuggestionStateCreating ->
+            Je.string "Creating"
+
+        SuggestionStateApprovalPending ->
+            Je.string "ApprovalPending"
+
+        SuggestionStateApproved ->
+            Je.string "Approved"
+
+        SuggestionStateRejected ->
+            Je.string "Rejected"
+
+
+{-| ChangeのJSONへのエンコーダ
+-}
+changeToJsonValue : Change -> Je.Value
+changeToJsonValue change =
+    case change of
+        ChangeProjectName parameter ->
+            Je.object [ ( "_", Je.string "ProjectName" ), ( "string_", Je.string parameter ) ]
+
+        ChangeAddPart parameter ->
+            Je.object [ ( "_", Je.string "AddPart" ), ( "addPart", addPartToJsonValue parameter ) ]
+
+
+{-| AddPartのJSONへのエンコーダ
+-}
+addPartToJsonValue : AddPart -> Je.Value
+addPartToJsonValue addPart =
+    Je.object
+        [ ( "name", Je.string addPart.name )
+        , ( "description", Je.string addPart.description )
+        , ( "type", suggestionTypeToJsonValue addPart.type_ )
+        ]
+
+
+{-| SuggestionTypeのJSONへのエンコーダ
+-}
+suggestionTypeToJsonValue : SuggestionType -> Je.Value
+suggestionTypeToJsonValue suggestionType =
+    case suggestionType of
+        SuggestionTypeFunction parameter ->
+            Je.object [ ( "_", Je.string "Function" ), ( "suggestionTypeFunction", suggestionTypeFunctionToJsonValue parameter ) ]
+
+        SuggestionTypeTypePartWithParameter parameter ->
+            Je.object [ ( "_", Je.string "TypePartWithParameter" ), ( "suggestionTypeTypePartWithParameter", suggestionTypeTypePartWithParameterToJsonValue parameter ) ]
+
+        SuggestionTypeSuggestionTypePartWithParameter parameter ->
+            Je.object [ ( "_", Je.string "SuggestionTypePartWithParameter" ), ( "suggestionTypeTypePartWithParameter", suggestionTypeTypePartWithParameterToJsonValue parameter ) ]
+
+
+{-| SuggestionTypeFunctionのJSONへのエンコーダ
+-}
+suggestionTypeFunctionToJsonValue : SuggestionTypeFunction -> Je.Value
+suggestionTypeFunctionToJsonValue suggestionTypeFunction =
+    Je.object
+        [ ( "inputType", suggestionTypeToJsonValue suggestionTypeFunction.inputType )
+        , ( "outputType", suggestionTypeToJsonValue suggestionTypeFunction.outputType )
+        ]
+
+
+{-| SuggestionTypeTypePartWithParameterのJSONへのエンコーダ
+-}
+suggestionTypeTypePartWithParameterToJsonValue : SuggestionTypeTypePartWithParameter -> Je.Value
+suggestionTypeTypePartWithParameterToJsonValue suggestionTypeTypePartWithParameter =
+    Je.object
+        [ ( "typePartId", typeIdToJsonValue suggestionTypeTypePartWithParameter.typePartId )
+        , ( "parameter", Je.list suggestionTypeToJsonValue suggestionTypeTypePartWithParameter.parameter )
+        ]
+
+
+{-| SuggestionTypeSuggestionTypePartWithParameterのJSONへのエンコーダ
+-}
+suggestionTypeSuggestionTypePartWithParameterToJsonValue : SuggestionTypeSuggestionTypePartWithParameter -> Je.Value
+suggestionTypeSuggestionTypePartWithParameterToJsonValue suggestionTypeSuggestionTypePartWithParameter =
+    Je.object
+        [ ( "suggestTypePartIndex", typeIdToJsonValue suggestionTypeSuggestionTypePartWithParameter.suggestTypePartIndex )
+        , ( "parameter", Je.list suggestionTypeToJsonValue suggestionTypeSuggestionTypePartWithParameter.parameter )
+        ]
+
+
 maybeJsonDecoder : Jd.Decoder a -> Jd.Decoder (Maybe a)
 maybeJsonDecoder decoder =
     Jd.field "_" Jd.string
@@ -1560,152 +1560,6 @@ itemBodyJsonDecoder =
                     _ ->
                         Jd.fail ("ItemBodyで不明なタグを受けたとった tag=" ++ tag)
             )
-
-
-{-| SuggestionのJSON Decoder
--}
-suggestionJsonDecoder : Jd.Decoder Suggestion
-suggestionJsonDecoder =
-    Jd.succeed
-        (\name reason state changeList projectId ideaId ->
-            { name = name
-            , reason = reason
-            , state = state
-            , changeList = changeList
-            , projectId = projectId
-            , ideaId = ideaId
-            }
-        )
-        |> Jdp.required "name" Jd.string
-        |> Jdp.required "reason" Jd.string
-        |> Jdp.required "state" suggestionStateJsonDecoder
-        |> Jdp.required "changeList" (Jd.list changeJsonDecoder)
-        |> Jdp.required "projectId" projectIdJsonDecoder
-        |> Jdp.required "ideaId" ideaIdJsonDecoder
-
-
-{-| SuggestionStateのJSON Decoder
--}
-suggestionStateJsonDecoder : Jd.Decoder SuggestionState
-suggestionStateJsonDecoder =
-    Jd.string
-        |> Jd.andThen
-            (\tag ->
-                case tag of
-                    "Creating" ->
-                        Jd.succeed SuggestionStateCreating
-
-                    "ApprovalPending" ->
-                        Jd.succeed SuggestionStateApprovalPending
-
-                    "Approved" ->
-                        Jd.succeed SuggestionStateApproved
-
-                    "Rejected" ->
-                        Jd.succeed SuggestionStateRejected
-
-                    _ ->
-                        Jd.fail ("SuggestionStateで不明なタグを受けたとった tag=" ++ tag)
-            )
-
-
-{-| ChangeのJSON Decoder
--}
-changeJsonDecoder : Jd.Decoder Change
-changeJsonDecoder =
-    Jd.field "_" Jd.string
-        |> Jd.andThen
-            (\tag ->
-                case tag of
-                    "ProjectName" ->
-                        Jd.field "string_" Jd.string |> Jd.map ChangeProjectName
-
-                    "AddPart" ->
-                        Jd.field "addPart" addPartJsonDecoder |> Jd.map ChangeAddPart
-
-                    _ ->
-                        Jd.fail ("Changeで不明なタグを受けたとった tag=" ++ tag)
-            )
-
-
-{-| AddPartのJSON Decoder
--}
-addPartJsonDecoder : Jd.Decoder AddPart
-addPartJsonDecoder =
-    Jd.succeed
-        (\name description type_ ->
-            { name = name
-            , description = description
-            , type_ = type_
-            }
-        )
-        |> Jdp.required "name" Jd.string
-        |> Jdp.required "description" Jd.string
-        |> Jdp.required "type" suggestionTypeJsonDecoder
-
-
-{-| SuggestionTypeのJSON Decoder
--}
-suggestionTypeJsonDecoder : Jd.Decoder SuggestionType
-suggestionTypeJsonDecoder =
-    Jd.field "_" Jd.string
-        |> Jd.andThen
-            (\tag ->
-                case tag of
-                    "Function" ->
-                        Jd.field "suggestionTypeFunction" suggestionTypeFunctionJsonDecoder |> Jd.map SuggestionTypeFunction
-
-                    "TypePartWithParameter" ->
-                        Jd.field "suggestionTypeTypePartWithParameter" suggestionTypeTypePartWithParameterJsonDecoder |> Jd.map SuggestionTypeTypePartWithParameter
-
-                    "SuggestionTypePartWithParameter" ->
-                        Jd.field "suggestionTypeTypePartWithParameter" suggestionTypeTypePartWithParameterJsonDecoder |> Jd.map SuggestionTypeSuggestionTypePartWithParameter
-
-                    _ ->
-                        Jd.fail ("SuggestionTypeで不明なタグを受けたとった tag=" ++ tag)
-            )
-
-
-{-| SuggestionTypeFunctionのJSON Decoder
--}
-suggestionTypeFunctionJsonDecoder : Jd.Decoder SuggestionTypeFunction
-suggestionTypeFunctionJsonDecoder =
-    Jd.succeed
-        (\inputType outputType ->
-            { inputType = inputType
-            , outputType = outputType
-            }
-        )
-        |> Jdp.required "inputType" suggestionTypeJsonDecoder
-        |> Jdp.required "outputType" suggestionTypeJsonDecoder
-
-
-{-| SuggestionTypeTypePartWithParameterのJSON Decoder
--}
-suggestionTypeTypePartWithParameterJsonDecoder : Jd.Decoder SuggestionTypeTypePartWithParameter
-suggestionTypeTypePartWithParameterJsonDecoder =
-    Jd.succeed
-        (\typePartId parameter ->
-            { typePartId = typePartId
-            , parameter = parameter
-            }
-        )
-        |> Jdp.required "typePartId" typeIdJsonDecoder
-        |> Jdp.required "parameter" (Jd.list suggestionTypeJsonDecoder)
-
-
-{-| SuggestionTypeSuggestionTypePartWithParameterのJSON Decoder
--}
-suggestionTypeSuggestionTypePartWithParameterJsonDecoder : Jd.Decoder SuggestionTypeSuggestionTypePartWithParameter
-suggestionTypeSuggestionTypePartWithParameterJsonDecoder =
-    Jd.succeed
-        (\suggestTypePartIndex parameter ->
-            { suggestTypePartIndex = suggestTypePartIndex
-            , parameter = parameter
-            }
-        )
-        |> Jdp.required "suggestTypePartIndex" typeIdJsonDecoder
-        |> Jdp.required "parameter" (Jd.list suggestionTypeJsonDecoder)
 
 
 {-| TypePartSnapshotのJSON Decoder
@@ -2266,3 +2120,149 @@ ideaListByProjectIdResponseJsonDecoder =
         )
         |> Jdp.required "projectId" projectIdJsonDecoder
         |> Jdp.required "ideaSnapshotAndIdList" (Jd.list ideaSnapshotAndIdJsonDecoder)
+
+
+{-| SuggestionのJSON Decoder
+-}
+suggestionJsonDecoder : Jd.Decoder Suggestion
+suggestionJsonDecoder =
+    Jd.succeed
+        (\name reason state changeList projectId ideaId ->
+            { name = name
+            , reason = reason
+            , state = state
+            , changeList = changeList
+            , projectId = projectId
+            , ideaId = ideaId
+            }
+        )
+        |> Jdp.required "name" Jd.string
+        |> Jdp.required "reason" Jd.string
+        |> Jdp.required "state" suggestionStateJsonDecoder
+        |> Jdp.required "changeList" (Jd.list changeJsonDecoder)
+        |> Jdp.required "projectId" projectIdJsonDecoder
+        |> Jdp.required "ideaId" ideaIdJsonDecoder
+
+
+{-| SuggestionStateのJSON Decoder
+-}
+suggestionStateJsonDecoder : Jd.Decoder SuggestionState
+suggestionStateJsonDecoder =
+    Jd.string
+        |> Jd.andThen
+            (\tag ->
+                case tag of
+                    "Creating" ->
+                        Jd.succeed SuggestionStateCreating
+
+                    "ApprovalPending" ->
+                        Jd.succeed SuggestionStateApprovalPending
+
+                    "Approved" ->
+                        Jd.succeed SuggestionStateApproved
+
+                    "Rejected" ->
+                        Jd.succeed SuggestionStateRejected
+
+                    _ ->
+                        Jd.fail ("SuggestionStateで不明なタグを受けたとった tag=" ++ tag)
+            )
+
+
+{-| ChangeのJSON Decoder
+-}
+changeJsonDecoder : Jd.Decoder Change
+changeJsonDecoder =
+    Jd.field "_" Jd.string
+        |> Jd.andThen
+            (\tag ->
+                case tag of
+                    "ProjectName" ->
+                        Jd.field "string_" Jd.string |> Jd.map ChangeProjectName
+
+                    "AddPart" ->
+                        Jd.field "addPart" addPartJsonDecoder |> Jd.map ChangeAddPart
+
+                    _ ->
+                        Jd.fail ("Changeで不明なタグを受けたとった tag=" ++ tag)
+            )
+
+
+{-| AddPartのJSON Decoder
+-}
+addPartJsonDecoder : Jd.Decoder AddPart
+addPartJsonDecoder =
+    Jd.succeed
+        (\name description type_ ->
+            { name = name
+            , description = description
+            , type_ = type_
+            }
+        )
+        |> Jdp.required "name" Jd.string
+        |> Jdp.required "description" Jd.string
+        |> Jdp.required "type" suggestionTypeJsonDecoder
+
+
+{-| SuggestionTypeのJSON Decoder
+-}
+suggestionTypeJsonDecoder : Jd.Decoder SuggestionType
+suggestionTypeJsonDecoder =
+    Jd.field "_" Jd.string
+        |> Jd.andThen
+            (\tag ->
+                case tag of
+                    "Function" ->
+                        Jd.field "suggestionTypeFunction" suggestionTypeFunctionJsonDecoder |> Jd.map SuggestionTypeFunction
+
+                    "TypePartWithParameter" ->
+                        Jd.field "suggestionTypeTypePartWithParameter" suggestionTypeTypePartWithParameterJsonDecoder |> Jd.map SuggestionTypeTypePartWithParameter
+
+                    "SuggestionTypePartWithParameter" ->
+                        Jd.field "suggestionTypeTypePartWithParameter" suggestionTypeTypePartWithParameterJsonDecoder |> Jd.map SuggestionTypeSuggestionTypePartWithParameter
+
+                    _ ->
+                        Jd.fail ("SuggestionTypeで不明なタグを受けたとった tag=" ++ tag)
+            )
+
+
+{-| SuggestionTypeFunctionのJSON Decoder
+-}
+suggestionTypeFunctionJsonDecoder : Jd.Decoder SuggestionTypeFunction
+suggestionTypeFunctionJsonDecoder =
+    Jd.succeed
+        (\inputType outputType ->
+            { inputType = inputType
+            , outputType = outputType
+            }
+        )
+        |> Jdp.required "inputType" suggestionTypeJsonDecoder
+        |> Jdp.required "outputType" suggestionTypeJsonDecoder
+
+
+{-| SuggestionTypeTypePartWithParameterのJSON Decoder
+-}
+suggestionTypeTypePartWithParameterJsonDecoder : Jd.Decoder SuggestionTypeTypePartWithParameter
+suggestionTypeTypePartWithParameterJsonDecoder =
+    Jd.succeed
+        (\typePartId parameter ->
+            { typePartId = typePartId
+            , parameter = parameter
+            }
+        )
+        |> Jdp.required "typePartId" typeIdJsonDecoder
+        |> Jdp.required "parameter" (Jd.list suggestionTypeJsonDecoder)
+
+
+{-| SuggestionTypeSuggestionTypePartWithParameterのJSON Decoder
+-}
+suggestionTypeSuggestionTypePartWithParameterJsonDecoder : Jd.Decoder SuggestionTypeSuggestionTypePartWithParameter
+suggestionTypeSuggestionTypePartWithParameterJsonDecoder =
+    Jd.succeed
+        (\suggestTypePartIndex parameter ->
+            { suggestTypePartIndex = suggestTypePartIndex
+            , parameter = parameter
+            }
+        )
+        |> Jdp.required "suggestTypePartIndex" typeIdJsonDecoder
+        |> Jdp.required "parameter" (Jd.list suggestionTypeJsonDecoder)

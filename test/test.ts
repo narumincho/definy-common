@@ -117,10 +117,10 @@ describe("test", () => {
      *
      * = (add (addOneHundred one)) one
      */
-    const intType: data.Type = {
-      typePartId: "" as data.TypeId,
+    const intType: data.Type = data.typeTypePartWithParameter({
+      typePartId: "int" as data.TypeId,
       parameter: [],
-    };
+    });
     const oneName = "0" as data.PartId;
     const addOneHundredName = "1" as data.PartId;
     const result = main.evaluateExpr(

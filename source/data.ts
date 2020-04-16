@@ -271,117 +271,6 @@ export type ItemBody =
   | { _: "SuggestionRejected"; suggestionId: SuggestionId };
 
 /**
- * 編集提案
- */
-export type Suggestion = {
-  /**
-   * 変更概要
-   */
-  name: string;
-  /**
-   * 変更理由
-   */
-  reason: string;
-  /**
-   * 承認状態
-   */
-  state: SuggestionState;
-  /**
-   * 変更
-   */
-  changeList: ReadonlyArray<Change>;
-  /**
-   * 変更をするプロジェクト
-   */
-  projectId: ProjectId;
-  /**
-   * 投稿したアイデアID
-   */
-  ideaId: IdeaId;
-};
-
-/**
- * 提案の状況
- */
-export type SuggestionState =
-  | "Creating"
-  | "ApprovalPending"
-  | "Approved"
-  | "Rejected";
-
-/**
- * 変更点
- */
-export type Change =
-  | { _: "ProjectName"; string_: string }
-  | { _: "AddPart"; addPart: AddPart };
-
-/**
- * パーツを追加するのに必要なもの
- */
-export type AddPart = {
-  /**
-   * 新しいパーツの名前
-   */
-  name: string;
-  /**
-   * 新しいパーツの説明
-   */
-  description: string;
-  /**
-   * 新しいパーツの型
-   */
-  type: SuggestionType;
-};
-
-/**
- * ChangeのAddPartなどで使われる提案で作成した型を使えるType
- */
-export type SuggestionType =
-  | { _: "Function"; suggestionTypeFunction: SuggestionTypeFunction }
-  | {
-      _: "TypePartWithParameter";
-      suggestionTypeTypePartWithParameter: SuggestionTypeTypePartWithParameter;
-    }
-  | {
-      _: "SuggestionTypePartWithParameter";
-      suggestionTypeTypePartWithParameter: SuggestionTypeTypePartWithParameter;
-    };
-
-export type SuggestionTypeFunction = {
-  /**
-   * 入力の型
-   */
-  inputType: SuggestionType;
-  /**
-   * 出力の型
-   */
-  outputType: SuggestionType;
-};
-
-export type SuggestionTypeTypePartWithParameter = {
-  /**
-   * 型の参照
-   */
-  typePartId: TypeId;
-  /**
-   * 型のパラメーター
-   */
-  parameter: ReadonlyArray<SuggestionType>;
-};
-
-export type SuggestionTypeSuggestionTypePartWithParameter = {
-  /**
-   * 提案内での定義した型パーツの番号
-   */
-  suggestTypePartIndex: TypeId;
-  /**
-   * 型のパラメーター
-   */
-  parameter: ReadonlyArray<SuggestionType>;
-};
-
-/**
  * 型パーツ
  */
 export type TypePartSnapshot = {
@@ -834,6 +723,117 @@ export type IdeaListByProjectIdResponse = {
   ideaSnapshotAndIdList: ReadonlyArray<IdeaSnapshotAndId>;
 };
 
+/**
+ * 編集提案
+ */
+export type Suggestion = {
+  /**
+   * 変更概要
+   */
+  name: string;
+  /**
+   * 変更理由
+   */
+  reason: string;
+  /**
+   * 承認状態
+   */
+  state: SuggestionState;
+  /**
+   * 変更
+   */
+  changeList: ReadonlyArray<Change>;
+  /**
+   * 変更をするプロジェクト
+   */
+  projectId: ProjectId;
+  /**
+   * 投稿したアイデアID
+   */
+  ideaId: IdeaId;
+};
+
+/**
+ * 提案の状況
+ */
+export type SuggestionState =
+  | "Creating"
+  | "ApprovalPending"
+  | "Approved"
+  | "Rejected";
+
+/**
+ * 変更点
+ */
+export type Change =
+  | { _: "ProjectName"; string_: string }
+  | { _: "AddPart"; addPart: AddPart };
+
+/**
+ * パーツを追加するのに必要なもの
+ */
+export type AddPart = {
+  /**
+   * 新しいパーツの名前
+   */
+  name: string;
+  /**
+   * 新しいパーツの説明
+   */
+  description: string;
+  /**
+   * 新しいパーツの型
+   */
+  type: SuggestionType;
+};
+
+/**
+ * ChangeのAddPartなどで使われる提案で作成した型を使えるType
+ */
+export type SuggestionType =
+  | { _: "Function"; suggestionTypeFunction: SuggestionTypeFunction }
+  | {
+      _: "TypePartWithParameter";
+      suggestionTypeTypePartWithParameter: SuggestionTypeTypePartWithParameter;
+    }
+  | {
+      _: "SuggestionTypePartWithParameter";
+      suggestionTypeTypePartWithParameter: SuggestionTypeTypePartWithParameter;
+    };
+
+export type SuggestionTypeFunction = {
+  /**
+   * 入力の型
+   */
+  inputType: SuggestionType;
+  /**
+   * 出力の型
+   */
+  outputType: SuggestionType;
+};
+
+export type SuggestionTypeTypePartWithParameter = {
+  /**
+   * 型の参照
+   */
+  typePartId: TypeId;
+  /**
+   * 型のパラメーター
+   */
+  parameter: ReadonlyArray<SuggestionType>;
+};
+
+export type SuggestionTypeSuggestionTypePartWithParameter = {
+  /**
+   * 提案内での定義した型パーツの番号
+   */
+  suggestTypePartIndex: TypeId;
+  /**
+   * 型のパラメーター
+   */
+  parameter: ReadonlyArray<SuggestionType>;
+};
+
 export type ProjectId = string & { _projectId: never };
 
 export type SuggestionId = string & { _suggestionId: never };
@@ -963,52 +963,6 @@ export const itemBodySuggestionApproved = (
 export const itemBodySuggestionRejected = (
   suggestionId: SuggestionId
 ): ItemBody => ({ _: "SuggestionRejected", suggestionId: suggestionId });
-
-/**
- * プロジェクト名の変更
- */
-export const changeProjectName = (string_: string): Change => ({
-  _: "ProjectName",
-  string_: string_,
-});
-
-/**
- * パーツの追加
- */
-export const changeAddPart = (addPart: AddPart): Change => ({
-  _: "AddPart",
-  addPart: addPart,
-});
-
-/**
- * 関数
- */
-export const suggestionTypeFunction = (
-  suggestionTypeFunction: SuggestionTypeFunction
-): SuggestionType => ({
-  _: "Function",
-  suggestionTypeFunction: suggestionTypeFunction,
-});
-
-/**
- * 提案前に作られた型パーツとパラメーター
- */
-export const suggestionTypeTypePartWithParameter = (
-  suggestionTypeTypePartWithParameter: SuggestionTypeTypePartWithParameter
-): SuggestionType => ({
-  _: "TypePartWithParameter",
-  suggestionTypeTypePartWithParameter: suggestionTypeTypePartWithParameter,
-});
-
-/**
- * 提案時に作られた型パーツとパラメーター
- */
-export const suggestionTypeSuggestionTypePartWithParameter = (
-  suggestionTypeTypePartWithParameter: SuggestionTypeTypePartWithParameter
-): SuggestionType => ({
-  _: "SuggestionTypePartWithParameter",
-  suggestionTypeTypePartWithParameter: suggestionTypeTypePartWithParameter,
-});
 
 /**
  * 直積型
@@ -1216,6 +1170,52 @@ export const evaluateExprErrorTypeError = (
 export const evaluateExprErrorNotSupported: EvaluateExprError = {
   _: "NotSupported",
 };
+
+/**
+ * プロジェクト名の変更
+ */
+export const changeProjectName = (string_: string): Change => ({
+  _: "ProjectName",
+  string_: string_,
+});
+
+/**
+ * パーツの追加
+ */
+export const changeAddPart = (addPart: AddPart): Change => ({
+  _: "AddPart",
+  addPart: addPart,
+});
+
+/**
+ * 関数
+ */
+export const suggestionTypeFunction = (
+  suggestionTypeFunction: SuggestionTypeFunction
+): SuggestionType => ({
+  _: "Function",
+  suggestionTypeFunction: suggestionTypeFunction,
+});
+
+/**
+ * 提案前に作られた型パーツとパラメーター
+ */
+export const suggestionTypeTypePartWithParameter = (
+  suggestionTypeTypePartWithParameter: SuggestionTypeTypePartWithParameter
+): SuggestionType => ({
+  _: "TypePartWithParameter",
+  suggestionTypeTypePartWithParameter: suggestionTypeTypePartWithParameter,
+});
+
+/**
+ * 提案時に作られた型パーツとパラメーター
+ */
+export const suggestionTypeSuggestionTypePartWithParameter = (
+  suggestionTypeTypePartWithParameter: SuggestionTypeTypePartWithParameter
+): SuggestionType => ({
+  _: "SuggestionTypePartWithParameter",
+  suggestionTypeTypePartWithParameter: suggestionTypeTypePartWithParameter,
+});
 
 /**
  * numberの32bit符号あり整数をSigned Leb128のバイナリに変換する
@@ -1483,104 +1483,6 @@ export const encodeItemBody = (itemBody: ItemBody): ReadonlyArray<number> => {
     }
   }
 };
-
-export const encodeSuggestion = (
-  suggestion: Suggestion
-): ReadonlyArray<number> =>
-  encodeString(suggestion.name)
-    .concat(encodeString(suggestion.reason))
-    .concat(encodeSuggestionState(suggestion.state))
-    .concat(encodeList(encodeChange)(suggestion.changeList))
-    .concat(encodeId(suggestion.projectId))
-    .concat(encodeId(suggestion.ideaId));
-
-export const encodeSuggestionState = (
-  suggestionState: SuggestionState
-): ReadonlyArray<number> => {
-  switch (suggestionState) {
-    case "Creating": {
-      return [0];
-    }
-    case "ApprovalPending": {
-      return [1];
-    }
-    case "Approved": {
-      return [2];
-    }
-    case "Rejected": {
-      return [3];
-    }
-  }
-};
-
-export const encodeChange = (change: Change): ReadonlyArray<number> => {
-  switch (change._) {
-    case "ProjectName": {
-      return [0].concat(encodeString(change.string_));
-    }
-    case "AddPart": {
-      return [1].concat(encodeAddPart(change.addPart));
-    }
-  }
-};
-
-export const encodeAddPart = (addPart: AddPart): ReadonlyArray<number> =>
-  encodeString(addPart.name)
-    .concat(encodeString(addPart.description))
-    .concat(encodeSuggestionType(addPart["type"]));
-
-export const encodeSuggestionType = (
-  suggestionType: SuggestionType
-): ReadonlyArray<number> => {
-  switch (suggestionType._) {
-    case "Function": {
-      return [0].concat(
-        encodeSuggestionTypeFunction(suggestionType.suggestionTypeFunction)
-      );
-    }
-    case "TypePartWithParameter": {
-      return [1].concat(
-        encodeSuggestionTypeTypePartWithParameter(
-          suggestionType.suggestionTypeTypePartWithParameter
-        )
-      );
-    }
-    case "SuggestionTypePartWithParameter": {
-      return [2].concat(
-        encodeSuggestionTypeTypePartWithParameter(
-          suggestionType.suggestionTypeTypePartWithParameter
-        )
-      );
-    }
-  }
-};
-
-export const encodeSuggestionTypeFunction = (
-  suggestionTypeFunction: SuggestionTypeFunction
-): ReadonlyArray<number> =>
-  encodeSuggestionType(suggestionTypeFunction.inputType).concat(
-    encodeSuggestionType(suggestionTypeFunction.outputType)
-  );
-
-export const encodeSuggestionTypeTypePartWithParameter = (
-  suggestionTypeTypePartWithParameter: SuggestionTypeTypePartWithParameter
-): ReadonlyArray<number> =>
-  encodeId(suggestionTypeTypePartWithParameter.typePartId).concat(
-    encodeList(encodeSuggestionType)(
-      suggestionTypeTypePartWithParameter.parameter
-    )
-  );
-
-export const encodeSuggestionTypeSuggestionTypePartWithParameter = (
-  suggestionTypeSuggestionTypePartWithParameter: SuggestionTypeSuggestionTypePartWithParameter
-): ReadonlyArray<number> =>
-  encodeId(
-    suggestionTypeSuggestionTypePartWithParameter.suggestTypePartIndex
-  ).concat(
-    encodeList(encodeSuggestionType)(
-      suggestionTypeSuggestionTypePartWithParameter.parameter
-    )
-  );
 
 export const encodeTypePartSnapshot = (
   typePartSnapshot: TypePartSnapshot
@@ -1918,6 +1820,104 @@ export const encodeIdeaListByProjectIdResponse = (
   encodeId(ideaListByProjectIdResponse.projectId).concat(
     encodeList(encodeIdeaSnapshotAndId)(
       ideaListByProjectIdResponse.ideaSnapshotAndIdList
+    )
+  );
+
+export const encodeSuggestion = (
+  suggestion: Suggestion
+): ReadonlyArray<number> =>
+  encodeString(suggestion.name)
+    .concat(encodeString(suggestion.reason))
+    .concat(encodeSuggestionState(suggestion.state))
+    .concat(encodeList(encodeChange)(suggestion.changeList))
+    .concat(encodeId(suggestion.projectId))
+    .concat(encodeId(suggestion.ideaId));
+
+export const encodeSuggestionState = (
+  suggestionState: SuggestionState
+): ReadonlyArray<number> => {
+  switch (suggestionState) {
+    case "Creating": {
+      return [0];
+    }
+    case "ApprovalPending": {
+      return [1];
+    }
+    case "Approved": {
+      return [2];
+    }
+    case "Rejected": {
+      return [3];
+    }
+  }
+};
+
+export const encodeChange = (change: Change): ReadonlyArray<number> => {
+  switch (change._) {
+    case "ProjectName": {
+      return [0].concat(encodeString(change.string_));
+    }
+    case "AddPart": {
+      return [1].concat(encodeAddPart(change.addPart));
+    }
+  }
+};
+
+export const encodeAddPart = (addPart: AddPart): ReadonlyArray<number> =>
+  encodeString(addPart.name)
+    .concat(encodeString(addPart.description))
+    .concat(encodeSuggestionType(addPart["type"]));
+
+export const encodeSuggestionType = (
+  suggestionType: SuggestionType
+): ReadonlyArray<number> => {
+  switch (suggestionType._) {
+    case "Function": {
+      return [0].concat(
+        encodeSuggestionTypeFunction(suggestionType.suggestionTypeFunction)
+      );
+    }
+    case "TypePartWithParameter": {
+      return [1].concat(
+        encodeSuggestionTypeTypePartWithParameter(
+          suggestionType.suggestionTypeTypePartWithParameter
+        )
+      );
+    }
+    case "SuggestionTypePartWithParameter": {
+      return [2].concat(
+        encodeSuggestionTypeTypePartWithParameter(
+          suggestionType.suggestionTypeTypePartWithParameter
+        )
+      );
+    }
+  }
+};
+
+export const encodeSuggestionTypeFunction = (
+  suggestionTypeFunction: SuggestionTypeFunction
+): ReadonlyArray<number> =>
+  encodeSuggestionType(suggestionTypeFunction.inputType).concat(
+    encodeSuggestionType(suggestionTypeFunction.outputType)
+  );
+
+export const encodeSuggestionTypeTypePartWithParameter = (
+  suggestionTypeTypePartWithParameter: SuggestionTypeTypePartWithParameter
+): ReadonlyArray<number> =>
+  encodeId(suggestionTypeTypePartWithParameter.typePartId).concat(
+    encodeList(encodeSuggestionType)(
+      suggestionTypeTypePartWithParameter.parameter
+    )
+  );
+
+export const encodeSuggestionTypeSuggestionTypePartWithParameter = (
+  suggestionTypeSuggestionTypePartWithParameter: SuggestionTypeSuggestionTypePartWithParameter
+): ReadonlyArray<number> =>
+  encodeId(
+    suggestionTypeSuggestionTypePartWithParameter.suggestTypePartIndex
+  ).concat(
+    encodeList(encodeSuggestionType)(
+      suggestionTypeSuggestionTypePartWithParameter.parameter
     )
   );
 
@@ -2783,296 +2783,6 @@ export const decodeItemBody = (
     };
   }
   throw new Error("存在しないパターンを指定された 型を更新してください");
-};
-
-/**
- * @param index バイナリを読み込み開始位置
- * @param binary バイナリ
- */
-export const decodeSuggestion = (
-  index: number,
-  binary: Uint8Array
-): { result: Suggestion; nextIndex: number } => {
-  const nameAndNextIndex: { result: string; nextIndex: number } = decodeString(
-    index,
-    binary
-  );
-  const reasonAndNextIndex: {
-    result: string;
-    nextIndex: number;
-  } = decodeString(nameAndNextIndex.nextIndex, binary);
-  const stateAndNextIndex: {
-    result: SuggestionState;
-    nextIndex: number;
-  } = decodeSuggestionState(reasonAndNextIndex.nextIndex, binary);
-  const changeListAndNextIndex: {
-    result: ReadonlyArray<Change>;
-    nextIndex: number;
-  } = decodeList(decodeChange)(stateAndNextIndex.nextIndex, binary);
-  const projectIdAndNextIndex: {
-    result: ProjectId;
-    nextIndex: number;
-  } = (decodeId as (
-    a: number,
-    b: Uint8Array
-  ) => { result: ProjectId; nextIndex: number })(
-    changeListAndNextIndex.nextIndex,
-    binary
-  );
-  const ideaIdAndNextIndex: {
-    result: IdeaId;
-    nextIndex: number;
-  } = (decodeId as (
-    a: number,
-    b: Uint8Array
-  ) => { result: IdeaId; nextIndex: number })(
-    projectIdAndNextIndex.nextIndex,
-    binary
-  );
-  return {
-    result: {
-      name: nameAndNextIndex.result,
-      reason: reasonAndNextIndex.result,
-      state: stateAndNextIndex.result,
-      changeList: changeListAndNextIndex.result,
-      projectId: projectIdAndNextIndex.result,
-      ideaId: ideaIdAndNextIndex.result,
-    },
-    nextIndex: ideaIdAndNextIndex.nextIndex,
-  };
-};
-
-/**
- * @param index バイナリを読み込み開始位置
- * @param binary バイナリ
- */
-export const decodeSuggestionState = (
-  index: number,
-  binary: Uint8Array
-): { result: SuggestionState; nextIndex: number } => {
-  const patternIndex: { result: number; nextIndex: number } = decodeInt32(
-    index,
-    binary
-  );
-  if (patternIndex.result === 0) {
-    return { result: "Creating", nextIndex: patternIndex.nextIndex };
-  }
-  if (patternIndex.result === 1) {
-    return { result: "ApprovalPending", nextIndex: patternIndex.nextIndex };
-  }
-  if (patternIndex.result === 2) {
-    return { result: "Approved", nextIndex: patternIndex.nextIndex };
-  }
-  if (patternIndex.result === 3) {
-    return { result: "Rejected", nextIndex: patternIndex.nextIndex };
-  }
-  throw new Error("存在しないパターンを指定された 型を更新してください");
-};
-
-/**
- * @param index バイナリを読み込み開始位置
- * @param binary バイナリ
- */
-export const decodeChange = (
-  index: number,
-  binary: Uint8Array
-): { result: Change; nextIndex: number } => {
-  const patternIndex: { result: number; nextIndex: number } = decodeInt32(
-    index,
-    binary
-  );
-  if (patternIndex.result === 0) {
-    const result: { result: string; nextIndex: number } = decodeString(
-      patternIndex.nextIndex,
-      binary
-    );
-    return {
-      result: changeProjectName(result.result),
-      nextIndex: result.nextIndex,
-    };
-  }
-  if (patternIndex.result === 1) {
-    const result: { result: AddPart; nextIndex: number } = decodeAddPart(
-      patternIndex.nextIndex,
-      binary
-    );
-    return {
-      result: changeAddPart(result.result),
-      nextIndex: result.nextIndex,
-    };
-  }
-  throw new Error("存在しないパターンを指定された 型を更新してください");
-};
-
-/**
- * @param index バイナリを読み込み開始位置
- * @param binary バイナリ
- */
-export const decodeAddPart = (
-  index: number,
-  binary: Uint8Array
-): { result: AddPart; nextIndex: number } => {
-  const nameAndNextIndex: { result: string; nextIndex: number } = decodeString(
-    index,
-    binary
-  );
-  const descriptionAndNextIndex: {
-    result: string;
-    nextIndex: number;
-  } = decodeString(nameAndNextIndex.nextIndex, binary);
-  const typeAndNextIndex: {
-    result: SuggestionType;
-    nextIndex: number;
-  } = decodeSuggestionType(descriptionAndNextIndex.nextIndex, binary);
-  return {
-    result: {
-      name: nameAndNextIndex.result,
-      description: descriptionAndNextIndex.result,
-      type: typeAndNextIndex.result,
-    },
-    nextIndex: typeAndNextIndex.nextIndex,
-  };
-};
-
-/**
- * @param index バイナリを読み込み開始位置
- * @param binary バイナリ
- */
-export const decodeSuggestionType = (
-  index: number,
-  binary: Uint8Array
-): { result: SuggestionType; nextIndex: number } => {
-  const patternIndex: { result: number; nextIndex: number } = decodeInt32(
-    index,
-    binary
-  );
-  if (patternIndex.result === 0) {
-    const result: {
-      result: SuggestionTypeFunction;
-      nextIndex: number;
-    } = decodeSuggestionTypeFunction(patternIndex.nextIndex, binary);
-    return {
-      result: suggestionTypeFunction(result.result),
-      nextIndex: result.nextIndex,
-    };
-  }
-  if (patternIndex.result === 1) {
-    const result: {
-      result: SuggestionTypeTypePartWithParameter;
-      nextIndex: number;
-    } = decodeSuggestionTypeTypePartWithParameter(
-      patternIndex.nextIndex,
-      binary
-    );
-    return {
-      result: suggestionTypeTypePartWithParameter(result.result),
-      nextIndex: result.nextIndex,
-    };
-  }
-  if (patternIndex.result === 2) {
-    const result: {
-      result: SuggestionTypeTypePartWithParameter;
-      nextIndex: number;
-    } = decodeSuggestionTypeTypePartWithParameter(
-      patternIndex.nextIndex,
-      binary
-    );
-    return {
-      result: suggestionTypeSuggestionTypePartWithParameter(result.result),
-      nextIndex: result.nextIndex,
-    };
-  }
-  throw new Error("存在しないパターンを指定された 型を更新してください");
-};
-
-/**
- * @param index バイナリを読み込み開始位置
- * @param binary バイナリ
- */
-export const decodeSuggestionTypeFunction = (
-  index: number,
-  binary: Uint8Array
-): { result: SuggestionTypeFunction; nextIndex: number } => {
-  const inputTypeAndNextIndex: {
-    result: SuggestionType;
-    nextIndex: number;
-  } = decodeSuggestionType(index, binary);
-  const outputTypeAndNextIndex: {
-    result: SuggestionType;
-    nextIndex: number;
-  } = decodeSuggestionType(inputTypeAndNextIndex.nextIndex, binary);
-  return {
-    result: {
-      inputType: inputTypeAndNextIndex.result,
-      outputType: outputTypeAndNextIndex.result,
-    },
-    nextIndex: outputTypeAndNextIndex.nextIndex,
-  };
-};
-
-/**
- * @param index バイナリを読み込み開始位置
- * @param binary バイナリ
- */
-export const decodeSuggestionTypeTypePartWithParameter = (
-  index: number,
-  binary: Uint8Array
-): { result: SuggestionTypeTypePartWithParameter; nextIndex: number } => {
-  const typePartIdAndNextIndex: {
-    result: TypeId;
-    nextIndex: number;
-  } = (decodeId as (
-    a: number,
-    b: Uint8Array
-  ) => { result: TypeId; nextIndex: number })(index, binary);
-  const parameterAndNextIndex: {
-    result: ReadonlyArray<SuggestionType>;
-    nextIndex: number;
-  } = decodeList(decodeSuggestionType)(
-    typePartIdAndNextIndex.nextIndex,
-    binary
-  );
-  return {
-    result: {
-      typePartId: typePartIdAndNextIndex.result,
-      parameter: parameterAndNextIndex.result,
-    },
-    nextIndex: parameterAndNextIndex.nextIndex,
-  };
-};
-
-/**
- * @param index バイナリを読み込み開始位置
- * @param binary バイナリ
- */
-export const decodeSuggestionTypeSuggestionTypePartWithParameter = (
-  index: number,
-  binary: Uint8Array
-): {
-  result: SuggestionTypeSuggestionTypePartWithParameter;
-  nextIndex: number;
-} => {
-  const suggestTypePartIndexAndNextIndex: {
-    result: TypeId;
-    nextIndex: number;
-  } = (decodeId as (
-    a: number,
-    b: Uint8Array
-  ) => { result: TypeId; nextIndex: number })(index, binary);
-  const parameterAndNextIndex: {
-    result: ReadonlyArray<SuggestionType>;
-    nextIndex: number;
-  } = decodeList(decodeSuggestionType)(
-    suggestTypePartIndexAndNextIndex.nextIndex,
-    binary
-  );
-  return {
-    result: {
-      suggestTypePartIndex: suggestTypePartIndexAndNextIndex.result,
-      parameter: parameterAndNextIndex.result,
-    },
-    nextIndex: parameterAndNextIndex.nextIndex,
-  };
 };
 
 /**
@@ -4209,5 +3919,295 @@ export const decodeIdeaListByProjectIdResponse = (
       ideaSnapshotAndIdList: ideaSnapshotAndIdListAndNextIndex.result,
     },
     nextIndex: ideaSnapshotAndIdListAndNextIndex.nextIndex,
+  };
+};
+
+/**
+ * @param index バイナリを読み込み開始位置
+ * @param binary バイナリ
+ */
+export const decodeSuggestion = (
+  index: number,
+  binary: Uint8Array
+): { result: Suggestion; nextIndex: number } => {
+  const nameAndNextIndex: { result: string; nextIndex: number } = decodeString(
+    index,
+    binary
+  );
+  const reasonAndNextIndex: {
+    result: string;
+    nextIndex: number;
+  } = decodeString(nameAndNextIndex.nextIndex, binary);
+  const stateAndNextIndex: {
+    result: SuggestionState;
+    nextIndex: number;
+  } = decodeSuggestionState(reasonAndNextIndex.nextIndex, binary);
+  const changeListAndNextIndex: {
+    result: ReadonlyArray<Change>;
+    nextIndex: number;
+  } = decodeList(decodeChange)(stateAndNextIndex.nextIndex, binary);
+  const projectIdAndNextIndex: {
+    result: ProjectId;
+    nextIndex: number;
+  } = (decodeId as (
+    a: number,
+    b: Uint8Array
+  ) => { result: ProjectId; nextIndex: number })(
+    changeListAndNextIndex.nextIndex,
+    binary
+  );
+  const ideaIdAndNextIndex: {
+    result: IdeaId;
+    nextIndex: number;
+  } = (decodeId as (
+    a: number,
+    b: Uint8Array
+  ) => { result: IdeaId; nextIndex: number })(
+    projectIdAndNextIndex.nextIndex,
+    binary
+  );
+  return {
+    result: {
+      name: nameAndNextIndex.result,
+      reason: reasonAndNextIndex.result,
+      state: stateAndNextIndex.result,
+      changeList: changeListAndNextIndex.result,
+      projectId: projectIdAndNextIndex.result,
+      ideaId: ideaIdAndNextIndex.result,
+    },
+    nextIndex: ideaIdAndNextIndex.nextIndex,
+  };
+};
+
+/**
+ * @param index バイナリを読み込み開始位置
+ * @param binary バイナリ
+ */
+export const decodeSuggestionState = (
+  index: number,
+  binary: Uint8Array
+): { result: SuggestionState; nextIndex: number } => {
+  const patternIndex: { result: number; nextIndex: number } = decodeInt32(
+    index,
+    binary
+  );
+  if (patternIndex.result === 0) {
+    return { result: "Creating", nextIndex: patternIndex.nextIndex };
+  }
+  if (patternIndex.result === 1) {
+    return { result: "ApprovalPending", nextIndex: patternIndex.nextIndex };
+  }
+  if (patternIndex.result === 2) {
+    return { result: "Approved", nextIndex: patternIndex.nextIndex };
+  }
+  if (patternIndex.result === 3) {
+    return { result: "Rejected", nextIndex: patternIndex.nextIndex };
+  }
+  throw new Error("存在しないパターンを指定された 型を更新してください");
+};
+
+/**
+ * @param index バイナリを読み込み開始位置
+ * @param binary バイナリ
+ */
+export const decodeChange = (
+  index: number,
+  binary: Uint8Array
+): { result: Change; nextIndex: number } => {
+  const patternIndex: { result: number; nextIndex: number } = decodeInt32(
+    index,
+    binary
+  );
+  if (patternIndex.result === 0) {
+    const result: { result: string; nextIndex: number } = decodeString(
+      patternIndex.nextIndex,
+      binary
+    );
+    return {
+      result: changeProjectName(result.result),
+      nextIndex: result.nextIndex,
+    };
+  }
+  if (patternIndex.result === 1) {
+    const result: { result: AddPart; nextIndex: number } = decodeAddPart(
+      patternIndex.nextIndex,
+      binary
+    );
+    return {
+      result: changeAddPart(result.result),
+      nextIndex: result.nextIndex,
+    };
+  }
+  throw new Error("存在しないパターンを指定された 型を更新してください");
+};
+
+/**
+ * @param index バイナリを読み込み開始位置
+ * @param binary バイナリ
+ */
+export const decodeAddPart = (
+  index: number,
+  binary: Uint8Array
+): { result: AddPart; nextIndex: number } => {
+  const nameAndNextIndex: { result: string; nextIndex: number } = decodeString(
+    index,
+    binary
+  );
+  const descriptionAndNextIndex: {
+    result: string;
+    nextIndex: number;
+  } = decodeString(nameAndNextIndex.nextIndex, binary);
+  const typeAndNextIndex: {
+    result: SuggestionType;
+    nextIndex: number;
+  } = decodeSuggestionType(descriptionAndNextIndex.nextIndex, binary);
+  return {
+    result: {
+      name: nameAndNextIndex.result,
+      description: descriptionAndNextIndex.result,
+      type: typeAndNextIndex.result,
+    },
+    nextIndex: typeAndNextIndex.nextIndex,
+  };
+};
+
+/**
+ * @param index バイナリを読み込み開始位置
+ * @param binary バイナリ
+ */
+export const decodeSuggestionType = (
+  index: number,
+  binary: Uint8Array
+): { result: SuggestionType; nextIndex: number } => {
+  const patternIndex: { result: number; nextIndex: number } = decodeInt32(
+    index,
+    binary
+  );
+  if (patternIndex.result === 0) {
+    const result: {
+      result: SuggestionTypeFunction;
+      nextIndex: number;
+    } = decodeSuggestionTypeFunction(patternIndex.nextIndex, binary);
+    return {
+      result: suggestionTypeFunction(result.result),
+      nextIndex: result.nextIndex,
+    };
+  }
+  if (patternIndex.result === 1) {
+    const result: {
+      result: SuggestionTypeTypePartWithParameter;
+      nextIndex: number;
+    } = decodeSuggestionTypeTypePartWithParameter(
+      patternIndex.nextIndex,
+      binary
+    );
+    return {
+      result: suggestionTypeTypePartWithParameter(result.result),
+      nextIndex: result.nextIndex,
+    };
+  }
+  if (patternIndex.result === 2) {
+    const result: {
+      result: SuggestionTypeTypePartWithParameter;
+      nextIndex: number;
+    } = decodeSuggestionTypeTypePartWithParameter(
+      patternIndex.nextIndex,
+      binary
+    );
+    return {
+      result: suggestionTypeSuggestionTypePartWithParameter(result.result),
+      nextIndex: result.nextIndex,
+    };
+  }
+  throw new Error("存在しないパターンを指定された 型を更新してください");
+};
+
+/**
+ * @param index バイナリを読み込み開始位置
+ * @param binary バイナリ
+ */
+export const decodeSuggestionTypeFunction = (
+  index: number,
+  binary: Uint8Array
+): { result: SuggestionTypeFunction; nextIndex: number } => {
+  const inputTypeAndNextIndex: {
+    result: SuggestionType;
+    nextIndex: number;
+  } = decodeSuggestionType(index, binary);
+  const outputTypeAndNextIndex: {
+    result: SuggestionType;
+    nextIndex: number;
+  } = decodeSuggestionType(inputTypeAndNextIndex.nextIndex, binary);
+  return {
+    result: {
+      inputType: inputTypeAndNextIndex.result,
+      outputType: outputTypeAndNextIndex.result,
+    },
+    nextIndex: outputTypeAndNextIndex.nextIndex,
+  };
+};
+
+/**
+ * @param index バイナリを読み込み開始位置
+ * @param binary バイナリ
+ */
+export const decodeSuggestionTypeTypePartWithParameter = (
+  index: number,
+  binary: Uint8Array
+): { result: SuggestionTypeTypePartWithParameter; nextIndex: number } => {
+  const typePartIdAndNextIndex: {
+    result: TypeId;
+    nextIndex: number;
+  } = (decodeId as (
+    a: number,
+    b: Uint8Array
+  ) => { result: TypeId; nextIndex: number })(index, binary);
+  const parameterAndNextIndex: {
+    result: ReadonlyArray<SuggestionType>;
+    nextIndex: number;
+  } = decodeList(decodeSuggestionType)(
+    typePartIdAndNextIndex.nextIndex,
+    binary
+  );
+  return {
+    result: {
+      typePartId: typePartIdAndNextIndex.result,
+      parameter: parameterAndNextIndex.result,
+    },
+    nextIndex: parameterAndNextIndex.nextIndex,
+  };
+};
+
+/**
+ * @param index バイナリを読み込み開始位置
+ * @param binary バイナリ
+ */
+export const decodeSuggestionTypeSuggestionTypePartWithParameter = (
+  index: number,
+  binary: Uint8Array
+): {
+  result: SuggestionTypeSuggestionTypePartWithParameter;
+  nextIndex: number;
+} => {
+  const suggestTypePartIndexAndNextIndex: {
+    result: TypeId;
+    nextIndex: number;
+  } = (decodeId as (
+    a: number,
+    b: Uint8Array
+  ) => { result: TypeId; nextIndex: number })(index, binary);
+  const parameterAndNextIndex: {
+    result: ReadonlyArray<SuggestionType>;
+    nextIndex: number;
+  } = decodeList(decodeSuggestionType)(
+    suggestTypePartIndexAndNextIndex.nextIndex,
+    binary
+  );
+  return {
+    result: {
+      suggestTypePartIndex: suggestTypePartIndexAndNextIndex.result,
+      parameter: parameterAndNextIndex.result,
+    },
+    nextIndex: parameterAndNextIndex.nextIndex,
   };
 };
