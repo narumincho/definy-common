@@ -508,6 +508,16 @@ const listCustomType: ReadonlyArray<type.CustomType> = [
         description: "変更",
         memberType: type.typeList(type.typeCustom(changeName)),
       },
+      {
+        name: "projectId",
+        description: "変更をするプロジェクト",
+        memberType: projectId,
+      },
+      {
+        name: "ideaId",
+        description: "投稿したアイデアID",
+        memberType: ideaId,
+      },
     ]),
   },
   {

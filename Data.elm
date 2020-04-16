@@ -113,7 +113,7 @@ type ItemBody
 {-| 編集提案
 -}
 type alias Suggestion =
-    { name : String, reason : String, state : SuggestionState, changeList : List Change }
+    { name : String, reason : String, state : SuggestionState, changeList : List Change, projectId : ProjectId, ideaId : IdeaId }
 
 
 {-| 提案の状況
@@ -691,6 +691,8 @@ suggestionToJsonValue suggestion =
         , ( "reason", Je.string suggestion.reason )
         , ( "state", suggestionStateToJsonValue suggestion.state )
         , ( "changeList", Je.list changeToJsonValue suggestion.changeList )
+        , ( "projectId", projectIdToJsonValue suggestion.projectId )
+        , ( "ideaId", ideaIdToJsonValue suggestion.ideaId )
         ]
 
 
@@ -1565,17 +1567,21 @@ itemBodyJsonDecoder =
 suggestionJsonDecoder : Jd.Decoder Suggestion
 suggestionJsonDecoder =
     Jd.succeed
-        (\name reason state changeList ->
+        (\name reason state changeList projectId ideaId ->
             { name = name
             , reason = reason
             , state = state
             , changeList = changeList
+            , projectId = projectId
+            , ideaId = ideaId
             }
         )
         |> Jdp.required "name" Jd.string
         |> Jdp.required "reason" Jd.string
         |> Jdp.required "state" suggestionStateJsonDecoder
         |> Jdp.required "changeList" (Jd.list changeJsonDecoder)
+        |> Jdp.required "projectId" projectIdJsonDecoder
+        |> Jdp.required "ideaId" ideaIdJsonDecoder
 
 
 {-| SuggestionStateのJSON Decoder

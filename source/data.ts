@@ -290,6 +290,14 @@ export type Suggestion = {
    * 変更
    */
   changeList: ReadonlyArray<Change>;
+  /**
+   * 変更をするプロジェクト
+   */
+  projectId: ProjectId;
+  /**
+   * 投稿したアイデアID
+   */
+  ideaId: IdeaId;
 };
 
 /**
@@ -1482,7 +1490,9 @@ export const encodeSuggestion = (
   encodeString(suggestion.name)
     .concat(encodeString(suggestion.reason))
     .concat(encodeSuggestionState(suggestion.state))
-    .concat(encodeList(encodeChange)(suggestion.changeList));
+    .concat(encodeList(encodeChange)(suggestion.changeList))
+    .concat(encodeId(suggestion.projectId))
+    .concat(encodeId(suggestion.ideaId));
 
 export const encodeSuggestionState = (
   suggestionState: SuggestionState
@@ -2799,14 +2809,36 @@ export const decodeSuggestion = (
     result: ReadonlyArray<Change>;
     nextIndex: number;
   } = decodeList(decodeChange)(stateAndNextIndex.nextIndex, binary);
+  const projectIdAndNextIndex: {
+    result: ProjectId;
+    nextIndex: number;
+  } = (decodeId as (
+    a: number,
+    b: Uint8Array
+  ) => { result: ProjectId; nextIndex: number })(
+    changeListAndNextIndex.nextIndex,
+    binary
+  );
+  const ideaIdAndNextIndex: {
+    result: IdeaId;
+    nextIndex: number;
+  } = (decodeId as (
+    a: number,
+    b: Uint8Array
+  ) => { result: IdeaId; nextIndex: number })(
+    projectIdAndNextIndex.nextIndex,
+    binary
+  );
   return {
     result: {
       name: nameAndNextIndex.result,
       reason: reasonAndNextIndex.result,
       state: stateAndNextIndex.result,
       changeList: changeListAndNextIndex.result,
+      projectId: projectIdAndNextIndex.result,
+      ideaId: ideaIdAndNextIndex.result,
     },
-    nextIndex: changeListAndNextIndex.nextIndex,
+    nextIndex: ideaIdAndNextIndex.nextIndex,
   };
 };
 
