@@ -1,4 +1,4 @@
-module Data exposing (AccessToken(..), AccessTokenError(..), AddCommentParameter, AddPart, BranchPartDefinition, Change(..), ClientMode(..), Condition(..), ConditionCapture, ConditionTag, CreateIdeaParameter, CreateProjectParameter, EvaluateExprError(..), EvaluatedExpr(..), Expr(..), FileHash(..), FunctionCall, IdeaId(..), IdeaItem, IdeaListByProjectIdResponse, IdeaResponse, IdeaSnapshot, IdeaSnapshotAndId, ItemBody(..), KernelCall, KernelExpr(..), LambdaBranch, Language(..), LocalPartId(..), LocalPartReference, Location(..), OpenIdConnectProvider(..), PartId(..), PartSnapshot, ProjectId(..), ProjectResponse, ProjectSnapshot, ProjectSnapshotAndId, RequestLogInUrlRequestData, Suggestion, SuggestionId(..), SuggestionState(..), SuggestionType(..), SuggestionTypeFunction, SuggestionTypeSuggestionTypePartWithParameter, SuggestionTypeTypePartWithParameter, TagId(..), TagReferenceIndex, Time, Type(..), TypeError, TypeFunction, TypeId(..), TypePartBody(..), TypePartBodyKernel(..), TypePartBodyProductMember, TypePartBodySumPattern, TypePartSnapshot, TypeTypePartWithParameter, UrlData, UserId(..), UserResponse, UserSnapshot, UserSnapshotAndId, accessTokenErrorJsonDecoder, accessTokenErrorToJsonValue, accessTokenJsonDecoder, accessTokenToJsonValue, addCommentParameterJsonDecoder, addCommentParameterToJsonValue, addPartJsonDecoder, addPartToJsonValue, branchPartDefinitionJsonDecoder, branchPartDefinitionToJsonValue, changeJsonDecoder, changeToJsonValue, clientModeJsonDecoder, clientModeToJsonValue, conditionCaptureJsonDecoder, conditionCaptureToJsonValue, conditionJsonDecoder, conditionTagJsonDecoder, conditionTagToJsonValue, conditionToJsonValue, createIdeaParameterJsonDecoder, createIdeaParameterToJsonValue, createProjectParameterJsonDecoder, createProjectParameterToJsonValue, evaluateExprErrorJsonDecoder, evaluateExprErrorToJsonValue, evaluatedExprJsonDecoder, evaluatedExprToJsonValue, exprJsonDecoder, exprToJsonValue, fileHashJsonDecoder, fileHashToJsonValue, functionCallJsonDecoder, functionCallToJsonValue, ideaIdJsonDecoder, ideaIdToJsonValue, ideaItemJsonDecoder, ideaItemToJsonValue, ideaListByProjectIdResponseJsonDecoder, ideaListByProjectIdResponseToJsonValue, ideaResponseJsonDecoder, ideaResponseToJsonValue, ideaSnapshotAndIdJsonDecoder, ideaSnapshotAndIdToJsonValue, ideaSnapshotJsonDecoder, ideaSnapshotToJsonValue, itemBodyJsonDecoder, itemBodyToJsonValue, kernelCallJsonDecoder, kernelCallToJsonValue, kernelExprJsonDecoder, kernelExprToJsonValue, lambdaBranchJsonDecoder, lambdaBranchToJsonValue, languageJsonDecoder, languageToJsonValue, localPartIdJsonDecoder, localPartIdToJsonValue, localPartReferenceJsonDecoder, localPartReferenceToJsonValue, locationJsonDecoder, locationToJsonValue, maybeJsonDecoder, maybeToJsonValue, openIdConnectProviderJsonDecoder, openIdConnectProviderToJsonValue, partIdJsonDecoder, partIdToJsonValue, partSnapshotJsonDecoder, partSnapshotToJsonValue, projectIdJsonDecoder, projectIdToJsonValue, projectResponseJsonDecoder, projectResponseToJsonValue, projectSnapshotAndIdJsonDecoder, projectSnapshotAndIdToJsonValue, projectSnapshotJsonDecoder, projectSnapshotToJsonValue, requestLogInUrlRequestDataJsonDecoder, requestLogInUrlRequestDataToJsonValue, resultJsonDecoder, resultToJsonValue, suggestionIdJsonDecoder, suggestionIdToJsonValue, suggestionJsonDecoder, suggestionStateJsonDecoder, suggestionStateToJsonValue, suggestionToJsonValue, suggestionTypeFunctionJsonDecoder, suggestionTypeFunctionToJsonValue, suggestionTypeJsonDecoder, suggestionTypeSuggestionTypePartWithParameterJsonDecoder, suggestionTypeSuggestionTypePartWithParameterToJsonValue, suggestionTypeToJsonValue, suggestionTypeTypePartWithParameterJsonDecoder, suggestionTypeTypePartWithParameterToJsonValue, tagIdJsonDecoder, tagIdToJsonValue, tagReferenceIndexJsonDecoder, tagReferenceIndexToJsonValue, timeJsonDecoder, timeToJsonValue, typeErrorJsonDecoder, typeErrorToJsonValue, typeFunctionJsonDecoder, typeFunctionToJsonValue, typeIdJsonDecoder, typeIdToJsonValue, typeJsonDecoder, typePartBodyJsonDecoder, typePartBodyKernelJsonDecoder, typePartBodyKernelToJsonValue, typePartBodyProductMemberJsonDecoder, typePartBodyProductMemberToJsonValue, typePartBodySumPatternJsonDecoder, typePartBodySumPatternToJsonValue, typePartBodyToJsonValue, typePartSnapshotJsonDecoder, typePartSnapshotToJsonValue, typeToJsonValue, typeTypePartWithParameterJsonDecoder, typeTypePartWithParameterToJsonValue, urlDataJsonDecoder, urlDataToJsonValue, userIdJsonDecoder, userIdToJsonValue, userResponseJsonDecoder, userResponseToJsonValue, userSnapshotAndIdJsonDecoder, userSnapshotAndIdToJsonValue, userSnapshotJsonDecoder, userSnapshotToJsonValue)
+module Data exposing (AccessToken(..), AccessTokenError(..), AddCommentParameter, AddPart, BranchPartDefinition, Change(..), ClientMode(..), Condition(..), ConditionCapture, ConditionTag, CreateIdeaParameter, CreateProjectParameter, EvaluateExprError(..), EvaluatedExpr(..), Expr(..), FileHash(..), FunctionCall, IdeaId(..), IdeaItem, IdeaListByProjectIdResponse, IdeaResponse, IdeaSnapshot, IdeaSnapshotAndId, ItemBody(..), KernelCall, KernelExpr(..), LambdaBranch, Language(..), LocalPartId(..), LocalPartReference, Location(..), OpenIdConnectProvider(..), PartId(..), PartSnapshot, ProjectId(..), ProjectResponse, ProjectSnapshot, ProjectSnapshotAndId, RequestLogInUrlRequestData, Suggestion, SuggestionId(..), SuggestionState(..), SuggestionType(..), SuggestionTypeFunction, SuggestionTypeSuggestionTypePartWithParameter, SuggestionTypeTypePartWithParameter, TagId(..), TagReference, Time, Type(..), TypeError, TypeFunction, TypeId(..), TypePartBody(..), TypePartBodyKernel(..), TypePartBodyProductMember, TypePartBodySumPattern, TypePartSnapshot, TypeTypePartWithParameter, UrlData, UserId(..), UserResponse, UserSnapshot, UserSnapshotAndId, accessTokenErrorJsonDecoder, accessTokenErrorToJsonValue, accessTokenJsonDecoder, accessTokenToJsonValue, addCommentParameterJsonDecoder, addCommentParameterToJsonValue, addPartJsonDecoder, addPartToJsonValue, branchPartDefinitionJsonDecoder, branchPartDefinitionToJsonValue, changeJsonDecoder, changeToJsonValue, clientModeJsonDecoder, clientModeToJsonValue, conditionCaptureJsonDecoder, conditionCaptureToJsonValue, conditionJsonDecoder, conditionTagJsonDecoder, conditionTagToJsonValue, conditionToJsonValue, createIdeaParameterJsonDecoder, createIdeaParameterToJsonValue, createProjectParameterJsonDecoder, createProjectParameterToJsonValue, evaluateExprErrorJsonDecoder, evaluateExprErrorToJsonValue, evaluatedExprJsonDecoder, evaluatedExprToJsonValue, exprJsonDecoder, exprToJsonValue, fileHashJsonDecoder, fileHashToJsonValue, functionCallJsonDecoder, functionCallToJsonValue, ideaIdJsonDecoder, ideaIdToJsonValue, ideaItemJsonDecoder, ideaItemToJsonValue, ideaListByProjectIdResponseJsonDecoder, ideaListByProjectIdResponseToJsonValue, ideaResponseJsonDecoder, ideaResponseToJsonValue, ideaSnapshotAndIdJsonDecoder, ideaSnapshotAndIdToJsonValue, ideaSnapshotJsonDecoder, ideaSnapshotToJsonValue, itemBodyJsonDecoder, itemBodyToJsonValue, kernelCallJsonDecoder, kernelCallToJsonValue, kernelExprJsonDecoder, kernelExprToJsonValue, lambdaBranchJsonDecoder, lambdaBranchToJsonValue, languageJsonDecoder, languageToJsonValue, localPartIdJsonDecoder, localPartIdToJsonValue, localPartReferenceJsonDecoder, localPartReferenceToJsonValue, locationJsonDecoder, locationToJsonValue, maybeJsonDecoder, maybeToJsonValue, openIdConnectProviderJsonDecoder, openIdConnectProviderToJsonValue, partIdJsonDecoder, partIdToJsonValue, partSnapshotJsonDecoder, partSnapshotToJsonValue, projectIdJsonDecoder, projectIdToJsonValue, projectResponseJsonDecoder, projectResponseToJsonValue, projectSnapshotAndIdJsonDecoder, projectSnapshotAndIdToJsonValue, projectSnapshotJsonDecoder, projectSnapshotToJsonValue, requestLogInUrlRequestDataJsonDecoder, requestLogInUrlRequestDataToJsonValue, resultJsonDecoder, resultToJsonValue, suggestionIdJsonDecoder, suggestionIdToJsonValue, suggestionJsonDecoder, suggestionStateJsonDecoder, suggestionStateToJsonValue, suggestionToJsonValue, suggestionTypeFunctionJsonDecoder, suggestionTypeFunctionToJsonValue, suggestionTypeJsonDecoder, suggestionTypeSuggestionTypePartWithParameterJsonDecoder, suggestionTypeSuggestionTypePartWithParameterToJsonValue, suggestionTypeToJsonValue, suggestionTypeTypePartWithParameterJsonDecoder, suggestionTypeTypePartWithParameterToJsonValue, tagIdJsonDecoder, tagIdToJsonValue, tagReferenceJsonDecoder, tagReferenceToJsonValue, timeJsonDecoder, timeToJsonValue, typeErrorJsonDecoder, typeErrorToJsonValue, typeFunctionJsonDecoder, typeFunctionToJsonValue, typeIdJsonDecoder, typeIdToJsonValue, typeJsonDecoder, typePartBodyJsonDecoder, typePartBodyKernelJsonDecoder, typePartBodyKernelToJsonValue, typePartBodyProductMemberJsonDecoder, typePartBodyProductMemberToJsonValue, typePartBodySumPatternJsonDecoder, typePartBodySumPatternToJsonValue, typePartBodyToJsonValue, typePartSnapshotJsonDecoder, typePartSnapshotToJsonValue, typeToJsonValue, typeTypePartWithParameterJsonDecoder, typeTypePartWithParameterToJsonValue, urlDataJsonDecoder, urlDataToJsonValue, userIdJsonDecoder, userIdToJsonValue, userResponseJsonDecoder, userResponseToJsonValue, userSnapshotAndIdJsonDecoder, userSnapshotAndIdToJsonValue, userSnapshotJsonDecoder, userSnapshotToJsonValue)
 
 import Json.Decode as Jd
 import Json.Decode.Pipeline as Jdp
@@ -113,7 +113,7 @@ type ItemBody
 {-| 型パーツ
 -}
 type alias TypePartSnapshot =
-    { name : String, parentList : List PartId, description : String, projectId : ProjectId, createSuggestionId : SuggestionId, getTime : Time }
+    { name : String, parentList : List PartId, description : String, projectId : ProjectId, createSuggestionId : SuggestionId, getTime : Time, body : TypePartBody }
 
 
 {-| パーツの定義
@@ -171,7 +171,7 @@ type Expr
     | ExprInt32Literal Int
     | ExprPartReference PartId
     | ExprLocalPartReference LocalPartReference
-    | ExprTagReference TagReferenceIndex
+    | ExprTagReference TagReference
     | ExprFunctionCall FunctionCall
     | ExprLambda (List LambdaBranch)
 
@@ -181,7 +181,8 @@ type Expr
 type EvaluatedExpr
     = EvaluatedExprKernel KernelExpr
     | EvaluatedExprInt32 Int
-    | EvaluatedExprTagReference TagReferenceIndex
+    | EvaluatedExprLocalPartReference LocalPartReference
+    | EvaluatedExprTagReference TagReference
     | EvaluatedExprLambda (List LambdaBranch)
     | EvaluatedExprKernelCall KernelCall
 
@@ -208,7 +209,7 @@ type alias LocalPartReference =
 
 {-| タグの参照を表す
 -}
-type alias TagReferenceIndex =
+type alias TagReference =
     { typePartId : TypeId, tagIndex : Int }
 
 
@@ -359,7 +360,7 @@ type alias SuggestionTypeTypePartWithParameter =
 
 
 type alias SuggestionTypeSuggestionTypePartWithParameter =
-    { suggestTypePartIndex : TypeId, parameter : List SuggestionType }
+    { suggestionTypePartIndex : TypeId, parameter : List SuggestionType }
 
 
 type ProjectId
@@ -693,6 +694,7 @@ typePartSnapshotToJsonValue typePartSnapshot =
         , ( "projectId", projectIdToJsonValue typePartSnapshot.projectId )
         , ( "createSuggestionId", suggestionIdToJsonValue typePartSnapshot.createSuggestionId )
         , ( "getTime", timeToJsonValue typePartSnapshot.getTime )
+        , ( "body", typePartBodyToJsonValue typePartSnapshot.body )
         ]
 
 
@@ -811,7 +813,7 @@ exprToJsonValue expr =
             Je.object [ ( "_", Je.string "LocalPartReference" ), ( "localPartReference", localPartReferenceToJsonValue parameter ) ]
 
         ExprTagReference parameter ->
-            Je.object [ ( "_", Je.string "TagReference" ), ( "tagReferenceIndex", tagReferenceIndexToJsonValue parameter ) ]
+            Je.object [ ( "_", Je.string "TagReference" ), ( "tagReference", tagReferenceToJsonValue parameter ) ]
 
         ExprFunctionCall parameter ->
             Je.object [ ( "_", Je.string "FunctionCall" ), ( "functionCall", functionCallToJsonValue parameter ) ]
@@ -831,8 +833,11 @@ evaluatedExprToJsonValue evaluatedExpr =
         EvaluatedExprInt32 parameter ->
             Je.object [ ( "_", Je.string "Int32" ), ( "int32", Je.int parameter ) ]
 
+        EvaluatedExprLocalPartReference parameter ->
+            Je.object [ ( "_", Je.string "LocalPartReference" ), ( "localPartReference", localPartReferenceToJsonValue parameter ) ]
+
         EvaluatedExprTagReference parameter ->
-            Je.object [ ( "_", Je.string "TagReference" ), ( "tagReferenceIndex", tagReferenceIndexToJsonValue parameter ) ]
+            Je.object [ ( "_", Je.string "TagReference" ), ( "tagReference", tagReferenceToJsonValue parameter ) ]
 
         EvaluatedExprLambda parameter ->
             Je.object [ ( "_", Je.string "Lambda" ), ( "lambdaBranchList", Je.list lambdaBranchToJsonValue parameter ) ]
@@ -876,13 +881,13 @@ localPartReferenceToJsonValue localPartReference =
         ]
 
 
-{-| TagReferenceIndexのJSONへのエンコーダ
+{-| TagReferenceのJSONへのエンコーダ
 -}
-tagReferenceIndexToJsonValue : TagReferenceIndex -> Je.Value
-tagReferenceIndexToJsonValue tagReferenceIndex =
+tagReferenceToJsonValue : TagReference -> Je.Value
+tagReferenceToJsonValue tagReference =
     Je.object
-        [ ( "typePartId", typeIdToJsonValue tagReferenceIndex.typePartId )
-        , ( "tagIndex", Je.int tagReferenceIndex.tagIndex )
+        [ ( "typePartId", typeIdToJsonValue tagReference.typePartId )
+        , ( "tagIndex", Je.int tagReference.tagIndex )
         ]
 
 
@@ -1168,7 +1173,7 @@ suggestionTypeTypePartWithParameterToJsonValue suggestionTypeTypePartWithParamet
 suggestionTypeSuggestionTypePartWithParameterToJsonValue : SuggestionTypeSuggestionTypePartWithParameter -> Je.Value
 suggestionTypeSuggestionTypePartWithParameterToJsonValue suggestionTypeSuggestionTypePartWithParameter =
     Je.object
-        [ ( "suggestTypePartIndex", typeIdToJsonValue suggestionTypeSuggestionTypePartWithParameter.suggestTypePartIndex )
+        [ ( "suggestionTypePartIndex", typeIdToJsonValue suggestionTypeSuggestionTypePartWithParameter.suggestionTypePartIndex )
         , ( "parameter", Je.list suggestionTypeToJsonValue suggestionTypeSuggestionTypePartWithParameter.parameter )
         ]
 
@@ -1567,13 +1572,14 @@ itemBodyJsonDecoder =
 typePartSnapshotJsonDecoder : Jd.Decoder TypePartSnapshot
 typePartSnapshotJsonDecoder =
     Jd.succeed
-        (\name parentList description projectId createSuggestionId getTime ->
+        (\name parentList description projectId createSuggestionId getTime body ->
             { name = name
             , parentList = parentList
             , description = description
             , projectId = projectId
             , createSuggestionId = createSuggestionId
             , getTime = getTime
+            , body = body
             }
         )
         |> Jdp.required "name" Jd.string
@@ -1582,6 +1588,7 @@ typePartSnapshotJsonDecoder =
         |> Jdp.required "projectId" projectIdJsonDecoder
         |> Jdp.required "createSuggestionId" suggestionIdJsonDecoder
         |> Jdp.required "getTime" timeJsonDecoder
+        |> Jdp.required "body" typePartBodyJsonDecoder
 
 
 {-| PartSnapshotのJSON Decoder
@@ -1751,7 +1758,7 @@ exprJsonDecoder =
                         Jd.field "localPartReference" localPartReferenceJsonDecoder |> Jd.map ExprLocalPartReference
 
                     "TagReference" ->
-                        Jd.field "tagReferenceIndex" tagReferenceIndexJsonDecoder |> Jd.map ExprTagReference
+                        Jd.field "tagReference" tagReferenceJsonDecoder |> Jd.map ExprTagReference
 
                     "FunctionCall" ->
                         Jd.field "functionCall" functionCallJsonDecoder |> Jd.map ExprFunctionCall
@@ -1778,8 +1785,11 @@ evaluatedExprJsonDecoder =
                     "Int32" ->
                         Jd.field "int32" Jd.int |> Jd.map EvaluatedExprInt32
 
+                    "LocalPartReference" ->
+                        Jd.field "localPartReference" localPartReferenceJsonDecoder |> Jd.map EvaluatedExprLocalPartReference
+
                     "TagReference" ->
-                        Jd.field "tagReferenceIndex" tagReferenceIndexJsonDecoder |> Jd.map EvaluatedExprTagReference
+                        Jd.field "tagReference" tagReferenceJsonDecoder |> Jd.map EvaluatedExprTagReference
 
                     "Lambda" ->
                         Jd.field "lambdaBranchList" (Jd.list lambdaBranchJsonDecoder) |> Jd.map EvaluatedExprLambda
@@ -1842,10 +1852,10 @@ localPartReferenceJsonDecoder =
         |> Jdp.required "localPartId" localPartIdJsonDecoder
 
 
-{-| TagReferenceIndexのJSON Decoder
+{-| TagReferenceのJSON Decoder
 -}
-tagReferenceIndexJsonDecoder : Jd.Decoder TagReferenceIndex
-tagReferenceIndexJsonDecoder =
+tagReferenceJsonDecoder : Jd.Decoder TagReference
+tagReferenceJsonDecoder =
     Jd.succeed
         (\typePartId tagIndex ->
             { typePartId = typePartId
@@ -2259,10 +2269,10 @@ suggestionTypeTypePartWithParameterJsonDecoder =
 suggestionTypeSuggestionTypePartWithParameterJsonDecoder : Jd.Decoder SuggestionTypeSuggestionTypePartWithParameter
 suggestionTypeSuggestionTypePartWithParameterJsonDecoder =
     Jd.succeed
-        (\suggestTypePartIndex parameter ->
-            { suggestTypePartIndex = suggestTypePartIndex
+        (\suggestionTypePartIndex parameter ->
+            { suggestionTypePartIndex = suggestionTypePartIndex
             , parameter = parameter
             }
         )
-        |> Jdp.required "suggestTypePartIndex" typeIdJsonDecoder
+        |> Jdp.required "suggestionTypePartIndex" typeIdJsonDecoder
         |> Jdp.required "parameter" (Jd.list suggestionTypeJsonDecoder)

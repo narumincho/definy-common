@@ -298,6 +298,10 @@ export type TypePartSnapshot = {
    * 取得日時
    */
   getTime: Time;
+  /**
+   * 定義本体
+   */
+  body: TypePartBody;
 };
 
 /**
@@ -433,7 +437,7 @@ export type Expr =
   | { _: "Int32Literal"; int32: number }
   | { _: "PartReference"; partId: PartId }
   | { _: "LocalPartReference"; localPartReference: LocalPartReference }
-  | { _: "TagReference"; tagReferenceIndex: TagReferenceIndex }
+  | { _: "TagReference"; tagReference: TagReference }
   | { _: "FunctionCall"; functionCall: FunctionCall }
   | { _: "Lambda"; lambdaBranchList: ReadonlyArray<LambdaBranch> };
 
@@ -443,7 +447,8 @@ export type Expr =
 export type EvaluatedExpr =
   | { _: "Kernel"; kernelExpr: KernelExpr }
   | { _: "Int32"; int32: number }
-  | { _: "TagReference"; tagReferenceIndex: TagReferenceIndex }
+  | { _: "LocalPartReference"; localPartReference: LocalPartReference }
+  | { _: "TagReference"; tagReference: TagReference }
   | { _: "Lambda"; lambdaBranchList: ReadonlyArray<LambdaBranch> }
   | { _: "KernelCall"; kernelCall: KernelCall };
 
@@ -483,7 +488,7 @@ export type LocalPartReference = {
 /**
  * タグの参照を表す
  */
-export type TagReferenceIndex = {
+export type TagReference = {
   /**
    * 型ID
    */
@@ -827,7 +832,7 @@ export type SuggestionTypeSuggestionTypePartWithParameter = {
   /**
    * 提案内での定義した型パーツの番号
    */
-  suggestTypePartIndex: TypeId;
+  suggestionTypePartIndex: TypeId;
   /**
    * 型のパラメーター
    */
@@ -1046,9 +1051,10 @@ export const exprLocalPartReference = (
 /**
  * タグを参照
  */
-export const exprTagReference = (
-  tagReferenceIndex: TagReferenceIndex
-): Expr => ({ _: "TagReference", tagReferenceIndex: tagReferenceIndex });
+export const exprTagReference = (tagReference: TagReference): Expr => ({
+  _: "TagReference",
+  tagReference: tagReference,
+});
 
 /**
  * 関数呼び出し
@@ -1082,14 +1088,21 @@ export const evaluatedExprInt32 = (int32: number): EvaluatedExpr => ({
 });
 
 /**
+ * ローカルパーツの参照
+ */
+export const evaluatedExprLocalPartReference = (
+  localPartReference: LocalPartReference
+): EvaluatedExpr => ({
+  _: "LocalPartReference",
+  localPartReference: localPartReference,
+});
+
+/**
  * タグを参照
  */
 export const evaluatedExprTagReference = (
-  tagReferenceIndex: TagReferenceIndex
-): EvaluatedExpr => ({
-  _: "TagReference",
-  tagReferenceIndex: tagReferenceIndex,
-});
+  tagReference: TagReference
+): EvaluatedExpr => ({ _: "TagReference", tagReference: tagReference });
 
 /**
  * ラムダ
@@ -1492,7 +1505,8 @@ export const encodeTypePartSnapshot = (
     .concat(encodeString(typePartSnapshot.description))
     .concat(encodeId(typePartSnapshot.projectId))
     .concat(encodeId(typePartSnapshot.createSuggestionId))
-    .concat(encodeTime(typePartSnapshot.getTime));
+    .concat(encodeTime(typePartSnapshot.getTime))
+    .concat(encodeTypePartBody(typePartSnapshot.body));
 
 export const encodePartSnapshot = (
   partSnapshot: PartSnapshot
@@ -1601,7 +1615,7 @@ export const encodeExpr = (expr: Expr): ReadonlyArray<number> => {
       return [3].concat(encodeLocalPartReference(expr.localPartReference));
     }
     case "TagReference": {
-      return [4].concat(encodeTagReferenceIndex(expr.tagReferenceIndex));
+      return [4].concat(encodeTagReference(expr.tagReference));
     }
     case "FunctionCall": {
       return [5].concat(encodeFunctionCall(expr.functionCall));
@@ -1622,18 +1636,21 @@ export const encodeEvaluatedExpr = (
     case "Int32": {
       return [1].concat(encodeInt32(evaluatedExpr.int32));
     }
-    case "TagReference": {
+    case "LocalPartReference": {
       return [2].concat(
-        encodeTagReferenceIndex(evaluatedExpr.tagReferenceIndex)
+        encodeLocalPartReference(evaluatedExpr.localPartReference)
       );
     }
+    case "TagReference": {
+      return [3].concat(encodeTagReference(evaluatedExpr.tagReference));
+    }
     case "Lambda": {
-      return [3].concat(
+      return [4].concat(
         encodeList(encodeLambdaBranch)(evaluatedExpr.lambdaBranchList)
       );
     }
     case "KernelCall": {
-      return [4].concat(encodeKernelCall(evaluatedExpr.kernelCall));
+      return [5].concat(encodeKernelCall(evaluatedExpr.kernelCall));
     }
   }
 };
@@ -1668,12 +1685,10 @@ export const encodeLocalPartReference = (
     encodeId(localPartReference.localPartId)
   );
 
-export const encodeTagReferenceIndex = (
-  tagReferenceIndex: TagReferenceIndex
+export const encodeTagReference = (
+  tagReference: TagReference
 ): ReadonlyArray<number> =>
-  encodeId(tagReferenceIndex.typePartId).concat(
-    encodeInt32(tagReferenceIndex.tagIndex)
-  );
+  encodeId(tagReference.typePartId).concat(encodeInt32(tagReference.tagIndex));
 
 export const encodeFunctionCall = (
   functionCall: FunctionCall
@@ -1914,7 +1929,7 @@ export const encodeSuggestionTypeSuggestionTypePartWithParameter = (
   suggestionTypeSuggestionTypePartWithParameter: SuggestionTypeSuggestionTypePartWithParameter
 ): ReadonlyArray<number> =>
   encodeId(
-    suggestionTypeSuggestionTypePartWithParameter.suggestTypePartIndex
+    suggestionTypeSuggestionTypePartWithParameter.suggestionTypePartIndex
   ).concat(
     encodeList(encodeSuggestionType)(
       suggestionTypeSuggestionTypePartWithParameter.parameter
@@ -2834,6 +2849,10 @@ export const decodeTypePartSnapshot = (
     createSuggestionIdAndNextIndex.nextIndex,
     binary
   );
+  const bodyAndNextIndex: {
+    result: TypePartBody;
+    nextIndex: number;
+  } = decodeTypePartBody(getTimeAndNextIndex.nextIndex, binary);
   return {
     result: {
       name: nameAndNextIndex.result,
@@ -2842,8 +2861,9 @@ export const decodeTypePartSnapshot = (
       projectId: projectIdAndNextIndex.result,
       createSuggestionId: createSuggestionIdAndNextIndex.result,
       getTime: getTimeAndNextIndex.result,
+      body: bodyAndNextIndex.result,
     },
-    nextIndex: getTimeAndNextIndex.nextIndex,
+    nextIndex: bodyAndNextIndex.nextIndex,
   };
 };
 
@@ -3187,9 +3207,9 @@ export const decodeExpr = (
   }
   if (patternIndex.result === 4) {
     const result: {
-      result: TagReferenceIndex;
+      result: TagReference;
       nextIndex: number;
-    } = decodeTagReferenceIndex(patternIndex.nextIndex, binary);
+    } = decodeTagReference(patternIndex.nextIndex, binary);
     return {
       result: exprTagReference(result.result),
       nextIndex: result.nextIndex,
@@ -3249,15 +3269,25 @@ export const decodeEvaluatedExpr = (
   }
   if (patternIndex.result === 2) {
     const result: {
-      result: TagReferenceIndex;
+      result: LocalPartReference;
       nextIndex: number;
-    } = decodeTagReferenceIndex(patternIndex.nextIndex, binary);
+    } = decodeLocalPartReference(patternIndex.nextIndex, binary);
+    return {
+      result: evaluatedExprLocalPartReference(result.result),
+      nextIndex: result.nextIndex,
+    };
+  }
+  if (patternIndex.result === 3) {
+    const result: {
+      result: TagReference;
+      nextIndex: number;
+    } = decodeTagReference(patternIndex.nextIndex, binary);
     return {
       result: evaluatedExprTagReference(result.result),
       nextIndex: result.nextIndex,
     };
   }
-  if (patternIndex.result === 3) {
+  if (patternIndex.result === 4) {
     const result: {
       result: ReadonlyArray<LambdaBranch>;
       nextIndex: number;
@@ -3267,7 +3297,7 @@ export const decodeEvaluatedExpr = (
       nextIndex: result.nextIndex,
     };
   }
-  if (patternIndex.result === 4) {
+  if (patternIndex.result === 5) {
     const result: { result: KernelCall; nextIndex: number } = decodeKernelCall(
       patternIndex.nextIndex,
       binary
@@ -3367,10 +3397,10 @@ export const decodeLocalPartReference = (
  * @param index バイナリを読み込み開始位置
  * @param binary バイナリ
  */
-export const decodeTagReferenceIndex = (
+export const decodeTagReference = (
   index: number,
   binary: Uint8Array
-): { result: TagReferenceIndex; nextIndex: number } => {
+): { result: TagReference; nextIndex: number } => {
   const typePartIdAndNextIndex: {
     result: TypeId;
     nextIndex: number;
@@ -4189,7 +4219,7 @@ export const decodeSuggestionTypeSuggestionTypePartWithParameter = (
   result: SuggestionTypeSuggestionTypePartWithParameter;
   nextIndex: number;
 } => {
-  const suggestTypePartIndexAndNextIndex: {
+  const suggestionTypePartIndexAndNextIndex: {
     result: TypeId;
     nextIndex: number;
   } = (decodeId as (
@@ -4200,12 +4230,12 @@ export const decodeSuggestionTypeSuggestionTypePartWithParameter = (
     result: ReadonlyArray<SuggestionType>;
     nextIndex: number;
   } = decodeList(decodeSuggestionType)(
-    suggestTypePartIndexAndNextIndex.nextIndex,
+    suggestionTypePartIndexAndNextIndex.nextIndex,
     binary
   );
   return {
     result: {
-      suggestTypePartIndex: suggestTypePartIndexAndNextIndex.result,
+      suggestionTypePartIndex: suggestionTypePartIndexAndNextIndex.result,
       parameter: parameterAndNextIndex.result,
     },
     nextIndex: parameterAndNextIndex.nextIndex,

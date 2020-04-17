@@ -179,7 +179,7 @@ export const customTypeList: ReadonlyArray<type.CustomType> = [
     description: "",
     body: product([
       {
-        name: "suggestTypePartIndex",
+        name: "suggestionTypePartIndex",
         description: "提案内での定義した型パーツの番号",
         memberType: idAndToken.typePartId,
       },

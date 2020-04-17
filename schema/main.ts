@@ -42,7 +42,7 @@ const evaluatedExprName = "EvaluatedExpr";
 const kernelCallName = "KernelCall";
 const kernelExprName = "KernelExpr";
 const localPartReferenceName = "LocalPartReference";
-const tagReferenceName = "TagReferenceIndex";
+const tagReferenceName = "TagReference";
 const functionCallName = "FunctionCall";
 const lambdaBranchName = "LambdaBranch";
 const conditionName = "Condition";
@@ -497,6 +497,11 @@ const listCustomType: ReadonlyArray<type.CustomType> = [
         description: "取得日時",
         memberType: type.typeCustom(timeName),
       },
+      {
+        name: "body",
+        description: "定義本体",
+        memberType: type.typeCustom(typePartBodyName),
+      },
     ]),
   },
   {
@@ -734,6 +739,11 @@ const listCustomType: ReadonlyArray<type.CustomType> = [
         name: "Int32",
         description: "32bit整数",
         parameter: type.maybeJust(type.typeInt32),
+      },
+      {
+        name: "LocalPartReference",
+        description: "ローカルパーツの参照",
+        parameter: type.maybeJust(type.typeCustom(localPartReferenceName)),
       },
       {
         name: "TagReference",
