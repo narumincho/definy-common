@@ -1065,23 +1065,6 @@ const listCustomType: ReadonlyArray<type.CustomType> = [
     ]),
   },
   {
-    name: accessTokenErrorName,
-    description: "アクセストークンに関するエラー",
-    body: type.customTypeBodySum([
-      {
-        name: "AccessTokenExpiredOrInvalid",
-        description: "アクセストークンが期限切れまたは無効です",
-        parameter: type.maybeNothing(),
-      },
-      {
-        name: "ProjectNameIsInvalid",
-        description:
-          "指定したプロジェクト名から使えない文字をとったら何も残りませんでした",
-        parameter: type.maybeNothing(),
-      },
-    ]),
-  },
-  {
     name: projectResponseName,
     description:
       "Maybe プロジェクトのスナップショット と projectId. indexedDBからElmに渡す用",

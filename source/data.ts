@@ -666,13 +666,6 @@ export type AddCommentParameter = {
 };
 
 /**
- * アクセストークンに関するエラー
- */
-export type AccessTokenError =
-  | "AccessTokenExpiredOrInvalid"
-  | "ProjectNameIsInvalid";
-
-/**
  * Maybe プロジェクトのスナップショット と projectId. indexedDBからElmに渡す用
  */
 export type ProjectResponse = {
@@ -1794,19 +1787,6 @@ export const encodeAddCommentParameter = (
   encodeToken(addCommentParameter.accessToken)
     .concat(encodeId(addCommentParameter.ideaId))
     .concat(encodeString(addCommentParameter.comment));
-
-export const encodeAccessTokenError = (
-  accessTokenError: AccessTokenError
-): ReadonlyArray<number> => {
-  switch (accessTokenError) {
-    case "AccessTokenExpiredOrInvalid": {
-      return [0];
-    }
-    case "ProjectNameIsInvalid": {
-      return [1];
-    }
-  }
-};
 
 export const encodeProjectResponse = (
   projectResponse: ProjectResponse
@@ -3814,33 +3794,6 @@ export const decodeAddCommentParameter = (
     },
     nextIndex: commentAndNextIndex.nextIndex,
   };
-};
-
-/**
- * @param index バイナリを読み込み開始位置
- * @param binary バイナリ
- */
-export const decodeAccessTokenError = (
-  index: number,
-  binary: Uint8Array
-): { result: AccessTokenError; nextIndex: number } => {
-  const patternIndex: { result: number; nextIndex: number } = decodeInt32(
-    index,
-    binary
-  );
-  if (patternIndex.result === 0) {
-    return {
-      result: "AccessTokenExpiredOrInvalid",
-      nextIndex: patternIndex.nextIndex,
-    };
-  }
-  if (patternIndex.result === 1) {
-    return {
-      result: "ProjectNameIsInvalid",
-      nextIndex: patternIndex.nextIndex,
-    };
-  }
-  throw new Error("存在しないパターンを指定された 型を更新してください");
 };
 
 /**
