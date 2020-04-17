@@ -70,6 +70,12 @@ type alias UserSnapshotAndId =
     { id : UserId, snapshot : UserSnapshot }
 
 
+{-| Maybe プロジェクトのスナップショット と userId. indexedDBからElmに渡す用
+-}
+type alias UserResponse =
+    { id : UserId, snapshotMaybe : Maybe UserSnapshot }
+
+
 {-| プロジェクト
 -}
 type alias ProjectSnapshot =
@@ -82,6 +88,12 @@ type alias ProjectSnapshotAndId =
     { id : ProjectId, snapshot : ProjectSnapshot }
 
 
+{-| Maybe プロジェクトのスナップショット と projectId. indexedDBからElmに渡す用
+-}
+type alias ProjectResponse =
+    { id : ProjectId, snapshotMaybe : Maybe ProjectSnapshot }
+
+
 {-| アイデア
 -}
 type alias IdeaSnapshot =
@@ -92,6 +104,18 @@ type alias IdeaSnapshot =
 -}
 type alias IdeaSnapshotAndId =
     { id : IdeaId, snapshot : IdeaSnapshot }
+
+
+{-| Maybe アイデア と ideaId. indexedDBからElmに渡す用
+-}
+type alias IdeaResponse =
+    { id : IdeaId, snapshotMaybe : Maybe IdeaSnapshot }
+
+
+{-| プロジェクトからアイデアの一覧を取得したときにElmに渡すもの
+-}
+type alias IdeaListByProjectIdResponse =
+    { projectId : ProjectId, ideaSnapshotAndIdList : List IdeaSnapshotAndId }
 
 
 {-| アイデアのコメント
@@ -282,30 +306,6 @@ type alias CreateIdeaParameter =
 -}
 type alias AddCommentParameter =
     { accessToken : AccessToken, ideaId : IdeaId, comment : String }
-
-
-{-| Maybe プロジェクトのスナップショット と projectId. indexedDBからElmに渡す用
--}
-type alias ProjectResponse =
-    { id : ProjectId, snapshotMaybe : Maybe ProjectSnapshot }
-
-
-{-| Maybe プロジェクトのスナップショット と userId. indexedDBからElmに渡す用
--}
-type alias UserResponse =
-    { id : UserId, snapshotMaybe : Maybe UserSnapshot }
-
-
-{-| Maybe アイデア と ideaId. indexedDBからElmに渡す用
--}
-type alias IdeaResponse =
-    { id : IdeaId, snapshotMaybe : Maybe IdeaSnapshot }
-
-
-{-| プロジェクトからアイデアの一覧を取得したときにElmに渡すもの
--}
-type alias IdeaListByProjectIdResponse =
-    { projectId : ProjectId, ideaSnapshotAndIdList : List IdeaSnapshotAndId }
 
 
 {-| 編集提案
@@ -592,6 +592,16 @@ userSnapshotAndIdToJsonValue userSnapshotAndId =
         ]
 
 
+{-| UserResponseのJSONへのエンコーダ
+-}
+userResponseToJsonValue : UserResponse -> Je.Value
+userResponseToJsonValue userResponse =
+    Je.object
+        [ ( "id", userIdToJsonValue userResponse.id )
+        , ( "snapshotMaybe", maybeToJsonValue userSnapshotToJsonValue userResponse.snapshotMaybe )
+        ]
+
+
 {-| ProjectSnapshotのJSONへのエンコーダ
 -}
 projectSnapshotToJsonValue : ProjectSnapshot -> Je.Value
@@ -619,6 +629,16 @@ projectSnapshotAndIdToJsonValue projectSnapshotAndId =
         ]
 
 
+{-| ProjectResponseのJSONへのエンコーダ
+-}
+projectResponseToJsonValue : ProjectResponse -> Je.Value
+projectResponseToJsonValue projectResponse =
+    Je.object
+        [ ( "id", projectIdToJsonValue projectResponse.id )
+        , ( "snapshotMaybe", maybeToJsonValue projectSnapshotToJsonValue projectResponse.snapshotMaybe )
+        ]
+
+
 {-| IdeaSnapshotのJSONへのエンコーダ
 -}
 ideaSnapshotToJsonValue : IdeaSnapshot -> Je.Value
@@ -641,6 +661,26 @@ ideaSnapshotAndIdToJsonValue ideaSnapshotAndId =
     Je.object
         [ ( "id", ideaIdToJsonValue ideaSnapshotAndId.id )
         , ( "snapshot", ideaSnapshotToJsonValue ideaSnapshotAndId.snapshot )
+        ]
+
+
+{-| IdeaResponseのJSONへのエンコーダ
+-}
+ideaResponseToJsonValue : IdeaResponse -> Je.Value
+ideaResponseToJsonValue ideaResponse =
+    Je.object
+        [ ( "id", ideaIdToJsonValue ideaResponse.id )
+        , ( "snapshotMaybe", maybeToJsonValue ideaSnapshotToJsonValue ideaResponse.snapshotMaybe )
+        ]
+
+
+{-| IdeaListByProjectIdResponseのJSONへのエンコーダ
+-}
+ideaListByProjectIdResponseToJsonValue : IdeaListByProjectIdResponse -> Je.Value
+ideaListByProjectIdResponseToJsonValue ideaListByProjectIdResponse =
+    Je.object
+        [ ( "projectId", projectIdToJsonValue ideaListByProjectIdResponse.projectId )
+        , ( "ideaSnapshotAndIdList", Je.list ideaSnapshotAndIdToJsonValue ideaListByProjectIdResponse.ideaSnapshotAndIdList )
         ]
 
 
@@ -1019,46 +1059,6 @@ addCommentParameterToJsonValue addCommentParameter =
         ]
 
 
-{-| ProjectResponseのJSONへのエンコーダ
--}
-projectResponseToJsonValue : ProjectResponse -> Je.Value
-projectResponseToJsonValue projectResponse =
-    Je.object
-        [ ( "id", projectIdToJsonValue projectResponse.id )
-        , ( "snapshotMaybe", maybeToJsonValue projectSnapshotToJsonValue projectResponse.snapshotMaybe )
-        ]
-
-
-{-| UserResponseのJSONへのエンコーダ
--}
-userResponseToJsonValue : UserResponse -> Je.Value
-userResponseToJsonValue userResponse =
-    Je.object
-        [ ( "id", userIdToJsonValue userResponse.id )
-        , ( "snapshotMaybe", maybeToJsonValue userSnapshotToJsonValue userResponse.snapshotMaybe )
-        ]
-
-
-{-| IdeaResponseのJSONへのエンコーダ
--}
-ideaResponseToJsonValue : IdeaResponse -> Je.Value
-ideaResponseToJsonValue ideaResponse =
-    Je.object
-        [ ( "id", ideaIdToJsonValue ideaResponse.id )
-        , ( "snapshotMaybe", maybeToJsonValue ideaSnapshotToJsonValue ideaResponse.snapshotMaybe )
-        ]
-
-
-{-| IdeaListByProjectIdResponseのJSONへのエンコーダ
--}
-ideaListByProjectIdResponseToJsonValue : IdeaListByProjectIdResponse -> Je.Value
-ideaListByProjectIdResponseToJsonValue ideaListByProjectIdResponse =
-    Je.object
-        [ ( "projectId", projectIdToJsonValue ideaListByProjectIdResponse.projectId )
-        , ( "ideaSnapshotAndIdList", Je.list ideaSnapshotAndIdToJsonValue ideaListByProjectIdResponse.ideaSnapshotAndIdList )
-        ]
-
-
 {-| SuggestionのJSONへのエンコーダ
 -}
 suggestionToJsonValue : Suggestion -> Je.Value
@@ -1424,6 +1424,20 @@ userSnapshotAndIdJsonDecoder =
         |> Jdp.required "snapshot" userSnapshotJsonDecoder
 
 
+{-| UserResponseのJSON Decoder
+-}
+userResponseJsonDecoder : Jd.Decoder UserResponse
+userResponseJsonDecoder =
+    Jd.succeed
+        (\id snapshotMaybe ->
+            { id = id
+            , snapshotMaybe = snapshotMaybe
+            }
+        )
+        |> Jdp.required "id" userIdJsonDecoder
+        |> Jdp.required "snapshotMaybe" (maybeJsonDecoder userSnapshotJsonDecoder)
+
+
 {-| ProjectSnapshotのJSON Decoder
 -}
 projectSnapshotJsonDecoder : Jd.Decoder ProjectSnapshot
@@ -1466,6 +1480,20 @@ projectSnapshotAndIdJsonDecoder =
         |> Jdp.required "snapshot" projectSnapshotJsonDecoder
 
 
+{-| ProjectResponseのJSON Decoder
+-}
+projectResponseJsonDecoder : Jd.Decoder ProjectResponse
+projectResponseJsonDecoder =
+    Jd.succeed
+        (\id snapshotMaybe ->
+            { id = id
+            , snapshotMaybe = snapshotMaybe
+            }
+        )
+        |> Jdp.required "id" projectIdJsonDecoder
+        |> Jdp.required "snapshotMaybe" (maybeJsonDecoder projectSnapshotJsonDecoder)
+
+
 {-| IdeaSnapshotのJSON Decoder
 -}
 ideaSnapshotJsonDecoder : Jd.Decoder IdeaSnapshot
@@ -1502,6 +1530,34 @@ ideaSnapshotAndIdJsonDecoder =
         )
         |> Jdp.required "id" ideaIdJsonDecoder
         |> Jdp.required "snapshot" ideaSnapshotJsonDecoder
+
+
+{-| IdeaResponseのJSON Decoder
+-}
+ideaResponseJsonDecoder : Jd.Decoder IdeaResponse
+ideaResponseJsonDecoder =
+    Jd.succeed
+        (\id snapshotMaybe ->
+            { id = id
+            , snapshotMaybe = snapshotMaybe
+            }
+        )
+        |> Jdp.required "id" ideaIdJsonDecoder
+        |> Jdp.required "snapshotMaybe" (maybeJsonDecoder ideaSnapshotJsonDecoder)
+
+
+{-| IdeaListByProjectIdResponseのJSON Decoder
+-}
+ideaListByProjectIdResponseJsonDecoder : Jd.Decoder IdeaListByProjectIdResponse
+ideaListByProjectIdResponseJsonDecoder =
+    Jd.succeed
+        (\projectId ideaSnapshotAndIdList ->
+            { projectId = projectId
+            , ideaSnapshotAndIdList = ideaSnapshotAndIdList
+            }
+        )
+        |> Jdp.required "projectId" projectIdJsonDecoder
+        |> Jdp.required "ideaSnapshotAndIdList" (Jd.list ideaSnapshotAndIdJsonDecoder)
 
 
 {-| IdeaItemのJSON Decoder
@@ -2036,62 +2092,6 @@ addCommentParameterJsonDecoder =
         |> Jdp.required "accessToken" accessTokenJsonDecoder
         |> Jdp.required "ideaId" ideaIdJsonDecoder
         |> Jdp.required "comment" Jd.string
-
-
-{-| ProjectResponseのJSON Decoder
--}
-projectResponseJsonDecoder : Jd.Decoder ProjectResponse
-projectResponseJsonDecoder =
-    Jd.succeed
-        (\id snapshotMaybe ->
-            { id = id
-            , snapshotMaybe = snapshotMaybe
-            }
-        )
-        |> Jdp.required "id" projectIdJsonDecoder
-        |> Jdp.required "snapshotMaybe" (maybeJsonDecoder projectSnapshotJsonDecoder)
-
-
-{-| UserResponseのJSON Decoder
--}
-userResponseJsonDecoder : Jd.Decoder UserResponse
-userResponseJsonDecoder =
-    Jd.succeed
-        (\id snapshotMaybe ->
-            { id = id
-            , snapshotMaybe = snapshotMaybe
-            }
-        )
-        |> Jdp.required "id" userIdJsonDecoder
-        |> Jdp.required "snapshotMaybe" (maybeJsonDecoder userSnapshotJsonDecoder)
-
-
-{-| IdeaResponseのJSON Decoder
--}
-ideaResponseJsonDecoder : Jd.Decoder IdeaResponse
-ideaResponseJsonDecoder =
-    Jd.succeed
-        (\id snapshotMaybe ->
-            { id = id
-            , snapshotMaybe = snapshotMaybe
-            }
-        )
-        |> Jdp.required "id" ideaIdJsonDecoder
-        |> Jdp.required "snapshotMaybe" (maybeJsonDecoder ideaSnapshotJsonDecoder)
-
-
-{-| IdeaListByProjectIdResponseのJSON Decoder
--}
-ideaListByProjectIdResponseJsonDecoder : Jd.Decoder IdeaListByProjectIdResponse
-ideaListByProjectIdResponseJsonDecoder =
-    Jd.succeed
-        (\projectId ideaSnapshotAndIdList ->
-            { projectId = projectId
-            , ideaSnapshotAndIdList = ideaSnapshotAndIdList
-            }
-        )
-        |> Jdp.required "projectId" projectIdJsonDecoder
-        |> Jdp.required "ideaSnapshotAndIdList" (Jd.list ideaSnapshotAndIdJsonDecoder)
 
 
 {-| SuggestionのJSON Decoder

@@ -139,6 +139,20 @@ export type UserSnapshotAndId = {
 };
 
 /**
+ * Maybe プロジェクトのスナップショット と userId. indexedDBからElmに渡す用
+ */
+export type UserResponse = {
+  /**
+   * ユーザーID
+   */
+  id: UserId;
+  /**
+   * ユーザーのデータ
+   */
+  snapshotMaybe: Maybe<UserSnapshot>;
+};
+
+/**
  * プロジェクト
  */
 export type ProjectSnapshot = {
@@ -195,6 +209,20 @@ export type ProjectSnapshotAndId = {
 };
 
 /**
+ * Maybe プロジェクトのスナップショット と projectId. indexedDBからElmに渡す用
+ */
+export type ProjectResponse = {
+  /**
+   * プロジェクトのID
+   */
+  id: ProjectId;
+  /**
+   * プロジェクトのデータ
+   */
+  snapshotMaybe: Maybe<ProjectSnapshot>;
+};
+
+/**
  * アイデア
  */
 export type IdeaSnapshot = {
@@ -240,6 +268,34 @@ export type IdeaSnapshotAndId = {
    * アイデアのスナップショット
    */
   snapshot: IdeaSnapshot;
+};
+
+/**
+ * Maybe アイデア と ideaId. indexedDBからElmに渡す用
+ */
+export type IdeaResponse = {
+  /**
+   * アイデアID
+   */
+  id: IdeaId;
+  /**
+   * アイデアのスナップショット
+   */
+  snapshotMaybe: Maybe<IdeaSnapshot>;
+};
+
+/**
+ * プロジェクトからアイデアの一覧を取得したときにElmに渡すもの
+ */
+export type IdeaListByProjectIdResponse = {
+  /**
+   * プロジェクトID
+   */
+  projectId: ProjectId;
+  /**
+   * アイデアの一覧
+   */
+  ideaSnapshotAndIdList: ReadonlyArray<IdeaSnapshotAndId>;
 };
 
 /**
@@ -663,62 +719,6 @@ export type AddCommentParameter = {
    * コメント本文
    */
   comment: string;
-};
-
-/**
- * Maybe プロジェクトのスナップショット と projectId. indexedDBからElmに渡す用
- */
-export type ProjectResponse = {
-  /**
-   * プロジェクトのID
-   */
-  id: ProjectId;
-  /**
-   * プロジェクトのデータ
-   */
-  snapshotMaybe: Maybe<ProjectSnapshot>;
-};
-
-/**
- * Maybe プロジェクトのスナップショット と userId. indexedDBからElmに渡す用
- */
-export type UserResponse = {
-  /**
-   * ユーザーID
-   */
-  id: UserId;
-  /**
-   * ユーザーのデータ
-   */
-  snapshotMaybe: Maybe<UserSnapshot>;
-};
-
-/**
- * Maybe アイデア と ideaId. indexedDBからElmに渡す用
- */
-export type IdeaResponse = {
-  /**
-   * アイデアID
-   */
-  id: IdeaId;
-  /**
-   * アイデアのスナップショット
-   */
-  snapshotMaybe: Maybe<IdeaSnapshot>;
-};
-
-/**
- * プロジェクトからアイデアの一覧を取得したときにElmに渡すもの
- */
-export type IdeaListByProjectIdResponse = {
-  /**
-   * プロジェクトID
-   */
-  projectId: ProjectId;
-  /**
-   * アイデアの一覧
-   */
-  ideaSnapshotAndIdList: ReadonlyArray<IdeaSnapshotAndId>;
 };
 
 /**
@@ -1427,6 +1427,13 @@ export const encodeUserSnapshotAndId = (
     encodeUserSnapshot(userSnapshotAndId.snapshot)
   );
 
+export const encodeUserResponse = (
+  userResponse: UserResponse
+): ReadonlyArray<number> =>
+  encodeId(userResponse.id).concat(
+    encodeMaybe(encodeUserSnapshot)(userResponse.snapshotMaybe)
+  );
+
 export const encodeProjectSnapshot = (
   projectSnapshot: ProjectSnapshot
 ): ReadonlyArray<number> =>
@@ -1447,6 +1454,13 @@ export const encodeProjectSnapshotAndId = (
     encodeProjectSnapshot(projectSnapshotAndId.snapshot)
   );
 
+export const encodeProjectResponse = (
+  projectResponse: ProjectResponse
+): ReadonlyArray<number> =>
+  encodeId(projectResponse.id).concat(
+    encodeMaybe(encodeProjectSnapshot)(projectResponse.snapshotMaybe)
+  );
+
 export const encodeIdeaSnapshot = (
   ideaSnapshot: IdeaSnapshot
 ): ReadonlyArray<number> =>
@@ -1463,6 +1477,22 @@ export const encodeIdeaSnapshotAndId = (
 ): ReadonlyArray<number> =>
   encodeId(ideaSnapshotAndId.id).concat(
     encodeIdeaSnapshot(ideaSnapshotAndId.snapshot)
+  );
+
+export const encodeIdeaResponse = (
+  ideaResponse: IdeaResponse
+): ReadonlyArray<number> =>
+  encodeId(ideaResponse.id).concat(
+    encodeMaybe(encodeIdeaSnapshot)(ideaResponse.snapshotMaybe)
+  );
+
+export const encodeIdeaListByProjectIdResponse = (
+  ideaListByProjectIdResponse: IdeaListByProjectIdResponse
+): ReadonlyArray<number> =>
+  encodeId(ideaListByProjectIdResponse.projectId).concat(
+    encodeList(encodeIdeaSnapshotAndId)(
+      ideaListByProjectIdResponse.ideaSnapshotAndIdList
+    )
   );
 
 export const encodeIdeaItem = (ideaItem: IdeaItem): ReadonlyArray<number> =>
@@ -1787,36 +1817,6 @@ export const encodeAddCommentParameter = (
   encodeToken(addCommentParameter.accessToken)
     .concat(encodeId(addCommentParameter.ideaId))
     .concat(encodeString(addCommentParameter.comment));
-
-export const encodeProjectResponse = (
-  projectResponse: ProjectResponse
-): ReadonlyArray<number> =>
-  encodeId(projectResponse.id).concat(
-    encodeMaybe(encodeProjectSnapshot)(projectResponse.snapshotMaybe)
-  );
-
-export const encodeUserResponse = (
-  userResponse: UserResponse
-): ReadonlyArray<number> =>
-  encodeId(userResponse.id).concat(
-    encodeMaybe(encodeUserSnapshot)(userResponse.snapshotMaybe)
-  );
-
-export const encodeIdeaResponse = (
-  ideaResponse: IdeaResponse
-): ReadonlyArray<number> =>
-  encodeId(ideaResponse.id).concat(
-    encodeMaybe(encodeIdeaSnapshot)(ideaResponse.snapshotMaybe)
-  );
-
-export const encodeIdeaListByProjectIdResponse = (
-  ideaListByProjectIdResponse: IdeaListByProjectIdResponse
-): ReadonlyArray<number> =>
-  encodeId(ideaListByProjectIdResponse.projectId).concat(
-    encodeList(encodeIdeaSnapshotAndId)(
-      ideaListByProjectIdResponse.ideaSnapshotAndIdList
-    )
-  );
 
 export const encodeSuggestion = (
   suggestion: Suggestion
@@ -2471,6 +2471,31 @@ export const decodeUserSnapshotAndId = (
  * @param index バイナリを読み込み開始位置
  * @param binary バイナリ
  */
+export const decodeUserResponse = (
+  index: number,
+  binary: Uint8Array
+): { result: UserResponse; nextIndex: number } => {
+  const idAndNextIndex: { result: UserId; nextIndex: number } = (decodeId as (
+    a: number,
+    b: Uint8Array
+  ) => { result: UserId; nextIndex: number })(index, binary);
+  const snapshotMaybeAndNextIndex: {
+    result: Maybe<UserSnapshot>;
+    nextIndex: number;
+  } = decodeMaybe(decodeUserSnapshot)(idAndNextIndex.nextIndex, binary);
+  return {
+    result: {
+      id: idAndNextIndex.result,
+      snapshotMaybe: snapshotMaybeAndNextIndex.result,
+    },
+    nextIndex: snapshotMaybeAndNextIndex.nextIndex,
+  };
+};
+
+/**
+ * @param index バイナリを読み込み開始位置
+ * @param binary バイナリ
+ */
 export const decodeProjectSnapshot = (
   index: number,
   binary: Uint8Array
@@ -2587,6 +2612,34 @@ export const decodeProjectSnapshotAndId = (
  * @param index バイナリを読み込み開始位置
  * @param binary バイナリ
  */
+export const decodeProjectResponse = (
+  index: number,
+  binary: Uint8Array
+): { result: ProjectResponse; nextIndex: number } => {
+  const idAndNextIndex: {
+    result: ProjectId;
+    nextIndex: number;
+  } = (decodeId as (
+    a: number,
+    b: Uint8Array
+  ) => { result: ProjectId; nextIndex: number })(index, binary);
+  const snapshotMaybeAndNextIndex: {
+    result: Maybe<ProjectSnapshot>;
+    nextIndex: number;
+  } = decodeMaybe(decodeProjectSnapshot)(idAndNextIndex.nextIndex, binary);
+  return {
+    result: {
+      id: idAndNextIndex.result,
+      snapshotMaybe: snapshotMaybeAndNextIndex.result,
+    },
+    nextIndex: snapshotMaybeAndNextIndex.nextIndex,
+  };
+};
+
+/**
+ * @param index バイナリを読み込み開始位置
+ * @param binary バイナリ
+ */
 export const decodeIdeaSnapshot = (
   index: number,
   binary: Uint8Array
@@ -2667,6 +2720,62 @@ export const decodeIdeaSnapshotAndId = (
       snapshot: snapshotAndNextIndex.result,
     },
     nextIndex: snapshotAndNextIndex.nextIndex,
+  };
+};
+
+/**
+ * @param index バイナリを読み込み開始位置
+ * @param binary バイナリ
+ */
+export const decodeIdeaResponse = (
+  index: number,
+  binary: Uint8Array
+): { result: IdeaResponse; nextIndex: number } => {
+  const idAndNextIndex: { result: IdeaId; nextIndex: number } = (decodeId as (
+    a: number,
+    b: Uint8Array
+  ) => { result: IdeaId; nextIndex: number })(index, binary);
+  const snapshotMaybeAndNextIndex: {
+    result: Maybe<IdeaSnapshot>;
+    nextIndex: number;
+  } = decodeMaybe(decodeIdeaSnapshot)(idAndNextIndex.nextIndex, binary);
+  return {
+    result: {
+      id: idAndNextIndex.result,
+      snapshotMaybe: snapshotMaybeAndNextIndex.result,
+    },
+    nextIndex: snapshotMaybeAndNextIndex.nextIndex,
+  };
+};
+
+/**
+ * @param index バイナリを読み込み開始位置
+ * @param binary バイナリ
+ */
+export const decodeIdeaListByProjectIdResponse = (
+  index: number,
+  binary: Uint8Array
+): { result: IdeaListByProjectIdResponse; nextIndex: number } => {
+  const projectIdAndNextIndex: {
+    result: ProjectId;
+    nextIndex: number;
+  } = (decodeId as (
+    a: number,
+    b: Uint8Array
+  ) => { result: ProjectId; nextIndex: number })(index, binary);
+  const ideaSnapshotAndIdListAndNextIndex: {
+    result: ReadonlyArray<IdeaSnapshotAndId>;
+    nextIndex: number;
+  } = decodeList(decodeIdeaSnapshotAndId)(
+    projectIdAndNextIndex.nextIndex,
+    binary
+  );
+  return {
+    result: {
+      projectId: projectIdAndNextIndex.result,
+      ideaSnapshotAndIdList: ideaSnapshotAndIdListAndNextIndex.result,
+    },
+    nextIndex: ideaSnapshotAndIdListAndNextIndex.nextIndex,
   };
 };
 
@@ -3793,115 +3902,6 @@ export const decodeAddCommentParameter = (
       comment: commentAndNextIndex.result,
     },
     nextIndex: commentAndNextIndex.nextIndex,
-  };
-};
-
-/**
- * @param index バイナリを読み込み開始位置
- * @param binary バイナリ
- */
-export const decodeProjectResponse = (
-  index: number,
-  binary: Uint8Array
-): { result: ProjectResponse; nextIndex: number } => {
-  const idAndNextIndex: {
-    result: ProjectId;
-    nextIndex: number;
-  } = (decodeId as (
-    a: number,
-    b: Uint8Array
-  ) => { result: ProjectId; nextIndex: number })(index, binary);
-  const snapshotMaybeAndNextIndex: {
-    result: Maybe<ProjectSnapshot>;
-    nextIndex: number;
-  } = decodeMaybe(decodeProjectSnapshot)(idAndNextIndex.nextIndex, binary);
-  return {
-    result: {
-      id: idAndNextIndex.result,
-      snapshotMaybe: snapshotMaybeAndNextIndex.result,
-    },
-    nextIndex: snapshotMaybeAndNextIndex.nextIndex,
-  };
-};
-
-/**
- * @param index バイナリを読み込み開始位置
- * @param binary バイナリ
- */
-export const decodeUserResponse = (
-  index: number,
-  binary: Uint8Array
-): { result: UserResponse; nextIndex: number } => {
-  const idAndNextIndex: { result: UserId; nextIndex: number } = (decodeId as (
-    a: number,
-    b: Uint8Array
-  ) => { result: UserId; nextIndex: number })(index, binary);
-  const snapshotMaybeAndNextIndex: {
-    result: Maybe<UserSnapshot>;
-    nextIndex: number;
-  } = decodeMaybe(decodeUserSnapshot)(idAndNextIndex.nextIndex, binary);
-  return {
-    result: {
-      id: idAndNextIndex.result,
-      snapshotMaybe: snapshotMaybeAndNextIndex.result,
-    },
-    nextIndex: snapshotMaybeAndNextIndex.nextIndex,
-  };
-};
-
-/**
- * @param index バイナリを読み込み開始位置
- * @param binary バイナリ
- */
-export const decodeIdeaResponse = (
-  index: number,
-  binary: Uint8Array
-): { result: IdeaResponse; nextIndex: number } => {
-  const idAndNextIndex: { result: IdeaId; nextIndex: number } = (decodeId as (
-    a: number,
-    b: Uint8Array
-  ) => { result: IdeaId; nextIndex: number })(index, binary);
-  const snapshotMaybeAndNextIndex: {
-    result: Maybe<IdeaSnapshot>;
-    nextIndex: number;
-  } = decodeMaybe(decodeIdeaSnapshot)(idAndNextIndex.nextIndex, binary);
-  return {
-    result: {
-      id: idAndNextIndex.result,
-      snapshotMaybe: snapshotMaybeAndNextIndex.result,
-    },
-    nextIndex: snapshotMaybeAndNextIndex.nextIndex,
-  };
-};
-
-/**
- * @param index バイナリを読み込み開始位置
- * @param binary バイナリ
- */
-export const decodeIdeaListByProjectIdResponse = (
-  index: number,
-  binary: Uint8Array
-): { result: IdeaListByProjectIdResponse; nextIndex: number } => {
-  const projectIdAndNextIndex: {
-    result: ProjectId;
-    nextIndex: number;
-  } = (decodeId as (
-    a: number,
-    b: Uint8Array
-  ) => { result: ProjectId; nextIndex: number })(index, binary);
-  const ideaSnapshotAndIdListAndNextIndex: {
-    result: ReadonlyArray<IdeaSnapshotAndId>;
-    nextIndex: number;
-  } = decodeList(decodeIdeaSnapshotAndId)(
-    projectIdAndNextIndex.nextIndex,
-    binary
-  );
-  return {
-    result: {
-      projectId: projectIdAndNextIndex.result,
-      ideaSnapshotAndIdList: ideaSnapshotAndIdListAndNextIndex.result,
-    },
-    nextIndex: ideaSnapshotAndIdListAndNextIndex.nextIndex,
   };
 };
 
