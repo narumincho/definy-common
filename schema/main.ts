@@ -6,8 +6,8 @@ import * as childProcess from "child_process";
 import * as prettier from "prettier";
 import * as suggestion from "./suggestion";
 import * as idAndToken from "./idAndToken";
+import * as time from "./time";
 
-const timeName = "Time";
 const requestLogInUrlRequestDataName = "RequestLogInUrlRequestData";
 const openIdConnectProviderName = "OpenIdConnectProvider";
 const urlDataName = "UrlData";
@@ -64,23 +64,7 @@ const ideaResponseName = "IdeaResponse";
 const IdeaListByProjectIdResponseName = "IdeaListByProjectIdResponse";
 
 const listCustomType: ReadonlyArray<type.CustomType> = [
-  {
-    name: timeName,
-    description:
-      "日時. 0001-01-01T00:00:00.000Z to 9999-12-31T23:59:59.999Z 最小単位はミリ秒. ミリ秒の求め方は day*1000*60*60*24 + millisecond",
-    body: type.customTypeBodyProduct([
-      {
-        name: "day",
-        description: "1970-01-01からの経過日数. マイナスになることもある",
-        memberType: type.typeInt32,
-      },
-      {
-        name: "millisecond",
-        description: "日にちの中のミリ秒. 0 to 86399999 (=1000*60*60*24-1)",
-        memberType: type.typeInt32,
-      },
-    ]),
-  },
+  time.timeCustomType,
   {
     name: requestLogInUrlRequestDataName,
     description: "ログインのURLを発行するために必要なデータ",
@@ -247,7 +231,7 @@ const listCustomType: ReadonlyArray<type.CustomType> = [
       {
         name: "createTime",
         description: "Definyでユーザーが作成された日時",
-        memberType: type.typeCustom(timeName),
+        memberType: time.time,
       },
       {
         name: "likeProjectIdList",
@@ -267,7 +251,7 @@ const listCustomType: ReadonlyArray<type.CustomType> = [
       {
         name: "getTime",
         description: "取得日時",
-        memberType: type.typeCustom(timeName),
+        memberType: time.time,
       },
     ]),
   },
@@ -309,7 +293,7 @@ const listCustomType: ReadonlyArray<type.CustomType> = [
       {
         name: "createTime",
         description: "作成日時",
-        memberType: type.typeCustom(timeName),
+        memberType: time.time,
       },
       {
         name: "createUser",
@@ -319,12 +303,12 @@ const listCustomType: ReadonlyArray<type.CustomType> = [
       {
         name: "updateTime",
         description: "更新日時",
-        memberType: type.typeCustom(timeName),
+        memberType: time.time,
       },
       {
         name: "getTime",
         description: "取得日時",
-        memberType: type.typeCustom(timeName),
+        memberType: time.time,
       },
       {
         name: "partIdList",
@@ -371,7 +355,7 @@ const listCustomType: ReadonlyArray<type.CustomType> = [
       {
         name: "createTime",
         description: "作成日時",
-        memberType: type.typeCustom(timeName),
+        memberType: time.time,
       },
       {
         name: "projectId",
@@ -386,12 +370,12 @@ const listCustomType: ReadonlyArray<type.CustomType> = [
       {
         name: "updateTime",
         description: "更新日時",
-        memberType: type.typeCustom(timeName),
+        memberType: time.time,
       },
       {
         name: "getTime",
         description: "取得日時",
-        memberType: type.typeCustom(timeName),
+        memberType: time.time,
       },
     ]),
   },
@@ -423,7 +407,7 @@ const listCustomType: ReadonlyArray<type.CustomType> = [
       {
         name: "createTime",
         description: "作成日時",
-        memberType: type.typeCustom(timeName),
+        memberType: time.time,
       },
       {
         name: "body",
@@ -495,7 +479,7 @@ const listCustomType: ReadonlyArray<type.CustomType> = [
       {
         name: "getTime",
         description: "取得日時",
-        memberType: type.typeCustom(timeName),
+        memberType: time.time,
       },
       {
         name: "body",
@@ -546,7 +530,7 @@ const listCustomType: ReadonlyArray<type.CustomType> = [
       {
         name: "getTime",
         description: "取得日時",
-        memberType: type.typeCustom(timeName),
+        memberType: time.time,
       },
     ]),
   },
