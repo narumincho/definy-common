@@ -643,7 +643,7 @@ export const exprToDebugString = (expr: data.Expr): string => {
     case "PartReference":
       return "[part " + (expr.partId as string) + "]";
     case "TagReference":
-      return "[tag " + JSON.stringify(expr.tagReferenceIndex) + "]";
+      return "[tag " + JSON.stringify(expr.tagReference) + "]";
     case "FunctionCall":
       return (
         "(" +
