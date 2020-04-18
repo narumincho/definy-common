@@ -8,10 +8,10 @@ export const changeName = "Change";
 const addPartName = "AddPart";
 const suggestionTypeName = "SuggestionType";
 const suggestionTypeFunctionName = "SuggestionTypeFunction";
-const suggestionTypeTypePartWithParameterName =
-  "SuggestionTypeTypePartWithParameter";
-const suggestionTypeSuggestionTypePartWithParameterName =
-  "SuggestionTypeSuggestionTypePartWithParameter";
+const typePartWithSuggestionTypeParameterName =
+  "TypePartWithSuggestionTypeParameter";
+const suggestionTypePartWithSuggestionTypeParameterName =
+  "SuggestionTypePartWithSuggestionTypeParameter";
 
 const suggestionExprName = "SuggestionExpr";
 const suggestionTagReferenceName = "SuggestionTagReference";
@@ -165,14 +165,14 @@ export const customTypeList: ReadonlyArray<type.CustomType> = [
         name: "TypePartWithParameter",
         description: "提案前に作られた型パーツとパラメーター",
         parameter: type.maybeJust(
-          type.typeCustom(suggestionTypeTypePartWithParameterName)
+          type.typeCustom(typePartWithSuggestionTypeParameterName)
         ),
       },
       {
         name: "SuggestionTypePartWithParameter",
         description: "提案時に作られた型パーツとパラメーター",
         parameter: type.maybeJust(
-          type.typeCustom(suggestionTypeTypePartWithParameterName)
+          type.typeCustom(suggestionTypePartWithSuggestionTypeParameterName)
         ),
       },
     ]),
@@ -194,7 +194,7 @@ export const customTypeList: ReadonlyArray<type.CustomType> = [
     ]),
   },
   {
-    name: suggestionTypeTypePartWithParameterName,
+    name: typePartWithSuggestionTypeParameterName,
     description: "",
     body: product([
       {
@@ -210,7 +210,7 @@ export const customTypeList: ReadonlyArray<type.CustomType> = [
     ]),
   },
   {
-    name: suggestionTypeSuggestionTypePartWithParameterName,
+    name: suggestionTypePartWithSuggestionTypeParameterName,
     description: "",
     body: product([
       {

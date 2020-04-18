@@ -401,11 +401,11 @@ export type SuggestionType =
   | { _: "Function"; suggestionTypeFunction: SuggestionTypeFunction }
   | {
       _: "TypePartWithParameter";
-      suggestionTypeTypePartWithParameter: SuggestionTypeTypePartWithParameter;
+      typePartWithSuggestionTypeParameter: TypePartWithSuggestionTypeParameter;
     }
   | {
       _: "SuggestionTypePartWithParameter";
-      suggestionTypeTypePartWithParameter: SuggestionTypeTypePartWithParameter;
+      suggestionTypePartWithSuggestionTypeParameter: SuggestionTypePartWithSuggestionTypeParameter;
     };
 
 export type SuggestionTypeFunction = {
@@ -419,7 +419,7 @@ export type SuggestionTypeFunction = {
   outputType: SuggestionType;
 };
 
-export type SuggestionTypeTypePartWithParameter = {
+export type TypePartWithSuggestionTypeParameter = {
   /**
    * 型の参照
    */
@@ -430,7 +430,7 @@ export type SuggestionTypeTypePartWithParameter = {
   parameter: ReadonlyArray<SuggestionType>;
 };
 
-export type SuggestionTypeSuggestionTypePartWithParameter = {
+export type SuggestionTypePartWithSuggestionTypeParameter = {
   /**
    * 提案内での定義した型パーツの番号
    */
@@ -1086,20 +1086,20 @@ export const suggestionTypeFunction = (
  * 提案前に作られた型パーツとパラメーター
  */
 export const suggestionTypeTypePartWithParameter = (
-  suggestionTypeTypePartWithParameter: SuggestionTypeTypePartWithParameter
+  typePartWithSuggestionTypeParameter: TypePartWithSuggestionTypeParameter
 ): SuggestionType => ({
   _: "TypePartWithParameter",
-  suggestionTypeTypePartWithParameter: suggestionTypeTypePartWithParameter,
+  typePartWithSuggestionTypeParameter: typePartWithSuggestionTypeParameter,
 });
 
 /**
  * 提案時に作られた型パーツとパラメーター
  */
 export const suggestionTypeSuggestionTypePartWithParameter = (
-  suggestionTypeTypePartWithParameter: SuggestionTypeTypePartWithParameter
+  suggestionTypePartWithSuggestionTypeParameter: SuggestionTypePartWithSuggestionTypeParameter
 ): SuggestionType => ({
   _: "SuggestionTypePartWithParameter",
-  suggestionTypeTypePartWithParameter: suggestionTypeTypePartWithParameter,
+  suggestionTypePartWithSuggestionTypeParameter: suggestionTypePartWithSuggestionTypeParameter,
 });
 
 /**
@@ -1747,15 +1747,15 @@ export const encodeSuggestionType = (
     }
     case "TypePartWithParameter": {
       return [1].concat(
-        encodeSuggestionTypeTypePartWithParameter(
-          suggestionType.suggestionTypeTypePartWithParameter
+        encodeTypePartWithSuggestionTypeParameter(
+          suggestionType.typePartWithSuggestionTypeParameter
         )
       );
     }
     case "SuggestionTypePartWithParameter": {
       return [2].concat(
-        encodeSuggestionTypeTypePartWithParameter(
-          suggestionType.suggestionTypeTypePartWithParameter
+        encodeSuggestionTypePartWithSuggestionTypeParameter(
+          suggestionType.suggestionTypePartWithSuggestionTypeParameter
         )
       );
     }
@@ -1769,23 +1769,23 @@ export const encodeSuggestionTypeFunction = (
     encodeSuggestionType(suggestionTypeFunction.outputType)
   );
 
-export const encodeSuggestionTypeTypePartWithParameter = (
-  suggestionTypeTypePartWithParameter: SuggestionTypeTypePartWithParameter
+export const encodeTypePartWithSuggestionTypeParameter = (
+  typePartWithSuggestionTypeParameter: TypePartWithSuggestionTypeParameter
 ): ReadonlyArray<number> =>
-  encodeId(suggestionTypeTypePartWithParameter.typePartId).concat(
+  encodeId(typePartWithSuggestionTypeParameter.typePartId).concat(
     encodeList(encodeSuggestionType)(
-      suggestionTypeTypePartWithParameter.parameter
+      typePartWithSuggestionTypeParameter.parameter
     )
   );
 
-export const encodeSuggestionTypeSuggestionTypePartWithParameter = (
-  suggestionTypeSuggestionTypePartWithParameter: SuggestionTypeSuggestionTypePartWithParameter
+export const encodeSuggestionTypePartWithSuggestionTypeParameter = (
+  suggestionTypePartWithSuggestionTypeParameter: SuggestionTypePartWithSuggestionTypeParameter
 ): ReadonlyArray<number> =>
   encodeInt32(
-    suggestionTypeSuggestionTypePartWithParameter.suggestionTypePartIndex
+    suggestionTypePartWithSuggestionTypeParameter.suggestionTypePartIndex
   ).concat(
     encodeList(encodeSuggestionType)(
-      suggestionTypeSuggestionTypePartWithParameter.parameter
+      suggestionTypePartWithSuggestionTypeParameter.parameter
     )
   );
 
@@ -3315,9 +3315,9 @@ export const decodeSuggestionType = (
   }
   if (patternIndex.result === 1) {
     const result: {
-      result: SuggestionTypeTypePartWithParameter;
+      result: TypePartWithSuggestionTypeParameter;
       nextIndex: number;
-    } = decodeSuggestionTypeTypePartWithParameter(
+    } = decodeTypePartWithSuggestionTypeParameter(
       patternIndex.nextIndex,
       binary
     );
@@ -3328,9 +3328,9 @@ export const decodeSuggestionType = (
   }
   if (patternIndex.result === 2) {
     const result: {
-      result: SuggestionTypeTypePartWithParameter;
+      result: SuggestionTypePartWithSuggestionTypeParameter;
       nextIndex: number;
-    } = decodeSuggestionTypeTypePartWithParameter(
+    } = decodeSuggestionTypePartWithSuggestionTypeParameter(
       patternIndex.nextIndex,
       binary
     );
@@ -3371,10 +3371,10 @@ export const decodeSuggestionTypeFunction = (
  * @param index バイナリを読み込み開始位置
  * @param binary バイナリ
  */
-export const decodeSuggestionTypeTypePartWithParameter = (
+export const decodeTypePartWithSuggestionTypeParameter = (
   index: number,
   binary: Uint8Array
-): { result: SuggestionTypeTypePartWithParameter; nextIndex: number } => {
+): { result: TypePartWithSuggestionTypeParameter; nextIndex: number } => {
   const typePartIdAndNextIndex: {
     result: TypeId;
     nextIndex: number;
@@ -3402,11 +3402,11 @@ export const decodeSuggestionTypeTypePartWithParameter = (
  * @param index バイナリを読み込み開始位置
  * @param binary バイナリ
  */
-export const decodeSuggestionTypeSuggestionTypePartWithParameter = (
+export const decodeSuggestionTypePartWithSuggestionTypeParameter = (
   index: number,
   binary: Uint8Array
 ): {
-  result: SuggestionTypeSuggestionTypePartWithParameter;
+  result: SuggestionTypePartWithSuggestionTypeParameter;
   nextIndex: number;
 } => {
   const suggestionTypePartIndexAndNextIndex: {
