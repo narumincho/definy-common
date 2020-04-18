@@ -7,7 +7,7 @@ export const suggestionStateName = "SuggestionState";
 export const changeName = "Change";
 const addPartName = "AddPart";
 const suggestionTypeName = "SuggestionType";
-const suggestionTypeFunctionName = "SuggestionTypeFunction";
+const suggestionTypeInputAndOutputName = "SuggestionTypeInputAndOutput";
 const typePartWithSuggestionTypeParameterName =
   "TypePartWithSuggestionTypeParameter";
 const suggestionTypePartWithSuggestionTypeParameterName =
@@ -26,8 +26,8 @@ const typePartBodyProductMemberName = "TypePartBodyProductMember";
 const typePartBodySumPatternName = "TypePartBodySumPattern";
 const typePartBodyKernelName = "TypePartBodyKernel";
 const typeName = "Type";
-const typeFunctionName = "TypeFunction";
-const typeTypePartWithParameterName = "TypeTypePartWithParameter";
+const typeInputAndOutputName = "TypeInputAndOutput";
+const typePartIdWithParameterName = "TypePartIdWithParameter";
 
 const exprName = "Expr";
 const evaluatedExprName = "EvaluatedExpr";
@@ -159,7 +159,9 @@ export const customTypeList: ReadonlyArray<type.CustomType> = [
       {
         name: "Function",
         description: "関数",
-        parameter: type.maybeJust(type.typeCustom(suggestionTypeFunctionName)),
+        parameter: type.maybeJust(
+          type.typeCustom(suggestionTypeInputAndOutputName)
+        ),
       },
       {
         name: "TypePartWithParameter",
@@ -178,7 +180,7 @@ export const customTypeList: ReadonlyArray<type.CustomType> = [
     ]),
   },
   {
-    name: suggestionTypeFunctionName,
+    name: suggestionTypeInputAndOutputName,
     description: "",
     body: product([
       {
@@ -545,19 +547,17 @@ export const customTypeList: ReadonlyArray<type.CustomType> = [
       {
         name: "Function",
         description: "関数",
-        parameter: type.maybeJust(type.typeCustom(typeFunctionName)),
+        parameter: type.maybeJust(type.typeCustom(typeInputAndOutputName)),
       },
       {
         name: "TypePartWithParameter",
         description: "型パーツと, パラメーターのリスト",
-        parameter: type.maybeJust(
-          type.typeCustom(typeTypePartWithParameterName)
-        ),
+        parameter: type.maybeJust(type.typeCustom(typePartIdWithParameterName)),
       },
     ]),
   },
   {
-    name: typeFunctionName,
+    name: typeInputAndOutputName,
     description: "",
     body: product([
       {
@@ -573,7 +573,7 @@ export const customTypeList: ReadonlyArray<type.CustomType> = [
     ]),
   },
   {
-    name: typeTypePartWithParameterName,
+    name: typePartIdWithParameterName,
     description: "",
     body: product([
       {

@@ -398,7 +398,10 @@ export type AddPart = {
  * ChangeのAddPartなどで使われる提案で作成した型を使えるType
  */
 export type SuggestionType =
-  | { _: "Function"; suggestionTypeFunction: SuggestionTypeFunction }
+  | {
+      _: "Function";
+      suggestionTypeInputAndOutput: SuggestionTypeInputAndOutput;
+    }
   | {
       _: "TypePartWithParameter";
       typePartWithSuggestionTypeParameter: TypePartWithSuggestionTypeParameter;
@@ -408,7 +411,7 @@ export type SuggestionType =
       suggestionTypePartWithSuggestionTypeParameter: SuggestionTypePartWithSuggestionTypeParameter;
     };
 
-export type SuggestionTypeFunction = {
+export type SuggestionTypeInputAndOutput = {
   /**
    * 入力の型
    */
@@ -662,13 +665,13 @@ export type TypePartBodyKernel = "Int32" | "List";
  * 型
  */
 export type Type =
-  | { _: "Function"; typeFunction: TypeFunction }
+  | { _: "Function"; typeInputAndOutput: TypeInputAndOutput }
   | {
       _: "TypePartWithParameter";
-      typeTypePartWithParameter: TypeTypePartWithParameter;
+      typePartIdWithParameter: TypePartIdWithParameter;
     };
 
-export type TypeFunction = {
+export type TypeInputAndOutput = {
   /**
    * 入力の型
    */
@@ -679,7 +682,7 @@ export type TypeFunction = {
   outputType: Type;
 };
 
-export type TypeTypePartWithParameter = {
+export type TypePartIdWithParameter = {
   /**
    * 型の参照
    */
@@ -1076,10 +1079,10 @@ export const changeAddPart = (addPart: AddPart): Change => ({
  * 関数
  */
 export const suggestionTypeFunction = (
-  suggestionTypeFunction: SuggestionTypeFunction
+  suggestionTypeInputAndOutput: SuggestionTypeInputAndOutput
 ): SuggestionType => ({
   _: "Function",
-  suggestionTypeFunction: suggestionTypeFunction,
+  suggestionTypeInputAndOutput: suggestionTypeInputAndOutput,
 });
 
 /**
@@ -1208,19 +1211,19 @@ export const typePartBodyKernel = (
 /**
  * 関数
  */
-export const typeFunction = (typeFunction: TypeFunction): Type => ({
+export const typeFunction = (typeInputAndOutput: TypeInputAndOutput): Type => ({
   _: "Function",
-  typeFunction: typeFunction,
+  typeInputAndOutput: typeInputAndOutput,
 });
 
 /**
  * 型パーツと, パラメーターのリスト
  */
 export const typeTypePartWithParameter = (
-  typeTypePartWithParameter: TypeTypePartWithParameter
+  typePartIdWithParameter: TypePartIdWithParameter
 ): Type => ({
   _: "TypePartWithParameter",
-  typeTypePartWithParameter: typeTypePartWithParameter,
+  typePartIdWithParameter: typePartIdWithParameter,
 });
 
 /**
@@ -1742,7 +1745,9 @@ export const encodeSuggestionType = (
   switch (suggestionType._) {
     case "Function": {
       return [0].concat(
-        encodeSuggestionTypeFunction(suggestionType.suggestionTypeFunction)
+        encodeSuggestionTypeInputAndOutput(
+          suggestionType.suggestionTypeInputAndOutput
+        )
       );
     }
     case "TypePartWithParameter": {
@@ -1762,11 +1767,11 @@ export const encodeSuggestionType = (
   }
 };
 
-export const encodeSuggestionTypeFunction = (
-  suggestionTypeFunction: SuggestionTypeFunction
+export const encodeSuggestionTypeInputAndOutput = (
+  suggestionTypeInputAndOutput: SuggestionTypeInputAndOutput
 ): ReadonlyArray<number> =>
-  encodeSuggestionType(suggestionTypeFunction.inputType).concat(
-    encodeSuggestionType(suggestionTypeFunction.outputType)
+  encodeSuggestionType(suggestionTypeInputAndOutput.inputType).concat(
+    encodeSuggestionType(suggestionTypeInputAndOutput.outputType)
   );
 
 export const encodeTypePartWithSuggestionTypeParameter = (
@@ -1945,28 +1950,28 @@ export const encodeTypePartBodyKernel = (
 export const encodeType = (type_: Type): ReadonlyArray<number> => {
   switch (type_._) {
     case "Function": {
-      return [0].concat(encodeTypeFunction(type_.typeFunction));
+      return [0].concat(encodeTypeInputAndOutput(type_.typeInputAndOutput));
     }
     case "TypePartWithParameter": {
       return [1].concat(
-        encodeTypeTypePartWithParameter(type_.typeTypePartWithParameter)
+        encodeTypePartIdWithParameter(type_.typePartIdWithParameter)
       );
     }
   }
 };
 
-export const encodeTypeFunction = (
-  typeFunction: TypeFunction
+export const encodeTypeInputAndOutput = (
+  typeInputAndOutput: TypeInputAndOutput
 ): ReadonlyArray<number> =>
-  encodeType(typeFunction.inputType).concat(
-    encodeType(typeFunction.outputType)
+  encodeType(typeInputAndOutput.inputType).concat(
+    encodeType(typeInputAndOutput.outputType)
   );
 
-export const encodeTypeTypePartWithParameter = (
-  typeTypePartWithParameter: TypeTypePartWithParameter
+export const encodeTypePartIdWithParameter = (
+  typePartIdWithParameter: TypePartIdWithParameter
 ): ReadonlyArray<number> =>
-  encodeId(typeTypePartWithParameter.typePartId).concat(
-    encodeList(encodeType)(typeTypePartWithParameter.parameter)
+  encodeId(typePartIdWithParameter.typePartId).concat(
+    encodeList(encodeType)(typePartIdWithParameter.parameter)
   );
 
 export const encodeExpr = (expr: Expr): ReadonlyArray<number> => {
@@ -3305,9 +3310,9 @@ export const decodeSuggestionType = (
   );
   if (patternIndex.result === 0) {
     const result: {
-      result: SuggestionTypeFunction;
+      result: SuggestionTypeInputAndOutput;
       nextIndex: number;
-    } = decodeSuggestionTypeFunction(patternIndex.nextIndex, binary);
+    } = decodeSuggestionTypeInputAndOutput(patternIndex.nextIndex, binary);
     return {
       result: suggestionTypeFunction(result.result),
       nextIndex: result.nextIndex,
@@ -3346,10 +3351,10 @@ export const decodeSuggestionType = (
  * @param index バイナリを読み込み開始位置
  * @param binary バイナリ
  */
-export const decodeSuggestionTypeFunction = (
+export const decodeSuggestionTypeInputAndOutput = (
   index: number,
   binary: Uint8Array
-): { result: SuggestionTypeFunction; nextIndex: number } => {
+): { result: SuggestionTypeInputAndOutput; nextIndex: number } => {
   const inputTypeAndNextIndex: {
     result: SuggestionType;
     nextIndex: number;
@@ -3953,16 +3958,16 @@ export const decodeType = (
   );
   if (patternIndex.result === 0) {
     const result: {
-      result: TypeFunction;
+      result: TypeInputAndOutput;
       nextIndex: number;
-    } = decodeTypeFunction(patternIndex.nextIndex, binary);
+    } = decodeTypeInputAndOutput(patternIndex.nextIndex, binary);
     return { result: typeFunction(result.result), nextIndex: result.nextIndex };
   }
   if (patternIndex.result === 1) {
     const result: {
-      result: TypeTypePartWithParameter;
+      result: TypePartIdWithParameter;
       nextIndex: number;
-    } = decodeTypeTypePartWithParameter(patternIndex.nextIndex, binary);
+    } = decodeTypePartIdWithParameter(patternIndex.nextIndex, binary);
     return {
       result: typeTypePartWithParameter(result.result),
       nextIndex: result.nextIndex,
@@ -3975,10 +3980,10 @@ export const decodeType = (
  * @param index バイナリを読み込み開始位置
  * @param binary バイナリ
  */
-export const decodeTypeFunction = (
+export const decodeTypeInputAndOutput = (
   index: number,
   binary: Uint8Array
-): { result: TypeFunction; nextIndex: number } => {
+): { result: TypeInputAndOutput; nextIndex: number } => {
   const inputTypeAndNextIndex: { result: Type; nextIndex: number } = decodeType(
     index,
     binary
@@ -4000,10 +4005,10 @@ export const decodeTypeFunction = (
  * @param index バイナリを読み込み開始位置
  * @param binary バイナリ
  */
-export const decodeTypeTypePartWithParameter = (
+export const decodeTypePartIdWithParameter = (
   index: number,
   binary: Uint8Array
-): { result: TypeTypePartWithParameter; nextIndex: number } => {
+): { result: TypePartIdWithParameter; nextIndex: number } => {
   const typePartIdAndNextIndex: {
     result: TypeId;
     nextIndex: number;
