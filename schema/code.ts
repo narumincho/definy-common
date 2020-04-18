@@ -14,6 +14,10 @@ const suggestionTypeSuggestionTypePartWithParameterName =
   "SuggestionTypeSuggestionTypePartWithParameter";
 
 const suggestionExprName = "SuggestionExpr";
+const suggestionTagReferenceName = "SuggestionTagReference";
+const suggestionFunctionCallName = "SuggestionFunctionCall";
+const suggestionLambdaBranchName = "SuggestionLambdaBranch";
+const suggestionBranchPartDefinitionName = "SuggestionBranchPartDefinition";
 
 const typePartSnapshotName = "TypePartSnapshot";
 const partSnapshotName = "PartSnapshot";
@@ -141,6 +145,11 @@ export const customTypeList: ReadonlyArray<type.CustomType> = [
         description: "新しいパーツの型",
         memberType: type.typeCustom(suggestionTypeName),
       },
+      {
+        name: "expr",
+        description: "新しいパーツの式",
+        memberType: type.typeCustom(suggestionExprName),
+      },
     ]),
   },
   {
@@ -207,12 +216,155 @@ export const customTypeList: ReadonlyArray<type.CustomType> = [
       {
         name: "suggestionTypePartIndex",
         description: "提案内での定義した型パーツの番号",
-        memberType: idAndToken.typePartId,
+        memberType: type.typeInt32,
       },
       {
         name: "parameter",
         description: "型のパラメーター",
         memberType: type.typeList(type.typeCustom(suggestionTypeName)),
+      },
+    ]),
+  },
+  {
+    name: suggestionExprName,
+    description: "提案時に含まれるパーツを参照できる式",
+    body: sum([
+      {
+        name: "Kernel",
+        description: "Definyだけでは表現できない式",
+        parameter: type.maybeJust(type.typeCustom(kernelExprName)),
+      },
+      {
+        name: "Int32Literal",
+        description: "32bit整数",
+        parameter: type.maybeJust(type.typeInt32),
+      },
+      {
+        name: "PartReference",
+        description: "パーツの値を参照",
+        parameter: type.maybeJust(idAndToken.partId),
+      },
+      {
+        name: "SuggestionPartReference",
+        description: "提案内で定義されたパーツの番号",
+        parameter: type.maybeJust(type.typeInt32),
+      },
+      {
+        name: "LocalPartReference",
+        description: "ローカルパーツの参照",
+        parameter: type.maybeJust(type.typeCustom(localPartReferenceName)),
+      },
+      {
+        name: "TagReference",
+        description: "タグを参照",
+        parameter: type.maybeJust(type.typeCustom(tagReferenceName)),
+      },
+      {
+        name: "SuggestionTagReference",
+        description: "提案内で定義された型のタグ",
+        parameter: type.maybeJust(type.typeCustom(suggestionTagReferenceName)),
+      },
+      {
+        name: "FunctionCall",
+        description: "関数呼び出し (中に含まれる型はSuggestionExpr)",
+        parameter: type.maybeJust(type.typeCustom(suggestionFunctionCallName)),
+      },
+      {
+        name: "Lambda",
+        description: "ラムダ",
+        parameter: type.maybeJust(type.typeCustom(suggestionLambdaBranchName)),
+      },
+    ]),
+  },
+  {
+    name: suggestionTagReferenceName,
+    description: "提案内で定義された型のタグ",
+    body: product([
+      {
+        name: "suggestionTypePartIndex",
+        description: "提案内での定義した型パーツの番号",
+        memberType: type.typeInt32,
+      },
+      {
+        name: "tagIndex",
+        description: "タグIndex",
+        memberType: type.typeInt32,
+      },
+    ]),
+  },
+  {
+    name: suggestionFunctionCallName,
+    description: "関数呼び出し (中に含まれる型はSuggestionExpr)",
+    body: product([
+      {
+        name: "function",
+        description: "関数",
+        memberType: type.typeCustom(suggestionExprName),
+      },
+      {
+        name: "parameter",
+        description: "パラメーター",
+        memberType: type.typeCustom(suggestionExprName),
+      },
+    ]),
+  },
+  {
+    name: suggestionLambdaBranchName,
+    description: "suggestionExprの入ったLambdaBranch",
+    body: product([
+      {
+        name: "condition",
+        description: "入力値の条件を書くところ",
+        memberType: type.typeCustom(conditionName),
+      },
+      {
+        name: "description",
+        description: "ブランチの説明",
+        memberType: type.typeString,
+      },
+      {
+        name: "localPartList",
+        description: "",
+        memberType: type.typeList(
+          type.typeCustom(suggestionBranchPartDefinitionName)
+        ),
+      },
+      {
+        name: "expr",
+        description: "式",
+        memberType: type.typeMaybe(type.typeCustom(suggestionExprName)),
+      },
+    ]),
+  },
+  {
+    name: suggestionBranchPartDefinitionName,
+    description:
+      "ラムダのブランチで使えるパーツを定義する部分 (SuggestionExpr バージョン)",
+    body: product([
+      {
+        name: "localPartId",
+        description: "ローカルパーツID",
+        memberType: idAndToken.localPartId,
+      },
+      {
+        name: "name",
+        description: "ブランチパーツの名前",
+        memberType: type.typeString,
+      },
+      {
+        name: "description",
+        description: "ブランチパーツの説明",
+        memberType: type.typeString,
+      },
+      {
+        name: "type",
+        description: "ローカルパーツの型",
+        memberType: type.typeCustom(suggestionTypeName),
+      },
+      {
+        name: "expr",
+        description: "ローカルパーツの式",
+        memberType: type.typeCustom(suggestionExprName),
       },
     ]),
   },
@@ -580,9 +732,9 @@ export const customTypeList: ReadonlyArray<type.CustomType> = [
         memberType: idAndToken.typePartId,
       },
       {
-        name: "tagIndex",
-        description: "タグIndex",
-        memberType: type.typeInt32,
+        name: "tagId",
+        description: "タグID",
+        memberType: idAndToken.tagId,
       },
     ]),
   },

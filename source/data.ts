@@ -388,6 +388,10 @@ export type AddPart = {
    * 新しいパーツの型
    */
   type: SuggestionType;
+  /**
+   * 新しいパーツの式
+   */
+  expr: SuggestionExpr;
 };
 
 /**
@@ -430,11 +434,101 @@ export type SuggestionTypeSuggestionTypePartWithParameter = {
   /**
    * 提案内での定義した型パーツの番号
    */
-  suggestionTypePartIndex: TypeId;
+  suggestionTypePartIndex: number;
   /**
    * 型のパラメーター
    */
   parameter: ReadonlyArray<SuggestionType>;
+};
+
+/**
+ * 提案時に含まれるパーツを参照できる式
+ */
+export type SuggestionExpr =
+  | { _: "Kernel"; kernelExpr: KernelExpr }
+  | { _: "Int32Literal"; int32: number }
+  | { _: "PartReference"; partId: PartId }
+  | { _: "SuggestionPartReference"; int32: number }
+  | { _: "LocalPartReference"; localPartReference: LocalPartReference }
+  | { _: "TagReference"; tagReference: TagReference }
+  | {
+      _: "SuggestionTagReference";
+      suggestionTagReference: SuggestionTagReference;
+    }
+  | { _: "FunctionCall"; suggestionFunctionCall: SuggestionFunctionCall }
+  | { _: "Lambda"; suggestionLambdaBranch: SuggestionLambdaBranch };
+
+/**
+ * 提案内で定義された型のタグ
+ */
+export type SuggestionTagReference = {
+  /**
+   * 提案内での定義した型パーツの番号
+   */
+  suggestionTypePartIndex: number;
+  /**
+   * タグIndex
+   */
+  tagIndex: number;
+};
+
+/**
+ * 関数呼び出し (中に含まれる型はSuggestionExpr)
+ */
+export type SuggestionFunctionCall = {
+  /**
+   * 関数
+   */
+  function: SuggestionExpr;
+  /**
+   * パラメーター
+   */
+  parameter: SuggestionExpr;
+};
+
+/**
+ * suggestionExprの入ったLambdaBranch
+ */
+export type SuggestionLambdaBranch = {
+  /**
+   * 入力値の条件を書くところ
+   */
+  condition: Condition;
+  /**
+   * ブランチの説明
+   */
+  description: string;
+  localPartList: ReadonlyArray<SuggestionBranchPartDefinition>;
+  /**
+   * 式
+   */
+  expr: Maybe<SuggestionExpr>;
+};
+
+/**
+ * ラムダのブランチで使えるパーツを定義する部分 (SuggestionExpr バージョン)
+ */
+export type SuggestionBranchPartDefinition = {
+  /**
+   * ローカルパーツID
+   */
+  localPartId: LocalPartId;
+  /**
+   * ブランチパーツの名前
+   */
+  name: string;
+  /**
+   * ブランチパーツの説明
+   */
+  description: string;
+  /**
+   * ローカルパーツの型
+   */
+  type: SuggestionType;
+  /**
+   * ローカルパーツの式
+   */
+  expr: SuggestionExpr;
 };
 
 /**
@@ -661,9 +755,9 @@ export type TagReference = {
    */
   typePartId: TypeId;
   /**
-   * タグIndex
+   * タグID
    */
-  tagIndex: number;
+  tagId: TagId;
 };
 
 /**
@@ -1006,6 +1100,82 @@ export const suggestionTypeSuggestionTypePartWithParameter = (
 ): SuggestionType => ({
   _: "SuggestionTypePartWithParameter",
   suggestionTypeTypePartWithParameter: suggestionTypeTypePartWithParameter,
+});
+
+/**
+ * Definyだけでは表現できない式
+ */
+export const suggestionExprKernel = (
+  kernelExpr: KernelExpr
+): SuggestionExpr => ({ _: "Kernel", kernelExpr: kernelExpr });
+
+/**
+ * 32bit整数
+ */
+export const suggestionExprInt32Literal = (int32: number): SuggestionExpr => ({
+  _: "Int32Literal",
+  int32: int32,
+});
+
+/**
+ * パーツの値を参照
+ */
+export const suggestionExprPartReference = (
+  partId: PartId
+): SuggestionExpr => ({ _: "PartReference", partId: partId });
+
+/**
+ * 提案内で定義されたパーツの番号
+ */
+export const suggestionExprSuggestionPartReference = (
+  int32: number
+): SuggestionExpr => ({ _: "SuggestionPartReference", int32: int32 });
+
+/**
+ * ローカルパーツの参照
+ */
+export const suggestionExprLocalPartReference = (
+  localPartReference: LocalPartReference
+): SuggestionExpr => ({
+  _: "LocalPartReference",
+  localPartReference: localPartReference,
+});
+
+/**
+ * タグを参照
+ */
+export const suggestionExprTagReference = (
+  tagReference: TagReference
+): SuggestionExpr => ({ _: "TagReference", tagReference: tagReference });
+
+/**
+ * 提案内で定義された型のタグ
+ */
+export const suggestionExprSuggestionTagReference = (
+  suggestionTagReference: SuggestionTagReference
+): SuggestionExpr => ({
+  _: "SuggestionTagReference",
+  suggestionTagReference: suggestionTagReference,
+});
+
+/**
+ * 関数呼び出し (中に含まれる型はSuggestionExpr)
+ */
+export const suggestionExprFunctionCall = (
+  suggestionFunctionCall: SuggestionFunctionCall
+): SuggestionExpr => ({
+  _: "FunctionCall",
+  suggestionFunctionCall: suggestionFunctionCall,
+});
+
+/**
+ * ラムダ
+ */
+export const suggestionExprLambda = (
+  suggestionLambdaBranch: SuggestionLambdaBranch
+): SuggestionExpr => ({
+  _: "Lambda",
+  suggestionLambdaBranch: suggestionLambdaBranch,
 });
 
 /**
@@ -1563,7 +1733,8 @@ export const encodeChange = (change: Change): ReadonlyArray<number> => {
 export const encodeAddPart = (addPart: AddPart): ReadonlyArray<number> =>
   encodeString(addPart.name)
     .concat(encodeString(addPart.description))
-    .concat(encodeSuggestionType(addPart["type"]));
+    .concat(encodeSuggestionType(addPart["type"]))
+    .concat(encodeSuggestionExpr(addPart.expr));
 
 export const encodeSuggestionType = (
   suggestionType: SuggestionType
@@ -1610,13 +1781,90 @@ export const encodeSuggestionTypeTypePartWithParameter = (
 export const encodeSuggestionTypeSuggestionTypePartWithParameter = (
   suggestionTypeSuggestionTypePartWithParameter: SuggestionTypeSuggestionTypePartWithParameter
 ): ReadonlyArray<number> =>
-  encodeId(
+  encodeInt32(
     suggestionTypeSuggestionTypePartWithParameter.suggestionTypePartIndex
   ).concat(
     encodeList(encodeSuggestionType)(
       suggestionTypeSuggestionTypePartWithParameter.parameter
     )
   );
+
+export const encodeSuggestionExpr = (
+  suggestionExpr: SuggestionExpr
+): ReadonlyArray<number> => {
+  switch (suggestionExpr._) {
+    case "Kernel": {
+      return [0].concat(encodeKernelExpr(suggestionExpr.kernelExpr));
+    }
+    case "Int32Literal": {
+      return [1].concat(encodeInt32(suggestionExpr.int32));
+    }
+    case "PartReference": {
+      return [2].concat(encodeId(suggestionExpr.partId));
+    }
+    case "SuggestionPartReference": {
+      return [3].concat(encodeInt32(suggestionExpr.int32));
+    }
+    case "LocalPartReference": {
+      return [4].concat(
+        encodeLocalPartReference(suggestionExpr.localPartReference)
+      );
+    }
+    case "TagReference": {
+      return [5].concat(encodeTagReference(suggestionExpr.tagReference));
+    }
+    case "SuggestionTagReference": {
+      return [6].concat(
+        encodeSuggestionTagReference(suggestionExpr.suggestionTagReference)
+      );
+    }
+    case "FunctionCall": {
+      return [7].concat(
+        encodeSuggestionFunctionCall(suggestionExpr.suggestionFunctionCall)
+      );
+    }
+    case "Lambda": {
+      return [8].concat(
+        encodeSuggestionLambdaBranch(suggestionExpr.suggestionLambdaBranch)
+      );
+    }
+  }
+};
+
+export const encodeSuggestionTagReference = (
+  suggestionTagReference: SuggestionTagReference
+): ReadonlyArray<number> =>
+  encodeInt32(suggestionTagReference.suggestionTypePartIndex).concat(
+    encodeInt32(suggestionTagReference.tagIndex)
+  );
+
+export const encodeSuggestionFunctionCall = (
+  suggestionFunctionCall: SuggestionFunctionCall
+): ReadonlyArray<number> =>
+  encodeSuggestionExpr(suggestionFunctionCall["function"]).concat(
+    encodeSuggestionExpr(suggestionFunctionCall.parameter)
+  );
+
+export const encodeSuggestionLambdaBranch = (
+  suggestionLambdaBranch: SuggestionLambdaBranch
+): ReadonlyArray<number> =>
+  encodeCondition(suggestionLambdaBranch.condition)
+    .concat(encodeString(suggestionLambdaBranch.description))
+    .concat(
+      encodeList(encodeSuggestionBranchPartDefinition)(
+        suggestionLambdaBranch.localPartList
+      )
+    )
+    .concat(encodeMaybe(encodeSuggestionExpr)(suggestionLambdaBranch.expr));
+
+export const encodeSuggestionBranchPartDefinition = (
+  suggestionBranchPartDefinition: SuggestionBranchPartDefinition
+): ReadonlyArray<number> =>
+  encodeId(suggestionBranchPartDefinition.localPartId)
+    .concat(encodeString(suggestionBranchPartDefinition.name))
+    .concat(encodeString(suggestionBranchPartDefinition.description))
+    .concat(encodeSuggestionType(suggestionBranchPartDefinition["type"]))
+    .concat(encodeSuggestionExpr(suggestionBranchPartDefinition.expr));
 
 export const encodeTypePartSnapshot = (
   typePartSnapshot: TypePartSnapshot
@@ -1809,7 +2057,7 @@ export const encodeLocalPartReference = (
 export const encodeTagReference = (
   tagReference: TagReference
 ): ReadonlyArray<number> =>
-  encodeId(tagReference.typePartId).concat(encodeInt32(tagReference.tagIndex));
+  encodeId(tagReference.typePartId).concat(encodeId(tagReference.tagId));
 
 export const encodeFunctionCall = (
   functionCall: FunctionCall
@@ -3028,13 +3276,18 @@ export const decodeAddPart = (
     result: SuggestionType;
     nextIndex: number;
   } = decodeSuggestionType(descriptionAndNextIndex.nextIndex, binary);
+  const exprAndNextIndex: {
+    result: SuggestionExpr;
+    nextIndex: number;
+  } = decodeSuggestionExpr(typeAndNextIndex.nextIndex, binary);
   return {
     result: {
       name: nameAndNextIndex.result,
       description: descriptionAndNextIndex.result,
       type: typeAndNextIndex.result,
+      expr: exprAndNextIndex.result,
     },
-    nextIndex: typeAndNextIndex.nextIndex,
+    nextIndex: exprAndNextIndex.nextIndex,
   };
 };
 
@@ -3157,12 +3410,9 @@ export const decodeSuggestionTypeSuggestionTypePartWithParameter = (
   nextIndex: number;
 } => {
   const suggestionTypePartIndexAndNextIndex: {
-    result: TypeId;
+    result: number;
     nextIndex: number;
-  } = (decodeId as (
-    a: number,
-    b: Uint8Array
-  ) => { result: TypeId; nextIndex: number })(index, binary);
+  } = decodeInt32(index, binary);
   const parameterAndNextIndex: {
     result: ReadonlyArray<SuggestionType>;
     nextIndex: number;
@@ -3176,6 +3426,245 @@ export const decodeSuggestionTypeSuggestionTypePartWithParameter = (
       parameter: parameterAndNextIndex.result,
     },
     nextIndex: parameterAndNextIndex.nextIndex,
+  };
+};
+
+/**
+ * @param index バイナリを読み込み開始位置
+ * @param binary バイナリ
+ */
+export const decodeSuggestionExpr = (
+  index: number,
+  binary: Uint8Array
+): { result: SuggestionExpr; nextIndex: number } => {
+  const patternIndex: { result: number; nextIndex: number } = decodeInt32(
+    index,
+    binary
+  );
+  if (patternIndex.result === 0) {
+    const result: { result: KernelExpr; nextIndex: number } = decodeKernelExpr(
+      patternIndex.nextIndex,
+      binary
+    );
+    return {
+      result: suggestionExprKernel(result.result),
+      nextIndex: result.nextIndex,
+    };
+  }
+  if (patternIndex.result === 1) {
+    const result: { result: number; nextIndex: number } = decodeInt32(
+      patternIndex.nextIndex,
+      binary
+    );
+    return {
+      result: suggestionExprInt32Literal(result.result),
+      nextIndex: result.nextIndex,
+    };
+  }
+  if (patternIndex.result === 2) {
+    const result: { result: PartId; nextIndex: number } = (decodeId as (
+      a: number,
+      b: Uint8Array
+    ) => { result: PartId; nextIndex: number })(patternIndex.nextIndex, binary);
+    return {
+      result: suggestionExprPartReference(result.result),
+      nextIndex: result.nextIndex,
+    };
+  }
+  if (patternIndex.result === 3) {
+    const result: { result: number; nextIndex: number } = decodeInt32(
+      patternIndex.nextIndex,
+      binary
+    );
+    return {
+      result: suggestionExprSuggestionPartReference(result.result),
+      nextIndex: result.nextIndex,
+    };
+  }
+  if (patternIndex.result === 4) {
+    const result: {
+      result: LocalPartReference;
+      nextIndex: number;
+    } = decodeLocalPartReference(patternIndex.nextIndex, binary);
+    return {
+      result: suggestionExprLocalPartReference(result.result),
+      nextIndex: result.nextIndex,
+    };
+  }
+  if (patternIndex.result === 5) {
+    const result: {
+      result: TagReference;
+      nextIndex: number;
+    } = decodeTagReference(patternIndex.nextIndex, binary);
+    return {
+      result: suggestionExprTagReference(result.result),
+      nextIndex: result.nextIndex,
+    };
+  }
+  if (patternIndex.result === 6) {
+    const result: {
+      result: SuggestionTagReference;
+      nextIndex: number;
+    } = decodeSuggestionTagReference(patternIndex.nextIndex, binary);
+    return {
+      result: suggestionExprSuggestionTagReference(result.result),
+      nextIndex: result.nextIndex,
+    };
+  }
+  if (patternIndex.result === 7) {
+    const result: {
+      result: SuggestionFunctionCall;
+      nextIndex: number;
+    } = decodeSuggestionFunctionCall(patternIndex.nextIndex, binary);
+    return {
+      result: suggestionExprFunctionCall(result.result),
+      nextIndex: result.nextIndex,
+    };
+  }
+  if (patternIndex.result === 8) {
+    const result: {
+      result: SuggestionLambdaBranch;
+      nextIndex: number;
+    } = decodeSuggestionLambdaBranch(patternIndex.nextIndex, binary);
+    return {
+      result: suggestionExprLambda(result.result),
+      nextIndex: result.nextIndex,
+    };
+  }
+  throw new Error("存在しないパターンを指定された 型を更新してください");
+};
+
+/**
+ * @param index バイナリを読み込み開始位置
+ * @param binary バイナリ
+ */
+export const decodeSuggestionTagReference = (
+  index: number,
+  binary: Uint8Array
+): { result: SuggestionTagReference; nextIndex: number } => {
+  const suggestionTypePartIndexAndNextIndex: {
+    result: number;
+    nextIndex: number;
+  } = decodeInt32(index, binary);
+  const tagIndexAndNextIndex: {
+    result: number;
+    nextIndex: number;
+  } = decodeInt32(suggestionTypePartIndexAndNextIndex.nextIndex, binary);
+  return {
+    result: {
+      suggestionTypePartIndex: suggestionTypePartIndexAndNextIndex.result,
+      tagIndex: tagIndexAndNextIndex.result,
+    },
+    nextIndex: tagIndexAndNextIndex.nextIndex,
+  };
+};
+
+/**
+ * @param index バイナリを読み込み開始位置
+ * @param binary バイナリ
+ */
+export const decodeSuggestionFunctionCall = (
+  index: number,
+  binary: Uint8Array
+): { result: SuggestionFunctionCall; nextIndex: number } => {
+  const functionAndNextIndex: {
+    result: SuggestionExpr;
+    nextIndex: number;
+  } = decodeSuggestionExpr(index, binary);
+  const parameterAndNextIndex: {
+    result: SuggestionExpr;
+    nextIndex: number;
+  } = decodeSuggestionExpr(functionAndNextIndex.nextIndex, binary);
+  return {
+    result: {
+      function: functionAndNextIndex.result,
+      parameter: parameterAndNextIndex.result,
+    },
+    nextIndex: parameterAndNextIndex.nextIndex,
+  };
+};
+
+/**
+ * @param index バイナリを読み込み開始位置
+ * @param binary バイナリ
+ */
+export const decodeSuggestionLambdaBranch = (
+  index: number,
+  binary: Uint8Array
+): { result: SuggestionLambdaBranch; nextIndex: number } => {
+  const conditionAndNextIndex: {
+    result: Condition;
+    nextIndex: number;
+  } = decodeCondition(index, binary);
+  const descriptionAndNextIndex: {
+    result: string;
+    nextIndex: number;
+  } = decodeString(conditionAndNextIndex.nextIndex, binary);
+  const localPartListAndNextIndex: {
+    result: ReadonlyArray<SuggestionBranchPartDefinition>;
+    nextIndex: number;
+  } = decodeList(decodeSuggestionBranchPartDefinition)(
+    descriptionAndNextIndex.nextIndex,
+    binary
+  );
+  const exprAndNextIndex: {
+    result: Maybe<SuggestionExpr>;
+    nextIndex: number;
+  } = decodeMaybe(decodeSuggestionExpr)(
+    localPartListAndNextIndex.nextIndex,
+    binary
+  );
+  return {
+    result: {
+      condition: conditionAndNextIndex.result,
+      description: descriptionAndNextIndex.result,
+      localPartList: localPartListAndNextIndex.result,
+      expr: exprAndNextIndex.result,
+    },
+    nextIndex: exprAndNextIndex.nextIndex,
+  };
+};
+
+/**
+ * @param index バイナリを読み込み開始位置
+ * @param binary バイナリ
+ */
+export const decodeSuggestionBranchPartDefinition = (
+  index: number,
+  binary: Uint8Array
+): { result: SuggestionBranchPartDefinition; nextIndex: number } => {
+  const localPartIdAndNextIndex: {
+    result: LocalPartId;
+    nextIndex: number;
+  } = (decodeId as (
+    a: number,
+    b: Uint8Array
+  ) => { result: LocalPartId; nextIndex: number })(index, binary);
+  const nameAndNextIndex: { result: string; nextIndex: number } = decodeString(
+    localPartIdAndNextIndex.nextIndex,
+    binary
+  );
+  const descriptionAndNextIndex: {
+    result: string;
+    nextIndex: number;
+  } = decodeString(nameAndNextIndex.nextIndex, binary);
+  const typeAndNextIndex: {
+    result: SuggestionType;
+    nextIndex: number;
+  } = decodeSuggestionType(descriptionAndNextIndex.nextIndex, binary);
+  const exprAndNextIndex: {
+    result: SuggestionExpr;
+    nextIndex: number;
+  } = decodeSuggestionExpr(typeAndNextIndex.nextIndex, binary);
+  return {
+    result: {
+      localPartId: localPartIdAndNextIndex.result,
+      name: nameAndNextIndex.result,
+      description: descriptionAndNextIndex.result,
+      type: typeAndNextIndex.result,
+      expr: exprAndNextIndex.result,
+    },
+    nextIndex: exprAndNextIndex.nextIndex,
   };
 };
 
@@ -3787,16 +4276,19 @@ export const decodeTagReference = (
     a: number,
     b: Uint8Array
   ) => { result: TypeId; nextIndex: number })(index, binary);
-  const tagIndexAndNextIndex: {
-    result: number;
-    nextIndex: number;
-  } = decodeInt32(typePartIdAndNextIndex.nextIndex, binary);
+  const tagIdAndNextIndex: { result: TagId; nextIndex: number } = (decodeId as (
+    a: number,
+    b: Uint8Array
+  ) => { result: TagId; nextIndex: number })(
+    typePartIdAndNextIndex.nextIndex,
+    binary
+  );
   return {
     result: {
       typePartId: typePartIdAndNextIndex.result,
-      tagIndex: tagIndexAndNextIndex.result,
+      tagId: tagIdAndNextIndex.result,
     },
-    nextIndex: tagIndexAndNextIndex.nextIndex,
+    nextIndex: tagIdAndNextIndex.nextIndex,
   };
 };
 
