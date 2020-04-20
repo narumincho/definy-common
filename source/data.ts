@@ -190,7 +190,7 @@ export type ProjectSnapshot = {
   /**
    * 所属している型パーツのIDのリスト
    */
-  typePartIdList: ReadonlyArray<TypeId>;
+  typePartIdList: ReadonlyArray<TypePartId>;
 };
 
 /**
@@ -425,7 +425,7 @@ export type TypePartWithSuggestionTypeParameter = {
   /**
    * 型の参照
    */
-  typePartId: TypeId;
+  typePartId: TypePartId;
   /**
    * 型のパラメーター
    */
@@ -685,7 +685,7 @@ export type TypePartIdWithParameter = {
   /**
    * 型の参照
    */
-  typePartId: TypeId;
+  typePartId: TypePartId;
   /**
    * 型のパラメーター
    */
@@ -755,7 +755,7 @@ export type TagReference = {
   /**
    * 型ID
    */
-  typePartId: TypeId;
+  typePartId: TypePartId;
   /**
    * タグID
    */
@@ -940,7 +940,7 @@ export type FileHash = string & { _fileHash: never };
 
 export type PartId = string & { _partId: never };
 
-export type TypeId = string & { _typeId: never };
+export type TypePartId = string & { _typePartId: never };
 
 export type LocalPartId = string & { _localPartId: never };
 
@@ -2785,13 +2785,13 @@ export const decodeProjectSnapshot = (
     ) => { result: PartId; nextIndex: number }
   )(getTimeAndNextIndex.nextIndex, binary);
   const typePartIdListAndNextIndex: {
-    result: ReadonlyArray<TypeId>;
+    result: ReadonlyArray<TypePartId>;
     nextIndex: number;
   } = decodeList(
     decodeId as (
       a: number,
       b: Uint8Array
-    ) => { result: TypeId; nextIndex: number }
+    ) => { result: TypePartId; nextIndex: number }
   )(partIdListAndNextIndex.nextIndex, binary);
   return {
     result: {
@@ -3357,12 +3357,12 @@ export const decodeTypePartWithSuggestionTypeParameter = (
   binary: Uint8Array
 ): { result: TypePartWithSuggestionTypeParameter; nextIndex: number } => {
   const typePartIdAndNextIndex: {
-    result: TypeId;
+    result: TypePartId;
     nextIndex: number;
   } = (decodeId as (
     a: number,
     b: Uint8Array
-  ) => { result: TypeId; nextIndex: number })(index, binary);
+  ) => { result: TypePartId; nextIndex: number })(index, binary);
   const parameterAndNextIndex: {
     result: ReadonlyArray<SuggestionType>;
     nextIndex: number;
@@ -3986,12 +3986,12 @@ export const decodeTypePartIdWithParameter = (
   binary: Uint8Array
 ): { result: TypePartIdWithParameter; nextIndex: number } => {
   const typePartIdAndNextIndex: {
-    result: TypeId;
+    result: TypePartId;
     nextIndex: number;
   } = (decodeId as (
     a: number,
     b: Uint8Array
-  ) => { result: TypeId; nextIndex: number })(index, binary);
+  ) => { result: TypePartId; nextIndex: number })(index, binary);
   const parameterAndNextIndex: {
     result: ReadonlyArray<Type>;
     nextIndex: number;
@@ -4251,12 +4251,12 @@ export const decodeTagReference = (
   binary: Uint8Array
 ): { result: TagReference; nextIndex: number } => {
   const typePartIdAndNextIndex: {
-    result: TypeId;
+    result: TypePartId;
     nextIndex: number;
   } = (decodeId as (
     a: number,
     b: Uint8Array
-  ) => { result: TypeId; nextIndex: number })(index, binary);
+  ) => { result: TypePartId; nextIndex: number })(index, binary);
   const tagIdAndNextIndex: { result: TagId; nextIndex: number } = (decodeId as (
     a: number,
     b: Uint8Array
