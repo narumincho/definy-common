@@ -1,4 +1,4 @@
-module Data exposing (AccessToken(..), AddCommentParameter, AddPart, BranchPartDefinition, Change(..), ClientMode(..), Condition(..), ConditionCapture, ConditionTag, CreateIdeaParameter, CreateProjectParameter, EvaluateExprError(..), EvaluatedExpr(..), Expr(..), FileHash(..), FunctionCall, IdeaId(..), IdeaItem, IdeaListByProjectIdResponse, IdeaResponse, IdeaSnapshot, IdeaSnapshotAndId, ItemBody(..), KernelCall, KernelExpr(..), LambdaBranch, Language(..), LocalPartId(..), LocalPartReference, Location(..), OpenIdConnectProvider(..), PartId(..), PartSnapshot, ProjectId(..), ProjectResponse, ProjectSnapshot, ProjectSnapshotAndId, RequestLogInUrlRequestData, SuggestionBranchPartDefinition, SuggestionExpr(..), SuggestionFunctionCall, SuggestionId(..), SuggestionLambdaBranch, SuggestionSnapshot, SuggestionSnapshotAndId, SuggestionState(..), SuggestionTagReference, SuggestionType(..), SuggestionTypeInputAndOutput, SuggestionTypePartWithSuggestionTypeParameter, TagId(..), TagReference, Time, Type(..), TypeError, TypeInputAndOutput, TypePartBody(..), TypePartBodyKernel(..), TypePartBodyProductMember, TypePartBodySumPattern, TypePartId(..), TypePartIdWithParameter, TypePartSnapshot, TypePartWithSuggestionTypeParameter, UrlData, UserId(..), UserResponse, UserSnapshot, UserSnapshotAndId, accessTokenJsonDecoder, accessTokenToJsonValue, addCommentParameterJsonDecoder, addCommentParameterToJsonValue, addPartJsonDecoder, addPartToJsonValue, branchPartDefinitionJsonDecoder, branchPartDefinitionToJsonValue, changeJsonDecoder, changeToJsonValue, clientModeJsonDecoder, clientModeToJsonValue, conditionCaptureJsonDecoder, conditionCaptureToJsonValue, conditionJsonDecoder, conditionTagJsonDecoder, conditionTagToJsonValue, conditionToJsonValue, createIdeaParameterJsonDecoder, createIdeaParameterToJsonValue, createProjectParameterJsonDecoder, createProjectParameterToJsonValue, evaluateExprErrorJsonDecoder, evaluateExprErrorToJsonValue, evaluatedExprJsonDecoder, evaluatedExprToJsonValue, exprJsonDecoder, exprToJsonValue, fileHashJsonDecoder, fileHashToJsonValue, functionCallJsonDecoder, functionCallToJsonValue, ideaIdJsonDecoder, ideaIdToJsonValue, ideaItemJsonDecoder, ideaItemToJsonValue, ideaListByProjectIdResponseJsonDecoder, ideaListByProjectIdResponseToJsonValue, ideaResponseJsonDecoder, ideaResponseToJsonValue, ideaSnapshotAndIdJsonDecoder, ideaSnapshotAndIdToJsonValue, ideaSnapshotJsonDecoder, ideaSnapshotToJsonValue, itemBodyJsonDecoder, itemBodyToJsonValue, kernelCallJsonDecoder, kernelCallToJsonValue, kernelExprJsonDecoder, kernelExprToJsonValue, lambdaBranchJsonDecoder, lambdaBranchToJsonValue, languageJsonDecoder, languageToJsonValue, localPartIdJsonDecoder, localPartIdToJsonValue, localPartReferenceJsonDecoder, localPartReferenceToJsonValue, locationJsonDecoder, locationToJsonValue, maybeJsonDecoder, maybeToJsonValue, openIdConnectProviderJsonDecoder, openIdConnectProviderToJsonValue, partIdJsonDecoder, partIdToJsonValue, partSnapshotJsonDecoder, partSnapshotToJsonValue, projectIdJsonDecoder, projectIdToJsonValue, projectResponseJsonDecoder, projectResponseToJsonValue, projectSnapshotAndIdJsonDecoder, projectSnapshotAndIdToJsonValue, projectSnapshotJsonDecoder, projectSnapshotToJsonValue, requestLogInUrlRequestDataJsonDecoder, requestLogInUrlRequestDataToJsonValue, resultJsonDecoder, resultToJsonValue, suggestionBranchPartDefinitionJsonDecoder, suggestionBranchPartDefinitionToJsonValue, suggestionExprJsonDecoder, suggestionExprToJsonValue, suggestionFunctionCallJsonDecoder, suggestionFunctionCallToJsonValue, suggestionIdJsonDecoder, suggestionIdToJsonValue, suggestionLambdaBranchJsonDecoder, suggestionLambdaBranchToJsonValue, suggestionSnapshotAndIdJsonDecoder, suggestionSnapshotAndIdToJsonValue, suggestionSnapshotJsonDecoder, suggestionSnapshotToJsonValue, suggestionStateJsonDecoder, suggestionStateToJsonValue, suggestionTagReferenceJsonDecoder, suggestionTagReferenceToJsonValue, suggestionTypeInputAndOutputJsonDecoder, suggestionTypeInputAndOutputToJsonValue, suggestionTypeJsonDecoder, suggestionTypePartWithSuggestionTypeParameterJsonDecoder, suggestionTypePartWithSuggestionTypeParameterToJsonValue, suggestionTypeToJsonValue, tagIdJsonDecoder, tagIdToJsonValue, tagReferenceJsonDecoder, tagReferenceToJsonValue, timeJsonDecoder, timeToJsonValue, typeErrorJsonDecoder, typeErrorToJsonValue, typeInputAndOutputJsonDecoder, typeInputAndOutputToJsonValue, typeJsonDecoder, typePartBodyJsonDecoder, typePartBodyKernelJsonDecoder, typePartBodyKernelToJsonValue, typePartBodyProductMemberJsonDecoder, typePartBodyProductMemberToJsonValue, typePartBodySumPatternJsonDecoder, typePartBodySumPatternToJsonValue, typePartBodyToJsonValue, typePartIdJsonDecoder, typePartIdToJsonValue, typePartIdWithParameterJsonDecoder, typePartIdWithParameterToJsonValue, typePartSnapshotJsonDecoder, typePartSnapshotToJsonValue, typePartWithSuggestionTypeParameterJsonDecoder, typePartWithSuggestionTypeParameterToJsonValue, typeToJsonValue, urlDataJsonDecoder, urlDataToJsonValue, userIdJsonDecoder, userIdToJsonValue, userResponseJsonDecoder, userResponseToJsonValue, userSnapshotAndIdJsonDecoder, userSnapshotAndIdToJsonValue, userSnapshotJsonDecoder, userSnapshotToJsonValue)
+module Data exposing (AccessToken(..), AddCommentParameter, AddPart, AddSuggestionParameter, BranchPartDefinition, Change(..), ClientMode(..), Condition(..), ConditionCapture, ConditionTag, CreateIdeaParameter, CreateProjectParameter, EvaluateExprError(..), EvaluatedExpr(..), Expr(..), FileHash(..), FunctionCall, IdeaId(..), IdeaItem, IdeaListByProjectIdResponse, IdeaResponse, IdeaSnapshot, IdeaSnapshotAndId, ItemBody(..), KernelCall, KernelExpr(..), LambdaBranch, Language(..), LocalPartId(..), LocalPartReference, Location(..), OpenIdConnectProvider(..), PartId(..), PartSnapshot, ProjectId(..), ProjectResponse, ProjectSnapshot, ProjectSnapshotAndId, RequestLogInUrlRequestData, SuggestionBranchPartDefinition, SuggestionExpr(..), SuggestionFunctionCall, SuggestionId(..), SuggestionLambdaBranch, SuggestionSnapshot, SuggestionSnapshotAndId, SuggestionState(..), SuggestionTagReference, SuggestionType(..), SuggestionTypeInputAndOutput, SuggestionTypePartWithSuggestionTypeParameter, TagId(..), TagReference, Time, Type(..), TypeError, TypeInputAndOutput, TypePartBody(..), TypePartBodyKernel(..), TypePartBodyProductMember, TypePartBodySumPattern, TypePartId(..), TypePartIdWithParameter, TypePartSnapshot, TypePartWithSuggestionTypeParameter, UpdateSuggestionParameter, UrlData, UserId(..), UserResponse, UserSnapshot, UserSnapshotAndId, accessTokenJsonDecoder, accessTokenToJsonValue, addCommentParameterJsonDecoder, addCommentParameterToJsonValue, addPartJsonDecoder, addPartToJsonValue, addSuggestionParameterJsonDecoder, addSuggestionParameterToJsonValue, branchPartDefinitionJsonDecoder, branchPartDefinitionToJsonValue, changeJsonDecoder, changeToJsonValue, clientModeJsonDecoder, clientModeToJsonValue, conditionCaptureJsonDecoder, conditionCaptureToJsonValue, conditionJsonDecoder, conditionTagJsonDecoder, conditionTagToJsonValue, conditionToJsonValue, createIdeaParameterJsonDecoder, createIdeaParameterToJsonValue, createProjectParameterJsonDecoder, createProjectParameterToJsonValue, evaluateExprErrorJsonDecoder, evaluateExprErrorToJsonValue, evaluatedExprJsonDecoder, evaluatedExprToJsonValue, exprJsonDecoder, exprToJsonValue, fileHashJsonDecoder, fileHashToJsonValue, functionCallJsonDecoder, functionCallToJsonValue, ideaIdJsonDecoder, ideaIdToJsonValue, ideaItemJsonDecoder, ideaItemToJsonValue, ideaListByProjectIdResponseJsonDecoder, ideaListByProjectIdResponseToJsonValue, ideaResponseJsonDecoder, ideaResponseToJsonValue, ideaSnapshotAndIdJsonDecoder, ideaSnapshotAndIdToJsonValue, ideaSnapshotJsonDecoder, ideaSnapshotToJsonValue, itemBodyJsonDecoder, itemBodyToJsonValue, kernelCallJsonDecoder, kernelCallToJsonValue, kernelExprJsonDecoder, kernelExprToJsonValue, lambdaBranchJsonDecoder, lambdaBranchToJsonValue, languageJsonDecoder, languageToJsonValue, localPartIdJsonDecoder, localPartIdToJsonValue, localPartReferenceJsonDecoder, localPartReferenceToJsonValue, locationJsonDecoder, locationToJsonValue, maybeJsonDecoder, maybeToJsonValue, openIdConnectProviderJsonDecoder, openIdConnectProviderToJsonValue, partIdJsonDecoder, partIdToJsonValue, partSnapshotJsonDecoder, partSnapshotToJsonValue, projectIdJsonDecoder, projectIdToJsonValue, projectResponseJsonDecoder, projectResponseToJsonValue, projectSnapshotAndIdJsonDecoder, projectSnapshotAndIdToJsonValue, projectSnapshotJsonDecoder, projectSnapshotToJsonValue, requestLogInUrlRequestDataJsonDecoder, requestLogInUrlRequestDataToJsonValue, resultJsonDecoder, resultToJsonValue, suggestionBranchPartDefinitionJsonDecoder, suggestionBranchPartDefinitionToJsonValue, suggestionExprJsonDecoder, suggestionExprToJsonValue, suggestionFunctionCallJsonDecoder, suggestionFunctionCallToJsonValue, suggestionIdJsonDecoder, suggestionIdToJsonValue, suggestionLambdaBranchJsonDecoder, suggestionLambdaBranchToJsonValue, suggestionSnapshotAndIdJsonDecoder, suggestionSnapshotAndIdToJsonValue, suggestionSnapshotJsonDecoder, suggestionSnapshotToJsonValue, suggestionStateJsonDecoder, suggestionStateToJsonValue, suggestionTagReferenceJsonDecoder, suggestionTagReferenceToJsonValue, suggestionTypeInputAndOutputJsonDecoder, suggestionTypeInputAndOutputToJsonValue, suggestionTypeJsonDecoder, suggestionTypePartWithSuggestionTypeParameterJsonDecoder, suggestionTypePartWithSuggestionTypeParameterToJsonValue, suggestionTypeToJsonValue, tagIdJsonDecoder, tagIdToJsonValue, tagReferenceJsonDecoder, tagReferenceToJsonValue, timeJsonDecoder, timeToJsonValue, typeErrorJsonDecoder, typeErrorToJsonValue, typeInputAndOutputJsonDecoder, typeInputAndOutputToJsonValue, typeJsonDecoder, typePartBodyJsonDecoder, typePartBodyKernelJsonDecoder, typePartBodyKernelToJsonValue, typePartBodyProductMemberJsonDecoder, typePartBodyProductMemberToJsonValue, typePartBodySumPatternJsonDecoder, typePartBodySumPatternToJsonValue, typePartBodyToJsonValue, typePartIdJsonDecoder, typePartIdToJsonValue, typePartIdWithParameterJsonDecoder, typePartIdWithParameterToJsonValue, typePartSnapshotJsonDecoder, typePartSnapshotToJsonValue, typePartWithSuggestionTypeParameterJsonDecoder, typePartWithSuggestionTypeParameterToJsonValue, typeToJsonValue, updateSuggestionParameterJsonDecoder, updateSuggestionParameterToJsonValue, urlDataJsonDecoder, urlDataToJsonValue, userIdJsonDecoder, userIdToJsonValue, userResponseJsonDecoder, userResponseToJsonValue, userSnapshotAndIdJsonDecoder, userSnapshotAndIdToJsonValue, userSnapshotJsonDecoder, userSnapshotToJsonValue)
 
 import Json.Decode as Jd
 import Json.Decode.Pipeline as Jdp
@@ -397,6 +397,18 @@ type alias CreateIdeaParameter =
 -}
 type alias AddCommentParameter =
     { accessToken : AccessToken, ideaId : IdeaId, comment : String }
+
+
+{-| 提案を作成するときに必要なパラメーター
+-}
+type alias AddSuggestionParameter =
+    { accessToken : AccessToken, ideaId : IdeaId }
+
+
+{-| 提案を更新するときに必要なパラメーター
+-}
+type alias UpdateSuggestionParameter =
+    { accessToke : AccessToken, suggestionId : SuggestionId, changeList : List Change }
 
 
 type ProjectId
@@ -1286,6 +1298,27 @@ addCommentParameterToJsonValue addCommentParameter =
         [ ( "accessToken", accessTokenToJsonValue addCommentParameter.accessToken )
         , ( "ideaId", ideaIdToJsonValue addCommentParameter.ideaId )
         , ( "comment", Je.string addCommentParameter.comment )
+        ]
+
+
+{-| AddSuggestionParameterのJSONへのエンコーダ
+-}
+addSuggestionParameterToJsonValue : AddSuggestionParameter -> Je.Value
+addSuggestionParameterToJsonValue addSuggestionParameter =
+    Je.object
+        [ ( "accessToken", accessTokenToJsonValue addSuggestionParameter.accessToken )
+        , ( "ideaId", ideaIdToJsonValue addSuggestionParameter.ideaId )
+        ]
+
+
+{-| UpdateSuggestionParameterのJSONへのエンコーダ
+-}
+updateSuggestionParameterToJsonValue : UpdateSuggestionParameter -> Je.Value
+updateSuggestionParameterToJsonValue updateSuggestionParameter =
+    Je.object
+        [ ( "accessToke", accessTokenToJsonValue updateSuggestionParameter.accessToke )
+        , ( "suggestionId", suggestionIdToJsonValue updateSuggestionParameter.suggestionId )
+        , ( "changeList", Je.list changeToJsonValue updateSuggestionParameter.changeList )
         ]
 
 
@@ -2489,3 +2522,33 @@ addCommentParameterJsonDecoder =
         |> Jdp.required "accessToken" accessTokenJsonDecoder
         |> Jdp.required "ideaId" ideaIdJsonDecoder
         |> Jdp.required "comment" Jd.string
+
+
+{-| AddSuggestionParameterのJSON Decoder
+-}
+addSuggestionParameterJsonDecoder : Jd.Decoder AddSuggestionParameter
+addSuggestionParameterJsonDecoder =
+    Jd.succeed
+        (\accessToken ideaId ->
+            { accessToken = accessToken
+            , ideaId = ideaId
+            }
+        )
+        |> Jdp.required "accessToken" accessTokenJsonDecoder
+        |> Jdp.required "ideaId" ideaIdJsonDecoder
+
+
+{-| UpdateSuggestionParameterのJSON Decoder
+-}
+updateSuggestionParameterJsonDecoder : Jd.Decoder UpdateSuggestionParameter
+updateSuggestionParameterJsonDecoder =
+    Jd.succeed
+        (\accessToke suggestionId changeList ->
+            { accessToke = accessToke
+            , suggestionId = suggestionId
+            , changeList = changeList
+            }
+        )
+        |> Jdp.required "accessToke" accessTokenJsonDecoder
+        |> Jdp.required "suggestionId" suggestionIdJsonDecoder
+        |> Jdp.required "changeList" (Jd.list changeJsonDecoder)

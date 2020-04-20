@@ -946,6 +946,38 @@ export type AddCommentParameter = {
   comment: string;
 };
 
+/**
+ * 提案を作成するときに必要なパラメーター
+ */
+export type AddSuggestionParameter = {
+  /**
+   * 提案を作成するアカウント
+   */
+  accessToken: AccessToken;
+  /**
+   * 提案に関連付けられるアイデア
+   */
+  ideaId: IdeaId;
+};
+
+/**
+ * 提案を更新するときに必要なパラメーター
+ */
+export type UpdateSuggestionParameter = {
+  /**
+   * 提案を更新するアカウント
+   */
+  accessToke: AccessToken;
+  /**
+   * 書き換える提案
+   */
+  suggestionId: SuggestionId;
+  /**
+   * 提案の変更
+   */
+  changeList: ReadonlyArray<Change>;
+};
+
 export type ProjectId = string & { _projectId: never };
 
 export type UserId = string & { _userId: never };
@@ -2183,6 +2215,20 @@ export const encodeAddCommentParameter = (
   encodeToken(addCommentParameter.accessToken)
     .concat(encodeId(addCommentParameter.ideaId))
     .concat(encodeString(addCommentParameter.comment));
+
+export const encodeAddSuggestionParameter = (
+  addSuggestionParameter: AddSuggestionParameter
+): ReadonlyArray<number> =>
+  encodeToken(addSuggestionParameter.accessToken).concat(
+    encodeId(addSuggestionParameter.ideaId)
+  );
+
+export const encodeUpdateSuggestionParameter = (
+  updateSuggestionParameter: UpdateSuggestionParameter
+): ReadonlyArray<number> =>
+  encodeToken(updateSuggestionParameter.accessToke)
+    .concat(encodeId(updateSuggestionParameter.suggestionId))
+    .concat(encodeList(encodeChange)(updateSuggestionParameter.changeList));
 
 /**
  * SignedLeb128で表現されたバイナリをnumberのビット演算ができる32bit符号付き整数の範囲の数値に変換するコード
@@ -4724,5 +4770,78 @@ export const decodeAddCommentParameter = (
       comment: commentAndNextIndex.result,
     },
     nextIndex: commentAndNextIndex.nextIndex,
+  };
+};
+
+/**
+ * @param index バイナリを読み込み開始位置
+ * @param binary バイナリ
+ */
+export const decodeAddSuggestionParameter = (
+  index: number,
+  binary: Uint8Array
+): { result: AddSuggestionParameter; nextIndex: number } => {
+  const accessTokenAndNextIndex: {
+    result: AccessToken;
+    nextIndex: number;
+  } = (decodeToken as (
+    a: number,
+    b: Uint8Array
+  ) => { result: AccessToken; nextIndex: number })(index, binary);
+  const ideaIdAndNextIndex: {
+    result: IdeaId;
+    nextIndex: number;
+  } = (decodeId as (
+    a: number,
+    b: Uint8Array
+  ) => { result: IdeaId; nextIndex: number })(
+    accessTokenAndNextIndex.nextIndex,
+    binary
+  );
+  return {
+    result: {
+      accessToken: accessTokenAndNextIndex.result,
+      ideaId: ideaIdAndNextIndex.result,
+    },
+    nextIndex: ideaIdAndNextIndex.nextIndex,
+  };
+};
+
+/**
+ * @param index バイナリを読み込み開始位置
+ * @param binary バイナリ
+ */
+export const decodeUpdateSuggestionParameter = (
+  index: number,
+  binary: Uint8Array
+): { result: UpdateSuggestionParameter; nextIndex: number } => {
+  const accessTokeAndNextIndex: {
+    result: AccessToken;
+    nextIndex: number;
+  } = (decodeToken as (
+    a: number,
+    b: Uint8Array
+  ) => { result: AccessToken; nextIndex: number })(index, binary);
+  const suggestionIdAndNextIndex: {
+    result: SuggestionId;
+    nextIndex: number;
+  } = (decodeId as (
+    a: number,
+    b: Uint8Array
+  ) => { result: SuggestionId; nextIndex: number })(
+    accessTokeAndNextIndex.nextIndex,
+    binary
+  );
+  const changeListAndNextIndex: {
+    result: ReadonlyArray<Change>;
+    nextIndex: number;
+  } = decodeList(decodeChange)(suggestionIdAndNextIndex.nextIndex, binary);
+  return {
+    result: {
+      accessToke: accessTokeAndNextIndex.result,
+      suggestionId: suggestionIdAndNextIndex.result,
+      changeList: changeListAndNextIndex.result,
+    },
+    nextIndex: changeListAndNextIndex.nextIndex,
   };
 };

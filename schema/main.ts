@@ -73,6 +73,43 @@ const listCustomType: ReadonlyArray<type.CustomType> = [
       },
     ]),
   },
+  {
+    name: "AddSuggestionParameter",
+    description: "提案を作成するときに必要なパラメーター",
+    body: type.customTypeBodyProduct([
+      {
+        name: "accessToken",
+        description: "提案を作成するアカウント",
+        memberType: idAndToken.accessToken,
+      },
+      {
+        name: "ideaId",
+        description: "提案に関連付けられるアイデア",
+        memberType: idAndToken.ideaId,
+      },
+    ]),
+  },
+  {
+    name: "UpdateSuggestionParameter",
+    description: "提案を更新するときに必要なパラメーター",
+    body: type.customTypeBodyProduct([
+      {
+        name: "accessToke",
+        description: "提案を更新するアカウント",
+        memberType: idAndToken.accessToken,
+      },
+      {
+        name: "suggestionId",
+        description: "書き換える提案",
+        memberType: idAndToken.suggestionId,
+      },
+      {
+        name: "changeList",
+        description: "提案の変更",
+        memberType: type.typeList(code.change),
+      },
+    ]),
+  },
 ];
 
 const typeScriptCode = codeGen.generateCodeAsString(

@@ -6,6 +6,7 @@ const suggestionSnapshotName = "SuggestionSnapshot";
 const suggestionSnapshotAndIdName = "SuggestionSnapshotAndId";
 const suggestionStateName = "SuggestionState";
 const changeName = "Change";
+export const change = type.typeCustom(changeName);
 const addPartName = "AddPart";
 const suggestionTypeName = "SuggestionType";
 const suggestionTypeInputAndOutputName = "SuggestionTypeInputAndOutput";
