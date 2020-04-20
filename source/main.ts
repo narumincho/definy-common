@@ -44,8 +44,6 @@ const locationToPath = (location: data.Location): string => {
       return "/create-project";
     case "CreateIdea":
       return "/create-idea/" + (location.projectId as string);
-    case "EditSuggestion":
-      return "/edit-suggestion/" + (location.suggestionId as string);
     case "User":
       return "/user/" + (location.userId as string);
     case "Project":
@@ -98,14 +96,6 @@ const locationFromUrl = (pathName: string): data.Location => {
   const createIdeaResult = pathName.match(/^\/create-idea\/([0-9a-f]{32})$/u);
   if (createIdeaResult !== null) {
     return data.locationCreateIdea(createIdeaResult[1] as data.ProjectId);
-  }
-  const editSuggestionResult = pathName.match(
-    /^\/edit-suggestion\/([0-9a-f]{32})$/u
-  );
-  if (editSuggestionResult !== null) {
-    return data.locationEditSuggestion(
-      editSuggestionResult[1] as data.SuggestionId
-    );
   }
   const projectResult = pathName.match(/^\/project\/([0-9a-f]{32})$/u);
   if (projectResult !== null) {

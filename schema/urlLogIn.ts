@@ -103,11 +103,6 @@ export const customTypeList: ReadonlyArray<type.CustomType> = [
         parameter: type.maybeJust(idAndToken.projectId),
       },
       {
-        name: "EditSuggestion",
-        description: "編集提案を編集するページ",
-        parameter: type.maybeJust(idAndToken.suggestionId),
-      },
-      {
         name: "User",
         description: "ユーザーの詳細ページ",
         parameter: type.maybeJust(idAndToken.userId),
@@ -124,7 +119,7 @@ export const customTypeList: ReadonlyArray<type.CustomType> = [
       },
       {
         name: "Suggestion",
-        description: "編集提案詳細ページ",
+        description: "編集提案のページ",
         parameter: type.maybeJust(idAndToken.suggestionId),
       },
     ]),
