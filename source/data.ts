@@ -978,6 +978,20 @@ export type UpdateSuggestionParameter = {
   changeList: ReadonlyArray<Change>;
 };
 
+/**
+ * アクセストークンとSuggestionId
+ */
+export type AccessTokenAndSuggestionId = {
+  /**
+   * アクセストークン
+   */
+  accessToke: AccessToken;
+  /**
+   * SuggestionId
+   */
+  suggestionId: SuggestionId;
+};
+
 export type ProjectId = string & { _projectId: never };
 
 export type UserId = string & { _userId: never };
@@ -2229,6 +2243,13 @@ export const encodeUpdateSuggestionParameter = (
   encodeToken(updateSuggestionParameter.accessToke)
     .concat(encodeId(updateSuggestionParameter.suggestionId))
     .concat(encodeList(encodeChange)(updateSuggestionParameter.changeList));
+
+export const encodeAccessTokenAndSuggestionId = (
+  accessTokenAndSuggestionId: AccessTokenAndSuggestionId
+): ReadonlyArray<number> =>
+  encodeToken(accessTokenAndSuggestionId.accessToke).concat(
+    encodeId(accessTokenAndSuggestionId.suggestionId)
+  );
 
 /**
  * SignedLeb128で表現されたバイナリをnumberのビット演算ができる32bit符号付き整数の範囲の数値に変換するコード
@@ -4843,5 +4864,39 @@ export const decodeUpdateSuggestionParameter = (
       changeList: changeListAndNextIndex.result,
     },
     nextIndex: changeListAndNextIndex.nextIndex,
+  };
+};
+
+/**
+ * @param index バイナリを読み込み開始位置
+ * @param binary バイナリ
+ */
+export const decodeAccessTokenAndSuggestionId = (
+  index: number,
+  binary: Uint8Array
+): { result: AccessTokenAndSuggestionId; nextIndex: number } => {
+  const accessTokeAndNextIndex: {
+    result: AccessToken;
+    nextIndex: number;
+  } = (decodeToken as (
+    a: number,
+    b: Uint8Array
+  ) => { result: AccessToken; nextIndex: number })(index, binary);
+  const suggestionIdAndNextIndex: {
+    result: SuggestionId;
+    nextIndex: number;
+  } = (decodeId as (
+    a: number,
+    b: Uint8Array
+  ) => { result: SuggestionId; nextIndex: number })(
+    accessTokeAndNextIndex.nextIndex,
+    binary
+  );
+  return {
+    result: {
+      accessToke: accessTokeAndNextIndex.result,
+      suggestionId: suggestionIdAndNextIndex.result,
+    },
+    nextIndex: suggestionIdAndNextIndex.nextIndex,
   };
 };
