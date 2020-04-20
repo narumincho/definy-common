@@ -230,7 +230,7 @@ const normalizeOneLineString = (text: string): string => {
 };
 
 type SourceAndCache = {
-  typePartMap: ReadonlyMap<data.TypeId, data.TypePartSnapshot>;
+  typePartMap: ReadonlyMap<data.TypePartId, data.TypePartSnapshot>;
   partMap: ReadonlyMap<data.PartId, data.PartSnapshot>;
   /** パーツ内に含まれるローカルパーツの式を格納する. キーはPartIdをLocalPartIdを結合したもの */
   localPartMap: ReadonlyMap<string, data.Expr>;

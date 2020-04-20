@@ -118,7 +118,7 @@ describe("test", () => {
      * = (add (addOneHundred one)) one
      */
     const intType: data.Type = data.typeTypePartWithParameter({
-      typePartId: "int" as data.TypeId,
+      typePartId: "int" as data.TypePartId,
       parameter: [],
     });
     const oneName = "0" as data.PartId;
