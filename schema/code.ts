@@ -2,9 +2,10 @@ import { type } from "@narumincho/type";
 import * as idAndToken from "./idAndToken";
 import * as time from "./time";
 
-export const suggestionName = "Suggestion";
-export const suggestionStateName = "SuggestionState";
-export const changeName = "Change";
+const suggestionSnapshotName = "SuggestionSnapshot";
+const suggestionSnapshotAndIdName = "SuggestionSnapshotAndId";
+const suggestionStateName = "SuggestionState";
+const changeName = "Change";
 const addPartName = "AddPart";
 const suggestionTypeName = "SuggestionType";
 const suggestionTypeInputAndOutputName = "SuggestionTypeInputAndOutput";
@@ -49,7 +50,7 @@ const sum = type.customTypeBodySum;
 
 export const customTypeList: ReadonlyArray<type.CustomType> = [
   {
-    name: suggestionName,
+    name: suggestionSnapshotName,
     description: "編集提案",
     body: product([
       {
@@ -81,6 +82,27 @@ export const customTypeList: ReadonlyArray<type.CustomType> = [
         name: "ideaId",
         description: "投稿したアイデアID",
         memberType: idAndToken.ideaId,
+      },
+      {
+        name: "getTime",
+        description: "取得日時",
+        memberType: time.time,
+      },
+    ]),
+  },
+  {
+    name: suggestionSnapshotAndIdName,
+    description: "Id付きのSuggestion",
+    body: product([
+      {
+        name: "id",
+        description: "SuggestionId",
+        memberType: idAndToken.suggestionId,
+      },
+      {
+        name: "snapshot",
+        description: "SuggestionSnapshot",
+        memberType: type.typeCustom(suggestionSnapshotName),
       },
     ]),
   },

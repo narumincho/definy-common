@@ -328,7 +328,7 @@ export type ItemBody =
 /**
  * 編集提案
  */
-export type Suggestion = {
+export type SuggestionSnapshot = {
   /**
    * 変更概要
    */
@@ -353,6 +353,24 @@ export type Suggestion = {
    * 投稿したアイデアID
    */
   ideaId: IdeaId;
+  /**
+   * 取得日時
+   */
+  getTime: Time;
+};
+
+/**
+ * Id付きのSuggestion
+ */
+export type SuggestionSnapshotAndId = {
+  /**
+   * SuggestionId
+   */
+  id: SuggestionId;
+  /**
+   * SuggestionSnapshot
+   */
+  snapshot: SuggestionSnapshot;
 };
 
 /**
@@ -1682,15 +1700,23 @@ export const encodeItemBody = (itemBody: ItemBody): ReadonlyArray<number> => {
   }
 };
 
-export const encodeSuggestion = (
-  suggestion: Suggestion
+export const encodeSuggestionSnapshot = (
+  suggestionSnapshot: SuggestionSnapshot
 ): ReadonlyArray<number> =>
-  encodeString(suggestion.name)
-    .concat(encodeString(suggestion.reason))
-    .concat(encodeSuggestionState(suggestion.state))
-    .concat(encodeList(encodeChange)(suggestion.changeList))
-    .concat(encodeId(suggestion.projectId))
-    .concat(encodeId(suggestion.ideaId));
+  encodeString(suggestionSnapshot.name)
+    .concat(encodeString(suggestionSnapshot.reason))
+    .concat(encodeSuggestionState(suggestionSnapshot.state))
+    .concat(encodeList(encodeChange)(suggestionSnapshot.changeList))
+    .concat(encodeId(suggestionSnapshot.projectId))
+    .concat(encodeId(suggestionSnapshot.ideaId))
+    .concat(encodeTime(suggestionSnapshot.getTime));
+
+export const encodeSuggestionSnapshotAndId = (
+  suggestionSnapshotAndId: SuggestionSnapshotAndId
+): ReadonlyArray<number> =>
+  encodeId(suggestionSnapshotAndId.id).concat(
+    encodeSuggestionSnapshot(suggestionSnapshotAndId.snapshot)
+  );
 
 export const encodeSuggestionState = (
   suggestionState: SuggestionState
@@ -3122,10 +3148,10 @@ export const decodeItemBody = (
  * @param index バイナリを読み込み開始位置
  * @param binary バイナリ
  */
-export const decodeSuggestion = (
+export const decodeSuggestionSnapshot = (
   index: number,
   binary: Uint8Array
-): { result: Suggestion; nextIndex: number } => {
+): { result: SuggestionSnapshot; nextIndex: number } => {
   const nameAndNextIndex: { result: string; nextIndex: number } = decodeString(
     index,
     binary
@@ -3162,6 +3188,10 @@ export const decodeSuggestion = (
     projectIdAndNextIndex.nextIndex,
     binary
   );
+  const getTimeAndNextIndex: { result: Time; nextIndex: number } = decodeTime(
+    ideaIdAndNextIndex.nextIndex,
+    binary
+  );
   return {
     result: {
       name: nameAndNextIndex.result,
@@ -3170,8 +3200,37 @@ export const decodeSuggestion = (
       changeList: changeListAndNextIndex.result,
       projectId: projectIdAndNextIndex.result,
       ideaId: ideaIdAndNextIndex.result,
+      getTime: getTimeAndNextIndex.result,
     },
-    nextIndex: ideaIdAndNextIndex.nextIndex,
+    nextIndex: getTimeAndNextIndex.nextIndex,
+  };
+};
+
+/**
+ * @param index バイナリを読み込み開始位置
+ * @param binary バイナリ
+ */
+export const decodeSuggestionSnapshotAndId = (
+  index: number,
+  binary: Uint8Array
+): { result: SuggestionSnapshotAndId; nextIndex: number } => {
+  const idAndNextIndex: {
+    result: SuggestionId;
+    nextIndex: number;
+  } = (decodeId as (
+    a: number,
+    b: Uint8Array
+  ) => { result: SuggestionId; nextIndex: number })(index, binary);
+  const snapshotAndNextIndex: {
+    result: SuggestionSnapshot;
+    nextIndex: number;
+  } = decodeSuggestionSnapshot(idAndNextIndex.nextIndex, binary);
+  return {
+    result: {
+      id: idAndNextIndex.result,
+      snapshot: snapshotAndNextIndex.result,
+    },
+    nextIndex: snapshotAndNextIndex.nextIndex,
   };
 };
 
