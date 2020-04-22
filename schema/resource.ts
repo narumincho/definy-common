@@ -300,27 +300,37 @@ export const customTypeList: ReadonlyArray<type.CustomType> = [
     body: type.customTypeBodySum([
       {
         name: "Comment",
-        description: "文章でのコメント",
+        description: "文章でのコメントをした",
         parameter: type.maybeJust(type.typeString),
       },
       {
         name: "SuggestionCreate",
-        description: "編集提案を作成した",
+        description: "提案を作成した",
         parameter: type.maybeJust(idAndToken.suggestionId),
       },
       {
-        name: "SuggestionApprovalPending",
-        description: "編集提案が作成されて承認待ちになった",
+        name: "SuggestionToApprovalPending",
+        description: "提案を承認待ちにした",
         parameter: type.maybeJust(idAndToken.suggestionId),
       },
       {
-        name: "SuggestionApproved",
-        description: "編集提案が承認された",
+        name: "SuggestionCancelToApprovalPending",
+        description: "承認待ちをキャンセルした",
         parameter: type.maybeJust(idAndToken.suggestionId),
       },
       {
-        name: "SuggestionRejected",
-        description: "編集提案が拒否された",
+        name: "SuggestionApprove",
+        description: "提案を承認した",
+        parameter: type.maybeJust(idAndToken.suggestionId),
+      },
+      {
+        name: "SuggestionReject",
+        description: "提案を拒否した",
+        parameter: type.maybeJust(idAndToken.suggestionId),
+      },
+      {
+        name: "SuggestionCancelRejection",
+        description: "提案の拒否をキャンセルした",
         parameter: type.maybeJust(idAndToken.suggestionId),
       },
     ]),

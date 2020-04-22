@@ -52,7 +52,7 @@ const sum = type.customTypeBodySum;
 export const customTypeList: ReadonlyArray<type.CustomType> = [
   {
     name: suggestionSnapshotName,
-    description: "編集提案",
+    description: "提案",
     body: product([
       {
         name: "name",

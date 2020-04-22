@@ -321,12 +321,14 @@ export type IdeaItem = {
 export type ItemBody =
   | { _: "Comment"; string_: string }
   | { _: "SuggestionCreate"; suggestionId: SuggestionId }
-  | { _: "SuggestionApprovalPending"; suggestionId: SuggestionId }
-  | { _: "SuggestionApproved"; suggestionId: SuggestionId }
-  | { _: "SuggestionRejected"; suggestionId: SuggestionId };
+  | { _: "SuggestionToApprovalPending"; suggestionId: SuggestionId }
+  | { _: "SuggestionCancelToApprovalPending"; suggestionId: SuggestionId }
+  | { _: "SuggestionApprove"; suggestionId: SuggestionId }
+  | { _: "SuggestionReject"; suggestionId: SuggestionId }
+  | { _: "SuggestionCancelRejection"; suggestionId: SuggestionId };
 
 /**
- * 編集提案
+ * 提案
  */
 export type SuggestionSnapshot = {
   /**
@@ -1076,7 +1078,7 @@ export const locationIdea = (ideaId: IdeaId): Location => ({
 });
 
 /**
- * 編集提案のページ
+ * 提案のページ
  */
 export const locationSuggestion = (suggestionId: SuggestionId): Location => ({
   _: "Suggestion",
@@ -1084,7 +1086,7 @@ export const locationSuggestion = (suggestionId: SuggestionId): Location => ({
 });
 
 /**
- * 文章でのコメント
+ * 文章でのコメントをした
  */
 export const itemBodyComment = (string_: string): ItemBody => ({
   _: "Comment",
@@ -1092,32 +1094,52 @@ export const itemBodyComment = (string_: string): ItemBody => ({
 });
 
 /**
- * 編集提案を作成した
+ * 提案を作成した
  */
 export const itemBodySuggestionCreate = (
   suggestionId: SuggestionId
 ): ItemBody => ({ _: "SuggestionCreate", suggestionId: suggestionId });
 
 /**
- * 編集提案が作成されて承認待ちになった
+ * 提案を承認待ちにした
  */
-export const itemBodySuggestionApprovalPending = (
+export const itemBodySuggestionToApprovalPending = (
   suggestionId: SuggestionId
-): ItemBody => ({ _: "SuggestionApprovalPending", suggestionId: suggestionId });
+): ItemBody => ({
+  _: "SuggestionToApprovalPending",
+  suggestionId: suggestionId,
+});
 
 /**
- * 編集提案が承認された
+ * 承認待ちをキャンセルした
  */
-export const itemBodySuggestionApproved = (
+export const itemBodySuggestionCancelToApprovalPending = (
   suggestionId: SuggestionId
-): ItemBody => ({ _: "SuggestionApproved", suggestionId: suggestionId });
+): ItemBody => ({
+  _: "SuggestionCancelToApprovalPending",
+  suggestionId: suggestionId,
+});
 
 /**
- * 編集提案が拒否された
+ * 提案を承認した
  */
-export const itemBodySuggestionRejected = (
+export const itemBodySuggestionApprove = (
   suggestionId: SuggestionId
-): ItemBody => ({ _: "SuggestionRejected", suggestionId: suggestionId });
+): ItemBody => ({ _: "SuggestionApprove", suggestionId: suggestionId });
+
+/**
+ * 提案を拒否した
+ */
+export const itemBodySuggestionReject = (
+  suggestionId: SuggestionId
+): ItemBody => ({ _: "SuggestionReject", suggestionId: suggestionId });
+
+/**
+ * 提案の拒否をキャンセルした
+ */
+export const itemBodySuggestionCancelRejection = (
+  suggestionId: SuggestionId
+): ItemBody => ({ _: "SuggestionCancelRejection", suggestionId: suggestionId });
 
 /**
  * プロジェクト名の変更
@@ -1738,14 +1760,20 @@ export const encodeItemBody = (itemBody: ItemBody): ReadonlyArray<number> => {
     case "SuggestionCreate": {
       return [1].concat(encodeId(itemBody.suggestionId));
     }
-    case "SuggestionApprovalPending": {
+    case "SuggestionToApprovalPending": {
       return [2].concat(encodeId(itemBody.suggestionId));
     }
-    case "SuggestionApproved": {
+    case "SuggestionCancelToApprovalPending": {
       return [3].concat(encodeId(itemBody.suggestionId));
     }
-    case "SuggestionRejected": {
+    case "SuggestionApprove": {
       return [4].concat(encodeId(itemBody.suggestionId));
+    }
+    case "SuggestionReject": {
+      return [5].concat(encodeId(itemBody.suggestionId));
+    }
+    case "SuggestionCancelRejection": {
+      return [6].concat(encodeId(itemBody.suggestionId));
     }
   }
 };
@@ -3183,7 +3211,7 @@ export const decodeItemBody = (
       binary
     );
     return {
-      result: itemBodySuggestionApprovalPending(result.result),
+      result: itemBodySuggestionToApprovalPending(result.result),
       nextIndex: result.nextIndex,
     };
   }
@@ -3196,7 +3224,7 @@ export const decodeItemBody = (
       binary
     );
     return {
-      result: itemBodySuggestionApproved(result.result),
+      result: itemBodySuggestionCancelToApprovalPending(result.result),
       nextIndex: result.nextIndex,
     };
   }
@@ -3209,7 +3237,33 @@ export const decodeItemBody = (
       binary
     );
     return {
-      result: itemBodySuggestionRejected(result.result),
+      result: itemBodySuggestionApprove(result.result),
+      nextIndex: result.nextIndex,
+    };
+  }
+  if (patternIndex.result === 5) {
+    const result: { result: SuggestionId; nextIndex: number } = (decodeId as (
+      a: number,
+      b: Uint8Array
+    ) => { result: SuggestionId; nextIndex: number })(
+      patternIndex.nextIndex,
+      binary
+    );
+    return {
+      result: itemBodySuggestionReject(result.result),
+      nextIndex: result.nextIndex,
+    };
+  }
+  if (patternIndex.result === 6) {
+    const result: { result: SuggestionId; nextIndex: number } = (decodeId as (
+      a: number,
+      b: Uint8Array
+    ) => { result: SuggestionId; nextIndex: number })(
+      patternIndex.nextIndex,
+      binary
+    );
+    return {
+      result: itemBodySuggestionCancelRejection(result.result),
       nextIndex: result.nextIndex,
     };
   }

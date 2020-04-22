@@ -128,12 +128,14 @@ type alias IdeaItem =
 type ItemBody
     = ItemBodyComment String
     | ItemBodySuggestionCreate SuggestionId
-    | ItemBodySuggestionApprovalPending SuggestionId
-    | ItemBodySuggestionApproved SuggestionId
-    | ItemBodySuggestionRejected SuggestionId
+    | ItemBodySuggestionToApprovalPending SuggestionId
+    | ItemBodySuggestionCancelToApprovalPending SuggestionId
+    | ItemBodySuggestionApprove SuggestionId
+    | ItemBodySuggestionReject SuggestionId
+    | ItemBodySuggestionCancelRejection SuggestionId
 
 
-{-| 編集提案
+{-| 提案
 -}
 type alias SuggestionSnapshot =
     { name : String, createUserId : UserId, reason : String, state : SuggestionState, changeList : List Change, projectId : ProjectId, ideaId : IdeaId, getTime : Time }
@@ -764,14 +766,20 @@ itemBodyToJsonValue itemBody =
         ItemBodySuggestionCreate parameter ->
             Je.object [ ( "_", Je.string "SuggestionCreate" ), ( "suggestionId", suggestionIdToJsonValue parameter ) ]
 
-        ItemBodySuggestionApprovalPending parameter ->
-            Je.object [ ( "_", Je.string "SuggestionApprovalPending" ), ( "suggestionId", suggestionIdToJsonValue parameter ) ]
+        ItemBodySuggestionToApprovalPending parameter ->
+            Je.object [ ( "_", Je.string "SuggestionToApprovalPending" ), ( "suggestionId", suggestionIdToJsonValue parameter ) ]
 
-        ItemBodySuggestionApproved parameter ->
-            Je.object [ ( "_", Je.string "SuggestionApproved" ), ( "suggestionId", suggestionIdToJsonValue parameter ) ]
+        ItemBodySuggestionCancelToApprovalPending parameter ->
+            Je.object [ ( "_", Je.string "SuggestionCancelToApprovalPending" ), ( "suggestionId", suggestionIdToJsonValue parameter ) ]
 
-        ItemBodySuggestionRejected parameter ->
-            Je.object [ ( "_", Je.string "SuggestionRejected" ), ( "suggestionId", suggestionIdToJsonValue parameter ) ]
+        ItemBodySuggestionApprove parameter ->
+            Je.object [ ( "_", Je.string "SuggestionApprove" ), ( "suggestionId", suggestionIdToJsonValue parameter ) ]
+
+        ItemBodySuggestionReject parameter ->
+            Je.object [ ( "_", Je.string "SuggestionReject" ), ( "suggestionId", suggestionIdToJsonValue parameter ) ]
+
+        ItemBodySuggestionCancelRejection parameter ->
+            Je.object [ ( "_", Je.string "SuggestionCancelRejection" ), ( "suggestionId", suggestionIdToJsonValue parameter ) ]
 
 
 {-| SuggestionSnapshotのJSONへのエンコーダ
@@ -1767,14 +1775,20 @@ itemBodyJsonDecoder =
                     "SuggestionCreate" ->
                         Jd.field "suggestionId" suggestionIdJsonDecoder |> Jd.map ItemBodySuggestionCreate
 
-                    "SuggestionApprovalPending" ->
-                        Jd.field "suggestionId" suggestionIdJsonDecoder |> Jd.map ItemBodySuggestionApprovalPending
+                    "SuggestionToApprovalPending" ->
+                        Jd.field "suggestionId" suggestionIdJsonDecoder |> Jd.map ItemBodySuggestionToApprovalPending
 
-                    "SuggestionApproved" ->
-                        Jd.field "suggestionId" suggestionIdJsonDecoder |> Jd.map ItemBodySuggestionApproved
+                    "SuggestionCancelToApprovalPending" ->
+                        Jd.field "suggestionId" suggestionIdJsonDecoder |> Jd.map ItemBodySuggestionCancelToApprovalPending
 
-                    "SuggestionRejected" ->
-                        Jd.field "suggestionId" suggestionIdJsonDecoder |> Jd.map ItemBodySuggestionRejected
+                    "SuggestionApprove" ->
+                        Jd.field "suggestionId" suggestionIdJsonDecoder |> Jd.map ItemBodySuggestionApprove
+
+                    "SuggestionReject" ->
+                        Jd.field "suggestionId" suggestionIdJsonDecoder |> Jd.map ItemBodySuggestionReject
+
+                    "SuggestionCancelRejection" ->
+                        Jd.field "suggestionId" suggestionIdJsonDecoder |> Jd.map ItemBodySuggestionCancelRejection
 
                     _ ->
                         Jd.fail ("ItemBodyで不明なタグを受けたとった tag=" ++ tag)
