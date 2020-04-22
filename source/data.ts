@@ -334,6 +334,10 @@ export type SuggestionSnapshot = {
    */
   name: string;
   /**
+   * 作成者
+   */
+  createUserId: UserId;
+  /**
    * 変更理由
    */
   reason: string;
@@ -1750,6 +1754,7 @@ export const encodeSuggestionSnapshot = (
   suggestionSnapshot: SuggestionSnapshot
 ): ReadonlyArray<number> =>
   encodeString(suggestionSnapshot.name)
+    .concat(encodeId(suggestionSnapshot.createUserId))
     .concat(encodeString(suggestionSnapshot.reason))
     .concat(encodeSuggestionState(suggestionSnapshot.state))
     .concat(encodeList(encodeChange)(suggestionSnapshot.changeList))
@@ -3223,10 +3228,20 @@ export const decodeSuggestionSnapshot = (
     index,
     binary
   );
+  const createUserIdAndNextIndex: {
+    result: UserId;
+    nextIndex: number;
+  } = (decodeId as (
+    a: number,
+    b: Uint8Array
+  ) => { result: UserId; nextIndex: number })(
+    nameAndNextIndex.nextIndex,
+    binary
+  );
   const reasonAndNextIndex: {
     result: string;
     nextIndex: number;
-  } = decodeString(nameAndNextIndex.nextIndex, binary);
+  } = decodeString(createUserIdAndNextIndex.nextIndex, binary);
   const stateAndNextIndex: {
     result: SuggestionState;
     nextIndex: number;
@@ -3262,6 +3277,7 @@ export const decodeSuggestionSnapshot = (
   return {
     result: {
       name: nameAndNextIndex.result,
+      createUserId: createUserIdAndNextIndex.result,
       reason: reasonAndNextIndex.result,
       state: stateAndNextIndex.result,
       changeList: changeListAndNextIndex.result,

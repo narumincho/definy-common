@@ -60,6 +60,11 @@ export const customTypeList: ReadonlyArray<type.CustomType> = [
         memberType: type.typeString,
       },
       {
+        name: "createUserId",
+        description: "作成者",
+        memberType: idAndToken.userId,
+      },
+      {
         name: "reason",
         description: "変更理由",
         memberType: type.typeString,
