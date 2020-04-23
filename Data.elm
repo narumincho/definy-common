@@ -138,7 +138,7 @@ type ItemBody
 {-| 提案
 -}
 type alias SuggestionSnapshot =
-    { name : String, createUserId : UserId, reason : String, state : SuggestionState, changeList : List Change, projectId : ProjectId, ideaId : IdeaId, getTime : Time }
+    { name : String, createUserId : UserId, reason : String, state : SuggestionState, changeList : List Change, projectId : ProjectId, ideaId : IdeaId, updateTime : Time, getTime : Time }
 
 
 {-| Id付きのSuggestion
@@ -794,6 +794,7 @@ suggestionSnapshotToJsonValue suggestionSnapshot =
         , ( "changeList", Je.list changeToJsonValue suggestionSnapshot.changeList )
         , ( "projectId", projectIdToJsonValue suggestionSnapshot.projectId )
         , ( "ideaId", ideaIdToJsonValue suggestionSnapshot.ideaId )
+        , ( "updateTime", timeToJsonValue suggestionSnapshot.updateTime )
         , ( "getTime", timeToJsonValue suggestionSnapshot.getTime )
         ]
 
@@ -1802,7 +1803,7 @@ itemBodyJsonDecoder =
 suggestionSnapshotJsonDecoder : Jd.Decoder SuggestionSnapshot
 suggestionSnapshotJsonDecoder =
     Jd.succeed
-        (\name createUserId reason state changeList projectId ideaId getTime ->
+        (\name createUserId reason state changeList projectId ideaId updateTime getTime ->
             { name = name
             , createUserId = createUserId
             , reason = reason
@@ -1810,6 +1811,7 @@ suggestionSnapshotJsonDecoder =
             , changeList = changeList
             , projectId = projectId
             , ideaId = ideaId
+            , updateTime = updateTime
             , getTime = getTime
             }
         )
@@ -1820,6 +1822,7 @@ suggestionSnapshotJsonDecoder =
         |> Jdp.required "changeList" (Jd.list changeJsonDecoder)
         |> Jdp.required "projectId" projectIdJsonDecoder
         |> Jdp.required "ideaId" ideaIdJsonDecoder
+        |> Jdp.required "updateTime" timeJsonDecoder
         |> Jdp.required "getTime" timeJsonDecoder
 
 

@@ -90,6 +90,11 @@ export const customTypeList: ReadonlyArray<type.CustomType> = [
         memberType: idAndToken.ideaId,
       },
       {
+        name: "updateTime",
+        description: "更新日時",
+        memberType: time.time,
+      },
+      {
         name: "getTime",
         description: "取得日時",
         memberType: time.time,

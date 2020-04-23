@@ -360,6 +360,10 @@ export type SuggestionSnapshot = {
    */
   ideaId: IdeaId;
   /**
+   * 更新日時
+   */
+  updateTime: Time;
+  /**
    * 取得日時
    */
   getTime: Time;
@@ -1796,6 +1800,7 @@ export const encodeSuggestionSnapshot = (
     .concat(encodeList(encodeChange)(suggestionSnapshot.changeList))
     .concat(encodeId(suggestionSnapshot.projectId))
     .concat(encodeId(suggestionSnapshot.ideaId))
+    .concat(encodeTime(suggestionSnapshot.updateTime))
     .concat(encodeTime(suggestionSnapshot.getTime));
 
 export const encodeSuggestionSnapshotAndId = (
@@ -3334,8 +3339,12 @@ export const decodeSuggestionSnapshot = (
     projectIdAndNextIndex.nextIndex,
     binary
   );
+  const updateTimeAndNextIndex: {
+    result: Time;
+    nextIndex: number;
+  } = decodeTime(ideaIdAndNextIndex.nextIndex, binary);
   const getTimeAndNextIndex: { result: Time; nextIndex: number } = decodeTime(
-    ideaIdAndNextIndex.nextIndex,
+    updateTimeAndNextIndex.nextIndex,
     binary
   );
   return {
@@ -3347,6 +3356,7 @@ export const decodeSuggestionSnapshot = (
       changeList: changeListAndNextIndex.result,
       projectId: projectIdAndNextIndex.result,
       ideaId: ideaIdAndNextIndex.result,
+      updateTime: updateTimeAndNextIndex.result,
       getTime: getTimeAndNextIndex.result,
     },
     nextIndex: getTimeAndNextIndex.nextIndex,
