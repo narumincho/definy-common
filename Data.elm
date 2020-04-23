@@ -410,13 +410,13 @@ type alias AddSuggestionParameter =
 {-| 提案を更新するときに必要なパラメーター
 -}
 type alias UpdateSuggestionParameter =
-    { accessToke : AccessToken, suggestionId : SuggestionId, name : String, reason : String, changeList : List Change }
+    { accessToken : AccessToken, suggestionId : SuggestionId, name : String, reason : String, changeList : List Change }
 
 
 {-| アクセストークンとSuggestionId
 -}
 type alias AccessTokenAndSuggestionId =
-    { accessToke : AccessToken, suggestionId : SuggestionId }
+    { accessToken : AccessToken, suggestionId : SuggestionId }
 
 
 type ProjectId
@@ -1332,7 +1332,7 @@ addSuggestionParameterToJsonValue addSuggestionParameter =
 updateSuggestionParameterToJsonValue : UpdateSuggestionParameter -> Je.Value
 updateSuggestionParameterToJsonValue updateSuggestionParameter =
     Je.object
-        [ ( "accessToke", accessTokenToJsonValue updateSuggestionParameter.accessToke )
+        [ ( "accessToken", accessTokenToJsonValue updateSuggestionParameter.accessToken )
         , ( "suggestionId", suggestionIdToJsonValue updateSuggestionParameter.suggestionId )
         , ( "name", Je.string updateSuggestionParameter.name )
         , ( "reason", Je.string updateSuggestionParameter.reason )
@@ -1345,7 +1345,7 @@ updateSuggestionParameterToJsonValue updateSuggestionParameter =
 accessTokenAndSuggestionIdToJsonValue : AccessTokenAndSuggestionId -> Je.Value
 accessTokenAndSuggestionIdToJsonValue accessTokenAndSuggestionId =
     Je.object
-        [ ( "accessToke", accessTokenToJsonValue accessTokenAndSuggestionId.accessToke )
+        [ ( "accessToken", accessTokenToJsonValue accessTokenAndSuggestionId.accessToken )
         , ( "suggestionId", suggestionIdToJsonValue accessTokenAndSuggestionId.suggestionId )
         ]
 
@@ -2581,15 +2581,15 @@ addSuggestionParameterJsonDecoder =
 updateSuggestionParameterJsonDecoder : Jd.Decoder UpdateSuggestionParameter
 updateSuggestionParameterJsonDecoder =
     Jd.succeed
-        (\accessToke suggestionId name reason changeList ->
-            { accessToke = accessToke
+        (\accessToken suggestionId name reason changeList ->
+            { accessToken = accessToken
             , suggestionId = suggestionId
             , name = name
             , reason = reason
             , changeList = changeList
             }
         )
-        |> Jdp.required "accessToke" accessTokenJsonDecoder
+        |> Jdp.required "accessToken" accessTokenJsonDecoder
         |> Jdp.required "suggestionId" suggestionIdJsonDecoder
         |> Jdp.required "name" Jd.string
         |> Jdp.required "reason" Jd.string
@@ -2601,10 +2601,10 @@ updateSuggestionParameterJsonDecoder =
 accessTokenAndSuggestionIdJsonDecoder : Jd.Decoder AccessTokenAndSuggestionId
 accessTokenAndSuggestionIdJsonDecoder =
     Jd.succeed
-        (\accessToke suggestionId ->
-            { accessToke = accessToke
+        (\accessToken suggestionId ->
+            { accessToken = accessToken
             , suggestionId = suggestionId
             }
         )
-        |> Jdp.required "accessToke" accessTokenJsonDecoder
+        |> Jdp.required "accessToken" accessTokenJsonDecoder
         |> Jdp.required "suggestionId" suggestionIdJsonDecoder

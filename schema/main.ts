@@ -94,7 +94,7 @@ const listCustomType: ReadonlyArray<type.CustomType> = [
     description: "提案を更新するときに必要なパラメーター",
     body: type.customTypeBodyProduct([
       {
-        name: "accessToke",
+        name: "accessToken",
         description: "提案を更新するアカウント",
         memberType: idAndToken.accessToken,
       },
@@ -125,7 +125,7 @@ const listCustomType: ReadonlyArray<type.CustomType> = [
     description: "アクセストークンとSuggestionId",
     body: type.customTypeBodyProduct([
       {
-        name: "accessToke",
+        name: "accessToken",
         description: "アクセストークン",
         memberType: idAndToken.accessToken,
       },

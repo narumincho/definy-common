@@ -977,7 +977,7 @@ export type UpdateSuggestionParameter = {
   /**
    * 提案を更新するアカウント
    */
-  accessToke: AccessToken;
+  accessToken: AccessToken;
   /**
    * 書き換える提案
    */
@@ -1003,7 +1003,7 @@ export type AccessTokenAndSuggestionId = {
   /**
    * アクセストークン
    */
-  accessToke: AccessToken;
+  accessToken: AccessToken;
   /**
    * SuggestionId
    */
@@ -2286,7 +2286,7 @@ export const encodeAddSuggestionParameter = (
 export const encodeUpdateSuggestionParameter = (
   updateSuggestionParameter: UpdateSuggestionParameter
 ): ReadonlyArray<number> =>
-  encodeToken(updateSuggestionParameter.accessToke)
+  encodeToken(updateSuggestionParameter.accessToken)
     .concat(encodeId(updateSuggestionParameter.suggestionId))
     .concat(encodeString(updateSuggestionParameter.name))
     .concat(encodeString(updateSuggestionParameter.reason))
@@ -2295,7 +2295,7 @@ export const encodeUpdateSuggestionParameter = (
 export const encodeAccessTokenAndSuggestionId = (
   accessTokenAndSuggestionId: AccessTokenAndSuggestionId
 ): ReadonlyArray<number> =>
-  encodeToken(accessTokenAndSuggestionId.accessToke).concat(
+  encodeToken(accessTokenAndSuggestionId.accessToken).concat(
     encodeId(accessTokenAndSuggestionId.suggestionId)
   );
 
@@ -4926,7 +4926,7 @@ export const decodeUpdateSuggestionParameter = (
   index: number,
   binary: Uint8Array
 ): { result: UpdateSuggestionParameter; nextIndex: number } => {
-  const accessTokeAndNextIndex: {
+  const accessTokenAndNextIndex: {
     result: AccessToken;
     nextIndex: number;
   } = (decodeToken as (
@@ -4940,7 +4940,7 @@ export const decodeUpdateSuggestionParameter = (
     a: number,
     b: Uint8Array
   ) => { result: SuggestionId; nextIndex: number })(
-    accessTokeAndNextIndex.nextIndex,
+    accessTokenAndNextIndex.nextIndex,
     binary
   );
   const nameAndNextIndex: { result: string; nextIndex: number } = decodeString(
@@ -4957,7 +4957,7 @@ export const decodeUpdateSuggestionParameter = (
   } = decodeList(decodeChange)(reasonAndNextIndex.nextIndex, binary);
   return {
     result: {
-      accessToke: accessTokeAndNextIndex.result,
+      accessToken: accessTokenAndNextIndex.result,
       suggestionId: suggestionIdAndNextIndex.result,
       name: nameAndNextIndex.result,
       reason: reasonAndNextIndex.result,
@@ -4975,7 +4975,7 @@ export const decodeAccessTokenAndSuggestionId = (
   index: number,
   binary: Uint8Array
 ): { result: AccessTokenAndSuggestionId; nextIndex: number } => {
-  const accessTokeAndNextIndex: {
+  const accessTokenAndNextIndex: {
     result: AccessToken;
     nextIndex: number;
   } = (decodeToken as (
@@ -4989,12 +4989,12 @@ export const decodeAccessTokenAndSuggestionId = (
     a: number,
     b: Uint8Array
   ) => { result: SuggestionId; nextIndex: number })(
-    accessTokeAndNextIndex.nextIndex,
+    accessTokenAndNextIndex.nextIndex,
     binary
   );
   return {
     result: {
-      accessToke: accessTokeAndNextIndex.result,
+      accessToken: accessTokenAndNextIndex.result,
       suggestionId: suggestionIdAndNextIndex.result,
     },
     nextIndex: suggestionIdAndNextIndex.nextIndex,
