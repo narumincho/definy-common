@@ -410,7 +410,7 @@ type alias AddSuggestionParameter =
 {-| 提案を更新するときに必要なパラメーター
 -}
 type alias UpdateSuggestionParameter =
-    { accessToke : AccessToken, suggestionId : SuggestionId, changeList : List Change }
+    { accessToke : AccessToken, suggestionId : SuggestionId, name : String, reason : String, changeList : List Change }
 
 
 {-| アクセストークンとSuggestionId
@@ -1333,6 +1333,8 @@ updateSuggestionParameterToJsonValue updateSuggestionParameter =
     Je.object
         [ ( "accessToke", accessTokenToJsonValue updateSuggestionParameter.accessToke )
         , ( "suggestionId", suggestionIdToJsonValue updateSuggestionParameter.suggestionId )
+        , ( "name", Je.string updateSuggestionParameter.name )
+        , ( "reason", Je.string updateSuggestionParameter.reason )
         , ( "changeList", Je.list changeToJsonValue updateSuggestionParameter.changeList )
         ]
 
@@ -2576,14 +2578,18 @@ addSuggestionParameterJsonDecoder =
 updateSuggestionParameterJsonDecoder : Jd.Decoder UpdateSuggestionParameter
 updateSuggestionParameterJsonDecoder =
     Jd.succeed
-        (\accessToke suggestionId changeList ->
+        (\accessToke suggestionId name reason changeList ->
             { accessToke = accessToke
             , suggestionId = suggestionId
+            , name = name
+            , reason = reason
             , changeList = changeList
             }
         )
         |> Jdp.required "accessToke" accessTokenJsonDecoder
         |> Jdp.required "suggestionId" suggestionIdJsonDecoder
+        |> Jdp.required "name" Jd.string
+        |> Jdp.required "reason" Jd.string
         |> Jdp.required "changeList" (Jd.list changeJsonDecoder)
 
 

@@ -979,6 +979,14 @@ export type UpdateSuggestionParameter = {
    */
   suggestionId: SuggestionId;
   /**
+   * 提案の名前
+   */
+  name: string;
+  /**
+   * 変更理由
+   */
+  reason: string;
+  /**
    * 提案の変更
    */
   changeList: ReadonlyArray<Change>;
@@ -2275,6 +2283,8 @@ export const encodeUpdateSuggestionParameter = (
 ): ReadonlyArray<number> =>
   encodeToken(updateSuggestionParameter.accessToke)
     .concat(encodeId(updateSuggestionParameter.suggestionId))
+    .concat(encodeString(updateSuggestionParameter.name))
+    .concat(encodeString(updateSuggestionParameter.reason))
     .concat(encodeList(encodeChange)(updateSuggestionParameter.changeList));
 
 export const encodeAccessTokenAndSuggestionId = (
@@ -4923,14 +4933,24 @@ export const decodeUpdateSuggestionParameter = (
     accessTokeAndNextIndex.nextIndex,
     binary
   );
+  const nameAndNextIndex: { result: string; nextIndex: number } = decodeString(
+    suggestionIdAndNextIndex.nextIndex,
+    binary
+  );
+  const reasonAndNextIndex: {
+    result: string;
+    nextIndex: number;
+  } = decodeString(nameAndNextIndex.nextIndex, binary);
   const changeListAndNextIndex: {
     result: ReadonlyArray<Change>;
     nextIndex: number;
-  } = decodeList(decodeChange)(suggestionIdAndNextIndex.nextIndex, binary);
+  } = decodeList(decodeChange)(reasonAndNextIndex.nextIndex, binary);
   return {
     result: {
       accessToke: accessTokeAndNextIndex.result,
       suggestionId: suggestionIdAndNextIndex.result,
+      name: nameAndNextIndex.result,
+      reason: reasonAndNextIndex.result,
       changeList: changeListAndNextIndex.result,
     },
     nextIndex: changeListAndNextIndex.nextIndex,

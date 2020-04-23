@@ -104,6 +104,16 @@ const listCustomType: ReadonlyArray<type.CustomType> = [
         memberType: idAndToken.suggestionId,
       },
       {
+        name: "name",
+        description: "提案の名前",
+        memberType: type.typeString,
+      },
+      {
+        name: "reason",
+        description: "変更理由",
+        memberType: type.typeString,
+      },
+      {
         name: "changeList",
         description: "提案の変更",
         memberType: type.typeList(code.change),
