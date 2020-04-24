@@ -4,6 +4,8 @@ import * as time from "./time";
 
 const suggestionSnapshotName = "SuggestionSnapshot";
 const suggestionSnapshotAndIdName = "SuggestionSnapshotAndId";
+const suggestionResponse = "SuggestionResponse";
+
 const suggestionStateName = "SuggestionState";
 const changeName = "Change";
 export const change = type.typeCustom(changeName);
@@ -114,6 +116,23 @@ export const customTypeList: ReadonlyArray<type.CustomType> = [
         name: "snapshot",
         description: "SuggestionSnapshot",
         memberType: type.typeCustom(suggestionSnapshotName),
+      },
+    ]),
+  },
+  {
+    name: suggestionResponse,
+    description:
+      "Maybe SuggestionSnapshotとSuggestionId TypeScript→Elmに渡す用",
+    body: product([
+      {
+        name: "id",
+        description: "SuggestionId",
+        memberType: idAndToken.suggestionId,
+      },
+      {
+        name: "snapshotMaybe",
+        description: "SuggestionSnapshot Maybe",
+        memberType: type.typeMaybe(type.typeCustom(suggestionSnapshotName)),
       },
     ]),
   },

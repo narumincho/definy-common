@@ -138,7 +138,7 @@ export type UserSnapshotAndId = {
 };
 
 /**
- * Maybe プロジェクトのスナップショット と userId. indexedDBからElmに渡す用
+ * Maybe プロジェクトのスナップショット と userId. TypeScript→Elmに渡す用
  */
 export type UserResponse = {
   /**
@@ -208,7 +208,7 @@ export type ProjectSnapshotAndId = {
 };
 
 /**
- * Maybe プロジェクトのスナップショット と projectId. indexedDBからElmに渡す用
+ * Maybe プロジェクトのスナップショット と projectId. TypeScript→Elmに渡す用
  */
 export type ProjectResponse = {
   /**
@@ -270,7 +270,7 @@ export type IdeaSnapshotAndId = {
 };
 
 /**
- * Maybe アイデア と ideaId. indexedDBからElmに渡す用
+ * Maybe アイデア と ideaId. TypeScript→Elmに渡す用
  */
 export type IdeaResponse = {
   /**
@@ -381,6 +381,20 @@ export type SuggestionSnapshotAndId = {
    * SuggestionSnapshot
    */
   snapshot: SuggestionSnapshot;
+};
+
+/**
+ * Maybe SuggestionSnapshotとSuggestionId TypeScript→Elmに渡す用
+ */
+export type SuggestionResponse = {
+  /**
+   * SuggestionId
+   */
+  id: SuggestionId;
+  /**
+   * SuggestionSnapshot Maybe
+   */
+  snapshotMaybe: Maybe<SuggestionSnapshot>;
 };
 
 /**
@@ -1794,6 +1808,13 @@ export const encodeSuggestionSnapshotAndId = (
 ): ReadonlyArray<number> =>
   encodeId(suggestionSnapshotAndId.id).concat(
     encodeSuggestionSnapshot(suggestionSnapshotAndId.snapshot)
+  );
+
+export const encodeSuggestionResponse = (
+  suggestionResponse: SuggestionResponse
+): ReadonlyArray<number> =>
+  encodeId(suggestionResponse.id).concat(
+    encodeMaybe(encodeSuggestionSnapshot)(suggestionResponse.snapshotMaybe)
   );
 
 export const encodeSuggestionState = (
@@ -3367,6 +3388,34 @@ export const decodeSuggestionSnapshotAndId = (
       snapshot: snapshotAndNextIndex.result,
     },
     nextIndex: snapshotAndNextIndex.nextIndex,
+  };
+};
+
+/**
+ * @param index バイナリを読み込み開始位置
+ * @param binary バイナリ
+ */
+export const decodeSuggestionResponse = (
+  index: number,
+  binary: Uint8Array
+): { result: SuggestionResponse; nextIndex: number } => {
+  const idAndNextIndex: {
+    result: SuggestionId;
+    nextIndex: number;
+  } = (decodeId as (
+    a: number,
+    b: Uint8Array
+  ) => { result: SuggestionId; nextIndex: number })(index, binary);
+  const snapshotMaybeAndNextIndex: {
+    result: Maybe<SuggestionSnapshot>;
+    nextIndex: number;
+  } = decodeMaybe(decodeSuggestionSnapshot)(idAndNextIndex.nextIndex, binary);
+  return {
+    result: {
+      id: idAndNextIndex.result,
+      snapshotMaybe: snapshotMaybeAndNextIndex.result,
+    },
+    nextIndex: snapshotMaybeAndNextIndex.nextIndex,
   };
 };
 

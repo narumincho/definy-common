@@ -86,7 +86,7 @@ export const customTypeList: ReadonlyArray<type.CustomType> = [
   {
     name: userResponseName,
     description:
-      "Maybe プロジェクトのスナップショット と userId. indexedDBからElmに渡す用",
+      "Maybe プロジェクトのスナップショット と userId. TypeScript→Elmに渡す用",
     body: type.customTypeBodyProduct([
       {
         name: "id",
@@ -170,7 +170,7 @@ export const customTypeList: ReadonlyArray<type.CustomType> = [
   {
     name: projectResponseName,
     description:
-      "Maybe プロジェクトのスナップショット と projectId. indexedDBからElmに渡す用",
+      "Maybe プロジェクトのスナップショット と projectId. TypeScript→Elmに渡す用",
     body: type.customTypeBodyProduct([
       {
         name: "id",
@@ -243,7 +243,7 @@ export const customTypeList: ReadonlyArray<type.CustomType> = [
   },
   {
     name: ideaResponseName,
-    description: "Maybe アイデア と ideaId. indexedDBからElmに渡す用",
+    description: "Maybe アイデア と ideaId. TypeScript→Elmに渡す用",
     body: type.customTypeBodyProduct([
       {
         name: "id",
