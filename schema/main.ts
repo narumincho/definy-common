@@ -120,6 +120,22 @@ const listCustomType: ReadonlyArray<type.CustomType> = [
       },
     ]),
   },
+  {
+    name: "AccessTokenAndSuggestionId",
+    description: "提案を承認待ちにしたり許可したりするときなどに使う",
+    body: type.customTypeBodyProduct([
+      {
+        name: "accessToken",
+        description: "アクセストークン",
+        memberType: idAndToken.accessToken,
+      },
+      {
+        name: "suggestionId",
+        description: "SuggestionId",
+        memberType: idAndToken.suggestionId,
+      },
+    ]),
+  },
 ];
 
 const typeScriptCode = codeGen.generateCodeAsString(
