@@ -32,7 +32,7 @@ export const customTypeList: ReadonlyArray<type.CustomType> = [
       {
         name: "imageHash",
         description: "プロフィール画像",
-        memberType: idAndToken.fileHash,
+        memberType: idAndToken.imageToken,
       },
       {
         name: "introduction",
@@ -112,12 +112,12 @@ export const customTypeList: ReadonlyArray<type.CustomType> = [
       {
         name: "iconHash",
         description: "プロジェクトのアイコン画像",
-        memberType: idAndToken.fileHash,
+        memberType: idAndToken.imageToken,
       },
       {
         name: "imageHash",
         description: "プロジェクトのカバー画像",
-        memberType: idAndToken.fileHash,
+        memberType: idAndToken.imageToken,
       },
       {
         name: "createTime",

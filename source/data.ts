@@ -96,7 +96,7 @@ export type UserSnapshot = {
   /**
    * プロフィール画像
    */
-  imageHash: FileHash;
+  imageHash: ImageToken;
   /**
    * 自己紹介文. 改行文字を含めることができる. Twitterと同じ 0～160文字
    */
@@ -162,11 +162,11 @@ export type ProjectSnapshot = {
   /**
    * プロジェクトのアイコン画像
    */
-  iconHash: FileHash;
+  iconHash: ImageToken;
   /**
    * プロジェクトのカバー画像
    */
-  imageHash: FileHash;
+  imageHash: ImageToken;
   /**
    * 作成日時
    */
@@ -1032,7 +1032,7 @@ export type IdeaId = string & { _ideaId: never };
 
 export type SuggestionId = string & { _suggestionId: never };
 
-export type FileHash = string & { _fileHash: never };
+export type ImageToken = string & { _imageToken: never };
 
 export type PartId = string & { _partId: never };
 
@@ -2770,12 +2770,12 @@ export const decodeUserSnapshot = (
     binary
   );
   const imageHashAndNextIndex: {
-    result: FileHash;
+    result: ImageToken;
     nextIndex: number;
   } = (decodeToken as (
     a: number,
     b: Uint8Array
-  ) => { result: FileHash; nextIndex: number })(
+  ) => { result: ImageToken; nextIndex: number })(
     nameAndNextIndex.nextIndex,
     binary
   );
@@ -2896,22 +2896,22 @@ export const decodeProjectSnapshot = (
     binary
   );
   const iconHashAndNextIndex: {
-    result: FileHash;
+    result: ImageToken;
     nextIndex: number;
   } = (decodeToken as (
     a: number,
     b: Uint8Array
-  ) => { result: FileHash; nextIndex: number })(
+  ) => { result: ImageToken; nextIndex: number })(
     nameAndNextIndex.nextIndex,
     binary
   );
   const imageHashAndNextIndex: {
-    result: FileHash;
+    result: ImageToken;
     nextIndex: number;
   } = (decodeToken as (
     a: number,
     b: Uint8Array
-  ) => { result: FileHash; nextIndex: number })(
+  ) => { result: ImageToken; nextIndex: number })(
     iconHashAndNextIndex.nextIndex,
     binary
   );
