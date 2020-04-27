@@ -3,14 +3,16 @@ import * as a from "util";
 /**
  * Maybe
  */
-export type Maybe<T> = { _: "Just"; value: T } | { _: "Nothing" };
+export type Maybe<T> =
+  | { readonly _: "Just"; readonly value: T }
+  | { readonly _: "Nothing" };
 
 /**
  * Result
  */
 export type Result<ok, error> =
-  | { _: "Ok"; ok: ok }
-  | { _: "Error"; error: error };
+  | { readonly _: "Ok"; readonly ok: ok }
+  | { readonly _: "Error"; readonly error: error };
 
 /**
  * 日時. 0001-01-01T00:00:00.000Z to 9999-12-31T23:59:59.999Z 最小単位はミリ秒. ミリ秒の求め方は day*1000*60*60*24 + millisecond
@@ -19,11 +21,11 @@ export type Time = {
   /**
    * 1970-01-01からの経過日数. マイナスになることもある
    */
-  day: number;
+  readonly day: number;
   /**
    * 日にちの中のミリ秒. 0 to 86399999 (=1000*60*60*24-1)
    */
-  millisecond: number;
+  readonly millisecond: number;
 };
 
 /**
@@ -33,11 +35,11 @@ export type RequestLogInUrlRequestData = {
   /**
    * ログインに使用するプロバイダー
    */
-  openIdConnectProvider: OpenIdConnectProvider;
+  readonly openIdConnectProvider: OpenIdConnectProvider;
   /**
    * ログインした後に返ってくるURLに必要なデータ
    */
-  urlData: UrlData;
+  readonly urlData: UrlData;
 };
 
 /**
@@ -52,15 +54,15 @@ export type UrlData = {
   /**
    * クライアントモード
    */
-  clientMode: ClientMode;
+  readonly clientMode: ClientMode;
   /**
    * 場所
    */
-  location: Location;
+  readonly location: Location;
   /**
    * 言語
    */
-  language: Language;
+  readonly language: Language;
 };
 
 /**
@@ -72,13 +74,13 @@ export type ClientMode = "DebugMode" | "Release";
  * DefinyWebアプリ内での場所を示すもの. URLから求められる. URLに変換できる
  */
 export type Location =
-  | { _: "Home" }
-  | { _: "CreateProject" }
-  | { _: "CreateIdea"; projectId: ProjectId }
-  | { _: "User"; userId: UserId }
-  | { _: "Project"; projectId: ProjectId }
-  | { _: "Idea"; ideaId: IdeaId }
-  | { _: "Suggestion"; suggestionId: SuggestionId };
+  | { readonly _: "Home" }
+  | { readonly _: "CreateProject" }
+  | { readonly _: "CreateIdea"; readonly projectId: ProjectId }
+  | { readonly _: "User"; readonly userId: UserId }
+  | { readonly _: "Project"; readonly projectId: ProjectId }
+  | { readonly _: "Idea"; readonly ideaId: IdeaId }
+  | { readonly _: "Suggestion"; readonly suggestionId: SuggestionId };
 
 /**
  * 英語,日本語,エスペラント語などの言語
@@ -92,35 +94,35 @@ export type UserSnapshot = {
   /**
    * ユーザー名. 表示される名前. 他のユーザーとかぶっても良い. 絵文字も使える. 全角英数は半角英数,半角カタカナは全角カタカナ, (株)の合字を分解するなどのNFKCの正規化がされる. U+0000-U+0019 と U+007F-U+00A0 の範囲の文字は入らない. 前後に空白を含められない. 間の空白は2文字以上連続しない. 文字数のカウント方法は正規化されたあとのCodePoint単位. Twitterと同じ, 1文字以上50文字以下
    */
-  name: string;
+  readonly name: string;
   /**
    * プロフィール画像
    */
-  imageHash: ImageToken;
+  readonly imageHash: ImageToken;
   /**
    * 自己紹介文. 改行文字を含めることができる. Twitterと同じ 0～160文字
    */
-  introduction: string;
+  readonly introduction: string;
   /**
    * Definyでユーザーが作成された日時
    */
-  createTime: Time;
+  readonly createTime: Time;
   /**
    * プロジェクトに対する いいね
    */
-  likeProjectIdList: ReadonlyArray<ProjectId>;
+  readonly likeProjectIdList: ReadonlyArray<ProjectId>;
   /**
    * 開発に参加した (書いたコードが使われた) プロジェクト
    */
-  developProjectIdList: ReadonlyArray<ProjectId>;
+  readonly developProjectIdList: ReadonlyArray<ProjectId>;
   /**
    * コメントをしたアイデア
    */
-  commentIdeaIdList: ReadonlyArray<IdeaId>;
+  readonly commentIdeaIdList: ReadonlyArray<IdeaId>;
   /**
    * 取得日時
    */
-  getTime: Time;
+  readonly getTime: Time;
 };
 
 /**
@@ -130,11 +132,11 @@ export type UserSnapshotAndId = {
   /**
    * ユーザーID
    */
-  id: UserId;
+  readonly id: UserId;
   /**
    * ユーザーのスナップショット
    */
-  snapshot: UserSnapshot;
+  readonly snapshot: UserSnapshot;
 };
 
 /**
@@ -144,11 +146,11 @@ export type UserResponse = {
   /**
    * ユーザーID
    */
-  id: UserId;
+  readonly id: UserId;
   /**
    * ユーザーのデータ
    */
-  snapshotMaybe: Maybe<UserSnapshot>;
+  readonly snapshotMaybe: Maybe<UserSnapshot>;
 };
 
 /**
@@ -158,39 +160,39 @@ export type ProjectSnapshot = {
   /**
    * プロジェクト名
    */
-  name: string;
+  readonly name: string;
   /**
    * プロジェクトのアイコン画像
    */
-  iconHash: ImageToken;
+  readonly iconHash: ImageToken;
   /**
    * プロジェクトのカバー画像
    */
-  imageHash: ImageToken;
+  readonly imageHash: ImageToken;
   /**
    * 作成日時
    */
-  createTime: Time;
+  readonly createTime: Time;
   /**
    * 作成アカウント
    */
-  createUser: UserId;
+  readonly createUser: UserId;
   /**
    * 更新日時
    */
-  updateTime: Time;
+  readonly updateTime: Time;
   /**
    * 取得日時
    */
-  getTime: Time;
+  readonly getTime: Time;
   /**
    * 所属しているのパーツのIDのリスト
    */
-  partIdList: ReadonlyArray<PartId>;
+  readonly partIdList: ReadonlyArray<PartId>;
   /**
    * 所属している型パーツのIDのリスト
    */
-  typePartIdList: ReadonlyArray<TypePartId>;
+  readonly typePartIdList: ReadonlyArray<TypePartId>;
 };
 
 /**
@@ -200,11 +202,11 @@ export type ProjectSnapshotAndId = {
   /**
    * プロジェクトID
    */
-  id: ProjectId;
+  readonly id: ProjectId;
   /**
    * プロジェクトのスナップショット
    */
-  snapshot: ProjectSnapshot;
+  readonly snapshot: ProjectSnapshot;
 };
 
 /**
@@ -214,11 +216,11 @@ export type ProjectResponse = {
   /**
    * プロジェクトのID
    */
-  id: ProjectId;
+  readonly id: ProjectId;
   /**
    * プロジェクトのデータ
    */
-  snapshotMaybe: Maybe<ProjectSnapshot>;
+  readonly snapshotMaybe: Maybe<ProjectSnapshot>;
 };
 
 /**
@@ -228,31 +230,31 @@ export type IdeaSnapshot = {
   /**
    * アイデア名
    */
-  name: string;
+  readonly name: string;
   /**
    * 言い出しっぺ
    */
-  createUser: UserId;
+  readonly createUser: UserId;
   /**
    * 作成日時
    */
-  createTime: Time;
+  readonly createTime: Time;
   /**
    * 対象のプロジェクト
    */
-  projectId: ProjectId;
+  readonly projectId: ProjectId;
   /**
    * アイデアの要素
    */
-  itemList: ReadonlyArray<IdeaItem>;
+  readonly itemList: ReadonlyArray<IdeaItem>;
   /**
    * 更新日時
    */
-  updateTime: Time;
+  readonly updateTime: Time;
   /**
    * 取得日時
    */
-  getTime: Time;
+  readonly getTime: Time;
 };
 
 /**
@@ -262,11 +264,11 @@ export type IdeaSnapshotAndId = {
   /**
    * アイデアID
    */
-  id: IdeaId;
+  readonly id: IdeaId;
   /**
    * アイデアのスナップショット
    */
-  snapshot: IdeaSnapshot;
+  readonly snapshot: IdeaSnapshot;
 };
 
 /**
@@ -276,11 +278,11 @@ export type IdeaResponse = {
   /**
    * アイデアID
    */
-  id: IdeaId;
+  readonly id: IdeaId;
   /**
    * アイデアのスナップショット
    */
-  snapshotMaybe: Maybe<IdeaSnapshot>;
+  readonly snapshotMaybe: Maybe<IdeaSnapshot>;
 };
 
 /**
@@ -290,11 +292,11 @@ export type IdeaListByProjectIdResponse = {
   /**
    * プロジェクトID
    */
-  projectId: ProjectId;
+  readonly projectId: ProjectId;
   /**
    * アイデアの一覧
    */
-  ideaSnapshotAndIdList: ReadonlyArray<IdeaSnapshotAndId>;
+  readonly ideaSnapshotAndIdList: ReadonlyArray<IdeaSnapshotAndId>;
 };
 
 /**
@@ -304,28 +306,37 @@ export type IdeaItem = {
   /**
    * 作成者
    */
-  createUserId: UserId;
+  readonly createUserId: UserId;
   /**
    * 作成日時
    */
-  createTime: Time;
+  readonly createTime: Time;
   /**
    * 本文
    */
-  body: ItemBody;
+  readonly body: ItemBody;
 };
 
 /**
  * アイデアのアイテム
  */
 export type ItemBody =
-  | { _: "Comment"; string_: string }
-  | { _: "SuggestionCreate"; suggestionId: SuggestionId }
-  | { _: "SuggestionToApprovalPending"; suggestionId: SuggestionId }
-  | { _: "SuggestionCancelToApprovalPending"; suggestionId: SuggestionId }
-  | { _: "SuggestionApprove"; suggestionId: SuggestionId }
-  | { _: "SuggestionReject"; suggestionId: SuggestionId }
-  | { _: "SuggestionCancelRejection"; suggestionId: SuggestionId };
+  | { readonly _: "Comment"; readonly string_: string }
+  | { readonly _: "SuggestionCreate"; readonly suggestionId: SuggestionId }
+  | {
+      readonly _: "SuggestionToApprovalPending";
+      readonly suggestionId: SuggestionId;
+    }
+  | {
+      readonly _: "SuggestionCancelToApprovalPending";
+      readonly suggestionId: SuggestionId;
+    }
+  | { readonly _: "SuggestionApprove"; readonly suggestionId: SuggestionId }
+  | { readonly _: "SuggestionReject"; readonly suggestionId: SuggestionId }
+  | {
+      readonly _: "SuggestionCancelRejection";
+      readonly suggestionId: SuggestionId;
+    };
 
 /**
  * 提案
@@ -334,39 +345,39 @@ export type SuggestionSnapshot = {
   /**
    * 変更概要
    */
-  name: string;
+  readonly name: string;
   /**
    * 作成者
    */
-  createUserId: UserId;
+  readonly createUserId: UserId;
   /**
    * 変更理由
    */
-  reason: string;
+  readonly reason: string;
   /**
    * 承認状態
    */
-  state: SuggestionState;
+  readonly state: SuggestionState;
   /**
    * 変更
    */
-  changeList: ReadonlyArray<Change>;
+  readonly changeList: ReadonlyArray<Change>;
   /**
    * 変更をするプロジェクト
    */
-  projectId: ProjectId;
+  readonly projectId: ProjectId;
   /**
    * 投稿したアイデアID
    */
-  ideaId: IdeaId;
+  readonly ideaId: IdeaId;
   /**
    * 更新日時
    */
-  updateTime: Time;
+  readonly updateTime: Time;
   /**
    * 取得日時
    */
-  getTime: Time;
+  readonly getTime: Time;
 };
 
 /**
@@ -376,11 +387,11 @@ export type SuggestionSnapshotAndId = {
   /**
    * SuggestionId
    */
-  id: SuggestionId;
+  readonly id: SuggestionId;
   /**
    * SuggestionSnapshot
    */
-  snapshot: SuggestionSnapshot;
+  readonly snapshot: SuggestionSnapshot;
 };
 
 /**
@@ -390,11 +401,11 @@ export type SuggestionResponse = {
   /**
    * SuggestionId
    */
-  id: SuggestionId;
+  readonly id: SuggestionId;
   /**
    * SuggestionSnapshot Maybe
    */
-  snapshotMaybe: Maybe<SuggestionSnapshot>;
+  readonly snapshotMaybe: Maybe<SuggestionSnapshot>;
 };
 
 /**
@@ -410,8 +421,8 @@ export type SuggestionState =
  * 変更点
  */
 export type Change =
-  | { _: "ProjectName"; string_: string }
-  | { _: "AddPart"; addPart: AddPart };
+  | { readonly _: "ProjectName"; readonly string_: string }
+  | { readonly _: "AddPart"; readonly addPart: AddPart };
 
 /**
  * パーツを追加するのに必要なもの
@@ -420,19 +431,19 @@ export type AddPart = {
   /**
    * 新しいパーツの名前
    */
-  name: string;
+  readonly name: string;
   /**
    * 新しいパーツの説明
    */
-  description: string;
+  readonly description: string;
   /**
    * 新しいパーツの型
    */
-  type: SuggestionType;
+  readonly type: SuggestionType;
   /**
    * 新しいパーツの式
    */
-  expr: SuggestionExpr;
+  readonly expr: SuggestionExpr;
 };
 
 /**
@@ -440,67 +451,76 @@ export type AddPart = {
  */
 export type SuggestionType =
   | {
-      _: "Function";
-      suggestionTypeInputAndOutput: SuggestionTypeInputAndOutput;
+      readonly _: "Function";
+      readonly suggestionTypeInputAndOutput: SuggestionTypeInputAndOutput;
     }
   | {
-      _: "TypePartWithParameter";
-      typePartWithSuggestionTypeParameter: TypePartWithSuggestionTypeParameter;
+      readonly _: "TypePartWithParameter";
+      readonly typePartWithSuggestionTypeParameter: TypePartWithSuggestionTypeParameter;
     }
   | {
-      _: "SuggestionTypePartWithParameter";
-      suggestionTypePartWithSuggestionTypeParameter: SuggestionTypePartWithSuggestionTypeParameter;
+      readonly _: "SuggestionTypePartWithParameter";
+      readonly suggestionTypePartWithSuggestionTypeParameter: SuggestionTypePartWithSuggestionTypeParameter;
     };
 
 export type SuggestionTypeInputAndOutput = {
   /**
    * 入力の型
    */
-  inputType: SuggestionType;
+  readonly inputType: SuggestionType;
   /**
    * 出力の型
    */
-  outputType: SuggestionType;
+  readonly outputType: SuggestionType;
 };
 
 export type TypePartWithSuggestionTypeParameter = {
   /**
    * 型の参照
    */
-  typePartId: TypePartId;
+  readonly typePartId: TypePartId;
   /**
    * 型のパラメーター
    */
-  parameter: ReadonlyArray<SuggestionType>;
+  readonly parameter: ReadonlyArray<SuggestionType>;
 };
 
 export type SuggestionTypePartWithSuggestionTypeParameter = {
   /**
    * 提案内での定義した型パーツの番号
    */
-  suggestionTypePartIndex: number;
+  readonly suggestionTypePartIndex: number;
   /**
    * 型のパラメーター
    */
-  parameter: ReadonlyArray<SuggestionType>;
+  readonly parameter: ReadonlyArray<SuggestionType>;
 };
 
 /**
  * 提案時に含まれるパーツを参照できる式
  */
 export type SuggestionExpr =
-  | { _: "Kernel"; kernelExpr: KernelExpr }
-  | { _: "Int32Literal"; int32: number }
-  | { _: "PartReference"; partId: PartId }
-  | { _: "SuggestionPartReference"; int32: number }
-  | { _: "LocalPartReference"; localPartReference: LocalPartReference }
-  | { _: "TagReference"; tagReference: TagReference }
+  | { readonly _: "Kernel"; readonly kernelExpr: KernelExpr }
+  | { readonly _: "Int32Literal"; readonly int32: number }
+  | { readonly _: "PartReference"; readonly partId: PartId }
+  | { readonly _: "SuggestionPartReference"; readonly int32: number }
   | {
-      _: "SuggestionTagReference";
-      suggestionTagReference: SuggestionTagReference;
+      readonly _: "LocalPartReference";
+      readonly localPartReference: LocalPartReference;
     }
-  | { _: "FunctionCall"; suggestionFunctionCall: SuggestionFunctionCall }
-  | { _: "Lambda"; suggestionLambdaBranch: SuggestionLambdaBranch };
+  | { readonly _: "TagReference"; readonly tagReference: TagReference }
+  | {
+      readonly _: "SuggestionTagReference";
+      readonly suggestionTagReference: SuggestionTagReference;
+    }
+  | {
+      readonly _: "FunctionCall";
+      readonly suggestionFunctionCall: SuggestionFunctionCall;
+    }
+  | {
+      readonly _: "Lambda";
+      readonly suggestionLambdaBranch: SuggestionLambdaBranch;
+    };
 
 /**
  * 提案内で定義された型のタグ
@@ -509,11 +529,11 @@ export type SuggestionTagReference = {
   /**
    * 提案内での定義した型パーツの番号
    */
-  suggestionTypePartIndex: number;
+  readonly suggestionTypePartIndex: number;
   /**
    * タグIndex
    */
-  tagIndex: number;
+  readonly tagIndex: number;
 };
 
 /**
@@ -523,11 +543,11 @@ export type SuggestionFunctionCall = {
   /**
    * 関数
    */
-  function: SuggestionExpr;
+  readonly function: SuggestionExpr;
   /**
    * パラメーター
    */
-  parameter: SuggestionExpr;
+  readonly parameter: SuggestionExpr;
 };
 
 /**
@@ -537,16 +557,16 @@ export type SuggestionLambdaBranch = {
   /**
    * 入力値の条件を書くところ
    */
-  condition: Condition;
+  readonly condition: Condition;
   /**
    * ブランチの説明
    */
-  description: string;
-  localPartList: ReadonlyArray<SuggestionBranchPartDefinition>;
+  readonly description: string;
+  readonly localPartList: ReadonlyArray<SuggestionBranchPartDefinition>;
   /**
    * 式
    */
-  expr: Maybe<SuggestionExpr>;
+  readonly expr: Maybe<SuggestionExpr>;
 };
 
 /**
@@ -556,23 +576,23 @@ export type SuggestionBranchPartDefinition = {
   /**
    * ローカルパーツID
    */
-  localPartId: LocalPartId;
+  readonly localPartId: LocalPartId;
   /**
    * ブランチパーツの名前
    */
-  name: string;
+  readonly name: string;
   /**
    * ブランチパーツの説明
    */
-  description: string;
+  readonly description: string;
   /**
    * ローカルパーツの型
    */
-  type: SuggestionType;
+  readonly type: SuggestionType;
   /**
    * ローカルパーツの式
    */
-  expr: SuggestionExpr;
+  readonly expr: SuggestionExpr;
 };
 
 /**
@@ -582,31 +602,31 @@ export type TypePartSnapshot = {
   /**
    * 型パーツの名前
    */
-  name: string;
+  readonly name: string;
   /**
    * この型パーツの元
    */
-  parentList: ReadonlyArray<PartId>;
+  readonly parentList: ReadonlyArray<PartId>;
   /**
    * 型パーツの説明
    */
-  description: string;
+  readonly description: string;
   /**
    * 所属しているプロジェクトのID
    */
-  projectId: ProjectId;
+  readonly projectId: ProjectId;
   /**
    * この型パーツが作成された提案
    */
-  createSuggestionId: SuggestionId;
+  readonly createSuggestionId: SuggestionId;
   /**
    * 取得日時
    */
-  getTime: Time;
+  readonly getTime: Time;
   /**
    * 定義本体
    */
-  body: TypePartBody;
+  readonly body: TypePartBody;
 };
 
 /**
@@ -616,35 +636,35 @@ export type PartSnapshot = {
   /**
    * パーツの名前
    */
-  name: string;
+  readonly name: string;
   /**
    * このパーツの元
    */
-  parentList: ReadonlyArray<PartId>;
+  readonly parentList: ReadonlyArray<PartId>;
   /**
    * パーツの説明
    */
-  description: string;
+  readonly description: string;
   /**
    * パーツの型
    */
-  type: Type;
+  readonly type: Type;
   /**
    * パーツの式
    */
-  expr: Maybe<Expr>;
+  readonly expr: Maybe<Expr>;
   /**
    * 所属しているプロジェクトのID
    */
-  projectId: ProjectId;
+  readonly projectId: ProjectId;
   /**
    * このパーツが作成された提案
    */
-  createSuggestionId: SuggestionId;
+  readonly createSuggestionId: SuggestionId;
   /**
    * 取得日時
    */
-  getTime: Time;
+  readonly getTime: Time;
 };
 
 /**
@@ -652,14 +672,18 @@ export type PartSnapshot = {
  */
 export type TypePartBody =
   | {
-      _: "Product";
-      typePartBodyProductMemberList: ReadonlyArray<TypePartBodyProductMember>;
+      readonly _: "Product";
+      readonly typePartBodyProductMemberList: ReadonlyArray<
+        TypePartBodyProductMember
+      >;
     }
   | {
-      _: "Sum";
-      typePartBodySumPatternList: ReadonlyArray<TypePartBodySumPattern>;
+      readonly _: "Sum";
+      readonly typePartBodySumPatternList: ReadonlyArray<
+        TypePartBodySumPattern
+      >;
     }
-  | { _: "Kernel"; typePartBodyKernel: TypePartBodyKernel };
+  | { readonly _: "Kernel"; readonly typePartBodyKernel: TypePartBodyKernel };
 
 /**
  * 直積型のメンバー
@@ -668,15 +692,15 @@ export type TypePartBodyProductMember = {
   /**
    * メンバー名
    */
-  name: string;
+  readonly name: string;
   /**
    * 説明文
    */
-  description: string;
+  readonly description: string;
   /**
    * メンバー値の型
    */
-  memberType: Type;
+  readonly memberType: Type;
 };
 
 /**
@@ -686,15 +710,15 @@ export type TypePartBodySumPattern = {
   /**
    * タグ名
    */
-  name: string;
+  readonly name: string;
   /**
    * 説明文
    */
-  description: string;
+  readonly description: string;
   /**
    * パラメーター
    */
-  parameter: Type;
+  readonly parameter: Type;
 };
 
 /**
@@ -706,56 +730,68 @@ export type TypePartBodyKernel = "Int32" | "List";
  * 型
  */
 export type Type =
-  | { _: "Function"; typeInputAndOutput: TypeInputAndOutput }
+  | { readonly _: "Function"; readonly typeInputAndOutput: TypeInputAndOutput }
   | {
-      _: "TypePartWithParameter";
-      typePartIdWithParameter: TypePartIdWithParameter;
+      readonly _: "TypePartWithParameter";
+      readonly typePartIdWithParameter: TypePartIdWithParameter;
     };
 
 export type TypeInputAndOutput = {
   /**
    * 入力の型
    */
-  inputType: Type;
+  readonly inputType: Type;
   /**
    * 出力の型
    */
-  outputType: Type;
+  readonly outputType: Type;
 };
 
 export type TypePartIdWithParameter = {
   /**
    * 型の参照
    */
-  typePartId: TypePartId;
+  readonly typePartId: TypePartId;
   /**
    * 型のパラメーター
    */
-  parameter: ReadonlyArray<Type>;
+  readonly parameter: ReadonlyArray<Type>;
 };
 
 /**
  * 式
  */
 export type Expr =
-  | { _: "Kernel"; kernelExpr: KernelExpr }
-  | { _: "Int32Literal"; int32: number }
-  | { _: "PartReference"; partId: PartId }
-  | { _: "LocalPartReference"; localPartReference: LocalPartReference }
-  | { _: "TagReference"; tagReference: TagReference }
-  | { _: "FunctionCall"; functionCall: FunctionCall }
-  | { _: "Lambda"; lambdaBranchList: ReadonlyArray<LambdaBranch> };
+  | { readonly _: "Kernel"; readonly kernelExpr: KernelExpr }
+  | { readonly _: "Int32Literal"; readonly int32: number }
+  | { readonly _: "PartReference"; readonly partId: PartId }
+  | {
+      readonly _: "LocalPartReference";
+      readonly localPartReference: LocalPartReference;
+    }
+  | { readonly _: "TagReference"; readonly tagReference: TagReference }
+  | { readonly _: "FunctionCall"; readonly functionCall: FunctionCall }
+  | {
+      readonly _: "Lambda";
+      readonly lambdaBranchList: ReadonlyArray<LambdaBranch>;
+    };
 
 /**
  * 評価しきった式
  */
 export type EvaluatedExpr =
-  | { _: "Kernel"; kernelExpr: KernelExpr }
-  | { _: "Int32"; int32: number }
-  | { _: "LocalPartReference"; localPartReference: LocalPartReference }
-  | { _: "TagReference"; tagReference: TagReference }
-  | { _: "Lambda"; lambdaBranchList: ReadonlyArray<LambdaBranch> }
-  | { _: "KernelCall"; kernelCall: KernelCall };
+  | { readonly _: "Kernel"; readonly kernelExpr: KernelExpr }
+  | { readonly _: "Int32"; readonly int32: number }
+  | {
+      readonly _: "LocalPartReference";
+      readonly localPartReference: LocalPartReference;
+    }
+  | { readonly _: "TagReference"; readonly tagReference: TagReference }
+  | {
+      readonly _: "Lambda";
+      readonly lambdaBranchList: ReadonlyArray<LambdaBranch>;
+    }
+  | { readonly _: "KernelCall"; readonly kernelCall: KernelCall };
 
 /**
  * 複数の引数が必要な内部関数の部分呼び出し
@@ -764,11 +800,11 @@ export type KernelCall = {
   /**
    * 関数
    */
-  kernel: KernelExpr;
+  readonly kernel: KernelExpr;
   /**
    * 呼び出すパラメーター
    */
-  expr: EvaluatedExpr;
+  readonly expr: EvaluatedExpr;
 };
 
 /**
@@ -783,11 +819,11 @@ export type LocalPartReference = {
   /**
    * ローカルパスが定義されているパーツのID
    */
-  partId: PartId;
+  readonly partId: PartId;
   /**
    * ローカルパーツID
    */
-  localPartId: LocalPartId;
+  readonly localPartId: LocalPartId;
 };
 
 /**
@@ -797,11 +833,11 @@ export type TagReference = {
   /**
    * 型ID
    */
-  typePartId: TypePartId;
+  readonly typePartId: TypePartId;
   /**
    * タグID
    */
-  tagId: TagId;
+  readonly tagId: TagId;
 };
 
 /**
@@ -811,11 +847,11 @@ export type FunctionCall = {
   /**
    * 関数
    */
-  function: Expr;
+  readonly function: Expr;
   /**
    * パラメーター
    */
-  parameter: Expr;
+  readonly parameter: Expr;
 };
 
 /**
@@ -825,26 +861,26 @@ export type LambdaBranch = {
   /**
    * 入力値の条件を書くところ. Just x
    */
-  condition: Condition;
+  readonly condition: Condition;
   /**
    * ブランチの説明
    */
-  description: string;
-  localPartList: ReadonlyArray<BranchPartDefinition>;
+  readonly description: string;
+  readonly localPartList: ReadonlyArray<BranchPartDefinition>;
   /**
    * 式
    */
-  expr: Maybe<Expr>;
+  readonly expr: Maybe<Expr>;
 };
 
 /**
  * ブランチの式を使う条件
  */
 export type Condition =
-  | { _: "ByTag"; conditionTag: ConditionTag }
-  | { _: "ByCapture"; conditionCapture: ConditionCapture }
-  | { _: "Any" }
-  | { _: "Int32"; int32: number };
+  | { readonly _: "ByTag"; readonly conditionTag: ConditionTag }
+  | { readonly _: "ByCapture"; readonly conditionCapture: ConditionCapture }
+  | { readonly _: "Any" }
+  | { readonly _: "Int32"; readonly int32: number };
 
 /**
  * タグによる条件
@@ -853,11 +889,11 @@ export type ConditionTag = {
   /**
    * タグ
    */
-  tag: TagId;
+  readonly tag: TagId;
   /**
    * パラメーター
    */
-  parameter: Maybe<Condition>;
+  readonly parameter: Maybe<Condition>;
 };
 
 /**
@@ -867,11 +903,11 @@ export type ConditionCapture = {
   /**
    * キャプチャパーツの名前
    */
-  name: string;
+  readonly name: string;
   /**
    * ローカルパーツId
    */
-  localPartId: LocalPartId;
+  readonly localPartId: LocalPartId;
 };
 
 /**
@@ -881,34 +917,34 @@ export type BranchPartDefinition = {
   /**
    * ローカルパーツID
    */
-  localPartId: LocalPartId;
+  readonly localPartId: LocalPartId;
   /**
    * ブランチパーツの名前
    */
-  name: string;
+  readonly name: string;
   /**
    * ブランチパーツの説明
    */
-  description: string;
+  readonly description: string;
   /**
    * ローカルパーツの型
    */
-  type: Type;
+  readonly type: Type;
   /**
    * ローカルパーツの式
    */
-  expr: Expr;
+  readonly expr: Expr;
 };
 
 export type EvaluateExprError =
-  | { _: "NeedPartDefinition"; partId: PartId }
-  | { _: "PartExprIsNothing"; partId: PartId }
+  | { readonly _: "NeedPartDefinition"; readonly partId: PartId }
+  | { readonly _: "PartExprIsNothing"; readonly partId: PartId }
   | {
-      _: "CannotFindLocalPartDefinition";
-      localPartReference: LocalPartReference;
+      readonly _: "CannotFindLocalPartDefinition";
+      readonly localPartReference: LocalPartReference;
     }
-  | { _: "TypeError"; typeError: TypeError }
-  | { _: "NotSupported" };
+  | { readonly _: "TypeError"; readonly typeError: TypeError }
+  | { readonly _: "NotSupported" };
 
 /**
  * 型エラー
@@ -917,7 +953,7 @@ export type TypeError = {
   /**
    * 型エラーの説明
    */
-  message: string;
+  readonly message: string;
 };
 
 /**
@@ -927,11 +963,11 @@ export type CreateProjectParameter = {
   /**
    * プロジェクトを作るときのアカウント
    */
-  accessToken: AccessToken;
+  readonly accessToken: AccessToken;
   /**
    * プロジェクト名
    */
-  projectName: string;
+  readonly projectName: string;
 };
 
 /**
@@ -941,15 +977,15 @@ export type CreateIdeaParameter = {
   /**
    * プロジェクトを作るときのアカウント
    */
-  accessToken: AccessToken;
+  readonly accessToken: AccessToken;
   /**
    * アイデア名
    */
-  ideaName: string;
+  readonly ideaName: string;
   /**
    * 対象のプロジェクトID
    */
-  projectId: ProjectId;
+  readonly projectId: ProjectId;
 };
 
 /**
@@ -959,15 +995,15 @@ export type AddCommentParameter = {
   /**
    * プロジェクトを作るときのアカウント
    */
-  accessToken: AccessToken;
+  readonly accessToken: AccessToken;
   /**
    * コメントを追加するアイデア
    */
-  ideaId: IdeaId;
+  readonly ideaId: IdeaId;
   /**
    * コメント本文
    */
-  comment: string;
+  readonly comment: string;
 };
 
 /**
@@ -977,11 +1013,11 @@ export type AddSuggestionParameter = {
   /**
    * 提案を作成するアカウント
    */
-  accessToken: AccessToken;
+  readonly accessToken: AccessToken;
   /**
    * 提案に関連付けられるアイデア
    */
-  ideaId: IdeaId;
+  readonly ideaId: IdeaId;
 };
 
 /**
@@ -991,23 +1027,23 @@ export type UpdateSuggestionParameter = {
   /**
    * 提案を更新するアカウント
    */
-  accessToken: AccessToken;
+  readonly accessToken: AccessToken;
   /**
    * 書き換える提案
    */
-  suggestionId: SuggestionId;
+  readonly suggestionId: SuggestionId;
   /**
    * 提案の名前
    */
-  name: string;
+  readonly name: string;
   /**
    * 変更理由
    */
-  reason: string;
+  readonly reason: string;
   /**
    * 提案の変更
    */
-  changeList: ReadonlyArray<Change>;
+  readonly changeList: ReadonlyArray<Change>;
 };
 
 /**
@@ -1017,32 +1053,32 @@ export type AccessTokenAndSuggestionId = {
   /**
    * アクセストークン
    */
-  accessToken: AccessToken;
+  readonly accessToken: AccessToken;
   /**
    * SuggestionId
    */
-  suggestionId: SuggestionId;
+  readonly suggestionId: SuggestionId;
 };
 
-export type ProjectId = string & { _projectId: never };
+export type ProjectId = string & { readonly _projectId: never };
 
-export type UserId = string & { _userId: never };
+export type UserId = string & { readonly _userId: never };
 
-export type IdeaId = string & { _ideaId: never };
+export type IdeaId = string & { readonly _ideaId: never };
 
-export type SuggestionId = string & { _suggestionId: never };
+export type SuggestionId = string & { readonly _suggestionId: never };
 
-export type ImageToken = string & { _imageToken: never };
+export type ImageToken = string & { readonly _imageToken: never };
 
-export type PartId = string & { _partId: never };
+export type PartId = string & { readonly _partId: never };
 
-export type TypePartId = string & { _typePartId: never };
+export type TypePartId = string & { readonly _typePartId: never };
 
-export type LocalPartId = string & { _localPartId: never };
+export type LocalPartId = string & { readonly _localPartId: never };
 
-export type TagId = string & { _tagId: never };
+export type TagId = string & { readonly _tagId: never };
 
-export type AccessToken = string & { _accessToken: never };
+export type AccessToken = string & { readonly _accessToken: never };
 
 export const maybeJust = <T>(value: T): Maybe<T> => ({
   _: "Just",
@@ -2328,7 +2364,7 @@ export const encodeAccessTokenAndSuggestionId = (
 export const decodeInt32 = (
   index: number,
   binary: Uint8Array
-): { result: number; nextIndex: number } => {
+): { readonly result: number; readonly nextIndex: number } => {
   let result: number = 0;
   let offset: number = 0;
   while (true) {
@@ -2355,11 +2391,11 @@ export const decodeInt32 = (
 export const decodeString = (
   index: number,
   binary: Uint8Array
-): { result: string; nextIndex: number } => {
-  const length: { result: number; nextIndex: number } = decodeInt32(
-    index,
-    binary
-  );
+): { readonly result: string; readonly nextIndex: number } => {
+  const length: {
+    readonly result: number;
+    readonly nextIndex: number;
+  } = decodeInt32(index, binary);
   const nextIndex: number = length.nextIndex + length.result;
   const textBinary: Uint8Array = binary.slice(length.nextIndex, nextIndex);
   const isBrowser: boolean =
@@ -2383,7 +2419,7 @@ export const decodeString = (
 export const decodeBool = (
   index: number,
   binary: Uint8Array
-): { result: boolean; nextIndex: number } => ({
+): { readonly result: boolean; readonly nextIndex: number } => ({
   result: binary[index] !== 0,
   nextIndex: index + 1,
 });
@@ -2395,11 +2431,11 @@ export const decodeBool = (
 export const decodeBinary = (
   index: number,
   binary: Uint8Array
-): { result: Uint8Array; nextIndex: number } => {
-  const length: { result: number; nextIndex: number } = decodeInt32(
-    index,
-    binary
-  );
+): { readonly result: Uint8Array; readonly nextIndex: number } => {
+  const length: {
+    readonly result: number;
+    readonly nextIndex: number;
+  } = decodeInt32(index, binary);
   const nextIndex: number = length.nextIndex + length.result;
   return {
     result: binary.slice(length.nextIndex, nextIndex),
@@ -2408,25 +2444,28 @@ export const decodeBinary = (
 };
 
 export const decodeList = <T>(
-  decodeFunction: (a: number, b: Uint8Array) => { result: T; nextIndex: number }
+  decodeFunction: (
+    a: number,
+    b: Uint8Array
+  ) => { readonly result: T; readonly nextIndex: number }
 ): ((
   a: number,
   b: Uint8Array
-) => { result: ReadonlyArray<T>; nextIndex: number }) => (
+) => { readonly result: ReadonlyArray<T>; readonly nextIndex: number }) => (
   index: number,
   binary: Uint8Array
-): { result: ReadonlyArray<T>; nextIndex: number } => {
-  const lengthResult: { result: number; nextIndex: number } = decodeInt32(
-    index,
-    binary
-  );
+): { readonly result: ReadonlyArray<T>; readonly nextIndex: number } => {
+  const lengthResult: {
+    readonly result: number;
+    readonly nextIndex: number;
+  } = decodeInt32(index, binary);
   index = lengthResult.nextIndex;
   const result: Array<T> = [];
   for (let i = 0; i < lengthResult.result; i += 1) {
-    const resultAndNextIndex: { result: T; nextIndex: number } = decodeFunction(
-      index,
-      binary
-    );
+    const resultAndNextIndex: {
+      readonly result: T;
+      readonly nextIndex: number;
+    } = decodeFunction(index, binary);
     result.push(resultAndNextIndex.result);
     index = resultAndNextIndex.nextIndex;
   }
@@ -2434,20 +2473,26 @@ export const decodeList = <T>(
 };
 
 export const decodeMaybe = <T>(
-  decodeFunction: (a: number, b: Uint8Array) => { result: T; nextIndex: number }
-): ((a: number, b: Uint8Array) => { result: Maybe<T>; nextIndex: number }) => (
+  decodeFunction: (
+    a: number,
+    b: Uint8Array
+  ) => { readonly result: T; readonly nextIndex: number }
+): ((
+  a: number,
+  b: Uint8Array
+) => { readonly result: Maybe<T>; readonly nextIndex: number }) => (
   index: number,
   binary: Uint8Array
-): { result: Maybe<T>; nextIndex: number } => {
+): { readonly result: Maybe<T>; readonly nextIndex: number } => {
   const patternIndexAndNextIndex: {
-    result: number;
-    nextIndex: number;
+    readonly result: number;
+    readonly nextIndex: number;
   } = decodeInt32(index, binary);
   if (patternIndexAndNextIndex.result === 0) {
-    const valueAndNextIndex: { result: T; nextIndex: number } = decodeFunction(
-      patternIndexAndNextIndex.nextIndex,
-      binary
-    );
+    const valueAndNextIndex: {
+      readonly result: T;
+      readonly nextIndex: number;
+    } = decodeFunction(patternIndexAndNextIndex.nextIndex, binary);
     return {
       result: maybeJust(valueAndNextIndex.result),
       nextIndex: valueAndNextIndex.nextIndex,
@@ -2468,27 +2513,27 @@ export const decodeResult = <ok, error>(
   okDecodeFunction: (
     a: number,
     b: Uint8Array
-  ) => { result: ok; nextIndex: number },
+  ) => { readonly result: ok; readonly nextIndex: number },
   errorDecodeFunction: (
     a: number,
     b: Uint8Array
-  ) => { result: error; nextIndex: number }
+  ) => { readonly result: error; readonly nextIndex: number }
 ): ((
   a: number,
   b: Uint8Array
-) => { result: Result<ok, error>; nextIndex: number }) => (
+) => { readonly result: Result<ok, error>; readonly nextIndex: number }) => (
   index: number,
   binary: Uint8Array
-): { result: Result<ok, error>; nextIndex: number } => {
+): { readonly result: Result<ok, error>; readonly nextIndex: number } => {
   const patternIndexAndNextIndex: {
-    result: number;
-    nextIndex: number;
+    readonly result: number;
+    readonly nextIndex: number;
   } = decodeInt32(index, binary);
   if (patternIndexAndNextIndex.result === 0) {
-    const okAndNextIndex: { result: ok; nextIndex: number } = okDecodeFunction(
-      patternIndexAndNextIndex.nextIndex,
-      binary
-    );
+    const okAndNextIndex: {
+      readonly result: ok;
+      readonly nextIndex: number;
+    } = okDecodeFunction(patternIndexAndNextIndex.nextIndex, binary);
     return {
       result: resultOk(okAndNextIndex.result),
       nextIndex: okAndNextIndex.nextIndex,
@@ -2496,8 +2541,8 @@ export const decodeResult = <ok, error>(
   }
   if (patternIndexAndNextIndex.result === 1) {
     const errorAndNextIndex: {
-      result: error;
-      nextIndex: number;
+      readonly result: error;
+      readonly nextIndex: number;
     } = errorDecodeFunction(patternIndexAndNextIndex.nextIndex, binary);
     return {
       result: resultError(errorAndNextIndex.result),
@@ -2516,7 +2561,7 @@ export const decodeResult = <ok, error>(
 export const decodeId = (
   index: number,
   binary: Uint8Array
-): { result: string; nextIndex: number } => ({
+): { readonly result: string; readonly nextIndex: number } => ({
   result: [...binary.slice(index, index + 16)]
     .map((n: number): string => n.toString(16).padStart(2, "0"))
     .join(""),
@@ -2530,7 +2575,7 @@ export const decodeId = (
 export const decodeToken = (
   index: number,
   binary: Uint8Array
-): { result: string; nextIndex: number } => ({
+): { readonly result: string; readonly nextIndex: number } => ({
   result: [...binary.slice(index, index + 32)]
     .map((n: number): string => n.toString(16).padStart(2, "0"))
     .join(""),
@@ -2544,14 +2589,14 @@ export const decodeToken = (
 export const decodeTime = (
   index: number,
   binary: Uint8Array
-): { result: Time; nextIndex: number } => {
-  const dayAndNextIndex: { result: number; nextIndex: number } = decodeInt32(
-    index,
-    binary
-  );
+): { readonly result: Time; readonly nextIndex: number } => {
+  const dayAndNextIndex: {
+    readonly result: number;
+    readonly nextIndex: number;
+  } = decodeInt32(index, binary);
   const millisecondAndNextIndex: {
-    result: number;
-    nextIndex: number;
+    readonly result: number;
+    readonly nextIndex: number;
   } = decodeInt32(dayAndNextIndex.nextIndex, binary);
   return {
     result: {
@@ -2569,14 +2614,17 @@ export const decodeTime = (
 export const decodeRequestLogInUrlRequestData = (
   index: number,
   binary: Uint8Array
-): { result: RequestLogInUrlRequestData; nextIndex: number } => {
+): {
+  readonly result: RequestLogInUrlRequestData;
+  readonly nextIndex: number;
+} => {
   const openIdConnectProviderAndNextIndex: {
-    result: OpenIdConnectProvider;
-    nextIndex: number;
+    readonly result: OpenIdConnectProvider;
+    readonly nextIndex: number;
   } = decodeOpenIdConnectProvider(index, binary);
   const urlDataAndNextIndex: {
-    result: UrlData;
-    nextIndex: number;
+    readonly result: UrlData;
+    readonly nextIndex: number;
   } = decodeUrlData(openIdConnectProviderAndNextIndex.nextIndex, binary);
   return {
     result: {
@@ -2594,11 +2642,11 @@ export const decodeRequestLogInUrlRequestData = (
 export const decodeOpenIdConnectProvider = (
   index: number,
   binary: Uint8Array
-): { result: OpenIdConnectProvider; nextIndex: number } => {
-  const patternIndex: { result: number; nextIndex: number } = decodeInt32(
-    index,
-    binary
-  );
+): { readonly result: OpenIdConnectProvider; readonly nextIndex: number } => {
+  const patternIndex: {
+    readonly result: number;
+    readonly nextIndex: number;
+  } = decodeInt32(index, binary);
   if (patternIndex.result === 0) {
     return { result: "Google", nextIndex: patternIndex.nextIndex };
   }
@@ -2615,18 +2663,18 @@ export const decodeOpenIdConnectProvider = (
 export const decodeUrlData = (
   index: number,
   binary: Uint8Array
-): { result: UrlData; nextIndex: number } => {
+): { readonly result: UrlData; readonly nextIndex: number } => {
   const clientModeAndNextIndex: {
-    result: ClientMode;
-    nextIndex: number;
+    readonly result: ClientMode;
+    readonly nextIndex: number;
   } = decodeClientMode(index, binary);
   const locationAndNextIndex: {
-    result: Location;
-    nextIndex: number;
+    readonly result: Location;
+    readonly nextIndex: number;
   } = decodeLocation(clientModeAndNextIndex.nextIndex, binary);
   const languageAndNextIndex: {
-    result: Language;
-    nextIndex: number;
+    readonly result: Language;
+    readonly nextIndex: number;
   } = decodeLanguage(locationAndNextIndex.nextIndex, binary);
   return {
     result: {
@@ -2645,11 +2693,11 @@ export const decodeUrlData = (
 export const decodeClientMode = (
   index: number,
   binary: Uint8Array
-): { result: ClientMode; nextIndex: number } => {
-  const patternIndex: { result: number; nextIndex: number } = decodeInt32(
-    index,
-    binary
-  );
+): { readonly result: ClientMode; readonly nextIndex: number } => {
+  const patternIndex: {
+    readonly result: number;
+    readonly nextIndex: number;
+  } = decodeInt32(index, binary);
   if (patternIndex.result === 0) {
     return { result: "DebugMode", nextIndex: patternIndex.nextIndex };
   }
@@ -2666,11 +2714,11 @@ export const decodeClientMode = (
 export const decodeLocation = (
   index: number,
   binary: Uint8Array
-): { result: Location; nextIndex: number } => {
-  const patternIndex: { result: number; nextIndex: number } = decodeInt32(
-    index,
-    binary
-  );
+): { readonly result: Location; readonly nextIndex: number } => {
+  const patternIndex: {
+    readonly result: number;
+    readonly nextIndex: number;
+  } = decodeInt32(index, binary);
   if (patternIndex.result === 0) {
     return { result: locationHome, nextIndex: patternIndex.nextIndex };
   }
@@ -2678,10 +2726,13 @@ export const decodeLocation = (
     return { result: locationCreateProject, nextIndex: patternIndex.nextIndex };
   }
   if (patternIndex.result === 2) {
-    const result: { result: ProjectId; nextIndex: number } = (decodeId as (
+    const result: {
+      readonly result: ProjectId;
+      readonly nextIndex: number;
+    } = (decodeId as (
       a: number,
       b: Uint8Array
-    ) => { result: ProjectId; nextIndex: number })(
+    ) => { readonly result: ProjectId; readonly nextIndex: number })(
       patternIndex.nextIndex,
       binary
     );
@@ -2691,17 +2742,26 @@ export const decodeLocation = (
     };
   }
   if (patternIndex.result === 3) {
-    const result: { result: UserId; nextIndex: number } = (decodeId as (
+    const result: {
+      readonly result: UserId;
+      readonly nextIndex: number;
+    } = (decodeId as (
       a: number,
       b: Uint8Array
-    ) => { result: UserId; nextIndex: number })(patternIndex.nextIndex, binary);
+    ) => { readonly result: UserId; readonly nextIndex: number })(
+      patternIndex.nextIndex,
+      binary
+    );
     return { result: locationUser(result.result), nextIndex: result.nextIndex };
   }
   if (patternIndex.result === 4) {
-    const result: { result: ProjectId; nextIndex: number } = (decodeId as (
+    const result: {
+      readonly result: ProjectId;
+      readonly nextIndex: number;
+    } = (decodeId as (
       a: number,
       b: Uint8Array
-    ) => { result: ProjectId; nextIndex: number })(
+    ) => { readonly result: ProjectId; readonly nextIndex: number })(
       patternIndex.nextIndex,
       binary
     );
@@ -2711,17 +2771,26 @@ export const decodeLocation = (
     };
   }
   if (patternIndex.result === 5) {
-    const result: { result: IdeaId; nextIndex: number } = (decodeId as (
+    const result: {
+      readonly result: IdeaId;
+      readonly nextIndex: number;
+    } = (decodeId as (
       a: number,
       b: Uint8Array
-    ) => { result: IdeaId; nextIndex: number })(patternIndex.nextIndex, binary);
+    ) => { readonly result: IdeaId; readonly nextIndex: number })(
+      patternIndex.nextIndex,
+      binary
+    );
     return { result: locationIdea(result.result), nextIndex: result.nextIndex };
   }
   if (patternIndex.result === 6) {
-    const result: { result: SuggestionId; nextIndex: number } = (decodeId as (
+    const result: {
+      readonly result: SuggestionId;
+      readonly nextIndex: number;
+    } = (decodeId as (
       a: number,
       b: Uint8Array
-    ) => { result: SuggestionId; nextIndex: number })(
+    ) => { readonly result: SuggestionId; readonly nextIndex: number })(
       patternIndex.nextIndex,
       binary
     );
@@ -2740,11 +2809,11 @@ export const decodeLocation = (
 export const decodeLanguage = (
   index: number,
   binary: Uint8Array
-): { result: Language; nextIndex: number } => {
-  const patternIndex: { result: number; nextIndex: number } = decodeInt32(
-    index,
-    binary
-  );
+): { readonly result: Language; readonly nextIndex: number } => {
+  const patternIndex: {
+    readonly result: number;
+    readonly nextIndex: number;
+  } = decodeInt32(index, binary);
   if (patternIndex.result === 0) {
     return { result: "Japanese", nextIndex: patternIndex.nextIndex };
   }
@@ -2764,60 +2833,60 @@ export const decodeLanguage = (
 export const decodeUserSnapshot = (
   index: number,
   binary: Uint8Array
-): { result: UserSnapshot; nextIndex: number } => {
-  const nameAndNextIndex: { result: string; nextIndex: number } = decodeString(
-    index,
-    binary
-  );
+): { readonly result: UserSnapshot; readonly nextIndex: number } => {
+  const nameAndNextIndex: {
+    readonly result: string;
+    readonly nextIndex: number;
+  } = decodeString(index, binary);
   const imageHashAndNextIndex: {
-    result: ImageToken;
-    nextIndex: number;
+    readonly result: ImageToken;
+    readonly nextIndex: number;
   } = (decodeToken as (
     a: number,
     b: Uint8Array
-  ) => { result: ImageToken; nextIndex: number })(
+  ) => { readonly result: ImageToken; readonly nextIndex: number })(
     nameAndNextIndex.nextIndex,
     binary
   );
   const introductionAndNextIndex: {
-    result: string;
-    nextIndex: number;
+    readonly result: string;
+    readonly nextIndex: number;
   } = decodeString(imageHashAndNextIndex.nextIndex, binary);
   const createTimeAndNextIndex: {
-    result: Time;
-    nextIndex: number;
+    readonly result: Time;
+    readonly nextIndex: number;
   } = decodeTime(introductionAndNextIndex.nextIndex, binary);
   const likeProjectIdListAndNextIndex: {
-    result: ReadonlyArray<ProjectId>;
-    nextIndex: number;
+    readonly result: ReadonlyArray<ProjectId>;
+    readonly nextIndex: number;
   } = decodeList(
     decodeId as (
       a: number,
       b: Uint8Array
-    ) => { result: ProjectId; nextIndex: number }
+    ) => { readonly result: ProjectId; readonly nextIndex: number }
   )(createTimeAndNextIndex.nextIndex, binary);
   const developProjectIdListAndNextIndex: {
-    result: ReadonlyArray<ProjectId>;
-    nextIndex: number;
+    readonly result: ReadonlyArray<ProjectId>;
+    readonly nextIndex: number;
   } = decodeList(
     decodeId as (
       a: number,
       b: Uint8Array
-    ) => { result: ProjectId; nextIndex: number }
+    ) => { readonly result: ProjectId; readonly nextIndex: number }
   )(likeProjectIdListAndNextIndex.nextIndex, binary);
   const commentIdeaIdListAndNextIndex: {
-    result: ReadonlyArray<IdeaId>;
-    nextIndex: number;
+    readonly result: ReadonlyArray<IdeaId>;
+    readonly nextIndex: number;
   } = decodeList(
     decodeId as (
       a: number,
       b: Uint8Array
-    ) => { result: IdeaId; nextIndex: number }
+    ) => { readonly result: IdeaId; readonly nextIndex: number }
   )(developProjectIdListAndNextIndex.nextIndex, binary);
-  const getTimeAndNextIndex: { result: Time; nextIndex: number } = decodeTime(
-    commentIdeaIdListAndNextIndex.nextIndex,
-    binary
-  );
+  const getTimeAndNextIndex: {
+    readonly result: Time;
+    readonly nextIndex: number;
+  } = decodeTime(commentIdeaIdListAndNextIndex.nextIndex, binary);
   return {
     result: {
       name: nameAndNextIndex.result,
@@ -2840,14 +2909,17 @@ export const decodeUserSnapshot = (
 export const decodeUserSnapshotAndId = (
   index: number,
   binary: Uint8Array
-): { result: UserSnapshotAndId; nextIndex: number } => {
-  const idAndNextIndex: { result: UserId; nextIndex: number } = (decodeId as (
+): { readonly result: UserSnapshotAndId; readonly nextIndex: number } => {
+  const idAndNextIndex: {
+    readonly result: UserId;
+    readonly nextIndex: number;
+  } = (decodeId as (
     a: number,
     b: Uint8Array
-  ) => { result: UserId; nextIndex: number })(index, binary);
+  ) => { readonly result: UserId; readonly nextIndex: number })(index, binary);
   const snapshotAndNextIndex: {
-    result: UserSnapshot;
-    nextIndex: number;
+    readonly result: UserSnapshot;
+    readonly nextIndex: number;
   } = decodeUserSnapshot(idAndNextIndex.nextIndex, binary);
   return {
     result: {
@@ -2865,14 +2937,17 @@ export const decodeUserSnapshotAndId = (
 export const decodeUserResponse = (
   index: number,
   binary: Uint8Array
-): { result: UserResponse; nextIndex: number } => {
-  const idAndNextIndex: { result: UserId; nextIndex: number } = (decodeId as (
+): { readonly result: UserResponse; readonly nextIndex: number } => {
+  const idAndNextIndex: {
+    readonly result: UserId;
+    readonly nextIndex: number;
+  } = (decodeId as (
     a: number,
     b: Uint8Array
-  ) => { result: UserId; nextIndex: number })(index, binary);
+  ) => { readonly result: UserId; readonly nextIndex: number })(index, binary);
   const snapshotMaybeAndNextIndex: {
-    result: Maybe<UserSnapshot>;
-    nextIndex: number;
+    readonly result: Maybe<UserSnapshot>;
+    readonly nextIndex: number;
   } = decodeMaybe(decodeUserSnapshot)(idAndNextIndex.nextIndex, binary);
   return {
     result: {
@@ -2890,70 +2965,70 @@ export const decodeUserResponse = (
 export const decodeProjectSnapshot = (
   index: number,
   binary: Uint8Array
-): { result: ProjectSnapshot; nextIndex: number } => {
-  const nameAndNextIndex: { result: string; nextIndex: number } = decodeString(
-    index,
-    binary
-  );
+): { readonly result: ProjectSnapshot; readonly nextIndex: number } => {
+  const nameAndNextIndex: {
+    readonly result: string;
+    readonly nextIndex: number;
+  } = decodeString(index, binary);
   const iconHashAndNextIndex: {
-    result: ImageToken;
-    nextIndex: number;
+    readonly result: ImageToken;
+    readonly nextIndex: number;
   } = (decodeToken as (
     a: number,
     b: Uint8Array
-  ) => { result: ImageToken; nextIndex: number })(
+  ) => { readonly result: ImageToken; readonly nextIndex: number })(
     nameAndNextIndex.nextIndex,
     binary
   );
   const imageHashAndNextIndex: {
-    result: ImageToken;
-    nextIndex: number;
+    readonly result: ImageToken;
+    readonly nextIndex: number;
   } = (decodeToken as (
     a: number,
     b: Uint8Array
-  ) => { result: ImageToken; nextIndex: number })(
+  ) => { readonly result: ImageToken; readonly nextIndex: number })(
     iconHashAndNextIndex.nextIndex,
     binary
   );
   const createTimeAndNextIndex: {
-    result: Time;
-    nextIndex: number;
+    readonly result: Time;
+    readonly nextIndex: number;
   } = decodeTime(imageHashAndNextIndex.nextIndex, binary);
   const createUserAndNextIndex: {
-    result: UserId;
-    nextIndex: number;
+    readonly result: UserId;
+    readonly nextIndex: number;
   } = (decodeId as (
     a: number,
     b: Uint8Array
-  ) => { result: UserId; nextIndex: number })(
+  ) => { readonly result: UserId; readonly nextIndex: number })(
     createTimeAndNextIndex.nextIndex,
     binary
   );
   const updateTimeAndNextIndex: {
-    result: Time;
-    nextIndex: number;
+    readonly result: Time;
+    readonly nextIndex: number;
   } = decodeTime(createUserAndNextIndex.nextIndex, binary);
-  const getTimeAndNextIndex: { result: Time; nextIndex: number } = decodeTime(
-    updateTimeAndNextIndex.nextIndex,
-    binary
-  );
+  const getTimeAndNextIndex: {
+    readonly result: Time;
+    readonly nextIndex: number;
+  } = decodeTime(updateTimeAndNextIndex.nextIndex, binary);
   const partIdListAndNextIndex: {
-    result: ReadonlyArray<PartId>;
-    nextIndex: number;
+    readonly result: ReadonlyArray<PartId>;
+    readonly nextIndex: number;
   } = decodeList(
     decodeId as (
       a: number,
       b: Uint8Array
-    ) => { result: PartId; nextIndex: number }
+    ) => { readonly result: PartId; readonly nextIndex: number }
   )(getTimeAndNextIndex.nextIndex, binary);
   const typePartIdListAndNextIndex: {
-    result: ReadonlyArray<TypePartId>;
-    nextIndex: number;
+    readonly result: ReadonlyArray<TypePartId>;
+    readonly nextIndex: number;
   } = decodeList(
     decodeId as (
       a: number,
       b: Uint8Array
-    ) => { result: TypePartId; nextIndex: number }
+    ) => { readonly result: TypePartId; readonly nextIndex: number }
   )(partIdListAndNextIndex.nextIndex, binary);
   return {
     result: {
@@ -2978,17 +3053,20 @@ export const decodeProjectSnapshot = (
 export const decodeProjectSnapshotAndId = (
   index: number,
   binary: Uint8Array
-): { result: ProjectSnapshotAndId; nextIndex: number } => {
+): { readonly result: ProjectSnapshotAndId; readonly nextIndex: number } => {
   const idAndNextIndex: {
-    result: ProjectId;
-    nextIndex: number;
+    readonly result: ProjectId;
+    readonly nextIndex: number;
   } = (decodeId as (
     a: number,
     b: Uint8Array
-  ) => { result: ProjectId; nextIndex: number })(index, binary);
+  ) => { readonly result: ProjectId; readonly nextIndex: number })(
+    index,
+    binary
+  );
   const snapshotAndNextIndex: {
-    result: ProjectSnapshot;
-    nextIndex: number;
+    readonly result: ProjectSnapshot;
+    readonly nextIndex: number;
   } = decodeProjectSnapshot(idAndNextIndex.nextIndex, binary);
   return {
     result: {
@@ -3006,17 +3084,20 @@ export const decodeProjectSnapshotAndId = (
 export const decodeProjectResponse = (
   index: number,
   binary: Uint8Array
-): { result: ProjectResponse; nextIndex: number } => {
+): { readonly result: ProjectResponse; readonly nextIndex: number } => {
   const idAndNextIndex: {
-    result: ProjectId;
-    nextIndex: number;
+    readonly result: ProjectId;
+    readonly nextIndex: number;
   } = (decodeId as (
     a: number,
     b: Uint8Array
-  ) => { result: ProjectId; nextIndex: number })(index, binary);
+  ) => { readonly result: ProjectId; readonly nextIndex: number })(
+    index,
+    binary
+  );
   const snapshotMaybeAndNextIndex: {
-    result: Maybe<ProjectSnapshot>;
-    nextIndex: number;
+    readonly result: Maybe<ProjectSnapshot>;
+    readonly nextIndex: number;
   } = decodeMaybe(decodeProjectSnapshot)(idAndNextIndex.nextIndex, binary);
   return {
     result: {
@@ -3034,47 +3115,47 @@ export const decodeProjectResponse = (
 export const decodeIdeaSnapshot = (
   index: number,
   binary: Uint8Array
-): { result: IdeaSnapshot; nextIndex: number } => {
-  const nameAndNextIndex: { result: string; nextIndex: number } = decodeString(
-    index,
-    binary
-  );
+): { readonly result: IdeaSnapshot; readonly nextIndex: number } => {
+  const nameAndNextIndex: {
+    readonly result: string;
+    readonly nextIndex: number;
+  } = decodeString(index, binary);
   const createUserAndNextIndex: {
-    result: UserId;
-    nextIndex: number;
+    readonly result: UserId;
+    readonly nextIndex: number;
   } = (decodeId as (
     a: number,
     b: Uint8Array
-  ) => { result: UserId; nextIndex: number })(
+  ) => { readonly result: UserId; readonly nextIndex: number })(
     nameAndNextIndex.nextIndex,
     binary
   );
   const createTimeAndNextIndex: {
-    result: Time;
-    nextIndex: number;
+    readonly result: Time;
+    readonly nextIndex: number;
   } = decodeTime(createUserAndNextIndex.nextIndex, binary);
   const projectIdAndNextIndex: {
-    result: ProjectId;
-    nextIndex: number;
+    readonly result: ProjectId;
+    readonly nextIndex: number;
   } = (decodeId as (
     a: number,
     b: Uint8Array
-  ) => { result: ProjectId; nextIndex: number })(
+  ) => { readonly result: ProjectId; readonly nextIndex: number })(
     createTimeAndNextIndex.nextIndex,
     binary
   );
   const itemListAndNextIndex: {
-    result: ReadonlyArray<IdeaItem>;
-    nextIndex: number;
+    readonly result: ReadonlyArray<IdeaItem>;
+    readonly nextIndex: number;
   } = decodeList(decodeIdeaItem)(projectIdAndNextIndex.nextIndex, binary);
   const updateTimeAndNextIndex: {
-    result: Time;
-    nextIndex: number;
+    readonly result: Time;
+    readonly nextIndex: number;
   } = decodeTime(itemListAndNextIndex.nextIndex, binary);
-  const getTimeAndNextIndex: { result: Time; nextIndex: number } = decodeTime(
-    updateTimeAndNextIndex.nextIndex,
-    binary
-  );
+  const getTimeAndNextIndex: {
+    readonly result: Time;
+    readonly nextIndex: number;
+  } = decodeTime(updateTimeAndNextIndex.nextIndex, binary);
   return {
     result: {
       name: nameAndNextIndex.result,
@@ -3096,14 +3177,17 @@ export const decodeIdeaSnapshot = (
 export const decodeIdeaSnapshotAndId = (
   index: number,
   binary: Uint8Array
-): { result: IdeaSnapshotAndId; nextIndex: number } => {
-  const idAndNextIndex: { result: IdeaId; nextIndex: number } = (decodeId as (
+): { readonly result: IdeaSnapshotAndId; readonly nextIndex: number } => {
+  const idAndNextIndex: {
+    readonly result: IdeaId;
+    readonly nextIndex: number;
+  } = (decodeId as (
     a: number,
     b: Uint8Array
-  ) => { result: IdeaId; nextIndex: number })(index, binary);
+  ) => { readonly result: IdeaId; readonly nextIndex: number })(index, binary);
   const snapshotAndNextIndex: {
-    result: IdeaSnapshot;
-    nextIndex: number;
+    readonly result: IdeaSnapshot;
+    readonly nextIndex: number;
   } = decodeIdeaSnapshot(idAndNextIndex.nextIndex, binary);
   return {
     result: {
@@ -3121,14 +3205,17 @@ export const decodeIdeaSnapshotAndId = (
 export const decodeIdeaResponse = (
   index: number,
   binary: Uint8Array
-): { result: IdeaResponse; nextIndex: number } => {
-  const idAndNextIndex: { result: IdeaId; nextIndex: number } = (decodeId as (
+): { readonly result: IdeaResponse; readonly nextIndex: number } => {
+  const idAndNextIndex: {
+    readonly result: IdeaId;
+    readonly nextIndex: number;
+  } = (decodeId as (
     a: number,
     b: Uint8Array
-  ) => { result: IdeaId; nextIndex: number })(index, binary);
+  ) => { readonly result: IdeaId; readonly nextIndex: number })(index, binary);
   const snapshotMaybeAndNextIndex: {
-    result: Maybe<IdeaSnapshot>;
-    nextIndex: number;
+    readonly result: Maybe<IdeaSnapshot>;
+    readonly nextIndex: number;
   } = decodeMaybe(decodeIdeaSnapshot)(idAndNextIndex.nextIndex, binary);
   return {
     result: {
@@ -3146,17 +3233,23 @@ export const decodeIdeaResponse = (
 export const decodeIdeaListByProjectIdResponse = (
   index: number,
   binary: Uint8Array
-): { result: IdeaListByProjectIdResponse; nextIndex: number } => {
+): {
+  readonly result: IdeaListByProjectIdResponse;
+  readonly nextIndex: number;
+} => {
   const projectIdAndNextIndex: {
-    result: ProjectId;
-    nextIndex: number;
+    readonly result: ProjectId;
+    readonly nextIndex: number;
   } = (decodeId as (
     a: number,
     b: Uint8Array
-  ) => { result: ProjectId; nextIndex: number })(index, binary);
+  ) => { readonly result: ProjectId; readonly nextIndex: number })(
+    index,
+    binary
+  );
   const ideaSnapshotAndIdListAndNextIndex: {
-    result: ReadonlyArray<IdeaSnapshotAndId>;
-    nextIndex: number;
+    readonly result: ReadonlyArray<IdeaSnapshotAndId>;
+    readonly nextIndex: number;
   } = decodeList(decodeIdeaSnapshotAndId)(
     projectIdAndNextIndex.nextIndex,
     binary
@@ -3177,21 +3270,21 @@ export const decodeIdeaListByProjectIdResponse = (
 export const decodeIdeaItem = (
   index: number,
   binary: Uint8Array
-): { result: IdeaItem; nextIndex: number } => {
+): { readonly result: IdeaItem; readonly nextIndex: number } => {
   const createUserIdAndNextIndex: {
-    result: UserId;
-    nextIndex: number;
+    readonly result: UserId;
+    readonly nextIndex: number;
   } = (decodeId as (
     a: number,
     b: Uint8Array
-  ) => { result: UserId; nextIndex: number })(index, binary);
+  ) => { readonly result: UserId; readonly nextIndex: number })(index, binary);
   const createTimeAndNextIndex: {
-    result: Time;
-    nextIndex: number;
+    readonly result: Time;
+    readonly nextIndex: number;
   } = decodeTime(createUserIdAndNextIndex.nextIndex, binary);
   const bodyAndNextIndex: {
-    result: ItemBody;
-    nextIndex: number;
+    readonly result: ItemBody;
+    readonly nextIndex: number;
   } = decodeItemBody(createTimeAndNextIndex.nextIndex, binary);
   return {
     result: {
@@ -3210,26 +3303,29 @@ export const decodeIdeaItem = (
 export const decodeItemBody = (
   index: number,
   binary: Uint8Array
-): { result: ItemBody; nextIndex: number } => {
-  const patternIndex: { result: number; nextIndex: number } = decodeInt32(
-    index,
-    binary
-  );
+): { readonly result: ItemBody; readonly nextIndex: number } => {
+  const patternIndex: {
+    readonly result: number;
+    readonly nextIndex: number;
+  } = decodeInt32(index, binary);
   if (patternIndex.result === 0) {
-    const result: { result: string; nextIndex: number } = decodeString(
-      patternIndex.nextIndex,
-      binary
-    );
+    const result: {
+      readonly result: string;
+      readonly nextIndex: number;
+    } = decodeString(patternIndex.nextIndex, binary);
     return {
       result: itemBodyComment(result.result),
       nextIndex: result.nextIndex,
     };
   }
   if (patternIndex.result === 1) {
-    const result: { result: SuggestionId; nextIndex: number } = (decodeId as (
+    const result: {
+      readonly result: SuggestionId;
+      readonly nextIndex: number;
+    } = (decodeId as (
       a: number,
       b: Uint8Array
-    ) => { result: SuggestionId; nextIndex: number })(
+    ) => { readonly result: SuggestionId; readonly nextIndex: number })(
       patternIndex.nextIndex,
       binary
     );
@@ -3239,10 +3335,13 @@ export const decodeItemBody = (
     };
   }
   if (patternIndex.result === 2) {
-    const result: { result: SuggestionId; nextIndex: number } = (decodeId as (
+    const result: {
+      readonly result: SuggestionId;
+      readonly nextIndex: number;
+    } = (decodeId as (
       a: number,
       b: Uint8Array
-    ) => { result: SuggestionId; nextIndex: number })(
+    ) => { readonly result: SuggestionId; readonly nextIndex: number })(
       patternIndex.nextIndex,
       binary
     );
@@ -3252,10 +3351,13 @@ export const decodeItemBody = (
     };
   }
   if (patternIndex.result === 3) {
-    const result: { result: SuggestionId; nextIndex: number } = (decodeId as (
+    const result: {
+      readonly result: SuggestionId;
+      readonly nextIndex: number;
+    } = (decodeId as (
       a: number,
       b: Uint8Array
-    ) => { result: SuggestionId; nextIndex: number })(
+    ) => { readonly result: SuggestionId; readonly nextIndex: number })(
       patternIndex.nextIndex,
       binary
     );
@@ -3265,10 +3367,13 @@ export const decodeItemBody = (
     };
   }
   if (patternIndex.result === 4) {
-    const result: { result: SuggestionId; nextIndex: number } = (decodeId as (
+    const result: {
+      readonly result: SuggestionId;
+      readonly nextIndex: number;
+    } = (decodeId as (
       a: number,
       b: Uint8Array
-    ) => { result: SuggestionId; nextIndex: number })(
+    ) => { readonly result: SuggestionId; readonly nextIndex: number })(
       patternIndex.nextIndex,
       binary
     );
@@ -3278,10 +3383,13 @@ export const decodeItemBody = (
     };
   }
   if (patternIndex.result === 5) {
-    const result: { result: SuggestionId; nextIndex: number } = (decodeId as (
+    const result: {
+      readonly result: SuggestionId;
+      readonly nextIndex: number;
+    } = (decodeId as (
       a: number,
       b: Uint8Array
-    ) => { result: SuggestionId; nextIndex: number })(
+    ) => { readonly result: SuggestionId; readonly nextIndex: number })(
       patternIndex.nextIndex,
       binary
     );
@@ -3291,10 +3399,13 @@ export const decodeItemBody = (
     };
   }
   if (patternIndex.result === 6) {
-    const result: { result: SuggestionId; nextIndex: number } = (decodeId as (
+    const result: {
+      readonly result: SuggestionId;
+      readonly nextIndex: number;
+    } = (decodeId as (
       a: number,
       b: Uint8Array
-    ) => { result: SuggestionId; nextIndex: number })(
+    ) => { readonly result: SuggestionId; readonly nextIndex: number })(
       patternIndex.nextIndex,
       binary
     );
@@ -3313,61 +3424,61 @@ export const decodeItemBody = (
 export const decodeSuggestionSnapshot = (
   index: number,
   binary: Uint8Array
-): { result: SuggestionSnapshot; nextIndex: number } => {
-  const nameAndNextIndex: { result: string; nextIndex: number } = decodeString(
-    index,
-    binary
-  );
+): { readonly result: SuggestionSnapshot; readonly nextIndex: number } => {
+  const nameAndNextIndex: {
+    readonly result: string;
+    readonly nextIndex: number;
+  } = decodeString(index, binary);
   const createUserIdAndNextIndex: {
-    result: UserId;
-    nextIndex: number;
+    readonly result: UserId;
+    readonly nextIndex: number;
   } = (decodeId as (
     a: number,
     b: Uint8Array
-  ) => { result: UserId; nextIndex: number })(
+  ) => { readonly result: UserId; readonly nextIndex: number })(
     nameAndNextIndex.nextIndex,
     binary
   );
   const reasonAndNextIndex: {
-    result: string;
-    nextIndex: number;
+    readonly result: string;
+    readonly nextIndex: number;
   } = decodeString(createUserIdAndNextIndex.nextIndex, binary);
   const stateAndNextIndex: {
-    result: SuggestionState;
-    nextIndex: number;
+    readonly result: SuggestionState;
+    readonly nextIndex: number;
   } = decodeSuggestionState(reasonAndNextIndex.nextIndex, binary);
   const changeListAndNextIndex: {
-    result: ReadonlyArray<Change>;
-    nextIndex: number;
+    readonly result: ReadonlyArray<Change>;
+    readonly nextIndex: number;
   } = decodeList(decodeChange)(stateAndNextIndex.nextIndex, binary);
   const projectIdAndNextIndex: {
-    result: ProjectId;
-    nextIndex: number;
+    readonly result: ProjectId;
+    readonly nextIndex: number;
   } = (decodeId as (
     a: number,
     b: Uint8Array
-  ) => { result: ProjectId; nextIndex: number })(
+  ) => { readonly result: ProjectId; readonly nextIndex: number })(
     changeListAndNextIndex.nextIndex,
     binary
   );
   const ideaIdAndNextIndex: {
-    result: IdeaId;
-    nextIndex: number;
+    readonly result: IdeaId;
+    readonly nextIndex: number;
   } = (decodeId as (
     a: number,
     b: Uint8Array
-  ) => { result: IdeaId; nextIndex: number })(
+  ) => { readonly result: IdeaId; readonly nextIndex: number })(
     projectIdAndNextIndex.nextIndex,
     binary
   );
   const updateTimeAndNextIndex: {
-    result: Time;
-    nextIndex: number;
+    readonly result: Time;
+    readonly nextIndex: number;
   } = decodeTime(ideaIdAndNextIndex.nextIndex, binary);
-  const getTimeAndNextIndex: { result: Time; nextIndex: number } = decodeTime(
-    updateTimeAndNextIndex.nextIndex,
-    binary
-  );
+  const getTimeAndNextIndex: {
+    readonly result: Time;
+    readonly nextIndex: number;
+  } = decodeTime(updateTimeAndNextIndex.nextIndex, binary);
   return {
     result: {
       name: nameAndNextIndex.result,
@@ -3391,17 +3502,20 @@ export const decodeSuggestionSnapshot = (
 export const decodeSuggestionSnapshotAndId = (
   index: number,
   binary: Uint8Array
-): { result: SuggestionSnapshotAndId; nextIndex: number } => {
+): { readonly result: SuggestionSnapshotAndId; readonly nextIndex: number } => {
   const idAndNextIndex: {
-    result: SuggestionId;
-    nextIndex: number;
+    readonly result: SuggestionId;
+    readonly nextIndex: number;
   } = (decodeId as (
     a: number,
     b: Uint8Array
-  ) => { result: SuggestionId; nextIndex: number })(index, binary);
+  ) => { readonly result: SuggestionId; readonly nextIndex: number })(
+    index,
+    binary
+  );
   const snapshotAndNextIndex: {
-    result: SuggestionSnapshot;
-    nextIndex: number;
+    readonly result: SuggestionSnapshot;
+    readonly nextIndex: number;
   } = decodeSuggestionSnapshot(idAndNextIndex.nextIndex, binary);
   return {
     result: {
@@ -3419,17 +3533,20 @@ export const decodeSuggestionSnapshotAndId = (
 export const decodeSuggestionResponse = (
   index: number,
   binary: Uint8Array
-): { result: SuggestionResponse; nextIndex: number } => {
+): { readonly result: SuggestionResponse; readonly nextIndex: number } => {
   const idAndNextIndex: {
-    result: SuggestionId;
-    nextIndex: number;
+    readonly result: SuggestionId;
+    readonly nextIndex: number;
   } = (decodeId as (
     a: number,
     b: Uint8Array
-  ) => { result: SuggestionId; nextIndex: number })(index, binary);
+  ) => { readonly result: SuggestionId; readonly nextIndex: number })(
+    index,
+    binary
+  );
   const snapshotMaybeAndNextIndex: {
-    result: Maybe<SuggestionSnapshot>;
-    nextIndex: number;
+    readonly result: Maybe<SuggestionSnapshot>;
+    readonly nextIndex: number;
   } = decodeMaybe(decodeSuggestionSnapshot)(idAndNextIndex.nextIndex, binary);
   return {
     result: {
@@ -3447,11 +3564,11 @@ export const decodeSuggestionResponse = (
 export const decodeSuggestionState = (
   index: number,
   binary: Uint8Array
-): { result: SuggestionState; nextIndex: number } => {
-  const patternIndex: { result: number; nextIndex: number } = decodeInt32(
-    index,
-    binary
-  );
+): { readonly result: SuggestionState; readonly nextIndex: number } => {
+  const patternIndex: {
+    readonly result: number;
+    readonly nextIndex: number;
+  } = decodeInt32(index, binary);
   if (patternIndex.result === 0) {
     return { result: "Creating", nextIndex: patternIndex.nextIndex };
   }
@@ -3474,26 +3591,26 @@ export const decodeSuggestionState = (
 export const decodeChange = (
   index: number,
   binary: Uint8Array
-): { result: Change; nextIndex: number } => {
-  const patternIndex: { result: number; nextIndex: number } = decodeInt32(
-    index,
-    binary
-  );
+): { readonly result: Change; readonly nextIndex: number } => {
+  const patternIndex: {
+    readonly result: number;
+    readonly nextIndex: number;
+  } = decodeInt32(index, binary);
   if (patternIndex.result === 0) {
-    const result: { result: string; nextIndex: number } = decodeString(
-      patternIndex.nextIndex,
-      binary
-    );
+    const result: {
+      readonly result: string;
+      readonly nextIndex: number;
+    } = decodeString(patternIndex.nextIndex, binary);
     return {
       result: changeProjectName(result.result),
       nextIndex: result.nextIndex,
     };
   }
   if (patternIndex.result === 1) {
-    const result: { result: AddPart; nextIndex: number } = decodeAddPart(
-      patternIndex.nextIndex,
-      binary
-    );
+    const result: {
+      readonly result: AddPart;
+      readonly nextIndex: number;
+    } = decodeAddPart(patternIndex.nextIndex, binary);
     return {
       result: changeAddPart(result.result),
       nextIndex: result.nextIndex,
@@ -3509,22 +3626,22 @@ export const decodeChange = (
 export const decodeAddPart = (
   index: number,
   binary: Uint8Array
-): { result: AddPart; nextIndex: number } => {
-  const nameAndNextIndex: { result: string; nextIndex: number } = decodeString(
-    index,
-    binary
-  );
+): { readonly result: AddPart; readonly nextIndex: number } => {
+  const nameAndNextIndex: {
+    readonly result: string;
+    readonly nextIndex: number;
+  } = decodeString(index, binary);
   const descriptionAndNextIndex: {
-    result: string;
-    nextIndex: number;
+    readonly result: string;
+    readonly nextIndex: number;
   } = decodeString(nameAndNextIndex.nextIndex, binary);
   const typeAndNextIndex: {
-    result: SuggestionType;
-    nextIndex: number;
+    readonly result: SuggestionType;
+    readonly nextIndex: number;
   } = decodeSuggestionType(descriptionAndNextIndex.nextIndex, binary);
   const exprAndNextIndex: {
-    result: SuggestionExpr;
-    nextIndex: number;
+    readonly result: SuggestionExpr;
+    readonly nextIndex: number;
   } = decodeSuggestionExpr(typeAndNextIndex.nextIndex, binary);
   return {
     result: {
@@ -3544,15 +3661,15 @@ export const decodeAddPart = (
 export const decodeSuggestionType = (
   index: number,
   binary: Uint8Array
-): { result: SuggestionType; nextIndex: number } => {
-  const patternIndex: { result: number; nextIndex: number } = decodeInt32(
-    index,
-    binary
-  );
+): { readonly result: SuggestionType; readonly nextIndex: number } => {
+  const patternIndex: {
+    readonly result: number;
+    readonly nextIndex: number;
+  } = decodeInt32(index, binary);
   if (patternIndex.result === 0) {
     const result: {
-      result: SuggestionTypeInputAndOutput;
-      nextIndex: number;
+      readonly result: SuggestionTypeInputAndOutput;
+      readonly nextIndex: number;
     } = decodeSuggestionTypeInputAndOutput(patternIndex.nextIndex, binary);
     return {
       result: suggestionTypeFunction(result.result),
@@ -3561,8 +3678,8 @@ export const decodeSuggestionType = (
   }
   if (patternIndex.result === 1) {
     const result: {
-      result: TypePartWithSuggestionTypeParameter;
-      nextIndex: number;
+      readonly result: TypePartWithSuggestionTypeParameter;
+      readonly nextIndex: number;
     } = decodeTypePartWithSuggestionTypeParameter(
       patternIndex.nextIndex,
       binary
@@ -3574,8 +3691,8 @@ export const decodeSuggestionType = (
   }
   if (patternIndex.result === 2) {
     const result: {
-      result: SuggestionTypePartWithSuggestionTypeParameter;
-      nextIndex: number;
+      readonly result: SuggestionTypePartWithSuggestionTypeParameter;
+      readonly nextIndex: number;
     } = decodeSuggestionTypePartWithSuggestionTypeParameter(
       patternIndex.nextIndex,
       binary
@@ -3595,14 +3712,17 @@ export const decodeSuggestionType = (
 export const decodeSuggestionTypeInputAndOutput = (
   index: number,
   binary: Uint8Array
-): { result: SuggestionTypeInputAndOutput; nextIndex: number } => {
+): {
+  readonly result: SuggestionTypeInputAndOutput;
+  readonly nextIndex: number;
+} => {
   const inputTypeAndNextIndex: {
-    result: SuggestionType;
-    nextIndex: number;
+    readonly result: SuggestionType;
+    readonly nextIndex: number;
   } = decodeSuggestionType(index, binary);
   const outputTypeAndNextIndex: {
-    result: SuggestionType;
-    nextIndex: number;
+    readonly result: SuggestionType;
+    readonly nextIndex: number;
   } = decodeSuggestionType(inputTypeAndNextIndex.nextIndex, binary);
   return {
     result: {
@@ -3620,17 +3740,23 @@ export const decodeSuggestionTypeInputAndOutput = (
 export const decodeTypePartWithSuggestionTypeParameter = (
   index: number,
   binary: Uint8Array
-): { result: TypePartWithSuggestionTypeParameter; nextIndex: number } => {
+): {
+  readonly result: TypePartWithSuggestionTypeParameter;
+  readonly nextIndex: number;
+} => {
   const typePartIdAndNextIndex: {
-    result: TypePartId;
-    nextIndex: number;
+    readonly result: TypePartId;
+    readonly nextIndex: number;
   } = (decodeId as (
     a: number,
     b: Uint8Array
-  ) => { result: TypePartId; nextIndex: number })(index, binary);
+  ) => { readonly result: TypePartId; readonly nextIndex: number })(
+    index,
+    binary
+  );
   const parameterAndNextIndex: {
-    result: ReadonlyArray<SuggestionType>;
-    nextIndex: number;
+    readonly result: ReadonlyArray<SuggestionType>;
+    readonly nextIndex: number;
   } = decodeList(decodeSuggestionType)(
     typePartIdAndNextIndex.nextIndex,
     binary
@@ -3652,16 +3778,16 @@ export const decodeSuggestionTypePartWithSuggestionTypeParameter = (
   index: number,
   binary: Uint8Array
 ): {
-  result: SuggestionTypePartWithSuggestionTypeParameter;
-  nextIndex: number;
+  readonly result: SuggestionTypePartWithSuggestionTypeParameter;
+  readonly nextIndex: number;
 } => {
   const suggestionTypePartIndexAndNextIndex: {
-    result: number;
-    nextIndex: number;
+    readonly result: number;
+    readonly nextIndex: number;
   } = decodeInt32(index, binary);
   const parameterAndNextIndex: {
-    result: ReadonlyArray<SuggestionType>;
-    nextIndex: number;
+    readonly result: ReadonlyArray<SuggestionType>;
+    readonly nextIndex: number;
   } = decodeList(decodeSuggestionType)(
     suggestionTypePartIndexAndNextIndex.nextIndex,
     binary
@@ -3682,46 +3808,52 @@ export const decodeSuggestionTypePartWithSuggestionTypeParameter = (
 export const decodeSuggestionExpr = (
   index: number,
   binary: Uint8Array
-): { result: SuggestionExpr; nextIndex: number } => {
-  const patternIndex: { result: number; nextIndex: number } = decodeInt32(
-    index,
-    binary
-  );
+): { readonly result: SuggestionExpr; readonly nextIndex: number } => {
+  const patternIndex: {
+    readonly result: number;
+    readonly nextIndex: number;
+  } = decodeInt32(index, binary);
   if (patternIndex.result === 0) {
-    const result: { result: KernelExpr; nextIndex: number } = decodeKernelExpr(
-      patternIndex.nextIndex,
-      binary
-    );
+    const result: {
+      readonly result: KernelExpr;
+      readonly nextIndex: number;
+    } = decodeKernelExpr(patternIndex.nextIndex, binary);
     return {
       result: suggestionExprKernel(result.result),
       nextIndex: result.nextIndex,
     };
   }
   if (patternIndex.result === 1) {
-    const result: { result: number; nextIndex: number } = decodeInt32(
-      patternIndex.nextIndex,
-      binary
-    );
+    const result: {
+      readonly result: number;
+      readonly nextIndex: number;
+    } = decodeInt32(patternIndex.nextIndex, binary);
     return {
       result: suggestionExprInt32Literal(result.result),
       nextIndex: result.nextIndex,
     };
   }
   if (patternIndex.result === 2) {
-    const result: { result: PartId; nextIndex: number } = (decodeId as (
+    const result: {
+      readonly result: PartId;
+      readonly nextIndex: number;
+    } = (decodeId as (
       a: number,
       b: Uint8Array
-    ) => { result: PartId; nextIndex: number })(patternIndex.nextIndex, binary);
+    ) => { readonly result: PartId; readonly nextIndex: number })(
+      patternIndex.nextIndex,
+      binary
+    );
     return {
       result: suggestionExprPartReference(result.result),
       nextIndex: result.nextIndex,
     };
   }
   if (patternIndex.result === 3) {
-    const result: { result: number; nextIndex: number } = decodeInt32(
-      patternIndex.nextIndex,
-      binary
-    );
+    const result: {
+      readonly result: number;
+      readonly nextIndex: number;
+    } = decodeInt32(patternIndex.nextIndex, binary);
     return {
       result: suggestionExprSuggestionPartReference(result.result),
       nextIndex: result.nextIndex,
@@ -3729,8 +3861,8 @@ export const decodeSuggestionExpr = (
   }
   if (patternIndex.result === 4) {
     const result: {
-      result: LocalPartReference;
-      nextIndex: number;
+      readonly result: LocalPartReference;
+      readonly nextIndex: number;
     } = decodeLocalPartReference(patternIndex.nextIndex, binary);
     return {
       result: suggestionExprLocalPartReference(result.result),
@@ -3739,8 +3871,8 @@ export const decodeSuggestionExpr = (
   }
   if (patternIndex.result === 5) {
     const result: {
-      result: TagReference;
-      nextIndex: number;
+      readonly result: TagReference;
+      readonly nextIndex: number;
     } = decodeTagReference(patternIndex.nextIndex, binary);
     return {
       result: suggestionExprTagReference(result.result),
@@ -3749,8 +3881,8 @@ export const decodeSuggestionExpr = (
   }
   if (patternIndex.result === 6) {
     const result: {
-      result: SuggestionTagReference;
-      nextIndex: number;
+      readonly result: SuggestionTagReference;
+      readonly nextIndex: number;
     } = decodeSuggestionTagReference(patternIndex.nextIndex, binary);
     return {
       result: suggestionExprSuggestionTagReference(result.result),
@@ -3759,8 +3891,8 @@ export const decodeSuggestionExpr = (
   }
   if (patternIndex.result === 7) {
     const result: {
-      result: SuggestionFunctionCall;
-      nextIndex: number;
+      readonly result: SuggestionFunctionCall;
+      readonly nextIndex: number;
     } = decodeSuggestionFunctionCall(patternIndex.nextIndex, binary);
     return {
       result: suggestionExprFunctionCall(result.result),
@@ -3769,8 +3901,8 @@ export const decodeSuggestionExpr = (
   }
   if (patternIndex.result === 8) {
     const result: {
-      result: SuggestionLambdaBranch;
-      nextIndex: number;
+      readonly result: SuggestionLambdaBranch;
+      readonly nextIndex: number;
     } = decodeSuggestionLambdaBranch(patternIndex.nextIndex, binary);
     return {
       result: suggestionExprLambda(result.result),
@@ -3787,14 +3919,14 @@ export const decodeSuggestionExpr = (
 export const decodeSuggestionTagReference = (
   index: number,
   binary: Uint8Array
-): { result: SuggestionTagReference; nextIndex: number } => {
+): { readonly result: SuggestionTagReference; readonly nextIndex: number } => {
   const suggestionTypePartIndexAndNextIndex: {
-    result: number;
-    nextIndex: number;
+    readonly result: number;
+    readonly nextIndex: number;
   } = decodeInt32(index, binary);
   const tagIndexAndNextIndex: {
-    result: number;
-    nextIndex: number;
+    readonly result: number;
+    readonly nextIndex: number;
   } = decodeInt32(suggestionTypePartIndexAndNextIndex.nextIndex, binary);
   return {
     result: {
@@ -3812,14 +3944,14 @@ export const decodeSuggestionTagReference = (
 export const decodeSuggestionFunctionCall = (
   index: number,
   binary: Uint8Array
-): { result: SuggestionFunctionCall; nextIndex: number } => {
+): { readonly result: SuggestionFunctionCall; readonly nextIndex: number } => {
   const functionAndNextIndex: {
-    result: SuggestionExpr;
-    nextIndex: number;
+    readonly result: SuggestionExpr;
+    readonly nextIndex: number;
   } = decodeSuggestionExpr(index, binary);
   const parameterAndNextIndex: {
-    result: SuggestionExpr;
-    nextIndex: number;
+    readonly result: SuggestionExpr;
+    readonly nextIndex: number;
   } = decodeSuggestionExpr(functionAndNextIndex.nextIndex, binary);
   return {
     result: {
@@ -3837,25 +3969,25 @@ export const decodeSuggestionFunctionCall = (
 export const decodeSuggestionLambdaBranch = (
   index: number,
   binary: Uint8Array
-): { result: SuggestionLambdaBranch; nextIndex: number } => {
+): { readonly result: SuggestionLambdaBranch; readonly nextIndex: number } => {
   const conditionAndNextIndex: {
-    result: Condition;
-    nextIndex: number;
+    readonly result: Condition;
+    readonly nextIndex: number;
   } = decodeCondition(index, binary);
   const descriptionAndNextIndex: {
-    result: string;
-    nextIndex: number;
+    readonly result: string;
+    readonly nextIndex: number;
   } = decodeString(conditionAndNextIndex.nextIndex, binary);
   const localPartListAndNextIndex: {
-    result: ReadonlyArray<SuggestionBranchPartDefinition>;
-    nextIndex: number;
+    readonly result: ReadonlyArray<SuggestionBranchPartDefinition>;
+    readonly nextIndex: number;
   } = decodeList(decodeSuggestionBranchPartDefinition)(
     descriptionAndNextIndex.nextIndex,
     binary
   );
   const exprAndNextIndex: {
-    result: Maybe<SuggestionExpr>;
-    nextIndex: number;
+    readonly result: Maybe<SuggestionExpr>;
+    readonly nextIndex: number;
   } = decodeMaybe(decodeSuggestionExpr)(
     localPartListAndNextIndex.nextIndex,
     binary
@@ -3878,29 +4010,35 @@ export const decodeSuggestionLambdaBranch = (
 export const decodeSuggestionBranchPartDefinition = (
   index: number,
   binary: Uint8Array
-): { result: SuggestionBranchPartDefinition; nextIndex: number } => {
+): {
+  readonly result: SuggestionBranchPartDefinition;
+  readonly nextIndex: number;
+} => {
   const localPartIdAndNextIndex: {
-    result: LocalPartId;
-    nextIndex: number;
+    readonly result: LocalPartId;
+    readonly nextIndex: number;
   } = (decodeId as (
     a: number,
     b: Uint8Array
-  ) => { result: LocalPartId; nextIndex: number })(index, binary);
-  const nameAndNextIndex: { result: string; nextIndex: number } = decodeString(
-    localPartIdAndNextIndex.nextIndex,
+  ) => { readonly result: LocalPartId; readonly nextIndex: number })(
+    index,
     binary
   );
+  const nameAndNextIndex: {
+    readonly result: string;
+    readonly nextIndex: number;
+  } = decodeString(localPartIdAndNextIndex.nextIndex, binary);
   const descriptionAndNextIndex: {
-    result: string;
-    nextIndex: number;
+    readonly result: string;
+    readonly nextIndex: number;
   } = decodeString(nameAndNextIndex.nextIndex, binary);
   const typeAndNextIndex: {
-    result: SuggestionType;
-    nextIndex: number;
+    readonly result: SuggestionType;
+    readonly nextIndex: number;
   } = decodeSuggestionType(descriptionAndNextIndex.nextIndex, binary);
   const exprAndNextIndex: {
-    result: SuggestionExpr;
-    nextIndex: number;
+    readonly result: SuggestionExpr;
+    readonly nextIndex: number;
   } = decodeSuggestionExpr(typeAndNextIndex.nextIndex, binary);
   return {
     result: {
@@ -3921,51 +4059,51 @@ export const decodeSuggestionBranchPartDefinition = (
 export const decodeTypePartSnapshot = (
   index: number,
   binary: Uint8Array
-): { result: TypePartSnapshot; nextIndex: number } => {
-  const nameAndNextIndex: { result: string; nextIndex: number } = decodeString(
-    index,
-    binary
-  );
+): { readonly result: TypePartSnapshot; readonly nextIndex: number } => {
+  const nameAndNextIndex: {
+    readonly result: string;
+    readonly nextIndex: number;
+  } = decodeString(index, binary);
   const parentListAndNextIndex: {
-    result: ReadonlyArray<PartId>;
-    nextIndex: number;
+    readonly result: ReadonlyArray<PartId>;
+    readonly nextIndex: number;
   } = decodeList(
     decodeId as (
       a: number,
       b: Uint8Array
-    ) => { result: PartId; nextIndex: number }
+    ) => { readonly result: PartId; readonly nextIndex: number }
   )(nameAndNextIndex.nextIndex, binary);
   const descriptionAndNextIndex: {
-    result: string;
-    nextIndex: number;
+    readonly result: string;
+    readonly nextIndex: number;
   } = decodeString(parentListAndNextIndex.nextIndex, binary);
   const projectIdAndNextIndex: {
-    result: ProjectId;
-    nextIndex: number;
+    readonly result: ProjectId;
+    readonly nextIndex: number;
   } = (decodeId as (
     a: number,
     b: Uint8Array
-  ) => { result: ProjectId; nextIndex: number })(
+  ) => { readonly result: ProjectId; readonly nextIndex: number })(
     descriptionAndNextIndex.nextIndex,
     binary
   );
   const createSuggestionIdAndNextIndex: {
-    result: SuggestionId;
-    nextIndex: number;
+    readonly result: SuggestionId;
+    readonly nextIndex: number;
   } = (decodeId as (
     a: number,
     b: Uint8Array
-  ) => { result: SuggestionId; nextIndex: number })(
+  ) => { readonly result: SuggestionId; readonly nextIndex: number })(
     projectIdAndNextIndex.nextIndex,
     binary
   );
-  const getTimeAndNextIndex: { result: Time; nextIndex: number } = decodeTime(
-    createSuggestionIdAndNextIndex.nextIndex,
-    binary
-  );
+  const getTimeAndNextIndex: {
+    readonly result: Time;
+    readonly nextIndex: number;
+  } = decodeTime(createSuggestionIdAndNextIndex.nextIndex, binary);
   const bodyAndNextIndex: {
-    result: TypePartBody;
-    nextIndex: number;
+    readonly result: TypePartBody;
+    readonly nextIndex: number;
   } = decodeTypePartBody(getTimeAndNextIndex.nextIndex, binary);
   return {
     result: {
@@ -3988,56 +4126,56 @@ export const decodeTypePartSnapshot = (
 export const decodePartSnapshot = (
   index: number,
   binary: Uint8Array
-): { result: PartSnapshot; nextIndex: number } => {
-  const nameAndNextIndex: { result: string; nextIndex: number } = decodeString(
-    index,
-    binary
-  );
+): { readonly result: PartSnapshot; readonly nextIndex: number } => {
+  const nameAndNextIndex: {
+    readonly result: string;
+    readonly nextIndex: number;
+  } = decodeString(index, binary);
   const parentListAndNextIndex: {
-    result: ReadonlyArray<PartId>;
-    nextIndex: number;
+    readonly result: ReadonlyArray<PartId>;
+    readonly nextIndex: number;
   } = decodeList(
     decodeId as (
       a: number,
       b: Uint8Array
-    ) => { result: PartId; nextIndex: number }
+    ) => { readonly result: PartId; readonly nextIndex: number }
   )(nameAndNextIndex.nextIndex, binary);
   const descriptionAndNextIndex: {
-    result: string;
-    nextIndex: number;
+    readonly result: string;
+    readonly nextIndex: number;
   } = decodeString(parentListAndNextIndex.nextIndex, binary);
-  const typeAndNextIndex: { result: Type; nextIndex: number } = decodeType(
-    descriptionAndNextIndex.nextIndex,
-    binary
-  );
+  const typeAndNextIndex: {
+    readonly result: Type;
+    readonly nextIndex: number;
+  } = decodeType(descriptionAndNextIndex.nextIndex, binary);
   const exprAndNextIndex: {
-    result: Maybe<Expr>;
-    nextIndex: number;
+    readonly result: Maybe<Expr>;
+    readonly nextIndex: number;
   } = decodeMaybe(decodeExpr)(typeAndNextIndex.nextIndex, binary);
   const projectIdAndNextIndex: {
-    result: ProjectId;
-    nextIndex: number;
+    readonly result: ProjectId;
+    readonly nextIndex: number;
   } = (decodeId as (
     a: number,
     b: Uint8Array
-  ) => { result: ProjectId; nextIndex: number })(
+  ) => { readonly result: ProjectId; readonly nextIndex: number })(
     exprAndNextIndex.nextIndex,
     binary
   );
   const createSuggestionIdAndNextIndex: {
-    result: SuggestionId;
-    nextIndex: number;
+    readonly result: SuggestionId;
+    readonly nextIndex: number;
   } = (decodeId as (
     a: number,
     b: Uint8Array
-  ) => { result: SuggestionId; nextIndex: number })(
+  ) => { readonly result: SuggestionId; readonly nextIndex: number })(
     projectIdAndNextIndex.nextIndex,
     binary
   );
-  const getTimeAndNextIndex: { result: Time; nextIndex: number } = decodeTime(
-    createSuggestionIdAndNextIndex.nextIndex,
-    binary
-  );
+  const getTimeAndNextIndex: {
+    readonly result: Time;
+    readonly nextIndex: number;
+  } = decodeTime(createSuggestionIdAndNextIndex.nextIndex, binary);
   return {
     result: {
       name: nameAndNextIndex.result,
@@ -4060,15 +4198,15 @@ export const decodePartSnapshot = (
 export const decodeTypePartBody = (
   index: number,
   binary: Uint8Array
-): { result: TypePartBody; nextIndex: number } => {
-  const patternIndex: { result: number; nextIndex: number } = decodeInt32(
-    index,
-    binary
-  );
+): { readonly result: TypePartBody; readonly nextIndex: number } => {
+  const patternIndex: {
+    readonly result: number;
+    readonly nextIndex: number;
+  } = decodeInt32(index, binary);
   if (patternIndex.result === 0) {
     const result: {
-      result: ReadonlyArray<TypePartBodyProductMember>;
-      nextIndex: number;
+      readonly result: ReadonlyArray<TypePartBodyProductMember>;
+      readonly nextIndex: number;
     } = decodeList(decodeTypePartBodyProductMember)(
       patternIndex.nextIndex,
       binary
@@ -4080,8 +4218,8 @@ export const decodeTypePartBody = (
   }
   if (patternIndex.result === 1) {
     const result: {
-      result: ReadonlyArray<TypePartBodySumPattern>;
-      nextIndex: number;
+      readonly result: ReadonlyArray<TypePartBodySumPattern>;
+      readonly nextIndex: number;
     } = decodeList(decodeTypePartBodySumPattern)(
       patternIndex.nextIndex,
       binary
@@ -4093,8 +4231,8 @@ export const decodeTypePartBody = (
   }
   if (patternIndex.result === 2) {
     const result: {
-      result: TypePartBodyKernel;
-      nextIndex: number;
+      readonly result: TypePartBodyKernel;
+      readonly nextIndex: number;
     } = decodeTypePartBodyKernel(patternIndex.nextIndex, binary);
     return {
       result: typePartBodyKernel(result.result),
@@ -4111,18 +4249,21 @@ export const decodeTypePartBody = (
 export const decodeTypePartBodyProductMember = (
   index: number,
   binary: Uint8Array
-): { result: TypePartBodyProductMember; nextIndex: number } => {
-  const nameAndNextIndex: { result: string; nextIndex: number } = decodeString(
-    index,
-    binary
-  );
+): {
+  readonly result: TypePartBodyProductMember;
+  readonly nextIndex: number;
+} => {
+  const nameAndNextIndex: {
+    readonly result: string;
+    readonly nextIndex: number;
+  } = decodeString(index, binary);
   const descriptionAndNextIndex: {
-    result: string;
-    nextIndex: number;
+    readonly result: string;
+    readonly nextIndex: number;
   } = decodeString(nameAndNextIndex.nextIndex, binary);
   const memberTypeAndNextIndex: {
-    result: Type;
-    nextIndex: number;
+    readonly result: Type;
+    readonly nextIndex: number;
   } = decodeType(descriptionAndNextIndex.nextIndex, binary);
   return {
     result: {
@@ -4141,19 +4282,19 @@ export const decodeTypePartBodyProductMember = (
 export const decodeTypePartBodySumPattern = (
   index: number,
   binary: Uint8Array
-): { result: TypePartBodySumPattern; nextIndex: number } => {
-  const nameAndNextIndex: { result: string; nextIndex: number } = decodeString(
-    index,
-    binary
-  );
+): { readonly result: TypePartBodySumPattern; readonly nextIndex: number } => {
+  const nameAndNextIndex: {
+    readonly result: string;
+    readonly nextIndex: number;
+  } = decodeString(index, binary);
   const descriptionAndNextIndex: {
-    result: string;
-    nextIndex: number;
+    readonly result: string;
+    readonly nextIndex: number;
   } = decodeString(nameAndNextIndex.nextIndex, binary);
-  const parameterAndNextIndex: { result: Type; nextIndex: number } = decodeType(
-    descriptionAndNextIndex.nextIndex,
-    binary
-  );
+  const parameterAndNextIndex: {
+    readonly result: Type;
+    readonly nextIndex: number;
+  } = decodeType(descriptionAndNextIndex.nextIndex, binary);
   return {
     result: {
       name: nameAndNextIndex.result,
@@ -4171,11 +4312,11 @@ export const decodeTypePartBodySumPattern = (
 export const decodeTypePartBodyKernel = (
   index: number,
   binary: Uint8Array
-): { result: TypePartBodyKernel; nextIndex: number } => {
-  const patternIndex: { result: number; nextIndex: number } = decodeInt32(
-    index,
-    binary
-  );
+): { readonly result: TypePartBodyKernel; readonly nextIndex: number } => {
+  const patternIndex: {
+    readonly result: number;
+    readonly nextIndex: number;
+  } = decodeInt32(index, binary);
   if (patternIndex.result === 0) {
     return { result: "Int32", nextIndex: patternIndex.nextIndex };
   }
@@ -4192,22 +4333,22 @@ export const decodeTypePartBodyKernel = (
 export const decodeType = (
   index: number,
   binary: Uint8Array
-): { result: Type; nextIndex: number } => {
-  const patternIndex: { result: number; nextIndex: number } = decodeInt32(
-    index,
-    binary
-  );
+): { readonly result: Type; readonly nextIndex: number } => {
+  const patternIndex: {
+    readonly result: number;
+    readonly nextIndex: number;
+  } = decodeInt32(index, binary);
   if (patternIndex.result === 0) {
     const result: {
-      result: TypeInputAndOutput;
-      nextIndex: number;
+      readonly result: TypeInputAndOutput;
+      readonly nextIndex: number;
     } = decodeTypeInputAndOutput(patternIndex.nextIndex, binary);
     return { result: typeFunction(result.result), nextIndex: result.nextIndex };
   }
   if (patternIndex.result === 1) {
     const result: {
-      result: TypePartIdWithParameter;
-      nextIndex: number;
+      readonly result: TypePartIdWithParameter;
+      readonly nextIndex: number;
     } = decodeTypePartIdWithParameter(patternIndex.nextIndex, binary);
     return {
       result: typeTypePartWithParameter(result.result),
@@ -4224,14 +4365,14 @@ export const decodeType = (
 export const decodeTypeInputAndOutput = (
   index: number,
   binary: Uint8Array
-): { result: TypeInputAndOutput; nextIndex: number } => {
-  const inputTypeAndNextIndex: { result: Type; nextIndex: number } = decodeType(
-    index,
-    binary
-  );
+): { readonly result: TypeInputAndOutput; readonly nextIndex: number } => {
+  const inputTypeAndNextIndex: {
+    readonly result: Type;
+    readonly nextIndex: number;
+  } = decodeType(index, binary);
   const outputTypeAndNextIndex: {
-    result: Type;
-    nextIndex: number;
+    readonly result: Type;
+    readonly nextIndex: number;
   } = decodeType(inputTypeAndNextIndex.nextIndex, binary);
   return {
     result: {
@@ -4249,17 +4390,20 @@ export const decodeTypeInputAndOutput = (
 export const decodeTypePartIdWithParameter = (
   index: number,
   binary: Uint8Array
-): { result: TypePartIdWithParameter; nextIndex: number } => {
+): { readonly result: TypePartIdWithParameter; readonly nextIndex: number } => {
   const typePartIdAndNextIndex: {
-    result: TypePartId;
-    nextIndex: number;
+    readonly result: TypePartId;
+    readonly nextIndex: number;
   } = (decodeId as (
     a: number,
     b: Uint8Array
-  ) => { result: TypePartId; nextIndex: number })(index, binary);
+  ) => { readonly result: TypePartId; readonly nextIndex: number })(
+    index,
+    binary
+  );
   const parameterAndNextIndex: {
-    result: ReadonlyArray<Type>;
-    nextIndex: number;
+    readonly result: ReadonlyArray<Type>;
+    readonly nextIndex: number;
   } = decodeList(decodeType)(typePartIdAndNextIndex.nextIndex, binary);
   return {
     result: {
@@ -4277,33 +4421,39 @@ export const decodeTypePartIdWithParameter = (
 export const decodeExpr = (
   index: number,
   binary: Uint8Array
-): { result: Expr; nextIndex: number } => {
-  const patternIndex: { result: number; nextIndex: number } = decodeInt32(
-    index,
-    binary
-  );
+): { readonly result: Expr; readonly nextIndex: number } => {
+  const patternIndex: {
+    readonly result: number;
+    readonly nextIndex: number;
+  } = decodeInt32(index, binary);
   if (patternIndex.result === 0) {
-    const result: { result: KernelExpr; nextIndex: number } = decodeKernelExpr(
-      patternIndex.nextIndex,
-      binary
-    );
+    const result: {
+      readonly result: KernelExpr;
+      readonly nextIndex: number;
+    } = decodeKernelExpr(patternIndex.nextIndex, binary);
     return { result: exprKernel(result.result), nextIndex: result.nextIndex };
   }
   if (patternIndex.result === 1) {
-    const result: { result: number; nextIndex: number } = decodeInt32(
-      patternIndex.nextIndex,
-      binary
-    );
+    const result: {
+      readonly result: number;
+      readonly nextIndex: number;
+    } = decodeInt32(patternIndex.nextIndex, binary);
     return {
       result: exprInt32Literal(result.result),
       nextIndex: result.nextIndex,
     };
   }
   if (patternIndex.result === 2) {
-    const result: { result: PartId; nextIndex: number } = (decodeId as (
+    const result: {
+      readonly result: PartId;
+      readonly nextIndex: number;
+    } = (decodeId as (
       a: number,
       b: Uint8Array
-    ) => { result: PartId; nextIndex: number })(patternIndex.nextIndex, binary);
+    ) => { readonly result: PartId; readonly nextIndex: number })(
+      patternIndex.nextIndex,
+      binary
+    );
     return {
       result: exprPartReference(result.result),
       nextIndex: result.nextIndex,
@@ -4311,8 +4461,8 @@ export const decodeExpr = (
   }
   if (patternIndex.result === 3) {
     const result: {
-      result: LocalPartReference;
-      nextIndex: number;
+      readonly result: LocalPartReference;
+      readonly nextIndex: number;
     } = decodeLocalPartReference(patternIndex.nextIndex, binary);
     return {
       result: exprLocalPartReference(result.result),
@@ -4321,8 +4471,8 @@ export const decodeExpr = (
   }
   if (patternIndex.result === 4) {
     const result: {
-      result: TagReference;
-      nextIndex: number;
+      readonly result: TagReference;
+      readonly nextIndex: number;
     } = decodeTagReference(patternIndex.nextIndex, binary);
     return {
       result: exprTagReference(result.result),
@@ -4331,8 +4481,8 @@ export const decodeExpr = (
   }
   if (patternIndex.result === 5) {
     const result: {
-      result: FunctionCall;
-      nextIndex: number;
+      readonly result: FunctionCall;
+      readonly nextIndex: number;
     } = decodeFunctionCall(patternIndex.nextIndex, binary);
     return {
       result: exprFunctionCall(result.result),
@@ -4341,8 +4491,8 @@ export const decodeExpr = (
   }
   if (patternIndex.result === 6) {
     const result: {
-      result: ReadonlyArray<LambdaBranch>;
-      nextIndex: number;
+      readonly result: ReadonlyArray<LambdaBranch>;
+      readonly nextIndex: number;
     } = decodeList(decodeLambdaBranch)(patternIndex.nextIndex, binary);
     return { result: exprLambda(result.result), nextIndex: result.nextIndex };
   }
@@ -4356,26 +4506,26 @@ export const decodeExpr = (
 export const decodeEvaluatedExpr = (
   index: number,
   binary: Uint8Array
-): { result: EvaluatedExpr; nextIndex: number } => {
-  const patternIndex: { result: number; nextIndex: number } = decodeInt32(
-    index,
-    binary
-  );
+): { readonly result: EvaluatedExpr; readonly nextIndex: number } => {
+  const patternIndex: {
+    readonly result: number;
+    readonly nextIndex: number;
+  } = decodeInt32(index, binary);
   if (patternIndex.result === 0) {
-    const result: { result: KernelExpr; nextIndex: number } = decodeKernelExpr(
-      patternIndex.nextIndex,
-      binary
-    );
+    const result: {
+      readonly result: KernelExpr;
+      readonly nextIndex: number;
+    } = decodeKernelExpr(patternIndex.nextIndex, binary);
     return {
       result: evaluatedExprKernel(result.result),
       nextIndex: result.nextIndex,
     };
   }
   if (patternIndex.result === 1) {
-    const result: { result: number; nextIndex: number } = decodeInt32(
-      patternIndex.nextIndex,
-      binary
-    );
+    const result: {
+      readonly result: number;
+      readonly nextIndex: number;
+    } = decodeInt32(patternIndex.nextIndex, binary);
     return {
       result: evaluatedExprInt32(result.result),
       nextIndex: result.nextIndex,
@@ -4383,8 +4533,8 @@ export const decodeEvaluatedExpr = (
   }
   if (patternIndex.result === 2) {
     const result: {
-      result: LocalPartReference;
-      nextIndex: number;
+      readonly result: LocalPartReference;
+      readonly nextIndex: number;
     } = decodeLocalPartReference(patternIndex.nextIndex, binary);
     return {
       result: evaluatedExprLocalPartReference(result.result),
@@ -4393,8 +4543,8 @@ export const decodeEvaluatedExpr = (
   }
   if (patternIndex.result === 3) {
     const result: {
-      result: TagReference;
-      nextIndex: number;
+      readonly result: TagReference;
+      readonly nextIndex: number;
     } = decodeTagReference(patternIndex.nextIndex, binary);
     return {
       result: evaluatedExprTagReference(result.result),
@@ -4403,8 +4553,8 @@ export const decodeEvaluatedExpr = (
   }
   if (patternIndex.result === 4) {
     const result: {
-      result: ReadonlyArray<LambdaBranch>;
-      nextIndex: number;
+      readonly result: ReadonlyArray<LambdaBranch>;
+      readonly nextIndex: number;
     } = decodeList(decodeLambdaBranch)(patternIndex.nextIndex, binary);
     return {
       result: evaluatedExprLambda(result.result),
@@ -4412,10 +4562,10 @@ export const decodeEvaluatedExpr = (
     };
   }
   if (patternIndex.result === 5) {
-    const result: { result: KernelCall; nextIndex: number } = decodeKernelCall(
-      patternIndex.nextIndex,
-      binary
-    );
+    const result: {
+      readonly result: KernelCall;
+      readonly nextIndex: number;
+    } = decodeKernelCall(patternIndex.nextIndex, binary);
     return {
       result: evaluatedExprKernelCall(result.result),
       nextIndex: result.nextIndex,
@@ -4431,14 +4581,14 @@ export const decodeEvaluatedExpr = (
 export const decodeKernelCall = (
   index: number,
   binary: Uint8Array
-): { result: KernelCall; nextIndex: number } => {
+): { readonly result: KernelCall; readonly nextIndex: number } => {
   const kernelAndNextIndex: {
-    result: KernelExpr;
-    nextIndex: number;
+    readonly result: KernelExpr;
+    readonly nextIndex: number;
   } = decodeKernelExpr(index, binary);
   const exprAndNextIndex: {
-    result: EvaluatedExpr;
-    nextIndex: number;
+    readonly result: EvaluatedExpr;
+    readonly nextIndex: number;
   } = decodeEvaluatedExpr(kernelAndNextIndex.nextIndex, binary);
   return {
     result: {
@@ -4456,11 +4606,11 @@ export const decodeKernelCall = (
 export const decodeKernelExpr = (
   index: number,
   binary: Uint8Array
-): { result: KernelExpr; nextIndex: number } => {
-  const patternIndex: { result: number; nextIndex: number } = decodeInt32(
-    index,
-    binary
-  );
+): { readonly result: KernelExpr; readonly nextIndex: number } => {
+  const patternIndex: {
+    readonly result: number;
+    readonly nextIndex: number;
+  } = decodeInt32(index, binary);
   if (patternIndex.result === 0) {
     return { result: "Int32Add", nextIndex: patternIndex.nextIndex };
   }
@@ -4480,21 +4630,21 @@ export const decodeKernelExpr = (
 export const decodeLocalPartReference = (
   index: number,
   binary: Uint8Array
-): { result: LocalPartReference; nextIndex: number } => {
+): { readonly result: LocalPartReference; readonly nextIndex: number } => {
   const partIdAndNextIndex: {
-    result: PartId;
-    nextIndex: number;
+    readonly result: PartId;
+    readonly nextIndex: number;
   } = (decodeId as (
     a: number,
     b: Uint8Array
-  ) => { result: PartId; nextIndex: number })(index, binary);
+  ) => { readonly result: PartId; readonly nextIndex: number })(index, binary);
   const localPartIdAndNextIndex: {
-    result: LocalPartId;
-    nextIndex: number;
+    readonly result: LocalPartId;
+    readonly nextIndex: number;
   } = (decodeId as (
     a: number,
     b: Uint8Array
-  ) => { result: LocalPartId; nextIndex: number })(
+  ) => { readonly result: LocalPartId; readonly nextIndex: number })(
     partIdAndNextIndex.nextIndex,
     binary
   );
@@ -4514,18 +4664,24 @@ export const decodeLocalPartReference = (
 export const decodeTagReference = (
   index: number,
   binary: Uint8Array
-): { result: TagReference; nextIndex: number } => {
+): { readonly result: TagReference; readonly nextIndex: number } => {
   const typePartIdAndNextIndex: {
-    result: TypePartId;
-    nextIndex: number;
+    readonly result: TypePartId;
+    readonly nextIndex: number;
   } = (decodeId as (
     a: number,
     b: Uint8Array
-  ) => { result: TypePartId; nextIndex: number })(index, binary);
-  const tagIdAndNextIndex: { result: TagId; nextIndex: number } = (decodeId as (
+  ) => { readonly result: TypePartId; readonly nextIndex: number })(
+    index,
+    binary
+  );
+  const tagIdAndNextIndex: {
+    readonly result: TagId;
+    readonly nextIndex: number;
+  } = (decodeId as (
     a: number,
     b: Uint8Array
-  ) => { result: TagId; nextIndex: number })(
+  ) => { readonly result: TagId; readonly nextIndex: number })(
     typePartIdAndNextIndex.nextIndex,
     binary
   );
@@ -4545,15 +4701,15 @@ export const decodeTagReference = (
 export const decodeFunctionCall = (
   index: number,
   binary: Uint8Array
-): { result: FunctionCall; nextIndex: number } => {
-  const functionAndNextIndex: { result: Expr; nextIndex: number } = decodeExpr(
-    index,
-    binary
-  );
-  const parameterAndNextIndex: { result: Expr; nextIndex: number } = decodeExpr(
-    functionAndNextIndex.nextIndex,
-    binary
-  );
+): { readonly result: FunctionCall; readonly nextIndex: number } => {
+  const functionAndNextIndex: {
+    readonly result: Expr;
+    readonly nextIndex: number;
+  } = decodeExpr(index, binary);
+  const parameterAndNextIndex: {
+    readonly result: Expr;
+    readonly nextIndex: number;
+  } = decodeExpr(functionAndNextIndex.nextIndex, binary);
   return {
     result: {
       function: functionAndNextIndex.result,
@@ -4570,25 +4726,25 @@ export const decodeFunctionCall = (
 export const decodeLambdaBranch = (
   index: number,
   binary: Uint8Array
-): { result: LambdaBranch; nextIndex: number } => {
+): { readonly result: LambdaBranch; readonly nextIndex: number } => {
   const conditionAndNextIndex: {
-    result: Condition;
-    nextIndex: number;
+    readonly result: Condition;
+    readonly nextIndex: number;
   } = decodeCondition(index, binary);
   const descriptionAndNextIndex: {
-    result: string;
-    nextIndex: number;
+    readonly result: string;
+    readonly nextIndex: number;
   } = decodeString(conditionAndNextIndex.nextIndex, binary);
   const localPartListAndNextIndex: {
-    result: ReadonlyArray<BranchPartDefinition>;
-    nextIndex: number;
+    readonly result: ReadonlyArray<BranchPartDefinition>;
+    readonly nextIndex: number;
   } = decodeList(decodeBranchPartDefinition)(
     descriptionAndNextIndex.nextIndex,
     binary
   );
   const exprAndNextIndex: {
-    result: Maybe<Expr>;
-    nextIndex: number;
+    readonly result: Maybe<Expr>;
+    readonly nextIndex: number;
   } = decodeMaybe(decodeExpr)(localPartListAndNextIndex.nextIndex, binary);
   return {
     result: {
@@ -4608,15 +4764,15 @@ export const decodeLambdaBranch = (
 export const decodeCondition = (
   index: number,
   binary: Uint8Array
-): { result: Condition; nextIndex: number } => {
-  const patternIndex: { result: number; nextIndex: number } = decodeInt32(
-    index,
-    binary
-  );
+): { readonly result: Condition; readonly nextIndex: number } => {
+  const patternIndex: {
+    readonly result: number;
+    readonly nextIndex: number;
+  } = decodeInt32(index, binary);
   if (patternIndex.result === 0) {
     const result: {
-      result: ConditionTag;
-      nextIndex: number;
+      readonly result: ConditionTag;
+      readonly nextIndex: number;
     } = decodeConditionTag(patternIndex.nextIndex, binary);
     return {
       result: conditionByTag(result.result),
@@ -4625,8 +4781,8 @@ export const decodeCondition = (
   }
   if (patternIndex.result === 1) {
     const result: {
-      result: ConditionCapture;
-      nextIndex: number;
+      readonly result: ConditionCapture;
+      readonly nextIndex: number;
     } = decodeConditionCapture(patternIndex.nextIndex, binary);
     return {
       result: conditionByCapture(result.result),
@@ -4637,10 +4793,10 @@ export const decodeCondition = (
     return { result: conditionAny, nextIndex: patternIndex.nextIndex };
   }
   if (patternIndex.result === 3) {
-    const result: { result: number; nextIndex: number } = decodeInt32(
-      patternIndex.nextIndex,
-      binary
-    );
+    const result: {
+      readonly result: number;
+      readonly nextIndex: number;
+    } = decodeInt32(patternIndex.nextIndex, binary);
     return {
       result: conditionInt32(result.result),
       nextIndex: result.nextIndex,
@@ -4656,14 +4812,17 @@ export const decodeCondition = (
 export const decodeConditionTag = (
   index: number,
   binary: Uint8Array
-): { result: ConditionTag; nextIndex: number } => {
-  const tagAndNextIndex: { result: TagId; nextIndex: number } = (decodeId as (
+): { readonly result: ConditionTag; readonly nextIndex: number } => {
+  const tagAndNextIndex: {
+    readonly result: TagId;
+    readonly nextIndex: number;
+  } = (decodeId as (
     a: number,
     b: Uint8Array
-  ) => { result: TagId; nextIndex: number })(index, binary);
+  ) => { readonly result: TagId; readonly nextIndex: number })(index, binary);
   const parameterAndNextIndex: {
-    result: Maybe<Condition>;
-    nextIndex: number;
+    readonly result: Maybe<Condition>;
+    readonly nextIndex: number;
   } = decodeMaybe(decodeCondition)(tagAndNextIndex.nextIndex, binary);
   return {
     result: {
@@ -4681,18 +4840,18 @@ export const decodeConditionTag = (
 export const decodeConditionCapture = (
   index: number,
   binary: Uint8Array
-): { result: ConditionCapture; nextIndex: number } => {
-  const nameAndNextIndex: { result: string; nextIndex: number } = decodeString(
-    index,
-    binary
-  );
+): { readonly result: ConditionCapture; readonly nextIndex: number } => {
+  const nameAndNextIndex: {
+    readonly result: string;
+    readonly nextIndex: number;
+  } = decodeString(index, binary);
   const localPartIdAndNextIndex: {
-    result: LocalPartId;
-    nextIndex: number;
+    readonly result: LocalPartId;
+    readonly nextIndex: number;
   } = (decodeId as (
     a: number,
     b: Uint8Array
-  ) => { result: LocalPartId; nextIndex: number })(
+  ) => { readonly result: LocalPartId; readonly nextIndex: number })(
     nameAndNextIndex.nextIndex,
     binary
   );
@@ -4712,30 +4871,33 @@ export const decodeConditionCapture = (
 export const decodeBranchPartDefinition = (
   index: number,
   binary: Uint8Array
-): { result: BranchPartDefinition; nextIndex: number } => {
+): { readonly result: BranchPartDefinition; readonly nextIndex: number } => {
   const localPartIdAndNextIndex: {
-    result: LocalPartId;
-    nextIndex: number;
+    readonly result: LocalPartId;
+    readonly nextIndex: number;
   } = (decodeId as (
     a: number,
     b: Uint8Array
-  ) => { result: LocalPartId; nextIndex: number })(index, binary);
-  const nameAndNextIndex: { result: string; nextIndex: number } = decodeString(
-    localPartIdAndNextIndex.nextIndex,
+  ) => { readonly result: LocalPartId; readonly nextIndex: number })(
+    index,
     binary
   );
+  const nameAndNextIndex: {
+    readonly result: string;
+    readonly nextIndex: number;
+  } = decodeString(localPartIdAndNextIndex.nextIndex, binary);
   const descriptionAndNextIndex: {
-    result: string;
-    nextIndex: number;
+    readonly result: string;
+    readonly nextIndex: number;
   } = decodeString(nameAndNextIndex.nextIndex, binary);
-  const typeAndNextIndex: { result: Type; nextIndex: number } = decodeType(
-    descriptionAndNextIndex.nextIndex,
-    binary
-  );
-  const exprAndNextIndex: { result: Expr; nextIndex: number } = decodeExpr(
-    typeAndNextIndex.nextIndex,
-    binary
-  );
+  const typeAndNextIndex: {
+    readonly result: Type;
+    readonly nextIndex: number;
+  } = decodeType(descriptionAndNextIndex.nextIndex, binary);
+  const exprAndNextIndex: {
+    readonly result: Expr;
+    readonly nextIndex: number;
+  } = decodeExpr(typeAndNextIndex.nextIndex, binary);
   return {
     result: {
       localPartId: localPartIdAndNextIndex.result,
@@ -4755,26 +4917,38 @@ export const decodeBranchPartDefinition = (
 export const decodeEvaluateExprError = (
   index: number,
   binary: Uint8Array
-): { result: EvaluateExprError; nextIndex: number } => {
-  const patternIndex: { result: number; nextIndex: number } = decodeInt32(
-    index,
-    binary
-  );
+): { readonly result: EvaluateExprError; readonly nextIndex: number } => {
+  const patternIndex: {
+    readonly result: number;
+    readonly nextIndex: number;
+  } = decodeInt32(index, binary);
   if (patternIndex.result === 0) {
-    const result: { result: PartId; nextIndex: number } = (decodeId as (
+    const result: {
+      readonly result: PartId;
+      readonly nextIndex: number;
+    } = (decodeId as (
       a: number,
       b: Uint8Array
-    ) => { result: PartId; nextIndex: number })(patternIndex.nextIndex, binary);
+    ) => { readonly result: PartId; readonly nextIndex: number })(
+      patternIndex.nextIndex,
+      binary
+    );
     return {
       result: evaluateExprErrorNeedPartDefinition(result.result),
       nextIndex: result.nextIndex,
     };
   }
   if (patternIndex.result === 1) {
-    const result: { result: PartId; nextIndex: number } = (decodeId as (
+    const result: {
+      readonly result: PartId;
+      readonly nextIndex: number;
+    } = (decodeId as (
       a: number,
       b: Uint8Array
-    ) => { result: PartId; nextIndex: number })(patternIndex.nextIndex, binary);
+    ) => { readonly result: PartId; readonly nextIndex: number })(
+      patternIndex.nextIndex,
+      binary
+    );
     return {
       result: evaluateExprErrorPartExprIsNothing(result.result),
       nextIndex: result.nextIndex,
@@ -4782,8 +4956,8 @@ export const decodeEvaluateExprError = (
   }
   if (patternIndex.result === 2) {
     const result: {
-      result: LocalPartReference;
-      nextIndex: number;
+      readonly result: LocalPartReference;
+      readonly nextIndex: number;
     } = decodeLocalPartReference(patternIndex.nextIndex, binary);
     return {
       result: evaluateExprErrorCannotFindLocalPartDefinition(result.result),
@@ -4791,10 +4965,10 @@ export const decodeEvaluateExprError = (
     };
   }
   if (patternIndex.result === 3) {
-    const result: { result: TypeError; nextIndex: number } = decodeTypeError(
-      patternIndex.nextIndex,
-      binary
-    );
+    const result: {
+      readonly result: TypeError;
+      readonly nextIndex: number;
+    } = decodeTypeError(patternIndex.nextIndex, binary);
     return {
       result: evaluateExprErrorTypeError(result.result),
       nextIndex: result.nextIndex,
@@ -4816,10 +4990,10 @@ export const decodeEvaluateExprError = (
 export const decodeTypeError = (
   index: number,
   binary: Uint8Array
-): { result: TypeError; nextIndex: number } => {
+): { readonly result: TypeError; readonly nextIndex: number } => {
   const messageAndNextIndex: {
-    result: string;
-    nextIndex: number;
+    readonly result: string;
+    readonly nextIndex: number;
   } = decodeString(index, binary);
   return {
     result: { message: messageAndNextIndex.result },
@@ -4834,17 +5008,20 @@ export const decodeTypeError = (
 export const decodeCreateProjectParameter = (
   index: number,
   binary: Uint8Array
-): { result: CreateProjectParameter; nextIndex: number } => {
+): { readonly result: CreateProjectParameter; readonly nextIndex: number } => {
   const accessTokenAndNextIndex: {
-    result: AccessToken;
-    nextIndex: number;
+    readonly result: AccessToken;
+    readonly nextIndex: number;
   } = (decodeToken as (
     a: number,
     b: Uint8Array
-  ) => { result: AccessToken; nextIndex: number })(index, binary);
+  ) => { readonly result: AccessToken; readonly nextIndex: number })(
+    index,
+    binary
+  );
   const projectNameAndNextIndex: {
-    result: string;
-    nextIndex: number;
+    readonly result: string;
+    readonly nextIndex: number;
   } = decodeString(accessTokenAndNextIndex.nextIndex, binary);
   return {
     result: {
@@ -4862,25 +5039,28 @@ export const decodeCreateProjectParameter = (
 export const decodeCreateIdeaParameter = (
   index: number,
   binary: Uint8Array
-): { result: CreateIdeaParameter; nextIndex: number } => {
+): { readonly result: CreateIdeaParameter; readonly nextIndex: number } => {
   const accessTokenAndNextIndex: {
-    result: AccessToken;
-    nextIndex: number;
+    readonly result: AccessToken;
+    readonly nextIndex: number;
   } = (decodeToken as (
     a: number,
     b: Uint8Array
-  ) => { result: AccessToken; nextIndex: number })(index, binary);
+  ) => { readonly result: AccessToken; readonly nextIndex: number })(
+    index,
+    binary
+  );
   const ideaNameAndNextIndex: {
-    result: string;
-    nextIndex: number;
+    readonly result: string;
+    readonly nextIndex: number;
   } = decodeString(accessTokenAndNextIndex.nextIndex, binary);
   const projectIdAndNextIndex: {
-    result: ProjectId;
-    nextIndex: number;
+    readonly result: ProjectId;
+    readonly nextIndex: number;
   } = (decodeId as (
     a: number,
     b: Uint8Array
-  ) => { result: ProjectId; nextIndex: number })(
+  ) => { readonly result: ProjectId; readonly nextIndex: number })(
     ideaNameAndNextIndex.nextIndex,
     binary
   );
@@ -4901,27 +5081,30 @@ export const decodeCreateIdeaParameter = (
 export const decodeAddCommentParameter = (
   index: number,
   binary: Uint8Array
-): { result: AddCommentParameter; nextIndex: number } => {
+): { readonly result: AddCommentParameter; readonly nextIndex: number } => {
   const accessTokenAndNextIndex: {
-    result: AccessToken;
-    nextIndex: number;
+    readonly result: AccessToken;
+    readonly nextIndex: number;
   } = (decodeToken as (
     a: number,
     b: Uint8Array
-  ) => { result: AccessToken; nextIndex: number })(index, binary);
+  ) => { readonly result: AccessToken; readonly nextIndex: number })(
+    index,
+    binary
+  );
   const ideaIdAndNextIndex: {
-    result: IdeaId;
-    nextIndex: number;
+    readonly result: IdeaId;
+    readonly nextIndex: number;
   } = (decodeId as (
     a: number,
     b: Uint8Array
-  ) => { result: IdeaId; nextIndex: number })(
+  ) => { readonly result: IdeaId; readonly nextIndex: number })(
     accessTokenAndNextIndex.nextIndex,
     binary
   );
   const commentAndNextIndex: {
-    result: string;
-    nextIndex: number;
+    readonly result: string;
+    readonly nextIndex: number;
   } = decodeString(ideaIdAndNextIndex.nextIndex, binary);
   return {
     result: {
@@ -4940,21 +5123,24 @@ export const decodeAddCommentParameter = (
 export const decodeAddSuggestionParameter = (
   index: number,
   binary: Uint8Array
-): { result: AddSuggestionParameter; nextIndex: number } => {
+): { readonly result: AddSuggestionParameter; readonly nextIndex: number } => {
   const accessTokenAndNextIndex: {
-    result: AccessToken;
-    nextIndex: number;
+    readonly result: AccessToken;
+    readonly nextIndex: number;
   } = (decodeToken as (
     a: number,
     b: Uint8Array
-  ) => { result: AccessToken; nextIndex: number })(index, binary);
+  ) => { readonly result: AccessToken; readonly nextIndex: number })(
+    index,
+    binary
+  );
   const ideaIdAndNextIndex: {
-    result: IdeaId;
-    nextIndex: number;
+    readonly result: IdeaId;
+    readonly nextIndex: number;
   } = (decodeId as (
     a: number,
     b: Uint8Array
-  ) => { result: IdeaId; nextIndex: number })(
+  ) => { readonly result: IdeaId; readonly nextIndex: number })(
     accessTokenAndNextIndex.nextIndex,
     binary
   );
@@ -4974,35 +5160,41 @@ export const decodeAddSuggestionParameter = (
 export const decodeUpdateSuggestionParameter = (
   index: number,
   binary: Uint8Array
-): { result: UpdateSuggestionParameter; nextIndex: number } => {
+): {
+  readonly result: UpdateSuggestionParameter;
+  readonly nextIndex: number;
+} => {
   const accessTokenAndNextIndex: {
-    result: AccessToken;
-    nextIndex: number;
+    readonly result: AccessToken;
+    readonly nextIndex: number;
   } = (decodeToken as (
     a: number,
     b: Uint8Array
-  ) => { result: AccessToken; nextIndex: number })(index, binary);
+  ) => { readonly result: AccessToken; readonly nextIndex: number })(
+    index,
+    binary
+  );
   const suggestionIdAndNextIndex: {
-    result: SuggestionId;
-    nextIndex: number;
+    readonly result: SuggestionId;
+    readonly nextIndex: number;
   } = (decodeId as (
     a: number,
     b: Uint8Array
-  ) => { result: SuggestionId; nextIndex: number })(
+  ) => { readonly result: SuggestionId; readonly nextIndex: number })(
     accessTokenAndNextIndex.nextIndex,
     binary
   );
-  const nameAndNextIndex: { result: string; nextIndex: number } = decodeString(
-    suggestionIdAndNextIndex.nextIndex,
-    binary
-  );
+  const nameAndNextIndex: {
+    readonly result: string;
+    readonly nextIndex: number;
+  } = decodeString(suggestionIdAndNextIndex.nextIndex, binary);
   const reasonAndNextIndex: {
-    result: string;
-    nextIndex: number;
+    readonly result: string;
+    readonly nextIndex: number;
   } = decodeString(nameAndNextIndex.nextIndex, binary);
   const changeListAndNextIndex: {
-    result: ReadonlyArray<Change>;
-    nextIndex: number;
+    readonly result: ReadonlyArray<Change>;
+    readonly nextIndex: number;
   } = decodeList(decodeChange)(reasonAndNextIndex.nextIndex, binary);
   return {
     result: {
@@ -5023,21 +5215,27 @@ export const decodeUpdateSuggestionParameter = (
 export const decodeAccessTokenAndSuggestionId = (
   index: number,
   binary: Uint8Array
-): { result: AccessTokenAndSuggestionId; nextIndex: number } => {
+): {
+  readonly result: AccessTokenAndSuggestionId;
+  readonly nextIndex: number;
+} => {
   const accessTokenAndNextIndex: {
-    result: AccessToken;
-    nextIndex: number;
+    readonly result: AccessToken;
+    readonly nextIndex: number;
   } = (decodeToken as (
     a: number,
     b: Uint8Array
-  ) => { result: AccessToken; nextIndex: number })(index, binary);
+  ) => { readonly result: AccessToken; readonly nextIndex: number })(
+    index,
+    binary
+  );
   const suggestionIdAndNextIndex: {
-    result: SuggestionId;
-    nextIndex: number;
+    readonly result: SuggestionId;
+    readonly nextIndex: number;
   } = (decodeId as (
     a: number,
     b: Uint8Array
-  ) => { result: SuggestionId; nextIndex: number })(
+  ) => { readonly result: SuggestionId; readonly nextIndex: number })(
     accessTokenAndNextIndex.nextIndex,
     binary
   );
