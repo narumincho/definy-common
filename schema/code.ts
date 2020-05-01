@@ -183,6 +183,11 @@ export const customTypeList: ReadonlyArray<type.CustomType> = [
     description: "パーツを追加するのに必要なもの",
     body: product([
       {
+        name: "id",
+        description: "ブラウザで生成した今回作成した提案内で参照するためのID",
+        memberType: type.typeInt32,
+      },
+      {
         name: "name",
         description: "新しいパーツの名前",
         memberType: type.typeString,
@@ -269,7 +274,7 @@ export const customTypeList: ReadonlyArray<type.CustomType> = [
     body: product([
       {
         name: "suggestionTypePartIndex",
-        description: "提案内での定義した型パーツの番号",
+        description: "提案内での定義した型パーツのID",
         memberType: type.typeInt32,
       },
       {
@@ -300,7 +305,7 @@ export const customTypeList: ReadonlyArray<type.CustomType> = [
       },
       {
         name: "SuggestionPartReference",
-        description: "提案内で定義されたパーツの番号",
+        description: "提案内で定義されたパーツのID",
         parameter: type.maybeJust(type.typeInt32),
       },
       {
@@ -326,7 +331,14 @@ export const customTypeList: ReadonlyArray<type.CustomType> = [
       {
         name: "Lambda",
         description: "ラムダ",
-        parameter: type.maybeJust(type.typeCustom(suggestionLambdaBranchName)),
+        parameter: type.maybeJust(
+          type.typeList(type.typeCustom(suggestionLambdaBranchName))
+        ),
+      },
+      {
+        name: "Blank",
+        description: "空白",
+        parameter: type.maybeNothing(),
       },
     ]),
   },
@@ -386,7 +398,7 @@ export const customTypeList: ReadonlyArray<type.CustomType> = [
       {
         name: "expr",
         description: "式",
-        memberType: type.typeMaybe(type.typeCustom(suggestionExprName)),
+        memberType: type.typeCustom(suggestionExprName),
       },
     ]),
   },
@@ -828,7 +840,7 @@ export const customTypeList: ReadonlyArray<type.CustomType> = [
       {
         name: "expr",
         description: "式",
-        memberType: type.typeMaybe(type.typeCustom(exprName)),
+        memberType: type.typeCustom(exprName),
       },
     ]),
   },
