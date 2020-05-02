@@ -48,6 +48,10 @@ const conditionCaptureName = "ConditionCapture";
 const evaluateExprErrorName = "EvaluateExprError";
 const typeErrorName = "TypeError";
 
+const evalParameterName = "EvalParameter";
+const partWithId = "PartWithId";
+const typePartWithId = "TypePartWithId";
+
 const product = type.customTypeBodyProduct;
 const sum = type.customTypeBodySum;
 
@@ -977,6 +981,64 @@ export const customTypeList: ReadonlyArray<type.CustomType> = [
         name: "message",
         description: "型エラーの説明",
         memberType: type.typeString,
+      },
+    ]),
+  },
+  {
+    name: evalParameterName,
+    description: "評価する上で必要なソースコード",
+    body: product([
+      {
+        name: "partList",
+        description: "パーツのリスト",
+        memberType: type.typeList(type.typeCustom(partWithId)),
+      },
+      {
+        name: "typePartList",
+        description: "型パーツのリスト",
+        memberType: type.typeList(type.typeCustom(typePartWithId)),
+      },
+      {
+        name: "changeList",
+        description: "変更点",
+        memberType: type.typeList(type.typeCustom(changeName)),
+      },
+      {
+        name: "expr",
+        description: "評価してほしい式",
+        memberType: type.typeCustom(suggestionExprName),
+      },
+    ]),
+  },
+  {
+    name: partWithId,
+    description: "パーツとPartId",
+    body: product([
+      {
+        name: "id",
+        description: "PartId",
+        memberType: idAndToken.partId,
+      },
+      {
+        name: "part",
+        description: "PartSnapshot",
+        memberType: type.typeCustom(partSnapshotName),
+      },
+    ]),
+  },
+  {
+    name: typePartWithId,
+    description: "型パーツとTypePartId",
+    body: product([
+      {
+        name: "id",
+        description: "TypePartId",
+        memberType: idAndToken.typePartId,
+      },
+      {
+        name: "typePart",
+        description: "TypePartSnapshot",
+        memberType: type.typeCustom(typePartSnapshotName),
       },
     ]),
   },

@@ -307,6 +307,43 @@ export type EvaluationResult = data.Result<
   ReadonlyArray<data.EvaluateExprError>
 >;
 
+/**
+ * Elmから送られてきたデータを元にして式を評価する
+ */
+export const evalExpr = (evalParameter: data.EvalParameter): EvaluationResult =>
+  evaluateSuggestionExpr(
+    {
+      partMap: new Map(
+        evalParameter.partList.map(({ id, part }) => [id, part])
+      ),
+      typePartMap: new Map(
+        evalParameter.typePartList.map(({ id, typePart }) => [id, typePart])
+      ),
+      suggestionPartMap: changeListToSuggestionPartMap(
+        evalParameter.changeList
+      ),
+      evaluatedPartMap: new Map(),
+      evaluatedSuggestionPartMap: new Map(),
+    },
+    evalParameter.expr
+  );
+
+const changeListToSuggestionPartMap = (
+  changeList: ReadonlyArray<data.Change>
+): ReadonlyMap<number, data.SuggestionExpr> => {
+  const map: Map<number, data.SuggestionExpr> = new Map();
+  for (const change of changeList) {
+    switch (change._) {
+      case "AddPart":
+        map.set(change.addPart.id, change.addPart.expr);
+        break;
+      case "ProjectName":
+        break;
+    }
+  }
+  return map;
+};
+
 export const evaluateSuggestionExpr = (
   sourceAndCache: SourceAndCache,
   suggestionExpr: data.SuggestionExpr

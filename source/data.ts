@@ -968,6 +968,56 @@ export type TypeError = {
 };
 
 /**
+ * 評価する上で必要なソースコード
+ */
+export type EvalParameter = {
+  /**
+   * パーツのリスト
+   */
+  readonly partList: ReadonlyArray<PartWithId>;
+  /**
+   * 型パーツのリスト
+   */
+  readonly typePartList: ReadonlyArray<TypePartWithId>;
+  /**
+   * 変更点
+   */
+  readonly changeList: ReadonlyArray<Change>;
+  /**
+   * 評価してほしい式
+   */
+  readonly expr: SuggestionExpr;
+};
+
+/**
+ * パーツとPartId
+ */
+export type PartWithId = {
+  /**
+   * PartId
+   */
+  readonly id: PartId;
+  /**
+   * PartSnapshot
+   */
+  readonly part: PartSnapshot;
+};
+
+/**
+ * 型パーツとTypePartId
+ */
+export type TypePartWithId = {
+  /**
+   * TypePartId
+   */
+  readonly id: TypePartId;
+  /**
+   * TypePartSnapshot
+   */
+  readonly typePart: TypePartSnapshot;
+};
+
+/**
  * プロジェクト作成時に必要なパラメーター
  */
 export type CreateProjectParameter = {
@@ -2341,6 +2391,26 @@ export const encodeEvaluateExprError = (
 
 export const encodeTypeError = (typeError: TypeError): ReadonlyArray<number> =>
   encodeString(typeError.message);
+
+export const encodeEvalParameter = (
+  evalParameter: EvalParameter
+): ReadonlyArray<number> =>
+  encodeList(encodePartWithId)(evalParameter.partList)
+    .concat(encodeList(encodeTypePartWithId)(evalParameter.typePartList))
+    .concat(encodeList(encodeChange)(evalParameter.changeList))
+    .concat(encodeSuggestionExpr(evalParameter.expr));
+
+export const encodePartWithId = (
+  partWithId: PartWithId
+): ReadonlyArray<number> =>
+  encodeId(partWithId.id).concat(encodePartSnapshot(partWithId.part));
+
+export const encodeTypePartWithId = (
+  typePartWithId: TypePartWithId
+): ReadonlyArray<number> =>
+  encodeId(typePartWithId.id).concat(
+    encodeTypePartSnapshot(typePartWithId.typePart)
+  );
 
 export const encodeCreateProjectParameter = (
   createProjectParameter: CreateProjectParameter
@@ -5036,6 +5106,97 @@ export const decodeTypeError = (
   return {
     result: { message: messageAndNextIndex.result },
     nextIndex: messageAndNextIndex.nextIndex,
+  };
+};
+
+/**
+ * @param index バイナリを読み込み開始位置
+ * @param binary バイナリ
+ */
+export const decodeEvalParameter = (
+  index: number,
+  binary: Uint8Array
+): { readonly result: EvalParameter; readonly nextIndex: number } => {
+  const partListAndNextIndex: {
+    readonly result: ReadonlyArray<PartWithId>;
+    readonly nextIndex: number;
+  } = decodeList(decodePartWithId)(index, binary);
+  const typePartListAndNextIndex: {
+    readonly result: ReadonlyArray<TypePartWithId>;
+    readonly nextIndex: number;
+  } = decodeList(decodeTypePartWithId)(partListAndNextIndex.nextIndex, binary);
+  const changeListAndNextIndex: {
+    readonly result: ReadonlyArray<Change>;
+    readonly nextIndex: number;
+  } = decodeList(decodeChange)(typePartListAndNextIndex.nextIndex, binary);
+  const exprAndNextIndex: {
+    readonly result: SuggestionExpr;
+    readonly nextIndex: number;
+  } = decodeSuggestionExpr(changeListAndNextIndex.nextIndex, binary);
+  return {
+    result: {
+      partList: partListAndNextIndex.result,
+      typePartList: typePartListAndNextIndex.result,
+      changeList: changeListAndNextIndex.result,
+      expr: exprAndNextIndex.result,
+    },
+    nextIndex: exprAndNextIndex.nextIndex,
+  };
+};
+
+/**
+ * @param index バイナリを読み込み開始位置
+ * @param binary バイナリ
+ */
+export const decodePartWithId = (
+  index: number,
+  binary: Uint8Array
+): { readonly result: PartWithId; readonly nextIndex: number } => {
+  const idAndNextIndex: {
+    readonly result: PartId;
+    readonly nextIndex: number;
+  } = (decodeId as (
+    a: number,
+    b: Uint8Array
+  ) => { readonly result: PartId; readonly nextIndex: number })(index, binary);
+  const partAndNextIndex: {
+    readonly result: PartSnapshot;
+    readonly nextIndex: number;
+  } = decodePartSnapshot(idAndNextIndex.nextIndex, binary);
+  return {
+    result: { id: idAndNextIndex.result, part: partAndNextIndex.result },
+    nextIndex: partAndNextIndex.nextIndex,
+  };
+};
+
+/**
+ * @param index バイナリを読み込み開始位置
+ * @param binary バイナリ
+ */
+export const decodeTypePartWithId = (
+  index: number,
+  binary: Uint8Array
+): { readonly result: TypePartWithId; readonly nextIndex: number } => {
+  const idAndNextIndex: {
+    readonly result: TypePartId;
+    readonly nextIndex: number;
+  } = (decodeId as (
+    a: number,
+    b: Uint8Array
+  ) => { readonly result: TypePartId; readonly nextIndex: number })(
+    index,
+    binary
+  );
+  const typePartAndNextIndex: {
+    readonly result: TypePartSnapshot;
+    readonly nextIndex: number;
+  } = decodeTypePartSnapshot(idAndNextIndex.nextIndex, binary);
+  return {
+    result: {
+      id: idAndNextIndex.result,
+      typePart: typePartAndNextIndex.result,
+    },
+    nextIndex: typePartAndNextIndex.nextIndex,
   };
 };
 
