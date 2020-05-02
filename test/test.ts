@@ -81,25 +81,25 @@ describe("test", () => {
     /*
      * = (add 50) ((add 32) 100)
      */
-    const result = main.evaluateExpr(
+    const result = main.evaluateSuggestionExpr(
       {
         typePartMap: new Map(),
         partMap: new Map(),
-        localPartMap: new Map(),
-        evaluatedLocalPartMap: new Map(),
+        suggestionPartMap: new Map(),
         evaluatedPartMap: new Map(),
+        evaluatedSuggestionPartMap: new Map(),
       },
-      data.exprFunctionCall({
-        function: data.exprFunctionCall({
-          function: data.exprKernel("Int32Add"),
-          parameter: data.exprInt32Literal(50),
+      data.suggestionExprFunctionCall({
+        function: data.suggestionExprFunctionCall({
+          function: data.suggestionExprKernel("Int32Add"),
+          parameter: data.suggestionExprInt32Literal(50),
         }),
-        parameter: data.exprFunctionCall({
-          function: data.exprFunctionCall({
-            function: data.exprKernel("Int32Add"),
-            parameter: data.exprInt32Literal(32),
+        parameter: data.suggestionExprFunctionCall({
+          function: data.suggestionExprFunctionCall({
+            function: data.suggestionExprKernel("Int32Add"),
+            parameter: data.suggestionExprInt32Literal(32),
           }),
-          parameter: data.exprInt32Literal(100),
+          parameter: data.suggestionExprInt32Literal(100),
         }),
       })
     );
@@ -123,7 +123,7 @@ describe("test", () => {
     });
     const oneName = "0" as data.PartId;
     const addOneHundredName = "1" as data.PartId;
-    const result = main.evaluateExpr(
+    const result = main.evaluateSuggestionExpr(
       {
         typePartMap: new Map(),
         partMap: new Map<data.PartId, data.PartSnapshot>([
@@ -134,7 +134,7 @@ describe("test", () => {
               description: "1を表す",
               parentList: [],
               type: intType,
-              expr: data.maybeJust(data.exprInt32Literal(1)),
+              expr: data.exprInt32Literal(1),
               createSuggestionId: "oneCreateSuggestionId" as data.SuggestionId,
               getTime: {
                 day: 0,
@@ -150,12 +150,10 @@ describe("test", () => {
               description: "100を足す関数",
               parentList: [],
               type: intType,
-              expr: data.maybeJust(
-                data.exprFunctionCall({
-                  function: data.exprKernel("Int32Add"),
-                  parameter: data.exprInt32Literal(100),
-                })
-              ),
+              expr: data.exprFunctionCall({
+                function: data.exprKernel("Int32Add"),
+                parameter: data.exprInt32Literal(100),
+              }),
               createSuggestionId: "addOneHundredCreateSuggestionId" as data.SuggestionId,
               getTime: {
                 day: 0,
@@ -165,24 +163,24 @@ describe("test", () => {
             },
           ],
         ]),
-        localPartMap: new Map(),
-        evaluatedLocalPartMap: new Map(),
+        suggestionPartMap: new Map(),
+        evaluatedSuggestionPartMap: new Map(),
         evaluatedPartMap: new Map(),
       },
-      data.exprFunctionCall({
-        function: data.exprFunctionCall({
-          function: data.exprKernel("Int32Add"),
-          parameter: data.exprFunctionCall({
-            function: data.exprPartReference(addOneHundredName),
-            parameter: data.exprPartReference(oneName),
+      data.suggestionExprFunctionCall({
+        function: data.suggestionExprFunctionCall({
+          function: data.suggestionExprKernel("Int32Add"),
+          parameter: data.suggestionExprFunctionCall({
+            function: data.suggestionExprPartReference(addOneHundredName),
+            parameter: data.suggestionExprPartReference(oneName),
           }),
         }),
-        parameter: data.exprPartReference(oneName),
+        parameter: data.suggestionExprPartReference(oneName),
       })
     );
     console.log(result);
-    expect(result.result).toEqual<
-      data.Result<data.EvaluatedExpr, data.EvaluateExprError>
+    expect(result).toEqual<
+      data.Result<data.EvaluatedExpr, ReadonlyArray<data.EvaluateExprError>>
     >(data.resultOk(data.evaluatedExprInt32(102)));
   });
 });
