@@ -243,7 +243,7 @@ type alias TypePartSnapshot =
 {-| パーツの定義
 -}
 type alias PartSnapshot =
-    { name : String, parentList : List PartId, description : String, type_ : Type, expr : Maybe Expr, projectId : ProjectId, createSuggestionId : SuggestionId, getTime : Time }
+    { name : String, parentList : List PartId, description : String, type_ : Type, expr : Expr, projectId : ProjectId, createSuggestionId : SuggestionId, getTime : Time }
 
 
 {-| 型の定義本体
@@ -376,9 +376,12 @@ type alias BranchPartDefinition =
     { localPartId : LocalPartId, name : String, description : String, type_ : Type, expr : Expr }
 
 
+{-| 評価したときに失敗した原因を表すもの
+-}
 type EvaluateExprError
     = EvaluateExprErrorNeedPartDefinition PartId
-    | EvaluateExprErrorPartExprIsNothing PartId
+    | EvaluateExprErrorNeedSuggestionPart Int
+    | EvaluateExprErrorBlank
     | EvaluateExprErrorCannotFindLocalPartDefinition LocalPartReference
     | EvaluateExprErrorTypeError TypeError
     | EvaluateExprErrorNotSupported
@@ -1019,7 +1022,7 @@ partSnapshotToJsonValue partSnapshot =
         , ( "parentList", Je.list partIdToJsonValue partSnapshot.parentList )
         , ( "description", Je.string partSnapshot.description )
         , ( "type", typeToJsonValue partSnapshot.type_ )
-        , ( "expr", maybeToJsonValue exprToJsonValue partSnapshot.expr )
+        , ( "expr", exprToJsonValue partSnapshot.expr )
         , ( "projectId", projectIdToJsonValue partSnapshot.projectId )
         , ( "createSuggestionId", suggestionIdToJsonValue partSnapshot.createSuggestionId )
         , ( "getTime", timeToJsonValue partSnapshot.getTime )
@@ -1284,8 +1287,11 @@ evaluateExprErrorToJsonValue evaluateExprError =
         EvaluateExprErrorNeedPartDefinition parameter ->
             Je.object [ ( "_", Je.string "NeedPartDefinition" ), ( "partId", partIdToJsonValue parameter ) ]
 
-        EvaluateExprErrorPartExprIsNothing parameter ->
-            Je.object [ ( "_", Je.string "PartExprIsNothing" ), ( "partId", partIdToJsonValue parameter ) ]
+        EvaluateExprErrorNeedSuggestionPart parameter ->
+            Je.object [ ( "_", Je.string "NeedSuggestionPart" ), ( "int32", Je.int parameter ) ]
+
+        EvaluateExprErrorBlank ->
+            Je.object [ ( "_", Je.string "Blank" ) ]
 
         EvaluateExprErrorCannotFindLocalPartDefinition parameter ->
             Je.object [ ( "_", Je.string "CannotFindLocalPartDefinition" ), ( "localPartReference", localPartReferenceToJsonValue parameter ) ]
@@ -2156,7 +2162,7 @@ partSnapshotJsonDecoder =
         |> Jdp.required "parentList" (Jd.list partIdJsonDecoder)
         |> Jdp.required "description" Jd.string
         |> Jdp.required "type" typeJsonDecoder
-        |> Jdp.required "expr" (maybeJsonDecoder exprJsonDecoder)
+        |> Jdp.required "expr" exprJsonDecoder
         |> Jdp.required "projectId" projectIdJsonDecoder
         |> Jdp.required "createSuggestionId" suggestionIdJsonDecoder
         |> Jdp.required "getTime" timeJsonDecoder
@@ -2527,8 +2533,11 @@ evaluateExprErrorJsonDecoder =
                     "NeedPartDefinition" ->
                         Jd.field "partId" partIdJsonDecoder |> Jd.map EvaluateExprErrorNeedPartDefinition
 
-                    "PartExprIsNothing" ->
-                        Jd.field "partId" partIdJsonDecoder |> Jd.map EvaluateExprErrorPartExprIsNothing
+                    "NeedSuggestionPart" ->
+                        Jd.field "int32" Jd.int |> Jd.map EvaluateExprErrorNeedSuggestionPart
+
+                    "Blank" ->
+                        Jd.succeed EvaluateExprErrorBlank
 
                     "CannotFindLocalPartDefinition" ->
                         Jd.field "localPartReference" localPartReferenceJsonDecoder |> Jd.map EvaluateExprErrorCannotFindLocalPartDefinition

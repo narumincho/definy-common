@@ -294,11 +294,11 @@ type SourceAndCache = {
   typePartMap: ReadonlyMap<data.TypePartId, data.TypePartSnapshot>;
   /** パーツ */
   partMap: ReadonlyMap<data.PartId, data.PartSnapshot>;
-  /** Suggestion内での変更 */
+  /** Suggestion内で作ったパーツ */
   suggestionPartMap: ReadonlyMap<number, data.SuggestionExpr>;
   /** 評価されたパーツ (キャッシュ) */
   evaluatedPartMap: Map<data.PartId, data.EvaluatedExpr>;
-  /** 評価されたSuggestion内での変更 */
+  /** 評価されたSuggestion内での作ったパーツ (キャッシュ) */
   evaluatedSuggestionPartMap: Map<number, data.EvaluatedExpr>;
 };
 
@@ -335,21 +335,17 @@ export const evaluateSuggestionExpr = (
     case "SuggestionTagReference":
       return data.resultError([data.evaluateExprErrorNotSupported]);
     case "FunctionCall":
-      return evaluateFunctionCall(
+      return evaluateSuggestionFunctionCall(
         sourceAndCache,
         suggestionExpr.suggestionFunctionCall
       );
     case "Lambda":
-      return "lambda……";
+      // TODO
+      return data.resultError([data.evaluateExprErrorBlank]);
     case "Blank":
-      return "blank……";
+      return data.resultError([data.evaluateExprErrorBlank]);
   }
 };
-
-const partIdAndEvaluatedExpr = (
-  partId: data.PartId,
-  evaluatedExpr: data.EvaluatedExpr
-): [data.PartId, data.EvaluatedExpr] => [partId, evaluatedExpr];
 
 const localPartReferenceAndEvaluatedExpr = (
   localPartReference: data.LocalPartReference,
@@ -372,86 +368,45 @@ const evaluatePartReference = (
   if (part === undefined) {
     return data.resultError([data.evaluateExprErrorNeedPartDefinition(partId)]);
   }
-  const expr = part.expr;
-  switch (expr._) {
-    case "Just": {
-      const evaluatedResult = evaluateExpr(sourceAndCache, expr.value);
-      return {
-        result: evaluatedResult.result,
-        evaluatedPartMap: new Map([
-          ...evaluatedResult.evaluatedPartMap,
-          ...(evaluatedResult.result._ === "Ok"
-            ? [partIdAndEvaluatedExpr(partId, evaluatedResult.result.ok)]
-            : []),
-        ]),
-        evaluatedLocalPartMap: evaluatedResult.evaluatedLocalPartMap,
-        suggestionEvaluatedPartMap: new Map(),
-      };
-    }
-    case "Nothing":
-      return {
-        result: data.resultError([
-          data.evaluateExprErrorNeedPartDefinition(partId),
-        ]),
-        evaluatedPartMap: new Map(),
-        evaluatedLocalPartMap: new Map(),
-        suggestionEvaluatedPartMap: new Map(),
-      };
+  const result = evaluateSuggestionExpr(
+    sourceAndCache,
+    exprToSuggestionExpr(part.expr)
+  );
+  // TODO パーツの評価に失敗したときはキャッシュに入れないよりも, エラーだったということを記録したほうが良いと思う
+  if (result._ === "Ok") {
+    sourceAndCache.evaluatedPartMap.set(partId, result.ok);
   }
+  return result;
 };
 
 const evaluateSuggestionPartReference = (
   sourceAndCache: SourceAndCache,
   addPartId: number
-): EvaluationResult => {};
+): EvaluationResult => {
+  const evaluatedSuggestionPart = sourceAndCache.evaluatedSuggestionPartMap.get(
+    addPartId
+  );
+  if (evaluatedSuggestionPart !== undefined) {
+    return data.resultOk(evaluatedSuggestionPart);
+  }
+  const suggestionPart = sourceAndCache.suggestionPartMap.get(addPartId);
+  if (suggestionPart === undefined) {
+    return data.resultError([
+      data.evaluateExprErrorNeedSuggestionPart(addPartId),
+    ]);
+  }
+  const result = evaluateSuggestionExpr(sourceAndCache, suggestionPart);
+  if (result._ === "Ok") {
+    sourceAndCache.evaluatedSuggestionPartMap.set(addPartId, result.ok);
+  }
+  return result;
+};
 
 const evaluateLocalPartReference = (
   sourceAndCache: SourceAndCache,
   localPartReference: data.LocalPartReference
 ): EvaluationResult => {
-  const evaluatedExpr = localEvaluatedPartMapGetLocalPartExpr(
-    sourceAndCache.evaluatedLocalPartMap,
-    localPartReference
-  );
-  if (evaluatedExpr !== undefined) {
-    return {
-      result: data.resultOk(evaluatedExpr),
-      evaluatedPartMap: new Map(),
-      evaluatedLocalPartMap: new Map(),
-      suggestionEvaluatedPartMap: new Map(),
-    };
-  }
-  const expr = localPartMapGetLocalPartExpr(
-    sourceAndCache.localPartMap,
-    localPartReference
-  );
-  if (expr !== undefined) {
-    const result = evaluateExpr(sourceAndCache, expr);
-    return {
-      result: result.result,
-      evaluatedPartMap: result.evaluatedPartMap,
-      evaluatedLocalPartMap: new Map([
-        ...result.evaluatedLocalPartMap,
-        ...(result.result._ === "Ok"
-          ? [
-              localPartReferenceAndEvaluatedExpr(
-                localPartReference,
-                result.result.ok
-              ),
-            ]
-          : []),
-      ]),
-      suggestionEvaluatedPartMap: new Map(),
-    };
-  }
-  return {
-    result: data.resultError([
-      data.evaluateExprErrorCannotFindLocalPartDefinition(localPartReference),
-    ]),
-    evaluatedLocalPartMap: new Map(),
-    evaluatedPartMap: new Map(),
-    suggestionEvaluatedPartMap: new Map(),
-  };
+  return data.resultError([data.evaluateExprErrorNotSupported]);
 };
 
 const localEvaluatedPartMapGetLocalPartExpr = (
@@ -498,47 +453,25 @@ const localPartMapSetLocalPartExpr = (
   );
 };
 
-const evaluateFunctionCall = (
+const evaluateSuggestionFunctionCall = (
   sourceAndCache: SourceAndCache,
-  functionCall: data.FunctionCall
+  functionCall: data.SuggestionFunctionCall
 ): EvaluationResult => {
-  /* 
-     [A] 引数で与えられたすでにあるキャッシュ
-     [B] Functionの部分を評価したら得られたキャッシュ
-     [C] Parameterの部分を評価したら得られたキャッシュ
-  */
-  /* use Cache [A] */
-  const functionResult = evaluateExpr(sourceAndCache, functionCall.function);
-  /* [A] + [B] */
-  const sourceAndCacheByFunctionEvaluation = sourceAndCacheAddCacheFromEvaluationResult(
+  const functionResult = evaluateSuggestionExpr(
     sourceAndCache,
-    functionResult
+    functionCall.function
   );
-  /* use Cache [A] + [B] */
-  const parameterResult = evaluateExpr(
-    sourceAndCacheByFunctionEvaluation,
+  const parameterResult = evaluateSuggestionExpr(
+    sourceAndCache,
     functionCall.parameter
   );
-  const sourceAndCacheByFunctionAndParameter = sourceAndCacheAddCacheFromEvaluationResult(
-    sourceAndCacheByFunctionEvaluation,
-    parameterResult
-  );
-
-  switch (functionResult.result._) {
+  switch (functionResult._) {
     case "Ok":
-      switch (parameterResult.result._) {
+      switch (parameterResult._) {
         case "Ok": {
-          return sourceAndCacheAddCacheFromEvaluationResult(
-            sourceAndCacheByFunctionAndParameter,
-            {
-              result: evaluateFunctionCallResultOk(
-                functionResult.result.ok,
-                parameterResult.result.ok
-              ),
-              evaluatedPartMap: new Map(),
-              evaluatedLocalPartMap: new Map(),
-              suggestionEvaluatedPartMap: new Map(),
-            }
+          return evaluateFunctionCallResultOk(
+            functionResult.ok,
+            parameterResult.ok
           );
         }
         case "Error":
@@ -547,17 +480,11 @@ const evaluateFunctionCall = (
       break;
 
     case "Error":
-      return {
-        result: data.resultError(
-          functionResult.result.error.concat(
-            parameterResult.result._ === "Error"
-              ? parameterResult.result.error
-              : []
-          )
-        ),
-        evaluatedPartMap: evaluatedPartMap,
-        evaluatedLocalPartMap: evaluatedLocalPartMap,
-      };
+      return data.resultError(
+        functionResult.error.concat(
+          parameterResult._ === "Error" ? parameterResult.error : []
+        )
+      );
   }
 };
 
@@ -661,31 +588,6 @@ const int32Sub = (
   ]);
 };
 
-/**
- *
- * @param sourceAndCache すでに求められているキャッシュ
- * @param result 評価された結果. 評価のついでに得られた計算結果のキャッシュも含まれている
- */
-const sourceAndCacheAddCacheFromEvaluationResult = (
-  sourceAndCache: SourceAndCache,
-  result: EvaluationResult
-): SourceAndCache => {
-  return {
-    typePartMap: sourceAndCache.typePartMap,
-    partMap: sourceAndCache.partMap,
-    suggestionPartMap: sourceAndCache.suggestionPartMap,
-    localPartMap: sourceAndCache.localPartMap,
-    evaluatedPartMap: new Map([
-      ...sourceAndCache.evaluatedPartMap,
-      ...result.evaluatedPartMap,
-    ]),
-    evaluatedLocalPartMap: new Map([
-      ...sourceAndCache.evaluatedPartMap,
-      ...result.evaluatedLocalPartMap,
-    ]),
-  };
-};
-
 export const exprToDebugString = (expr: data.Expr): string => {
   switch (expr._) {
     case "Kernel":
@@ -730,7 +632,7 @@ const lambdaBranchToString = (lambdaBranch: data.LambdaBranch): string => {
       : "{-" + lambdaBranch.description + "-}") +
     conditionToString(lambdaBranch.condition) +
     " → " +
-    util.maybeUnwrap(lambdaBranch.expr, exprToDebugString, "□")
+    exprToDebugString(lambdaBranch.expr)
   );
 };
 

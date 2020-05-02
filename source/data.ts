@@ -659,7 +659,7 @@ export type PartSnapshot = {
   /**
    * パーツの式
    */
-  readonly expr: Maybe<Expr>;
+  readonly expr: Expr;
   /**
    * 所属しているプロジェクトのID
    */
@@ -943,9 +943,13 @@ export type BranchPartDefinition = {
   readonly expr: Expr;
 };
 
+/**
+ * 評価したときに失敗した原因を表すもの
+ */
 export type EvaluateExprError =
   | { readonly _: "NeedPartDefinition"; readonly partId: PartId }
-  | { readonly _: "PartExprIsNothing"; readonly partId: PartId }
+  | { readonly _: "NeedSuggestionPart"; readonly int32: number }
+  | { readonly _: "Blank" }
   | {
       readonly _: "CannotFindLocalPartDefinition";
       readonly localPartReference: LocalPartReference;
@@ -1522,11 +1526,16 @@ export const evaluateExprErrorNeedPartDefinition = (
 ): EvaluateExprError => ({ _: "NeedPartDefinition", partId: partId });
 
 /**
- * パーツの式が空だと言っている
+ * 式を評価するために必要なSuggestionPartが見つからない
  */
-export const evaluateExprErrorPartExprIsNothing = (
-  partId: PartId
-): EvaluateExprError => ({ _: "PartExprIsNothing", partId: partId });
+export const evaluateExprErrorNeedSuggestionPart = (
+  int32: number
+): EvaluateExprError => ({ _: "NeedSuggestionPart", int32: int32 });
+
+/**
+ * 計算結果にblankが含まれている
+ */
+export const evaluateExprErrorBlank: EvaluateExprError = { _: "Blank" };
 
 /**
  * ローカルパーツの定義を見つけることができなかった
@@ -2071,7 +2080,7 @@ export const encodePartSnapshot = (
     .concat(encodeList(encodeId)(partSnapshot.parentList))
     .concat(encodeString(partSnapshot.description))
     .concat(encodeType(partSnapshot["type"]))
-    .concat(encodeMaybe(encodeExpr)(partSnapshot.expr))
+    .concat(encodeExpr(partSnapshot.expr))
     .concat(encodeId(partSnapshot.projectId))
     .concat(encodeId(partSnapshot.createSuggestionId))
     .concat(encodeTime(partSnapshot.getTime));
@@ -2310,19 +2319,22 @@ export const encodeEvaluateExprError = (
     case "NeedPartDefinition": {
       return [0].concat(encodeId(evaluateExprError.partId));
     }
-    case "PartExprIsNothing": {
-      return [1].concat(encodeId(evaluateExprError.partId));
+    case "NeedSuggestionPart": {
+      return [1].concat(encodeInt32(evaluateExprError.int32));
+    }
+    case "Blank": {
+      return [2];
     }
     case "CannotFindLocalPartDefinition": {
-      return [2].concat(
+      return [3].concat(
         encodeLocalPartReference(evaluateExprError.localPartReference)
       );
     }
     case "TypeError": {
-      return [3].concat(encodeTypeError(evaluateExprError.typeError));
+      return [4].concat(encodeTypeError(evaluateExprError.typeError));
     }
     case "NotSupported": {
-      return [4];
+      return [5];
     }
   }
 };
@@ -4175,9 +4187,9 @@ export const decodePartSnapshot = (
     readonly nextIndex: number;
   } = decodeType(descriptionAndNextIndex.nextIndex, binary);
   const exprAndNextIndex: {
-    readonly result: Maybe<Expr>;
+    readonly result: Expr;
     readonly nextIndex: number;
-  } = decodeMaybe(decodeExpr)(typeAndNextIndex.nextIndex, binary);
+  } = decodeExpr(typeAndNextIndex.nextIndex, binary);
   const projectIdAndNextIndex: {
     readonly result: ProjectId;
     readonly nextIndex: number;
@@ -4966,21 +4978,21 @@ export const decodeEvaluateExprError = (
   }
   if (patternIndex.result === 1) {
     const result: {
-      readonly result: PartId;
+      readonly result: number;
       readonly nextIndex: number;
-    } = (decodeId as (
-      a: number,
-      b: Uint8Array
-    ) => { readonly result: PartId; readonly nextIndex: number })(
-      patternIndex.nextIndex,
-      binary
-    );
+    } = decodeInt32(patternIndex.nextIndex, binary);
     return {
-      result: evaluateExprErrorPartExprIsNothing(result.result),
+      result: evaluateExprErrorNeedSuggestionPart(result.result),
       nextIndex: result.nextIndex,
     };
   }
   if (patternIndex.result === 2) {
+    return {
+      result: evaluateExprErrorBlank,
+      nextIndex: patternIndex.nextIndex,
+    };
+  }
+  if (patternIndex.result === 3) {
     const result: {
       readonly result: LocalPartReference;
       readonly nextIndex: number;
@@ -4990,7 +5002,7 @@ export const decodeEvaluateExprError = (
       nextIndex: result.nextIndex,
     };
   }
-  if (patternIndex.result === 3) {
+  if (patternIndex.result === 4) {
     const result: {
       readonly result: TypeError;
       readonly nextIndex: number;
@@ -5000,7 +5012,7 @@ export const decodeEvaluateExprError = (
       nextIndex: result.nextIndex,
     };
   }
-  if (patternIndex.result === 4) {
+  if (patternIndex.result === 5) {
     return {
       result: evaluateExprErrorNotSupported,
       nextIndex: patternIndex.nextIndex,

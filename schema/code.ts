@@ -502,7 +502,7 @@ export const customTypeList: ReadonlyArray<type.CustomType> = [
       {
         name: "expr",
         description: "パーツの式",
-        memberType: type.typeMaybe(type.typeCustom(exprName)),
+        memberType: type.typeCustom(exprName),
       },
       {
         name: "projectId",
@@ -935,7 +935,7 @@ export const customTypeList: ReadonlyArray<type.CustomType> = [
   },
   {
     name: evaluateExprErrorName,
-    description: "",
+    description: "評価したときに失敗した原因を表すもの",
     body: sum([
       {
         name: "NeedPartDefinition",
@@ -943,9 +943,14 @@ export const customTypeList: ReadonlyArray<type.CustomType> = [
         parameter: type.maybeJust(idAndToken.partId),
       },
       {
-        name: "PartExprIsNothing",
-        description: "パーツの式が空だと言っている",
-        parameter: type.maybeJust(idAndToken.partId),
+        name: "NeedSuggestionPart",
+        description: "式を評価するために必要なSuggestionPartが見つからない",
+        parameter: type.maybeJust(type.typeInt32),
+      },
+      {
+        name: "Blank",
+        description: "計算結果にblankが含まれている",
+        parameter: type.maybeNothing(),
       },
       {
         name: "CannotFindLocalPartDefinition",
