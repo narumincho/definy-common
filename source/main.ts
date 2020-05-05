@@ -46,12 +46,20 @@ const locationToPath = (location: data.Location): string => {
       return "/create-idea/" + (location.projectId as string);
     case "User":
       return "/user/" + (location.userId as string);
+    case "UserList":
+      return "/user";
     case "Project":
       return "/project/" + (location.projectId as string);
     case "Idea":
       return "/idea/" + (location.ideaId as string);
     case "Suggestion":
       return "/suggestion/" + (location.suggestionId as string);
+    case "PartList":
+      return "/part";
+    case "TypePartList":
+      return "/type-part";
+    case "About":
+      return "/about";
   }
 };
 
@@ -92,6 +100,18 @@ const clientModeFromUrl = (origin: string): data.ClientMode =>
 const locationFromUrl = (pathName: string): data.Location => {
   if (pathName === "/create-project") {
     return data.locationCreateProject;
+  }
+  if (pathName === "/user") {
+    return data.locationUserList;
+  }
+  if (pathName === "/part") {
+    return data.locationPartList;
+  }
+  if (pathName === "/type-part") {
+    return data.locationTypePartList;
+  }
+  if (pathName === "/about") {
+    return data.locationAbout;
   }
   const createIdeaResult = pathName.match(/^\/create-idea\/([0-9a-f]{32})$/u);
   if (createIdeaResult !== null) {
