@@ -44,9 +44,15 @@ type Location
     | LocationCreateProject
     | LocationCreateIdea ProjectId
     | LocationUser UserId
+    | LocationUserList
     | LocationProject ProjectId
     | LocationIdea IdeaId
+    | LocationIdeaList
     | LocationSuggestion SuggestionId
+    | LocationSuggestionList
+    | LocationPartList
+    | LocationTypePartList
+    | LocationAbout
 
 
 {-| 英語,日本語,エスペラント語などの言語
@@ -629,14 +635,32 @@ locationToJsonValue location =
         LocationUser parameter ->
             Je.object [ ( "_", Je.string "User" ), ( "userId", userIdToJsonValue parameter ) ]
 
+        LocationUserList ->
+            Je.object [ ( "_", Je.string "UserList" ) ]
+
         LocationProject parameter ->
             Je.object [ ( "_", Je.string "Project" ), ( "projectId", projectIdToJsonValue parameter ) ]
 
         LocationIdea parameter ->
             Je.object [ ( "_", Je.string "Idea" ), ( "ideaId", ideaIdToJsonValue parameter ) ]
 
+        LocationIdeaList ->
+            Je.object [ ( "_", Je.string "IdeaList" ) ]
+
         LocationSuggestion parameter ->
             Je.object [ ( "_", Je.string "Suggestion" ), ( "suggestionId", suggestionIdToJsonValue parameter ) ]
+
+        LocationSuggestionList ->
+            Je.object [ ( "_", Je.string "SuggestionList" ) ]
+
+        LocationPartList ->
+            Je.object [ ( "_", Je.string "PartList" ) ]
+
+        LocationTypePartList ->
+            Je.object [ ( "_", Je.string "TypePartList" ) ]
+
+        LocationAbout ->
+            Je.object [ ( "_", Je.string "About" ) ]
 
 
 {-| LanguageのJSONへのエンコーダ
@@ -1613,14 +1637,32 @@ locationJsonDecoder =
                     "User" ->
                         Jd.field "userId" userIdJsonDecoder |> Jd.map LocationUser
 
+                    "UserList" ->
+                        Jd.succeed LocationUserList
+
                     "Project" ->
                         Jd.field "projectId" projectIdJsonDecoder |> Jd.map LocationProject
 
                     "Idea" ->
                         Jd.field "ideaId" ideaIdJsonDecoder |> Jd.map LocationIdea
 
+                    "IdeaList" ->
+                        Jd.succeed LocationIdeaList
+
                     "Suggestion" ->
                         Jd.field "suggestionId" suggestionIdJsonDecoder |> Jd.map LocationSuggestion
+
+                    "SuggestionList" ->
+                        Jd.succeed LocationSuggestionList
+
+                    "PartList" ->
+                        Jd.succeed LocationPartList
+
+                    "TypePartList" ->
+                        Jd.succeed LocationTypePartList
+
+                    "About" ->
+                        Jd.succeed LocationAbout
 
                     _ ->
                         Jd.fail ("Locationで不明なタグを受けたとった tag=" ++ tag)

@@ -78,9 +78,15 @@ export type Location =
   | { readonly _: "CreateProject" }
   | { readonly _: "CreateIdea"; readonly projectId: ProjectId }
   | { readonly _: "User"; readonly userId: UserId }
+  | { readonly _: "UserList" }
   | { readonly _: "Project"; readonly projectId: ProjectId }
   | { readonly _: "Idea"; readonly ideaId: IdeaId }
-  | { readonly _: "Suggestion"; readonly suggestionId: SuggestionId };
+  | { readonly _: "IdeaList" }
+  | { readonly _: "Suggestion"; readonly suggestionId: SuggestionId }
+  | { readonly _: "SuggestionList" }
+  | { readonly _: "PartList" }
+  | { readonly _: "TypePartList" }
+  | { readonly _: "About" };
 
 /**
  * 英語,日本語,エスペラント語などの言語
@@ -1185,6 +1191,11 @@ export const locationUser = (userId: UserId): Location => ({
 });
 
 /**
+ * ユーザー一覧ページ
+ */
+export const locationUserList: Location = { _: "UserList" };
+
+/**
  * プロジェクトの詳細ページ
  */
 export const locationProject = (projectId: ProjectId): Location => ({
@@ -1201,12 +1212,37 @@ export const locationIdea = (ideaId: IdeaId): Location => ({
 });
 
 /**
+ * アイデア一覧ページ
+ */
+export const locationIdeaList: Location = { _: "IdeaList" };
+
+/**
  * 提案のページ
  */
 export const locationSuggestion = (suggestionId: SuggestionId): Location => ({
   _: "Suggestion",
   suggestionId: suggestionId,
 });
+
+/**
+ * 提案一覧ページ
+ */
+export const locationSuggestionList: Location = { _: "SuggestionList" };
+
+/**
+ * パーツ一覧ページ
+ */
+export const locationPartList: Location = { _: "PartList" };
+
+/**
+ * 型パーツ一覧ページ
+ */
+export const locationTypePartList: Location = { _: "TypePartList" };
+
+/**
+ * Definyについて説明したページ
+ */
+export const locationAbout: Location = { _: "About" };
 
 /**
  * 文章でのコメントをした
@@ -1767,14 +1803,32 @@ export const encodeLocation = (location: Location): ReadonlyArray<number> => {
     case "User": {
       return [3].concat(encodeId(location.userId));
     }
+    case "UserList": {
+      return [4];
+    }
     case "Project": {
-      return [4].concat(encodeId(location.projectId));
+      return [5].concat(encodeId(location.projectId));
     }
     case "Idea": {
-      return [5].concat(encodeId(location.ideaId));
+      return [6].concat(encodeId(location.ideaId));
+    }
+    case "IdeaList": {
+      return [7];
     }
     case "Suggestion": {
-      return [6].concat(encodeId(location.suggestionId));
+      return [8].concat(encodeId(location.suggestionId));
+    }
+    case "SuggestionList": {
+      return [9];
+    }
+    case "PartList": {
+      return [10];
+    }
+    case "TypePartList": {
+      return [11];
+    }
+    case "About": {
+      return [12];
     }
   }
 };
@@ -2465,8 +2519,8 @@ export const decodeInt32 = (
   index: number,
   binary: Uint8Array
 ): { readonly result: number; readonly nextIndex: number } => {
-  let result = 0;
-  let offset = 0;
+  let result: number = 0;
+  let offset: number = 0;
   while (true) {
     const byte: number = binary[index + offset];
     result |= (byte & 127) << (offset * 7);
@@ -2855,6 +2909,9 @@ export const decodeLocation = (
     return { result: locationUser(result.result), nextIndex: result.nextIndex };
   }
   if (patternIndex.result === 4) {
+    return { result: locationUserList, nextIndex: patternIndex.nextIndex };
+  }
+  if (patternIndex.result === 5) {
     const result: {
       readonly result: ProjectId;
       readonly nextIndex: number;
@@ -2870,7 +2927,7 @@ export const decodeLocation = (
       nextIndex: result.nextIndex,
     };
   }
-  if (patternIndex.result === 5) {
+  if (patternIndex.result === 6) {
     const result: {
       readonly result: IdeaId;
       readonly nextIndex: number;
@@ -2883,7 +2940,10 @@ export const decodeLocation = (
     );
     return { result: locationIdea(result.result), nextIndex: result.nextIndex };
   }
-  if (patternIndex.result === 6) {
+  if (patternIndex.result === 7) {
+    return { result: locationIdeaList, nextIndex: patternIndex.nextIndex };
+  }
+  if (patternIndex.result === 8) {
     const result: {
       readonly result: SuggestionId;
       readonly nextIndex: number;
@@ -2898,6 +2958,21 @@ export const decodeLocation = (
       result: locationSuggestion(result.result),
       nextIndex: result.nextIndex,
     };
+  }
+  if (patternIndex.result === 9) {
+    return {
+      result: locationSuggestionList,
+      nextIndex: patternIndex.nextIndex,
+    };
+  }
+  if (patternIndex.result === 10) {
+    return { result: locationPartList, nextIndex: patternIndex.nextIndex };
+  }
+  if (patternIndex.result === 11) {
+    return { result: locationTypePartList, nextIndex: patternIndex.nextIndex };
+  }
+  if (patternIndex.result === 12) {
+    return { result: locationAbout, nextIndex: patternIndex.nextIndex };
   }
   throw new Error("存在しないパターンを指定された 型を更新してください");
 };
