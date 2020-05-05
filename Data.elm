@@ -47,9 +47,7 @@ type Location
     | LocationUserList
     | LocationProject ProjectId
     | LocationIdea IdeaId
-    | LocationIdeaList
     | LocationSuggestion SuggestionId
-    | LocationSuggestionList
     | LocationPartList
     | LocationTypePartList
     | LocationAbout
@@ -644,14 +642,8 @@ locationToJsonValue location =
         LocationIdea parameter ->
             Je.object [ ( "_", Je.string "Idea" ), ( "ideaId", ideaIdToJsonValue parameter ) ]
 
-        LocationIdeaList ->
-            Je.object [ ( "_", Je.string "IdeaList" ) ]
-
         LocationSuggestion parameter ->
             Je.object [ ( "_", Je.string "Suggestion" ), ( "suggestionId", suggestionIdToJsonValue parameter ) ]
-
-        LocationSuggestionList ->
-            Je.object [ ( "_", Je.string "SuggestionList" ) ]
 
         LocationPartList ->
             Je.object [ ( "_", Je.string "PartList" ) ]
@@ -1646,14 +1638,8 @@ locationJsonDecoder =
                     "Idea" ->
                         Jd.field "ideaId" ideaIdJsonDecoder |> Jd.map LocationIdea
 
-                    "IdeaList" ->
-                        Jd.succeed LocationIdeaList
-
                     "Suggestion" ->
                         Jd.field "suggestionId" suggestionIdJsonDecoder |> Jd.map LocationSuggestion
-
-                    "SuggestionList" ->
-                        Jd.succeed LocationSuggestionList
 
                     "PartList" ->
                         Jd.succeed LocationPartList

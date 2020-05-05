@@ -81,9 +81,7 @@ export type Location =
   | { readonly _: "UserList" }
   | { readonly _: "Project"; readonly projectId: ProjectId }
   | { readonly _: "Idea"; readonly ideaId: IdeaId }
-  | { readonly _: "IdeaList" }
   | { readonly _: "Suggestion"; readonly suggestionId: SuggestionId }
-  | { readonly _: "SuggestionList" }
   | { readonly _: "PartList" }
   | { readonly _: "TypePartList" }
   | { readonly _: "About" };
@@ -1212,22 +1210,12 @@ export const locationIdea = (ideaId: IdeaId): Location => ({
 });
 
 /**
- * アイデア一覧ページ
- */
-export const locationIdeaList: Location = { _: "IdeaList" };
-
-/**
  * 提案のページ
  */
 export const locationSuggestion = (suggestionId: SuggestionId): Location => ({
   _: "Suggestion",
   suggestionId: suggestionId,
 });
-
-/**
- * 提案一覧ページ
- */
-export const locationSuggestionList: Location = { _: "SuggestionList" };
 
 /**
  * パーツ一覧ページ
@@ -1812,23 +1800,17 @@ export const encodeLocation = (location: Location): ReadonlyArray<number> => {
     case "Idea": {
       return [6].concat(encodeId(location.ideaId));
     }
-    case "IdeaList": {
-      return [7];
-    }
     case "Suggestion": {
-      return [8].concat(encodeId(location.suggestionId));
-    }
-    case "SuggestionList": {
-      return [9];
+      return [7].concat(encodeId(location.suggestionId));
     }
     case "PartList": {
-      return [10];
+      return [8];
     }
     case "TypePartList": {
-      return [11];
+      return [9];
     }
     case "About": {
-      return [12];
+      return [10];
     }
   }
 };
@@ -2941,9 +2923,6 @@ export const decodeLocation = (
     return { result: locationIdea(result.result), nextIndex: result.nextIndex };
   }
   if (patternIndex.result === 7) {
-    return { result: locationIdeaList, nextIndex: patternIndex.nextIndex };
-  }
-  if (patternIndex.result === 8) {
     const result: {
       readonly result: SuggestionId;
       readonly nextIndex: number;
@@ -2959,19 +2938,13 @@ export const decodeLocation = (
       nextIndex: result.nextIndex,
     };
   }
-  if (patternIndex.result === 9) {
-    return {
-      result: locationSuggestionList,
-      nextIndex: patternIndex.nextIndex,
-    };
-  }
-  if (patternIndex.result === 10) {
+  if (patternIndex.result === 8) {
     return { result: locationPartList, nextIndex: patternIndex.nextIndex };
   }
-  if (patternIndex.result === 11) {
+  if (patternIndex.result === 9) {
     return { result: locationTypePartList, nextIndex: patternIndex.nextIndex };
   }
-  if (patternIndex.result === 12) {
+  if (patternIndex.result === 10) {
     return { result: locationAbout, nextIndex: patternIndex.nextIndex };
   }
   throw new Error("存在しないパターンを指定された 型を更新してください");
