@@ -238,7 +238,7 @@ export type IdeaSnapshot = {
   /**
    * 言い出しっぺ
    */
-  readonly createUser: UserId;
+  readonly createUserId: UserId;
   /**
    * 作成日時
    */
@@ -1886,7 +1886,7 @@ export const encodeIdeaSnapshot = (
   ideaSnapshot: IdeaSnapshot
 ): ReadonlyArray<number> =>
   encodeString(ideaSnapshot.name)
-    .concat(encodeId(ideaSnapshot.createUser))
+    .concat(encodeId(ideaSnapshot.createUserId))
     .concat(encodeTime(ideaSnapshot.createTime))
     .concat(encodeId(ideaSnapshot.projectId))
     .concat(encodeList(encodeIdeaItem)(ideaSnapshot.itemList))
@@ -3268,7 +3268,7 @@ export const decodeIdeaSnapshot = (
     readonly result: string;
     readonly nextIndex: number;
   } = decodeString(index, binary);
-  const createUserAndNextIndex: {
+  const createUserIdAndNextIndex: {
     readonly result: UserId;
     readonly nextIndex: number;
   } = (decodeId as (
@@ -3281,7 +3281,7 @@ export const decodeIdeaSnapshot = (
   const createTimeAndNextIndex: {
     readonly result: Time;
     readonly nextIndex: number;
-  } = decodeTime(createUserAndNextIndex.nextIndex, binary);
+  } = decodeTime(createUserIdAndNextIndex.nextIndex, binary);
   const projectIdAndNextIndex: {
     readonly result: ProjectId;
     readonly nextIndex: number;
@@ -3307,7 +3307,7 @@ export const decodeIdeaSnapshot = (
   return {
     result: {
       name: nameAndNextIndex.result,
-      createUser: createUserAndNextIndex.result,
+      createUserId: createUserIdAndNextIndex.result,
       createTime: createTimeAndNextIndex.result,
       projectId: projectIdAndNextIndex.result,
       itemList: itemListAndNextIndex.result,

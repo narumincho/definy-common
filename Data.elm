@@ -100,7 +100,7 @@ type alias ProjectResponse =
 {-| アイデア
 -}
 type alias IdeaSnapshot =
-    { name : String, createUser : UserId, createTime : Time, projectId : ProjectId, itemList : List IdeaItem, updateTime : Time, getTime : Time }
+    { name : String, createUserId : UserId, createTime : Time, projectId : ProjectId, itemList : List IdeaItem, updateTime : Time, getTime : Time }
 
 
 {-| アイデアとそのID. アイデア作成時に返ってくる
@@ -749,7 +749,7 @@ ideaSnapshotToJsonValue : IdeaSnapshot -> Je.Value
 ideaSnapshotToJsonValue ideaSnapshot =
     Je.object
         [ ( "name", Je.string ideaSnapshot.name )
-        , ( "createUser", userIdToJsonValue ideaSnapshot.createUser )
+        , ( "createUserId", userIdToJsonValue ideaSnapshot.createUserId )
         , ( "createTime", timeToJsonValue ideaSnapshot.createTime )
         , ( "projectId", projectIdToJsonValue ideaSnapshot.projectId )
         , ( "itemList", Je.list ideaItemToJsonValue ideaSnapshot.itemList )
@@ -1792,9 +1792,9 @@ projectResponseJsonDecoder =
 ideaSnapshotJsonDecoder : Jd.Decoder IdeaSnapshot
 ideaSnapshotJsonDecoder =
     Jd.succeed
-        (\name createUser createTime projectId itemList updateTime getTime ->
+        (\name createUserId createTime projectId itemList updateTime getTime ->
             { name = name
-            , createUser = createUser
+            , createUserId = createUserId
             , createTime = createTime
             , projectId = projectId
             , itemList = itemList
@@ -1803,7 +1803,7 @@ ideaSnapshotJsonDecoder =
             }
         )
         |> Jdp.required "name" Jd.string
-        |> Jdp.required "createUser" userIdJsonDecoder
+        |> Jdp.required "createUserId" userIdJsonDecoder
         |> Jdp.required "createTime" timeJsonDecoder
         |> Jdp.required "projectId" projectIdJsonDecoder
         |> Jdp.required "itemList" (Jd.list ideaItemJsonDecoder)
