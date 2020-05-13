@@ -249,6 +249,7 @@ const normalizeOneLineString = (text: string): string => {
   return result;
 };
 
+/** エディタ上で型の名前を作る. 先頭は小文字だがエディタ上は大文字 */
 export const stringToTypePartName = (text: string): string | undefined => {
   text = text.normalize("NFKC");
   let isBeforeSpace = false;
@@ -269,7 +270,12 @@ export const stringToTypePartName = (text: string): string | undefined => {
     }
     isBeforeSpace = true;
   }
-  return result;
+  return result.slice(0, 64);
+};
+
+/** サーバー上での型の名前のバリテーション */
+export const isValidTypePartName = (text: string): boolean => {
+  return /^[a-z][a-zA-Z0-9]*$/u.test(text) && text.length <= 64;
 };
 
 export const exprToSuggestionExpr = (expr: data.Expr): data.SuggestionExpr => {

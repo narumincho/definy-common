@@ -108,7 +108,12 @@ describe("test", () => {
         }),
       })
     );
-    console.log(result);
+    expect(result).toEqual<
+      main.data.Result<
+        main.data.EvaluatedExpr,
+        ReadonlyArray<main.data.EvaluateExprError>
+      >
+    >(data.resultOk(data.evaluatedExprInt32(182)));
   });
 
   it("dynamic Evaluation: use part definition", () => {
@@ -183,7 +188,6 @@ describe("test", () => {
         parameter: data.suggestionExprPartReference(oneName),
       })
     );
-    console.log(result);
     expect(result).toEqual<
       data.Result<data.EvaluatedExpr, ReadonlyArray<data.EvaluateExprError>>
     >(data.resultOk(data.evaluatedExprInt32(102)));
