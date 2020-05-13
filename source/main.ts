@@ -249,6 +249,29 @@ const normalizeOneLineString = (text: string): string => {
   return result;
 };
 
+export const stringToTypePartName = (text: string): string | undefined => {
+  text = text.normalize("NFKC");
+  let isBeforeSpace = false;
+  let isFirstChar = true;
+  let result = "";
+  for (const char of text) {
+    if (isFirstChar) {
+      if (/^[a-zA-Z]$/u.test(char)) {
+        result += char.toLowerCase();
+        isFirstChar = false;
+      }
+      continue;
+    }
+    if (/^[a-zA-Z0-9]$/u.test(char)) {
+      result += isBeforeSpace ? char.toUpperCase() : char;
+      isBeforeSpace = false;
+      continue;
+    }
+    isBeforeSpace = true;
+  }
+  return result;
+};
+
 export const exprToSuggestionExpr = (expr: data.Expr): data.SuggestionExpr => {
   switch (expr._) {
     case "Kernel":

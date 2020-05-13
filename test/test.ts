@@ -77,6 +77,11 @@ describe("test", () => {
       main.util.timeFromDate(main.util.timeToDate(sampleDateTime))
     );
   });
+  it("stringToTypePartName", () => {
+    expect(main.stringToTypePartName("Definy is web  app! for.web::App")).toBe(
+      "definyIsWebAppForWebApp"
+    );
+  });
   it("dynamic Evaluation: simple expr", () => {
     /*
      * = (add 50) ((add 32) 100)
