@@ -180,7 +180,7 @@ export type ProjectSnapshot = {
   /**
    * 作成アカウント
    */
-  readonly createUser: UserId;
+  readonly createUserId: UserId;
   /**
    * 更新日時
    */
@@ -1862,7 +1862,7 @@ export const encodeProjectSnapshot = (
     .concat(encodeToken(projectSnapshot.iconHash))
     .concat(encodeToken(projectSnapshot.imageHash))
     .concat(encodeTime(projectSnapshot.createTime))
-    .concat(encodeId(projectSnapshot.createUser))
+    .concat(encodeId(projectSnapshot.createUserId))
     .concat(encodeTime(projectSnapshot.updateTime))
     .concat(encodeTime(projectSnapshot.getTime))
     .concat(encodeList(encodeId)(projectSnapshot.partIdList))
@@ -3142,7 +3142,7 @@ export const decodeProjectSnapshot = (
     readonly result: Time;
     readonly nextIndex: number;
   } = decodeTime(imageHashAndNextIndex.nextIndex, binary);
-  const createUserAndNextIndex: {
+  const createUserIdAndNextIndex: {
     readonly result: UserId;
     readonly nextIndex: number;
   } = (decodeId as (
@@ -3155,7 +3155,7 @@ export const decodeProjectSnapshot = (
   const updateTimeAndNextIndex: {
     readonly result: Time;
     readonly nextIndex: number;
-  } = decodeTime(createUserAndNextIndex.nextIndex, binary);
+  } = decodeTime(createUserIdAndNextIndex.nextIndex, binary);
   const getTimeAndNextIndex: {
     readonly result: Time;
     readonly nextIndex: number;
@@ -3184,7 +3184,7 @@ export const decodeProjectSnapshot = (
       iconHash: iconHashAndNextIndex.result,
       imageHash: imageHashAndNextIndex.result,
       createTime: createTimeAndNextIndex.result,
-      createUser: createUserAndNextIndex.result,
+      createUserId: createUserIdAndNextIndex.result,
       updateTime: updateTimeAndNextIndex.result,
       getTime: getTimeAndNextIndex.result,
       partIdList: partIdListAndNextIndex.result,

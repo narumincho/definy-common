@@ -125,7 +125,7 @@ export const customTypeList: ReadonlyArray<type.CustomType> = [
         memberType: time.time,
       },
       {
-        name: "createUser",
+        name: "createUserId",
         description: "作成アカウント",
         memberType: idAndToken.userId,
       },
