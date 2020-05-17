@@ -588,7 +588,7 @@ export const customTypeList: ReadonlyArray<type.CustomType> = [
       {
         name: "parameter",
         description: "パラメーター",
-        memberType: type.typeCustom(typeName),
+        memberType: type.typeMaybe(type.typeCustom(typeName)),
       },
     ]),
   },

@@ -729,7 +729,7 @@ export type TypePartBodySumPattern = {
   /**
    * パラメーター
    */
-  readonly parameter: Type;
+  readonly parameter: Maybe<Type>;
 };
 
 /**
@@ -2209,7 +2209,7 @@ export const encodeTypePartBodySumPattern = (
 ): ReadonlyArray<number> =>
   encodeString(typePartBodySumPattern.name)
     .concat(encodeString(typePartBodySumPattern.description))
-    .concat(encodeType(typePartBodySumPattern.parameter));
+    .concat(encodeMaybe(encodeType)(typePartBodySumPattern.parameter));
 
 export const encodeTypePartBodyKernel = (
   typePartBodyKernel: TypePartBodyKernel
@@ -4448,9 +4448,9 @@ export const decodeTypePartBodySumPattern = (
     readonly nextIndex: number;
   } = decodeString(nameAndNextIndex.nextIndex, binary);
   const parameterAndNextIndex: {
-    readonly result: Type;
+    readonly result: Maybe<Type>;
     readonly nextIndex: number;
-  } = decodeType(descriptionAndNextIndex.nextIndex, binary);
+  } = decodeMaybe(decodeType)(descriptionAndNextIndex.nextIndex, binary);
   return {
     result: {
       name: nameAndNextIndex.result,

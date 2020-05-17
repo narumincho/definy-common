@@ -267,7 +267,7 @@ type alias TypePartBodyProductMember =
 {-| 直積型のパターン
 -}
 type alias TypePartBodySumPattern =
-    { name : String, description : String, parameter : Type }
+    { name : String, description : String, parameter : Maybe Type }
 
 
 {-| Definyだけでは表現できないデータ型
@@ -1096,7 +1096,7 @@ typePartBodySumPatternToJsonValue typePartBodySumPattern =
     Je.object
         [ ( "name", Je.string typePartBodySumPattern.name )
         , ( "description", Je.string typePartBodySumPattern.description )
-        , ( "parameter", typeToJsonValue typePartBodySumPattern.parameter )
+        , ( "parameter", maybeToJsonValue typeToJsonValue typePartBodySumPattern.parameter )
         ]
 
 
@@ -2297,7 +2297,7 @@ typePartBodySumPatternJsonDecoder =
         )
         |> Jdp.required "name" Jd.string
         |> Jdp.required "description" Jd.string
-        |> Jdp.required "parameter" typeJsonDecoder
+        |> Jdp.required "parameter" (maybeJsonDecoder typeJsonDecoder)
 
 
 {-| TypePartBodyKernelのJSON Decoder
