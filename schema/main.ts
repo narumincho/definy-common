@@ -1,8 +1,11 @@
 import * as nt from "@narumincho/type";
-import { type } from "@narumincho/type";
+import {
+  Type,
+  CustomTypeDefinition,
+  CustomTypeDefinitionBody,
+} from "@narumincho/type/distribution/data";
 import * as codeGen from "js-ts-code-generator";
 import * as fs from "fs";
-import * as childProcess from "child_process";
 import * as prettier from "prettier";
 import * as code from "./code";
 import * as idAndToken from "./idAndToken";
@@ -10,7 +13,7 @@ import * as time from "./time";
 import * as urlLogIn from "./urlLogIn";
 import * as resource from "./resource";
 
-const listCustomType: ReadonlyArray<type.CustomType> = [
+const listCustomType: ReadonlyArray<CustomTypeDefinition> = [
   time.timeCustomType,
   ...urlLogIn.customTypeList,
   ...resource.customTypeList,
@@ -18,121 +21,127 @@ const listCustomType: ReadonlyArray<type.CustomType> = [
   {
     name: "CreateProjectParameter",
     description: "プロジェクト作成時に必要なパラメーター",
-    body: type.customTypeBodyProduct([
+    typeParameterList: [],
+    body: CustomTypeDefinitionBody.Product([
       {
         name: "accessToken",
         description: "プロジェクトを作るときのアカウント",
-        memberType: idAndToken.accessToken,
+        type: idAndToken.accessToken,
       },
       {
         name: "projectName",
         description: "プロジェクト名",
-        memberType: type.typeString,
+        type: Type.String,
       },
     ]),
   },
   {
     name: "CreateIdeaParameter",
     description: "アイデアを作成時に必要なパラメーター",
-    body: type.customTypeBodyProduct([
+    typeParameterList: [],
+    body: CustomTypeDefinitionBody.Product([
       {
         name: "accessToken",
         description: "プロジェクトを作るときのアカウント",
-        memberType: idAndToken.accessToken,
+        type: idAndToken.accessToken,
       },
       {
         name: "ideaName",
         description: "アイデア名",
-        memberType: type.typeString,
+        type: Type.String,
       },
       {
         name: "projectId",
         description: "対象のプロジェクトID",
-        memberType: idAndToken.projectId,
+        type: idAndToken.projectId,
       },
     ]),
   },
   {
     name: "AddCommentParameter",
     description: "アイデアにコメントを追加するときに必要なパラメーター",
-    body: type.customTypeBodyProduct([
+    typeParameterList: [],
+    body: CustomTypeDefinitionBody.Product([
       {
         name: "accessToken",
         description: "プロジェクトを作るときのアカウント",
-        memberType: idAndToken.accessToken,
+        type: idAndToken.accessToken,
       },
       {
         name: "ideaId",
         description: "コメントを追加するアイデア",
-        memberType: idAndToken.ideaId,
+        type: idAndToken.ideaId,
       },
       {
         name: "comment",
         description: "コメント本文",
-        memberType: type.typeString,
+        type: Type.String,
       },
     ]),
   },
   {
     name: "AddSuggestionParameter",
     description: "提案を作成するときに必要なパラメーター",
-    body: type.customTypeBodyProduct([
+    typeParameterList: [],
+    body: CustomTypeDefinitionBody.Product([
       {
         name: "accessToken",
         description: "提案を作成するアカウント",
-        memberType: idAndToken.accessToken,
+        type: idAndToken.accessToken,
       },
       {
         name: "ideaId",
         description: "提案に関連付けられるアイデア",
-        memberType: idAndToken.ideaId,
+        type: idAndToken.ideaId,
       },
     ]),
   },
   {
     name: "UpdateSuggestionParameter",
     description: "提案を更新するときに必要なパラメーター",
-    body: type.customTypeBodyProduct([
+    typeParameterList: [],
+    body: CustomTypeDefinitionBody.Product([
       {
         name: "accessToken",
         description: "提案を更新するアカウント",
-        memberType: idAndToken.accessToken,
+        type: idAndToken.accessToken,
       },
       {
         name: "suggestionId",
         description: "書き換える提案",
-        memberType: idAndToken.suggestionId,
+        type: idAndToken.suggestionId,
       },
       {
         name: "name",
         description: "提案の名前",
-        memberType: type.typeString,
+        type: Type.String,
       },
       {
         name: "reason",
         description: "変更理由",
-        memberType: type.typeString,
+        type: Type.String,
       },
       {
         name: "changeList",
         description: "提案の変更",
-        memberType: type.typeList(code.change),
+        type: Type.List(code.changeType),
       },
     ]),
   },
   {
     name: "AccessTokenAndSuggestionId",
     description: "提案を承認待ちにしたり許可したりするときなどに使う",
-    body: type.customTypeBodyProduct([
+    typeParameterList: [],
+    body: CustomTypeDefinitionBody.Product([
       {
         name: "accessToken",
         description: "アクセストークン",
-        memberType: idAndToken.accessToken,
+        type: idAndToken.accessToken,
       },
       {
         name: "suggestionId",
         description: "SuggestionId",
-        memberType: idAndToken.suggestionId,
+        type: idAndToken.suggestionId,
       },
     ]),
   },
@@ -151,15 +160,4 @@ fs.promises
   )
   .then(() => {
     console.log("output TypeScript code!");
-  });
-const elmPath = "Data.elm";
-fs.promises
-  .writeFile(elmPath, nt.generateElmCode("Data", listCustomType))
-  .then(() => {
-    childProcess.exec("elm-format --yes " + elmPath, (error) => {
-      console.log("output Elm code!");
-      if (error !== null) {
-        throw new Error("elm code error! " + error.toString());
-      }
-    });
   });

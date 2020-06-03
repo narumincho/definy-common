@@ -1,21 +1,18 @@
-import * as data from "./data";
+import { Maybe, Result, Time } from "./data";
 
 export const maybeMap = <Input, Output>(
-  maybe: data.Maybe<Input>,
+  maybe: Maybe<Input>,
   func: (input: Input) => Output
-): data.Maybe<Output> => {
+): Maybe<Output> => {
   switch (maybe._) {
     case "Just":
-      return data.maybeJust(func(maybe.value));
+      return Maybe.Just(func(maybe.value));
     case "Nothing":
-      return data.maybeNothing();
+      return Maybe.Nothing();
   }
 };
 
-export const maybeWithDefault = <T>(
-  maybe: data.Maybe<T>,
-  defaultValue: T
-): T => {
+export const maybeWithDefault = <T>(maybe: Maybe<T>, defaultValue: T): T => {
   switch (maybe._) {
     case "Just":
       return maybe.value;
@@ -25,7 +22,7 @@ export const maybeWithDefault = <T>(
 };
 
 export const maybeUnwrap = <T, U>(
-  maybe: data.Maybe<T>,
+  maybe: Maybe<T>,
   func: (t: T) => U,
   defaultValue: U
 ): U => {
@@ -38,56 +35,56 @@ export const maybeUnwrap = <T, U>(
 };
 
 export const maybeAndThen = <T, U>(
-  maybe: data.Maybe<T>,
-  func: (t: T) => data.Maybe<U>
-): data.Maybe<U> => {
+  maybe: Maybe<T>,
+  func: (t: T) => Maybe<U>
+): Maybe<U> => {
   switch (maybe._) {
     case "Just":
       return func(maybe.value);
     case "Nothing":
-      return data.maybeNothing();
+      return Maybe.Nothing();
   }
 };
 
 export const resultMap = <InputOk, InputError, OutputOk, OutputError>(
-  result: data.Result<InputOk, InputError>,
+  result: Result<InputOk, InputError>,
   okFunc: (input: InputOk) => OutputOk,
   errorFunc: (input: InputError) => OutputError
-): data.Result<OutputOk, OutputError> => {
+): Result<OutputOk, OutputError> => {
   switch (result._) {
     case "Ok":
-      return data.resultOk(okFunc(result.ok));
+      return Result.Ok(okFunc(result.ok));
     case "Error":
-      return data.resultError(errorFunc(result.error));
+      return Result.Error(errorFunc(result.error));
   }
 };
 
 export const resultMapOk = <InputOk, OutputOk, Error>(
-  result: data.Result<InputOk, Error>,
+  result: Result<InputOk, Error>,
   func: (input: InputOk) => OutputOk
-): data.Result<OutputOk, Error> => {
+): Result<OutputOk, Error> => {
   switch (result._) {
     case "Ok":
-      return data.resultOk(func(result.ok));
+      return Result.Ok(func(result.ok));
     case "Error":
       return result;
   }
 };
 
 export const resultMapError = <Ok, InputError, OutputError>(
-  result: data.Result<Ok, InputError>,
+  result: Result<Ok, InputError>,
   func: (input: InputError) => OutputError
-): data.Result<Ok, OutputError> => {
+): Result<Ok, OutputError> => {
   switch (result._) {
     case "Ok":
       return result;
     case "Error":
-      return data.resultError(func(result.error));
+      return Result.Error(func(result.error));
   }
 };
 
 export const resultWithDefault = <Ok, Error>(
-  result: data.Result<Ok, Error>,
+  result: Result<Ok, Error>,
   defaultValue: Ok
 ): Ok => {
   switch (result._) {
@@ -99,34 +96,34 @@ export const resultWithDefault = <Ok, Error>(
 };
 
 export const resultToMaybe = <Ok, Error>(
-  result: data.Result<Ok, Error>
-): data.Maybe<Ok> => {
+  result: Result<Ok, Error>
+): Maybe<Ok> => {
   switch (result._) {
     case "Ok":
-      return data.maybeJust(result.ok);
+      return Maybe.Just(result.ok);
     case "Error":
-      return data.maybeNothing();
+      return Maybe.Nothing();
   }
 };
 
 export const resultFromMaybe = <Ok, Error>(
-  maybe: data.Maybe<Ok>,
+  maybe: Maybe<Ok>,
   error: Error
-): data.Result<Ok, Error> => {
+): Result<Ok, Error> => {
   switch (maybe._) {
     case "Just":
-      return data.resultOk(maybe.value);
+      return Result.Ok(maybe.value);
     case "Nothing":
-      return data.resultError(error);
+      return Result.Error(error);
   }
 };
 
 const millisecondInDay = 1000 * 60 * 60 * 24;
 
-export const timeToDate = (dateTime: data.Time): Date =>
+export const timeToDate = (dateTime: Time): Date =>
   new Date(dateTime.day * millisecondInDay + dateTime.millisecond);
 
-export const timeFromDate = (date: Date): data.Time => {
+export const timeFromDate = (date: Date): Time => {
   const millisecond = date.getTime();
   return {
     day: Math.floor(millisecond / millisecondInDay),

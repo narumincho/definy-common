@@ -1,4 +1,9 @@
-import { type } from "@narumincho/type";
+import {
+  Maybe,
+  Type,
+  CustomTypeDefinition,
+  CustomTypeDefinitionBody,
+} from "@narumincho/type/distribution/data";
 import * as idAndToken from "./idAndToken";
 import * as time from "./time";
 
@@ -8,7 +13,6 @@ const suggestionResponse = "SuggestionResponse";
 
 const suggestionStateName = "SuggestionState";
 const changeName = "Change";
-export const change = type.typeCustom(changeName);
 const addPartName = "AddPart";
 const suggestionTypeName = "SuggestionType";
 const suggestionTypeInputAndOutputName = "SuggestionTypeInputAndOutput";
@@ -51,75 +55,206 @@ const typeErrorName = "TypeError";
 const evalParameterName = "EvalParameter";
 const partWithId = "PartWithId";
 const typePartWithId = "TypePartWithId";
+export const changeType = Type.Custom({
+  name: changeName,
+  parameterList: [],
+});
+const suggestionStateType = Type.Custom({
+  name: suggestionStateName,
+  parameterList: [],
+});
+const suggestionSnapshotType = Type.Custom({
+  name: suggestionSnapshotName,
+  parameterList: [],
+});
+const addPartType = Type.Custom({
+  name: addPartName,
+  parameterList: [],
+});
+const suggestionTypeType = Type.Custom({
+  name: suggestionTypeName,
+  parameterList: [],
+});
+const suggestionExprType = Type.Custom({
+  name: suggestionExprName,
+  parameterList: [],
+});
+const suggestionTypeInputAndOutputType = Type.Custom({
+  name: suggestionTypeInputAndOutputName,
+  parameterList: [],
+});
+const typePartWithSuggestionTypeParameterType = Type.Custom({
+  name: typePartWithSuggestionTypeParameterName,
+  parameterList: [],
+});
+const suggestionTypePartWithSuggestionTypeParameterType = Type.Custom({
+  name: suggestionTypePartWithSuggestionTypeParameterName,
+  parameterList: [],
+});
+const kernelExprType = Type.Custom({
+  name: kernelExprName,
+  parameterList: [],
+});
+const localPartReferenceType = Type.Custom({
+  name: localPartReferenceName,
+  parameterList: [],
+});
+const TagReferenceType = Type.Custom({
+  name: tagReferenceName,
+  parameterList: [],
+});
+const suggestionTagReferenceType = Type.Custom({
+  name: suggestionTagReferenceName,
+  parameterList: [],
+});
+const suggestionFunctionCallType = Type.Custom({
+  name: suggestionFunctionCallName,
+  parameterList: [],
+});
+const suggestionLambdaBranchType = Type.Custom({
+  name: suggestionLambdaBranchName,
+  parameterList: [],
+});
+const conditionType = Type.Custom({
+  name: conditionName,
+  parameterList: [],
+});
+const suggestionBranchPartDefinitionType = Type.Custom({
+  name: suggestionBranchPartDefinitionName,
+  parameterList: [],
+});
+const typePartBodyType = Type.Custom({
+  name: typePartBodyName,
+  parameterList: [],
+});
+const typeType = Type.Custom({
+  name: typeName,
+  parameterList: [],
+});
+const exprType = Type.Custom({
+  name: exprName,
+  parameterList: [],
+});
+const typePartBodyProductMemberType = Type.Custom({
+  name: typePartBodyProductMemberName,
+  parameterList: [],
+});
+const typePartBodySumPatternType = Type.Custom({
+  name: typePartBodySumPatternName,
+  parameterList: [],
+});
+const typePartBodyKernelType = Type.Custom({
+  name: typePartBodyKernelName,
+  parameterList: [],
+});
+const typeInputAndOutputType = Type.Custom({
+  name: typeInputAndOutputName,
+  parameterList: [],
+});
+const typePartIdWithParameterType = Type.Custom({
+  name: typePartIdWithParameterName,
+  parameterList: [],
+});
+const functionCallType = Type.Custom({
+  name: functionCallName,
+  parameterList: [],
+});
+const lambdaBranchType = Type.Custom({
+  name: lambdaBranchName,
+  parameterList: [],
+});
+const kernelCallType = Type.Custom({
+  name: kernelCallName,
+  parameterList: [],
+});
+const evaluatedExprType = Type.Custom({
+  name: evaluatedExprName,
+  parameterList: [],
+});
+const branchPartDefinitionType = Type.Custom({
+  name: branchPartDefinitionName,
+  parameterList: [],
+});
+const conditionTagType = Type.Custom({
+  name: conditionTagName,
+  parameterList: [],
+});
+const conditionCaptureType = Type.Custom({
+  name: conditionCaptureName,
+  parameterList: [],
+});
+const typeErrorType = Type.Custom({
+  name: typeErrorName,
+  parameterList: [],
+});
 
-const product = type.customTypeBodyProduct;
-const sum = type.customTypeBodySum;
-
-export const customTypeList: ReadonlyArray<type.CustomType> = [
+export const customTypeList: ReadonlyArray<CustomTypeDefinition> = [
   {
     name: suggestionSnapshotName,
     description: "提案",
-    body: product([
+    typeParameterList: [],
+    body: CustomTypeDefinitionBody.Product([
       {
         name: "name",
         description: "変更概要",
-        memberType: type.typeString,
+        type: Type.String,
       },
       {
         name: "createUserId",
         description: "作成者",
-        memberType: idAndToken.userId,
+        type: idAndToken.userId,
       },
       {
         name: "reason",
         description: "変更理由",
-        memberType: type.typeString,
+        type: Type.String,
       },
       {
         name: "state",
         description: "承認状態",
-        memberType: type.typeCustom(suggestionStateName),
+        type: suggestionStateType,
       },
       {
         name: "changeList",
         description: "変更",
-        memberType: type.typeList(type.typeCustom(changeName)),
+        type: Type.List(changeType),
       },
       {
         name: "projectId",
         description: "変更をするプロジェクト",
-        memberType: idAndToken.projectId,
+        type: idAndToken.projectId,
       },
       {
         name: "ideaId",
         description: "投稿したアイデアID",
-        memberType: idAndToken.ideaId,
+        type: idAndToken.ideaId,
       },
       {
         name: "updateTime",
         description: "更新日時",
-        memberType: time.time,
+        type: time.time,
       },
       {
         name: "getTime",
         description: "取得日時",
-        memberType: time.time,
+        type: time.time,
       },
     ]),
   },
   {
     name: suggestionSnapshotAndIdName,
     description: "Id付きのSuggestion",
-    body: product([
+    typeParameterList: [],
+    body: CustomTypeDefinitionBody.Product([
       {
         name: "id",
         description: "SuggestionId",
-        memberType: idAndToken.suggestionId,
+        type: idAndToken.suggestionId,
       },
       {
         name: "snapshot",
         description: "SuggestionSnapshot",
-        memberType: type.typeCustom(suggestionSnapshotName),
+        type: suggestionSnapshotType,
       },
     ]),
   },
@@ -127,115 +262,116 @@ export const customTypeList: ReadonlyArray<type.CustomType> = [
     name: suggestionResponse,
     description:
       "Maybe SuggestionSnapshotとSuggestionId TypeScript→Elmに渡す用",
-    body: product([
+    typeParameterList: [],
+    body: CustomTypeDefinitionBody.Product([
       {
         name: "id",
         description: "SuggestionId",
-        memberType: idAndToken.suggestionId,
+        type: idAndToken.suggestionId,
       },
       {
         name: "snapshotMaybe",
         description: "SuggestionSnapshot Maybe",
-        memberType: type.typeMaybe(type.typeCustom(suggestionSnapshotName)),
+        type: Type.Maybe(suggestionSnapshotType),
       },
     ]),
   },
   {
     name: suggestionStateName,
     description: "提案の状況",
-    body: sum([
+    typeParameterList: [],
+    body: CustomTypeDefinitionBody.Sum([
       {
         name: "Creating",
         description: "作成中",
-        parameter: type.maybeNothing(),
+        parameter: Maybe.Nothing(),
       },
       {
         name: "ApprovalPending",
         description: "承認待ち",
-        parameter: type.maybeNothing(),
+        parameter: Maybe.Nothing(),
       },
       {
         name: "Approved",
         description: "承認済み",
-        parameter: type.maybeNothing(),
+        parameter: Maybe.Nothing(),
       },
       {
         name: "Rejected",
         description: "拒否された",
-        parameter: type.maybeNothing(),
+        parameter: Maybe.Nothing(),
       },
     ]),
   },
   {
     name: changeName,
     description: "変更点",
-    body: sum([
+    typeParameterList: [],
+    body: CustomTypeDefinitionBody.Sum([
       {
         name: "ProjectName",
         description: "プロジェクト名の変更",
-        parameter: type.maybeJust(type.typeString),
+        parameter: Maybe.Just(Type.String),
       },
       {
         name: "AddPart",
         description: "パーツの追加",
-        parameter: type.maybeJust(type.typeCustom(addPartName)),
+        parameter: Maybe.Just(addPartType),
       },
     ]),
   },
   {
     name: addPartName,
     description: "パーツを追加するのに必要なもの",
-    body: product([
+    typeParameterList: [],
+    body: CustomTypeDefinitionBody.Product([
       {
         name: "id",
         description: "ブラウザで生成した今回作成した提案内で参照するためのID",
-        memberType: type.typeInt32,
+        type: Type.Int32,
       },
       {
         name: "name",
         description: "新しいパーツの名前",
-        memberType: type.typeString,
+        type: Type.String,
       },
       {
         name: "description",
         description: "新しいパーツの説明",
-        memberType: type.typeString,
+        type: Type.String,
       },
       {
         name: "type",
         description: "新しいパーツの型",
-        memberType: type.typeCustom(suggestionTypeName),
+        type: suggestionTypeType,
       },
       {
         name: "expr",
         description: "新しいパーツの式",
-        memberType: type.typeCustom(suggestionExprName),
+        type: suggestionExprType,
       },
     ]),
   },
   {
     name: suggestionTypeName,
     description: "ChangeのAddPartなどで使われる提案で作成した型を使えるType",
-    body: sum([
+    typeParameterList: [],
+    body: CustomTypeDefinitionBody.Sum([
       {
         name: "Function",
         description: "関数",
-        parameter: type.maybeJust(
-          type.typeCustom(suggestionTypeInputAndOutputName)
-        ),
+        parameter: Maybe.Just(suggestionTypeInputAndOutputType),
       },
       {
         name: "TypePartWithParameter",
         description: "提案前に作られた型パーツとパラメーター",
-        parameter: type.maybeJust(
-          type.typeCustom(typePartWithSuggestionTypeParameterName)
-        ),
+        parameter: Maybe.Just(typePartWithSuggestionTypeParameterType),
       },
       {
         name: "SuggestionTypePartWithParameter",
         description: "提案時に作られた型パーツとパラメーター",
-        parameter: type.maybeJust(
-          type.typeCustom(suggestionTypePartWithSuggestionTypeParameterName)
+        parameter: Maybe.Just(
+          suggestionTypePartWithSuggestionTypeParameterType
         ),
       },
     ]),
@@ -243,166 +379,169 @@ export const customTypeList: ReadonlyArray<type.CustomType> = [
   {
     name: suggestionTypeInputAndOutputName,
     description: "",
-    body: product([
+    typeParameterList: [],
+    body: CustomTypeDefinitionBody.Product([
       {
         name: "inputType",
         description: "入力の型",
-        memberType: type.typeCustom(suggestionTypeName),
+        type: suggestionTypeType,
       },
       {
         name: "outputType",
         description: "出力の型",
-        memberType: type.typeCustom(suggestionTypeName),
+        type: suggestionTypeType,
       },
     ]),
   },
   {
     name: typePartWithSuggestionTypeParameterName,
     description: "",
-    body: product([
+    typeParameterList: [],
+    body: CustomTypeDefinitionBody.Product([
       {
         name: "typePartId",
         description: "型の参照",
-        memberType: idAndToken.typePartId,
+        type: idAndToken.typePartId,
       },
       {
         name: "parameter",
         description: "型のパラメーター",
-        memberType: type.typeList(type.typeCustom(suggestionTypeName)),
+        type: Type.List(suggestionTypeType),
       },
     ]),
   },
   {
     name: suggestionTypePartWithSuggestionTypeParameterName,
     description: "",
-    body: product([
+    typeParameterList: [],
+    body: CustomTypeDefinitionBody.Product([
       {
         name: "suggestionTypePartIndex",
         description: "提案内での定義した型パーツのID",
-        memberType: type.typeInt32,
+        type: Type.Int32,
       },
       {
         name: "parameter",
         description: "型のパラメーター",
-        memberType: type.typeList(type.typeCustom(suggestionTypeName)),
+        type: Type.List(suggestionTypeType),
       },
     ]),
   },
   {
     name: suggestionExprName,
     description: "提案時に含まれるパーツを参照できる式",
-    body: sum([
+    typeParameterList: [],
+    body: CustomTypeDefinitionBody.Sum([
       {
         name: "Kernel",
         description: "Definyだけでは表現できない式",
-        parameter: type.maybeJust(type.typeCustom(kernelExprName)),
+        parameter: Maybe.Just(kernelExprType),
       },
       {
         name: "Int32Literal",
         description: "32bit整数",
-        parameter: type.maybeJust(type.typeInt32),
+        parameter: Maybe.Just(Type.Int32),
       },
       {
         name: "PartReference",
         description: "パーツの値を参照",
-        parameter: type.maybeJust(idAndToken.partId),
+        parameter: Maybe.Just(idAndToken.partId),
       },
       {
         name: "SuggestionPartReference",
         description: "提案内で定義されたパーツのID",
-        parameter: type.maybeJust(type.typeInt32),
+        parameter: Maybe.Just(Type.Int32),
       },
       {
         name: "LocalPartReference",
         description: "ローカルパーツの参照",
-        parameter: type.maybeJust(type.typeCustom(localPartReferenceName)),
+        parameter: Maybe.Just(localPartReferenceType),
       },
       {
         name: "TagReference",
         description: "タグを参照",
-        parameter: type.maybeJust(type.typeCustom(tagReferenceName)),
+        parameter: Maybe.Just(TagReferenceType),
       },
       {
         name: "SuggestionTagReference",
         description: "提案内で定義された型のタグ",
-        parameter: type.maybeJust(type.typeCustom(suggestionTagReferenceName)),
+        parameter: Maybe.Just(suggestionTagReferenceType),
       },
       {
         name: "FunctionCall",
         description: "関数呼び出し (中に含まれる型はSuggestionExpr)",
-        parameter: type.maybeJust(type.typeCustom(suggestionFunctionCallName)),
+        parameter: Maybe.Just(suggestionFunctionCallType),
       },
       {
         name: "Lambda",
         description: "ラムダ",
-        parameter: type.maybeJust(
-          type.typeList(type.typeCustom(suggestionLambdaBranchName))
-        ),
+        parameter: Maybe.Just(Type.List(suggestionLambdaBranchType)),
       },
       {
         name: "Blank",
         description: "空白",
-        parameter: type.maybeNothing(),
+        parameter: Maybe.Nothing(),
       },
     ]),
   },
   {
     name: suggestionTagReferenceName,
     description: "提案内で定義された型のタグ",
-    body: product([
+    typeParameterList: [],
+    body: CustomTypeDefinitionBody.Product([
       {
         name: "suggestionTypePartIndex",
         description: "提案内での定義した型パーツの番号",
-        memberType: type.typeInt32,
+        type: Type.Int32,
       },
       {
         name: "tagIndex",
         description: "タグIndex",
-        memberType: type.typeInt32,
+        type: Type.Int32,
       },
     ]),
   },
   {
     name: suggestionFunctionCallName,
     description: "関数呼び出し (中に含まれる型はSuggestionExpr)",
-    body: product([
+    typeParameterList: [],
+    body: CustomTypeDefinitionBody.Product([
       {
         name: "function",
         description: "関数",
-        memberType: type.typeCustom(suggestionExprName),
+        type: suggestionExprType,
       },
       {
         name: "parameter",
         description: "パラメーター",
-        memberType: type.typeCustom(suggestionExprName),
+        type: suggestionExprType,
       },
     ]),
   },
   {
     name: suggestionLambdaBranchName,
     description: "suggestionExprの入ったLambdaBranch",
-    body: product([
+    typeParameterList: [],
+    body: CustomTypeDefinitionBody.Product([
       {
         name: "condition",
         description: "入力値の条件を書くところ",
-        memberType: type.typeCustom(conditionName),
+        type: conditionType,
       },
       {
         name: "description",
         description: "ブランチの説明",
-        memberType: type.typeString,
+        type: Type.String,
       },
       {
         name: "localPartList",
         description: "",
-        memberType: type.typeList(
-          type.typeCustom(suggestionBranchPartDefinitionName)
-        ),
+        type: Type.List(suggestionBranchPartDefinitionType),
       },
       {
         name: "expr",
         description: "式",
-        memberType: type.typeCustom(suggestionExprName),
+        type: suggestionExprType,
       },
     ]),
   },
@@ -410,635 +549,656 @@ export const customTypeList: ReadonlyArray<type.CustomType> = [
     name: suggestionBranchPartDefinitionName,
     description:
       "ラムダのブランチで使えるパーツを定義する部分 (SuggestionExpr バージョン)",
-    body: product([
+    typeParameterList: [],
+    body: CustomTypeDefinitionBody.Product([
       {
         name: "localPartId",
         description: "ローカルパーツID",
-        memberType: idAndToken.localPartId,
+        type: idAndToken.localPartId,
       },
       {
         name: "name",
         description: "ブランチパーツの名前",
-        memberType: type.typeString,
+        type: Type.String,
       },
       {
         name: "description",
         description: "ブランチパーツの説明",
-        memberType: type.typeString,
+        type: Type.String,
       },
       {
         name: "type",
         description: "ローカルパーツの型",
-        memberType: type.typeCustom(suggestionTypeName),
+        type: suggestionTypeType,
       },
       {
         name: "expr",
         description: "ローカルパーツの式",
-        memberType: type.typeCustom(suggestionExprName),
+        type: suggestionExprType,
       },
     ]),
   },
   {
     name: typePartSnapshotName,
     description: "型パーツ",
-    body: product([
+    typeParameterList: [],
+    body: CustomTypeDefinitionBody.Product([
       {
         name: "name",
         description: "型パーツの名前",
-        memberType: type.typeString,
+        type: Type.String,
       },
       {
         name: "parentList",
         description: "この型パーツの元",
-        memberType: type.typeList(idAndToken.partId),
+        type: Type.List(idAndToken.partId),
       },
       {
         name: "description",
         description: "型パーツの説明",
-        memberType: type.typeString,
+        type: Type.String,
       },
       {
         name: "projectId",
         description: "所属しているプロジェクトのID",
-        memberType: idAndToken.projectId,
+        type: idAndToken.projectId,
       },
       {
         name: "createSuggestionId",
         description: "この型パーツが作成された提案",
-        memberType: idAndToken.suggestionId,
+        type: idAndToken.suggestionId,
       },
       {
         name: "getTime",
         description: "取得日時",
-        memberType: time.time,
+        type: time.time,
       },
       {
         name: "body",
         description: "定義本体",
-        memberType: type.typeCustom(typePartBodyName),
+        type: typePartBodyType,
       },
     ]),
   },
   {
     name: partSnapshotName,
     description: "パーツの定義",
-    body: product([
+    typeParameterList: [],
+    body: CustomTypeDefinitionBody.Product([
       {
         name: "name",
         description: "パーツの名前",
-        memberType: type.typeString,
+        type: Type.String,
       },
       {
         name: "parentList",
         description: "このパーツの元",
-        memberType: type.typeList(idAndToken.partId),
+        type: Type.List(idAndToken.partId),
       },
       {
         name: "description",
         description: "パーツの説明",
-        memberType: type.typeString,
+        type: Type.String,
       },
       {
         name: "type",
         description: "パーツの型",
-        memberType: type.typeCustom(typeName),
+        type: typeType,
       },
       {
         name: "expr",
         description: "パーツの式",
-        memberType: type.typeCustom(exprName),
+        type: exprType,
       },
       {
         name: "projectId",
         description: "所属しているプロジェクトのID",
-        memberType: idAndToken.projectId,
+        type: idAndToken.projectId,
       },
       {
         name: "createSuggestionId",
         description: "このパーツが作成された提案",
-        memberType: idAndToken.suggestionId,
+        type: idAndToken.suggestionId,
       },
       {
         name: "getTime",
         description: "取得日時",
-        memberType: time.time,
+        type: time.time,
       },
     ]),
   },
   {
     name: typePartBodyName,
     description: "型の定義本体",
-    body: sum([
+    typeParameterList: [],
+    body: CustomTypeDefinitionBody.Sum([
       {
         name: "Product",
         description: "直積型",
-        parameter: type.maybeJust(
-          type.typeList(type.typeCustom(typePartBodyProductMemberName))
-        ),
+        parameter: Maybe.Just(Type.List(typePartBodyProductMemberType)),
       },
       {
         name: "Sum",
         description: "直和型",
-        parameter: type.maybeJust(
-          type.typeList(type.typeCustom(typePartBodySumPatternName))
-        ),
+        parameter: Maybe.Just(Type.List(typePartBodySumPatternType)),
       },
       {
         name: "Kernel",
         description: "Definyだけでは表現できないデータ型",
-        parameter: type.maybeJust(type.typeCustom(typePartBodyKernelName)),
+        parameter: Maybe.Just(typePartBodyKernelType),
       },
     ]),
   },
   {
     name: typePartBodyProductMemberName,
     description: "直積型のメンバー",
-    body: product([
+    typeParameterList: [],
+    body: CustomTypeDefinitionBody.Product([
       {
         name: "name",
         description: "メンバー名",
-        memberType: type.typeString,
+        type: Type.String,
       },
       {
         name: "description",
         description: "説明文",
-        memberType: type.typeString,
+        type: Type.String,
       },
       {
-        name: "memberType",
+        name: "type",
         description: "メンバー値の型",
-        memberType: type.typeCustom(typeName),
+        type: typeType,
       },
     ]),
   },
   {
     name: typePartBodySumPatternName,
     description: "直積型のパターン",
-    body: product([
+    typeParameterList: [],
+    body: CustomTypeDefinitionBody.Product([
       {
         name: "name",
         description: "タグ名",
-        memberType: type.typeString,
+        type: Type.String,
       },
       {
         name: "description",
         description: "説明文",
-        memberType: type.typeString,
+        type: Type.String,
       },
       {
         name: "parameter",
         description: "パラメーター",
-        memberType: type.typeMaybe(type.typeCustom(typeName)),
+        type: Type.Maybe(typeType),
       },
     ]),
   },
   {
     name: typePartBodyKernelName,
     description: "Definyだけでは表現できないデータ型",
-    body: sum([
+    typeParameterList: [],
+    body: CustomTypeDefinitionBody.Sum([
       {
         name: "Int32",
         description: "32bit整数",
-        parameter: type.maybeNothing(),
+        parameter: Maybe.Nothing(),
       },
       {
         name: "List",
         description: "リスト",
-        parameter: type.maybeNothing(),
+        parameter: Maybe.Nothing(),
       },
     ]),
   },
   {
     name: typeName,
     description: "型",
-    body: sum([
+    typeParameterList: [],
+    body: CustomTypeDefinitionBody.Sum([
       {
         name: "Function",
         description: "関数",
-        parameter: type.maybeJust(type.typeCustom(typeInputAndOutputName)),
+        parameter: Maybe.Just(typeInputAndOutputType),
       },
       {
         name: "TypePartWithParameter",
         description: "型パーツと, パラメーターのリスト",
-        parameter: type.maybeJust(type.typeCustom(typePartIdWithParameterName)),
+        parameter: Maybe.Just(typePartIdWithParameterType),
       },
     ]),
   },
   {
     name: typeInputAndOutputName,
     description: "",
-    body: product([
+    typeParameterList: [],
+    body: CustomTypeDefinitionBody.Product([
       {
         name: "inputType",
         description: "入力の型",
-        memberType: type.typeCustom(typeName),
+        type: typeType,
       },
       {
         name: "outputType",
         description: "出力の型",
-        memberType: type.typeCustom(typeName),
+        type: typeType,
       },
     ]),
   },
   {
     name: typePartIdWithParameterName,
     description: "",
-    body: product([
+    typeParameterList: [],
+    body: CustomTypeDefinitionBody.Product([
       {
         name: "typePartId",
         description: "型の参照",
-        memberType: idAndToken.typePartId,
+        type: idAndToken.typePartId,
       },
       {
         name: "parameter",
         description: "型のパラメーター",
-        memberType: type.typeList(type.typeCustom(typeName)),
+        type: Type.List(typeType),
       },
     ]),
   },
   {
     name: exprName,
     description: "式",
-    body: sum([
+    typeParameterList: [],
+    body: CustomTypeDefinitionBody.Sum([
       {
         name: "Kernel",
         description: "Definyだけでは表現できない式",
-        parameter: type.maybeJust(type.typeCustom(kernelExprName)),
+        parameter: Maybe.Just(kernelExprType),
       },
       {
         name: "Int32Literal",
         description: "32bit整数",
-        parameter: type.maybeJust(type.typeInt32),
+        parameter: Maybe.Just(Type.Int32),
       },
       {
         name: "PartReference",
         description: "パーツの値を参照",
-        parameter: type.maybeJust(idAndToken.partId),
+        parameter: Maybe.Just(idAndToken.partId),
       },
       {
         name: "LocalPartReference",
         description: "ローカルパーツの参照",
-        parameter: type.maybeJust(type.typeCustom(localPartReferenceName)),
+        parameter: Maybe.Just(localPartReferenceType),
       },
       {
         name: "TagReference",
         description: "タグを参照",
-        parameter: type.maybeJust(type.typeCustom(tagReferenceName)),
+        parameter: Maybe.Just(TagReferenceType),
       },
       {
         name: "FunctionCall",
         description: "関数呼び出し",
-        parameter: type.maybeJust(type.typeCustom(functionCallName)),
+        parameter: Maybe.Just(functionCallType),
       },
       {
         name: "Lambda",
         description: "ラムダ",
-        parameter: type.maybeJust(
-          type.typeList(type.typeCustom(lambdaBranchName))
-        ),
+        parameter: Maybe.Just(Type.List(lambdaBranchType)),
       },
     ]),
   },
   {
     name: evaluatedExprName,
     description: "評価しきった式",
-    body: sum([
+    typeParameterList: [],
+    body: CustomTypeDefinitionBody.Sum([
       {
         name: "Kernel",
         description: "Definyだけでは表現できない式",
-        parameter: type.maybeJust(type.typeCustom(kernelExprName)),
+        parameter: Maybe.Just(kernelExprType),
       },
       {
         name: "Int32",
         description: "32bit整数",
-        parameter: type.maybeJust(type.typeInt32),
+        parameter: Maybe.Just(Type.Int32),
       },
       {
         name: "LocalPartReference",
         description: "ローカルパーツの参照",
-        parameter: type.maybeJust(type.typeCustom(localPartReferenceName)),
+        parameter: Maybe.Just(localPartReferenceType),
       },
       {
         name: "TagReference",
         description: "タグを参照",
-        parameter: type.maybeJust(type.typeCustom(tagReferenceName)),
+        parameter: Maybe.Just(TagReferenceType),
       },
       {
         name: "Lambda",
         description: "ラムダ",
-        parameter: type.maybeJust(
-          type.typeList(type.typeCustom(lambdaBranchName))
-        ),
+        parameter: Maybe.Just(Type.List(lambdaBranchType)),
       },
       {
         name: "KernelCall",
         description: "内部関数呼び出し",
-        parameter: type.maybeJust(type.typeCustom(kernelCallName)),
+        parameter: Maybe.Just(kernelCallType),
       },
     ]),
   },
   {
     name: kernelCallName,
     description: "複数の引数が必要な内部関数の部分呼び出し",
-    body: product([
+    typeParameterList: [],
+    body: CustomTypeDefinitionBody.Product([
       {
         name: "kernel",
         description: "関数",
-        memberType: type.typeCustom(kernelExprName),
+        type: kernelExprType,
       },
       {
         name: "expr",
         description: "呼び出すパラメーター",
-        memberType: type.typeCustom(evaluatedExprName),
+        type: evaluatedExprType,
       },
     ]),
   },
   {
     name: kernelExprName,
     description: "Definyだけでは表現できない式",
-    body: sum([
+    typeParameterList: [],
+    body: CustomTypeDefinitionBody.Sum([
       {
         name: "Int32Add",
         description: "32bit整数を足す関数",
-        parameter: type.maybeNothing(),
+        parameter: Maybe.Nothing(),
       },
       {
         name: "Int32Sub",
         description: "32bit整数を引く関数",
-        parameter: type.maybeNothing(),
+        parameter: Maybe.Nothing(),
       },
       {
         name: "Int32Mul",
         description: "32bit整数をかける関数",
-        parameter: type.maybeNothing(),
+        parameter: Maybe.Nothing(),
       },
     ]),
   },
   {
     name: localPartReferenceName,
     description: "ローカルパスの参照を表す",
-    body: product([
+    typeParameterList: [],
+    body: CustomTypeDefinitionBody.Product([
       {
         name: "partId",
         description: "ローカルパスが定義されているパーツのID",
-        memberType: idAndToken.partId,
+        type: idAndToken.partId,
       },
       {
         name: "localPartId",
         description: "ローカルパーツID",
-        memberType: idAndToken.localPartId,
+        type: idAndToken.localPartId,
       },
     ]),
   },
   {
     name: tagReferenceName,
     description: "タグの参照を表す",
-    body: product([
+    typeParameterList: [],
+    body: CustomTypeDefinitionBody.Product([
       {
         name: "typePartId",
         description: "型ID",
-        memberType: idAndToken.typePartId,
+        type: idAndToken.typePartId,
       },
       {
         name: "tagId",
         description: "タグID",
-        memberType: idAndToken.tagId,
+        type: idAndToken.tagId,
       },
     ]),
   },
   {
     name: functionCallName,
     description: "関数呼び出し",
-    body: product([
+    typeParameterList: [],
+    body: CustomTypeDefinitionBody.Product([
       {
         name: "function",
         description: "関数",
-        memberType: type.typeCustom(exprName),
+        type: exprType,
       },
       {
         name: "parameter",
         description: "パラメーター",
-        memberType: type.typeCustom(exprName),
+        type: exprType,
       },
     ]),
   },
   {
     name: lambdaBranchName,
     description: "ラムダのブランチ. Just x -> data x のようなところ",
-    body: product([
+    typeParameterList: [],
+    body: CustomTypeDefinitionBody.Product([
       {
         name: "condition",
         description: "入力値の条件を書くところ. Just x",
-        memberType: type.typeCustom(conditionName),
+        type: conditionType,
       },
       {
         name: "description",
         description: "ブランチの説明",
-        memberType: type.typeString,
+        type: Type.String,
       },
       {
         name: "localPartList",
         description: "",
-        memberType: type.typeList(type.typeCustom(branchPartDefinitionName)),
+        type: Type.List(branchPartDefinitionType),
       },
       {
         name: "expr",
         description: "式",
-        memberType: type.typeCustom(exprName),
+        type: exprType,
       },
     ]),
   },
   {
     name: conditionName,
     description: "ブランチの式を使う条件",
-    body: sum([
+    typeParameterList: [],
+    body: CustomTypeDefinitionBody.Sum([
       {
         name: "ByTag",
         description: "タグ",
-        parameter: type.maybeJust(type.typeCustom(conditionTagName)),
+        parameter: Maybe.Just(conditionTagType),
       },
       {
         name: "ByCapture",
         description: "キャプチャパーツへのキャプチャ",
-        parameter: type.maybeJust(type.typeCustom(conditionCaptureName)),
+        parameter: Maybe.Just(conditionCaptureType),
       },
       {
         name: "Any",
         description: "_ すべてのパターンを通すもの",
-        parameter: type.maybeNothing(),
+        parameter: Maybe.Nothing(),
       },
       {
         name: "Int32",
         description: "32bit整数の完全一致",
-        parameter: type.maybeJust(type.typeInt32),
+        parameter: Maybe.Just(Type.Int32),
       },
     ]),
   },
   {
     name: conditionTagName,
     description: "タグによる条件",
-    body: product([
+    typeParameterList: [],
+    body: CustomTypeDefinitionBody.Product([
       {
         name: "tag",
         description: "タグ",
-        memberType: idAndToken.tagId,
+        type: idAndToken.tagId,
       },
       {
         name: "parameter",
         description: "パラメーター",
-        memberType: type.typeMaybe(type.typeCustom(conditionName)),
+        type: Type.Maybe(conditionType),
       },
     ]),
   },
   {
     name: conditionCaptureName,
     description: "キャプチャパーツへのキャプチャ",
-    body: product([
+    typeParameterList: [],
+    body: CustomTypeDefinitionBody.Product([
       {
         name: "name",
         description: "キャプチャパーツの名前",
-        memberType: type.typeString,
+        type: Type.String,
       },
       {
         name: "localPartId",
         description: "ローカルパーツId",
-        memberType: idAndToken.localPartId,
+        type: idAndToken.localPartId,
       },
     ]),
   },
   {
     name: branchPartDefinitionName,
     description: "ラムダのブランチで使えるパーツを定義する部分",
-    body: product([
+    typeParameterList: [],
+    body: CustomTypeDefinitionBody.Product([
       {
         name: "localPartId",
         description: "ローカルパーツID",
-        memberType: idAndToken.localPartId,
+        type: idAndToken.localPartId,
       },
       {
         name: "name",
         description: "ブランチパーツの名前",
-        memberType: type.typeString,
+        type: Type.String,
       },
       {
         name: "description",
         description: "ブランチパーツの説明",
-        memberType: type.typeString,
+        type: Type.String,
       },
       {
         name: "type",
         description: "ローカルパーツの型",
-        memberType: type.typeCustom(typeName),
+        type: typeType,
       },
       {
         name: "expr",
         description: "ローカルパーツの式",
-        memberType: type.typeCustom(exprName),
+        type: exprType,
       },
     ]),
   },
   {
     name: evaluateExprErrorName,
     description: "評価したときに失敗した原因を表すもの",
-    body: sum([
+    typeParameterList: [],
+    body: CustomTypeDefinitionBody.Sum([
       {
         name: "NeedPartDefinition",
         description: "式を評価するには,このパーツの定義が必要だと言っている",
-        parameter: type.maybeJust(idAndToken.partId),
+        parameter: Maybe.Just(idAndToken.partId),
       },
       {
         name: "NeedSuggestionPart",
         description: "式を評価するために必要なSuggestionPartが見つからない",
-        parameter: type.maybeJust(type.typeInt32),
+        parameter: Maybe.Just(Type.Int32),
       },
       {
         name: "Blank",
         description: "計算結果にblankが含まれている",
-        parameter: type.maybeNothing(),
+        parameter: Maybe.Nothing(),
       },
       {
         name: "CannotFindLocalPartDefinition",
         description: "ローカルパーツの定義を見つけることができなかった",
-        parameter: type.maybeJust(type.typeCustom(localPartReferenceName)),
+        parameter: Maybe.Just(localPartReferenceType),
       },
       {
         name: "TypeError",
         description: "型が合わない",
-        parameter: type.maybeJust(type.typeCustom(typeErrorName)),
+        parameter: Maybe.Just(typeErrorType),
       },
       {
         name: "NotSupported",
         description: "まだサポートしていないものが含まれている",
-        parameter: type.maybeNothing(),
+        parameter: Maybe.Nothing(),
       },
     ]),
   },
   {
     name: typeErrorName,
     description: "型エラー",
-    body: product([
+    typeParameterList: [],
+    body: CustomTypeDefinitionBody.Product([
       {
         name: "message",
         description: "型エラーの説明",
-        memberType: type.typeString,
+        type: Type.String,
       },
     ]),
   },
   {
     name: evalParameterName,
     description: "評価する上で必要なソースコード",
-    body: product([
+    typeParameterList: [],
+    body: CustomTypeDefinitionBody.Product([
       {
         name: "partList",
         description: "パーツのリスト",
-        memberType: type.typeList(type.typeCustom(partWithId)),
+        type: Type.List(Type.Custom({ name: partWithId, parameterList: [] })),
       },
       {
         name: "typePartList",
         description: "型パーツのリスト",
-        memberType: type.typeList(type.typeCustom(typePartWithId)),
+        type: Type.List(
+          Type.Custom({ name: typePartWithId, parameterList: [] })
+        ),
       },
       {
         name: "changeList",
         description: "変更点",
-        memberType: type.typeList(type.typeCustom(changeName)),
+        type: Type.List(changeType),
       },
       {
         name: "expr",
         description: "評価してほしい式",
-        memberType: type.typeCustom(suggestionExprName),
+        type: suggestionExprType,
       },
     ]),
   },
   {
     name: partWithId,
     description: "パーツとPartId",
-    body: product([
+    typeParameterList: [],
+    body: CustomTypeDefinitionBody.Product([
       {
         name: "id",
         description: "PartId",
-        memberType: idAndToken.partId,
+        type: idAndToken.partId,
       },
       {
         name: "part",
         description: "PartSnapshot",
-        memberType: type.typeCustom(partSnapshotName),
+        type: Type.Custom({ name: partSnapshotName, parameterList: [] }),
       },
     ]),
   },
   {
     name: typePartWithId,
     description: "型パーツとTypePartId",
-    body: product([
+    typeParameterList: [],
+    body: CustomTypeDefinitionBody.Product([
       {
         name: "id",
         description: "TypePartId",
-        memberType: idAndToken.typePartId,
+        type: idAndToken.typePartId,
       },
       {
         name: "typePart",
         description: "TypePartSnapshot",
-        memberType: type.typeCustom(typePartSnapshotName),
+        type: Type.Custom({ name: typePartSnapshotName, parameterList: [] }),
       },
     ]),
   },

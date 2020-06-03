@@ -1,12 +1,12 @@
-import { type } from "@narumincho/type";
+import { data } from "@narumincho/type";
 
-export const accessToken = type.typeToken("AccessToken");
-export const userId = type.typeId("UserId");
-export const projectId = type.typeId("ProjectId");
-export const ideaId = type.typeId("IdeaId");
-export const imageToken = type.typeToken("ImageToken");
-export const suggestionId = type.typeId("SuggestionId");
-export const typePartId = type.typeId("TypePartId");
-export const tagId = type.typeId("TagId");
-export const partId = type.typeId("PartId");
-export const localPartId = type.typeId("LocalPartId");
+export const accessToken = data.Type.Token("AccessToken");
+export const userId = data.Type.Id("UserId");
+export const projectId = data.Type.Id("ProjectId");
+export const ideaId = data.Type.Id("IdeaId");
+export const imageToken = data.Type.Token("ImageToken");
+export const suggestionId = data.Type.Id("SuggestionId");
+export const typePartId = data.Type.Id("TypePartId");
+export const tagId = data.Type.Id("TagId");
+export const partId = data.Type.Id("PartId");
+export const localPartId = data.Type.Id("LocalPartId");
