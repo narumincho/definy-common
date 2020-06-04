@@ -99,41 +99,41 @@ const clientModeFromUrl = (origin: string): data.ClientMode =>
 
 const locationFromUrl = (pathName: string): data.Location => {
   if (pathName === "/create-project") {
-    return data.locationCreateProject;
+    return data.Location.CreateProject;
   }
   if (pathName === "/user") {
-    return data.locationUserList;
+    return data.Location.UserList;
   }
   if (pathName === "/part") {
-    return data.locationPartList;
+    return data.Location.PartList;
   }
   if (pathName === "/type-part") {
-    return data.locationTypePartList;
+    return data.Location.TypePartList;
   }
   if (pathName === "/about") {
-    return data.locationAbout;
+    return data.Location.About;
   }
   const createIdeaResult = pathName.match(/^\/create-idea\/([0-9a-f]{32})$/u);
   if (createIdeaResult !== null) {
-    return data.locationCreateIdea(createIdeaResult[1] as data.ProjectId);
+    return data.Location.CreateIdea(createIdeaResult[1] as data.ProjectId);
   }
   const projectResult = pathName.match(/^\/project\/([0-9a-f]{32})$/u);
   if (projectResult !== null) {
-    return data.locationProject(projectResult[1] as data.ProjectId);
+    return data.Location.Project(projectResult[1] as data.ProjectId);
   }
   const userResult = pathName.match(/^\/user\/([0-9a-f]{32})$/u);
   if (userResult !== null) {
-    return data.locationUser(userResult[1] as data.UserId);
+    return data.Location.User(userResult[1] as data.UserId);
   }
   const ideaResult = pathName.match(/^\/idea\/([0-9a-f]{32})$/);
   if (ideaResult !== null) {
-    return data.locationIdea(ideaResult[1] as data.IdeaId);
+    return data.Location.Idea(ideaResult[1] as data.IdeaId);
   }
   const suggestionResult = pathName.match(/^\/suggestion\/([0-9a-f]{32})$/);
   if (suggestionResult !== null) {
-    return data.locationSuggestion(suggestionResult[1] as data.SuggestionId);
+    return data.Location.Suggestion(suggestionResult[1] as data.SuggestionId);
   }
-  return data.locationHome;
+  return data.Location.Home;
 };
 
 const languageFromIdString = (languageAsString: string): data.Language => {
@@ -151,9 +151,9 @@ const languageFromIdString = (languageAsString: string): data.Language => {
 const accessTokenFromUrl = (hash: string): data.Maybe<data.AccessToken> => {
   const matchResult = hash.match(/access-token=([0-9a-f]{64})/u);
   if (matchResult === null) {
-    return data.maybeNothing();
+    return data.Maybe.Nothing();
   }
-  return data.maybeJust(matchResult[1] as data.AccessToken);
+  return data.Maybe.Just(matchResult[1] as data.AccessToken);
 };
 
 export const stringToValidUserName = (userName: string): string | null => {
@@ -281,22 +281,22 @@ export const isValidTypePartName = (text: string): boolean => {
 export const exprToSuggestionExpr = (expr: data.Expr): data.SuggestionExpr => {
   switch (expr._) {
     case "Kernel":
-      return data.suggestionExprKernel(expr.kernelExpr);
+      return data.SuggestionExpr.Kernel(expr.kernelExpr);
     case "Int32Literal":
-      return data.suggestionExprInt32Literal(expr.int32);
+      return data.SuggestionExpr.Int32Literal(expr.int32);
     case "PartReference":
-      return data.suggestionExprPartReference(expr.partId);
+      return data.SuggestionExpr.PartReference(expr.partId);
     case "LocalPartReference":
-      return data.suggestionExprLocalPartReference(expr.localPartReference);
+      return data.SuggestionExpr.LocalPartReference(expr.localPartReference);
     case "TagReference":
-      return data.suggestionExprTagReference(expr.tagReference);
+      return data.SuggestionExpr.TagReference(expr.tagReference);
     case "FunctionCall":
-      return data.suggestionExprFunctionCall({
+      return data.SuggestionExpr.FunctionCall({
         function: exprToSuggestionExpr(expr.functionCall.function),
         parameter: exprToSuggestionExpr(expr.functionCall.parameter),
       });
     case "Lambda":
-      return data.suggestionExprLambda(
+      return data.SuggestionExpr.Lambda(
         expr.lambdaBranchList.map(lambdaBranchToSuggestionLambdaBranch)
       );
   }
@@ -326,12 +326,12 @@ const branchPartDefinitionToSuggestion = (
 const typeToSuggestion = (type: data.Type): data.SuggestionType => {
   switch (type._) {
     case "Function":
-      return data.suggestionTypeFunction({
+      return data.SuggestionType.Function({
         inputType: typeToSuggestion(type.typeInputAndOutput.inputType),
         outputType: typeToSuggestion(type.typeInputAndOutput.outputType),
       });
     case "TypePartWithParameter":
-      return data.suggestionTypeTypePartWithParameter({
+      return data.SuggestionType.TypePartWithParameter({
         parameter: type.typePartIdWithParameter.parameter.map(typeToSuggestion),
         typePartId: type.typePartIdWithParameter.typePartId,
       });
@@ -399,9 +399,11 @@ export const evaluateSuggestionExpr = (
 ): EvaluationResult => {
   switch (suggestionExpr._) {
     case "Kernel":
-      return data.resultOk(data.evaluatedExprKernel(suggestionExpr.kernelExpr));
+      return data.Result.Ok(
+        data.EvaluatedExpr.Kernel(suggestionExpr.kernelExpr)
+      );
     case "Int32Literal":
-      return data.resultOk(data.evaluatedExprInt32(suggestionExpr.int32));
+      return data.Result.Ok(data.EvaluatedExpr.Int32(suggestionExpr.int32));
     case "PartReference":
       return evaluatePartReference(sourceAndCache, suggestionExpr.partId);
     case "SuggestionPartReference":
@@ -415,11 +417,11 @@ export const evaluateSuggestionExpr = (
         suggestionExpr.localPartReference
       );
     case "TagReference":
-      return data.resultOk(
-        data.evaluatedExprTagReference(suggestionExpr.tagReference)
+      return data.Result.Ok(
+        data.EvaluatedExpr.TagReference(suggestionExpr.tagReference)
       );
     case "SuggestionTagReference":
-      return data.resultError([data.evaluateExprErrorNotSupported]);
+      return data.Result.Error([data.EvaluateExprError.NotSupported]);
     case "FunctionCall":
       return evaluateSuggestionFunctionCall(
         sourceAndCache,
@@ -427,9 +429,9 @@ export const evaluateSuggestionExpr = (
       );
     case "Lambda":
       // TODO
-      return data.resultError([data.evaluateExprErrorBlank]);
+      return data.Result.Error([data.EvaluateExprError.Blank]);
     case "Blank":
-      return data.resultError([data.evaluateExprErrorBlank]);
+      return data.Result.Error([data.EvaluateExprError.Blank]);
   }
 };
 
@@ -448,11 +450,13 @@ const evaluatePartReference = (
 ): EvaluationResult => {
   const evaluatedPart = sourceAndCache.evaluatedPartMap.get(partId);
   if (evaluatedPart !== undefined) {
-    return data.resultOk(evaluatedPart);
+    return data.Result.Ok(evaluatedPart);
   }
   const part = sourceAndCache.partMap.get(partId);
   if (part === undefined) {
-    return data.resultError([data.evaluateExprErrorNeedPartDefinition(partId)]);
+    return data.Result.Error([
+      data.EvaluateExprError.NeedPartDefinition(partId),
+    ]);
   }
   const result = evaluateSuggestionExpr(
     sourceAndCache,
@@ -473,12 +477,12 @@ const evaluateSuggestionPartReference = (
     addPartId
   );
   if (evaluatedSuggestionPart !== undefined) {
-    return data.resultOk(evaluatedSuggestionPart);
+    return data.Result.Ok(evaluatedSuggestionPart);
   }
   const suggestionPart = sourceAndCache.suggestionPartMap.get(addPartId);
   if (suggestionPart === undefined) {
-    return data.resultError([
-      data.evaluateExprErrorNeedSuggestionPart(addPartId),
+    return data.Result.Error([
+      data.EvaluateExprError.NeedSuggestionPart(addPartId),
     ]);
   }
   const result = evaluateSuggestionExpr(sourceAndCache, suggestionPart);
@@ -492,7 +496,7 @@ const evaluateLocalPartReference = (
   sourceAndCache: SourceAndCache,
   localPartReference: data.LocalPartReference
 ): EvaluationResult => {
-  return data.resultError([data.evaluateExprErrorNotSupported]);
+  return data.Result.Error([data.EvaluateExprError.NotSupported]);
 };
 
 const localEvaluatedPartMapGetLocalPartExpr = (
@@ -566,7 +570,7 @@ const evaluateSuggestionFunctionCall = (
       break;
 
     case "Error":
-      return data.resultError(
+      return data.Result.Error(
         functionResult.error.concat(
           parameterResult._ === "Error" ? parameterResult.error : []
         )
@@ -580,8 +584,8 @@ const evaluateFunctionCallResultOk = (
 ): data.Result<data.EvaluatedExpr, ReadonlyArray<data.EvaluateExprError>> => {
   switch (functionExpr._) {
     case "Kernel": {
-      return data.resultOk(
-        data.evaluatedExprKernelCall({
+      return data.Result.Ok(
+        data.EvaluatedExpr.KernelCall({
           kernel: functionExpr.kernelExpr,
           expr: parameter,
         })
@@ -598,8 +602,8 @@ const evaluateFunctionCallResultOk = (
       }
     }
   }
-  return data.resultError([
-    data.evaluateExprErrorTypeError({
+  return data.Result.Error([
+    data.EvaluateExprError.TypeError({
       message: "関数のところにkernel,kernelCall以外が来てしまった",
     }),
   ]);
@@ -615,14 +619,14 @@ const int32Add = (
         case "Int32": {
           const parameterAInt: number = parameterA.int32;
           const parameterBInt: number = parameterB.int32;
-          return data.resultOk(
-            data.evaluatedExprInt32((parameterAInt + parameterBInt) | 0)
+          return data.Result.Ok(
+            data.EvaluatedExpr.Int32((parameterAInt + parameterBInt) | 0)
           );
         }
       }
   }
-  return data.resultError([
-    data.evaluateExprErrorTypeError({
+  return data.Result.Error([
+    data.EvaluateExprError.TypeError({
       message: "int32Addで整数が渡されなかった",
     }),
   ]);
@@ -638,14 +642,14 @@ const int32Mul = (
         case "Int32": {
           const parameterAInt: number = parameterA.int32;
           const parameterBInt: number = parameterB.int32;
-          return data.resultOk(
-            data.evaluatedExprInt32((parameterAInt * parameterBInt) | 0)
+          return data.Result.Ok(
+            data.EvaluatedExpr.Int32((parameterAInt * parameterBInt) | 0)
           );
         }
       }
   }
-  return data.resultError([
-    data.evaluateExprErrorTypeError({
+  return data.Result.Error([
+    data.EvaluateExprError.TypeError({
       message: "int33Mulで整数が渡されなかった",
     }),
   ]);
@@ -661,14 +665,14 @@ const int32Sub = (
         case "Int32": {
           const parameterAInt: number = parameterA.int32;
           const parameterBInt: number = parameterB.int32;
-          return data.resultOk(
-            data.evaluatedExprInt32((parameterAInt - parameterBInt) | 0)
+          return data.Result.Ok(
+            data.EvaluatedExpr.Int32((parameterAInt - parameterBInt) | 0)
           );
         }
       }
   }
-  return data.resultError([
-    data.evaluateExprErrorTypeError({
+  return data.Result.Error([
+    data.EvaluateExprError.TypeError({
       message: "int33Subで整数が渡されなかった",
     }),
   ]);

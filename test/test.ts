@@ -7,7 +7,7 @@ describe("test", () => {
       main.urlDataAndAccessTokenFromUrl(new URL("https://definy.app/")).urlData
     ).toEqual<data.UrlData>({
       clientMode: "Release",
-      location: data.locationHome,
+      location: data.Location.Home,
       language: "English",
     });
   });
@@ -20,7 +20,7 @@ describe("test", () => {
       ).urlData
     ).toEqual<data.UrlData>({
       clientMode: "Release",
-      location: data.locationProject(
+      location: data.Location.Project(
         "580d8d6a54cf43e4452a0bba6694a4ed" as data.ProjectId
       ),
       language: "Japanese",
@@ -34,7 +34,7 @@ describe("test", () => {
       data.UrlData
     >({
       clientMode: "DebugMode",
-      location: data.locationUser(
+      location: data.Location.User(
         "580d8d6a54cf43e4452a0bba6694a4ed" as data.UserId
       ),
       language: "Esperanto",
@@ -47,7 +47,7 @@ describe("test", () => {
     expect(main.urlDataAndAccessTokenFromUrl(url).accessToken).toEqual<
       data.Maybe<data.AccessToken>
     >(
-      data.maybeJust(
+      data.Maybe.Just(
         "f81919b78537257302b50f776b77a90b984cc3d75fa899f9f460ff972dcc8cb0" as data.AccessToken
       )
     );
@@ -55,14 +55,14 @@ describe("test", () => {
   it("encode, decode user url", () => {
     const languageAndLocation: data.UrlData = {
       clientMode: "DebugMode",
-      location: data.locationUser(
+      location: data.Location.User(
         "580d8d6a54cf43e4452a0bba6694a4ed" as data.UserId
       ),
       language: "Esperanto",
     };
     const url = main.urlDataAndAccessTokenToUrl(
       languageAndLocation,
-      data.maybeNothing()
+      data.Maybe.Nothing()
     );
     const decodedLanguageAndLocation: data.UrlData = main.urlDataAndAccessTokenFromUrl(
       url
@@ -94,17 +94,17 @@ describe("test", () => {
         evaluatedPartMap: new Map(),
         evaluatedSuggestionPartMap: new Map(),
       },
-      data.suggestionExprFunctionCall({
-        function: data.suggestionExprFunctionCall({
-          function: data.suggestionExprKernel("Int32Add"),
-          parameter: data.suggestionExprInt32Literal(50),
+      data.SuggestionExpr.FunctionCall({
+        function: data.SuggestionExpr.FunctionCall({
+          function: data.SuggestionExpr.Kernel("Int32Add"),
+          parameter: data.SuggestionExpr.Int32Literal(50),
         }),
-        parameter: data.suggestionExprFunctionCall({
-          function: data.suggestionExprFunctionCall({
-            function: data.suggestionExprKernel("Int32Add"),
-            parameter: data.suggestionExprInt32Literal(32),
+        parameter: data.SuggestionExpr.FunctionCall({
+          function: data.SuggestionExpr.FunctionCall({
+            function: data.SuggestionExpr.Kernel("Int32Add"),
+            parameter: data.SuggestionExpr.Int32Literal(32),
           }),
-          parameter: data.suggestionExprInt32Literal(100),
+          parameter: data.SuggestionExpr.Int32Literal(100),
         }),
       })
     );
@@ -113,7 +113,7 @@ describe("test", () => {
         main.data.EvaluatedExpr,
         ReadonlyArray<main.data.EvaluateExprError>
       >
-    >(data.resultOk(data.evaluatedExprInt32(182)));
+    >(data.Result.Ok(data.EvaluatedExpr.Int32(182)));
   });
 
   it("dynamic Evaluation: use part definition", () => {
@@ -127,7 +127,7 @@ describe("test", () => {
      *
      * = (add (addOneHundred one)) one
      */
-    const intType: data.Type = data.typeTypePartWithParameter({
+    const intType: data.Type = data.Type.TypePartWithParameter({
       typePartId: "int" as data.TypePartId,
       parameter: [],
     });
@@ -144,7 +144,7 @@ describe("test", () => {
               description: "1を表す",
               parentList: [],
               type: intType,
-              expr: data.exprInt32Literal(1),
+              expr: data.Expr.Int32Literal(1),
               createSuggestionId: "oneCreateSuggestionId" as data.SuggestionId,
               getTime: {
                 day: 0,
@@ -160,9 +160,9 @@ describe("test", () => {
               description: "100を足す関数",
               parentList: [],
               type: intType,
-              expr: data.exprFunctionCall({
-                function: data.exprKernel("Int32Add"),
-                parameter: data.exprInt32Literal(100),
+              expr: data.Expr.FunctionCall({
+                function: data.Expr.Kernel("Int32Add"),
+                parameter: data.Expr.Int32Literal(100),
               }),
               createSuggestionId: "addOneHundredCreateSuggestionId" as data.SuggestionId,
               getTime: {
@@ -177,19 +177,19 @@ describe("test", () => {
         evaluatedSuggestionPartMap: new Map(),
         evaluatedPartMap: new Map(),
       },
-      data.suggestionExprFunctionCall({
-        function: data.suggestionExprFunctionCall({
-          function: data.suggestionExprKernel("Int32Add"),
-          parameter: data.suggestionExprFunctionCall({
-            function: data.suggestionExprPartReference(addOneHundredName),
-            parameter: data.suggestionExprPartReference(oneName),
+      data.SuggestionExpr.FunctionCall({
+        function: data.SuggestionExpr.FunctionCall({
+          function: data.SuggestionExpr.Kernel("Int32Add"),
+          parameter: data.SuggestionExpr.FunctionCall({
+            function: data.SuggestionExpr.PartReference(addOneHundredName),
+            parameter: data.SuggestionExpr.PartReference(oneName),
           }),
         }),
-        parameter: data.suggestionExprPartReference(oneName),
+        parameter: data.SuggestionExpr.PartReference(oneName),
       })
     );
     expect(result).toEqual<
       data.Result<data.EvaluatedExpr, ReadonlyArray<data.EvaluateExprError>>
-    >(data.resultOk(data.evaluatedExprInt32(102)));
+    >(data.Result.Ok(data.EvaluatedExpr.Int32(102)));
   });
 });
