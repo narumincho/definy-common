@@ -30,8 +30,8 @@ const suggestionBranchPartDefinitionName = "SuggestionBranchPartDefinition";
 const typePartSnapshotName = "TypePartSnapshot";
 const partSnapshotName = "PartSnapshot";
 const typePartBodyName = "TypePartBody";
-const typePartBodyProductMemberName = "TypePartBodyProductMember";
-const typePartBodySumPatternName = "TypePartBodySumPattern";
+const memberName = "Member";
+const patternName = "Pattern";
 const typePartBodyKernelName = "TypePartBodyKernel";
 const typeName = "Type";
 const typeInputAndOutputName = "TypeInputAndOutput";
@@ -135,12 +135,12 @@ const exprType = Type.Custom({
   name: exprName,
   parameterList: [],
 });
-const typePartBodyProductMemberType = Type.Custom({
-  name: typePartBodyProductMemberName,
+const memberType = Type.Custom({
+  name: memberName,
   parameterList: [],
 });
-const typePartBodySumPatternType = Type.Custom({
-  name: typePartBodySumPatternName,
+const patternType = Type.Custom({
+  name: patternName,
   parameterList: [],
 });
 const typePartBodyKernelType = Type.Custom({
@@ -675,12 +675,12 @@ export const customTypeList: ReadonlyArray<CustomTypeDefinition> = [
       {
         name: "Product",
         description: "直積型",
-        parameter: Maybe.Just(Type.List(typePartBodyProductMemberType)),
+        parameter: Maybe.Just(Type.List(memberType)),
       },
       {
         name: "Sum",
         description: "直和型",
-        parameter: Maybe.Just(Type.List(typePartBodySumPatternType)),
+        parameter: Maybe.Just(Type.List(patternType)),
       },
       {
         name: "Kernel",
@@ -690,7 +690,7 @@ export const customTypeList: ReadonlyArray<CustomTypeDefinition> = [
     ]),
   },
   {
-    name: typePartBodyProductMemberName,
+    name: memberName,
     description: "直積型のメンバー",
     typeParameterList: [],
     body: CustomTypeDefinitionBody.Product([
@@ -712,7 +712,7 @@ export const customTypeList: ReadonlyArray<CustomTypeDefinition> = [
     ]),
   },
   {
-    name: typePartBodySumPatternName,
+    name: patternName,
     description: "直積型のパターン",
     typeParameterList: [],
     body: CustomTypeDefinitionBody.Product([

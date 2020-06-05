@@ -693,24 +693,14 @@ export type PartSnapshot = {
  * 型の定義本体
  */
 export type TypePartBody =
-  | {
-      readonly _: "Product";
-      readonly typePartBodyProductMemberList: ReadonlyArray<
-        TypePartBodyProductMember
-      >;
-    }
-  | {
-      readonly _: "Sum";
-      readonly typePartBodySumPatternList: ReadonlyArray<
-        TypePartBodySumPattern
-      >;
-    }
+  | { readonly _: "Product"; readonly memberList: ReadonlyArray<Member> }
+  | { readonly _: "Sum"; readonly patternList: ReadonlyArray<Pattern> }
   | { readonly _: "Kernel"; readonly typePartBodyKernel: TypePartBodyKernel };
 
 /**
  * 直積型のメンバー
  */
-export type TypePartBodyProductMember = {
+export type Member = {
   /**
    * メンバー名
    */
@@ -728,7 +718,7 @@ export type TypePartBodyProductMember = {
 /**
  * 直積型のパターン
  */
-export type TypePartBodySumPattern = {
+export type Pattern = {
   /**
    * タグ名
    */
@@ -4015,30 +4005,24 @@ export const TypePartBody: {
   /**
    * 直積型
    */
-  readonly Product: (
-    a: ReadonlyArray<TypePartBodyProductMember>
-  ) => TypePartBody;
+  readonly Product: (a: ReadonlyArray<Member>) => TypePartBody;
   /**
    * 直和型
    */
-  readonly Sum: (a: ReadonlyArray<TypePartBodySumPattern>) => TypePartBody;
+  readonly Sum: (a: ReadonlyArray<Pattern>) => TypePartBody;
   /**
    * Definyだけでは表現できないデータ型
    */
   readonly Kernel: (a: TypePartBodyKernel) => TypePartBody;
   readonly codec: Codec<TypePartBody>;
 } = {
-  Product: (
-    typePartBodyProductMemberList: ReadonlyArray<TypePartBodyProductMember>
-  ): TypePartBody => ({
+  Product: (memberList: ReadonlyArray<Member>): TypePartBody => ({
     _: "Product",
-    typePartBodyProductMemberList: typePartBodyProductMemberList,
+    memberList: memberList,
   }),
-  Sum: (
-    typePartBodySumPatternList: ReadonlyArray<TypePartBodySumPattern>
-  ): TypePartBody => ({
+  Sum: (patternList: ReadonlyArray<Pattern>): TypePartBody => ({
     _: "Sum",
-    typePartBodySumPatternList: typePartBodySumPatternList,
+    patternList: patternList,
   }),
   Kernel: (typePartBodyKernel: TypePartBodyKernel): TypePartBody => ({
     _: "Kernel",
@@ -4048,17 +4032,11 @@ export const TypePartBody: {
     encode: (value: TypePartBody): ReadonlyArray<number> => {
       switch (value._) {
         case "Product": {
-          return [0].concat(
-            List.codec(TypePartBodyProductMember.codec).encode(
-              value.typePartBodyProductMemberList
-            )
-          );
+          return [0].concat(List.codec(Member.codec).encode(value.memberList));
         }
         case "Sum": {
           return [1].concat(
-            List.codec(TypePartBodySumPattern.codec).encode(
-              value.typePartBodySumPatternList
-            )
+            List.codec(Pattern.codec).encode(value.patternList)
           );
         }
         case "Kernel": {
@@ -4078,12 +4056,9 @@ export const TypePartBody: {
       } = Int32.codec.decode(index, binary);
       if (patternIndex.result === 0) {
         const result: {
-          readonly result: ReadonlyArray<TypePartBodyProductMember>;
+          readonly result: ReadonlyArray<Member>;
           readonly nextIndex: number;
-        } = List.codec(TypePartBodyProductMember.codec).decode(
-          patternIndex.nextIndex,
-          binary
-        );
+        } = List.codec(Member.codec).decode(patternIndex.nextIndex, binary);
         return {
           result: TypePartBody.Product(result.result),
           nextIndex: result.nextIndex,
@@ -4091,12 +4066,9 @@ export const TypePartBody: {
       }
       if (patternIndex.result === 1) {
         const result: {
-          readonly result: ReadonlyArray<TypePartBodySumPattern>;
+          readonly result: ReadonlyArray<Pattern>;
           readonly nextIndex: number;
-        } = List.codec(TypePartBodySumPattern.codec).decode(
-          patternIndex.nextIndex,
-          binary
-        );
+        } = List.codec(Pattern.codec).decode(patternIndex.nextIndex, binary);
         return {
           result: TypePartBody.Sum(result.result),
           nextIndex: result.nextIndex,
@@ -4120,11 +4092,9 @@ export const TypePartBody: {
 /**
  * 直積型のメンバー
  */
-export const TypePartBodyProductMember: {
-  readonly codec: Codec<TypePartBodyProductMember>;
-} = {
+export const Member: { readonly codec: Codec<Member> } = {
   codec: {
-    encode: (value: TypePartBodyProductMember): ReadonlyArray<number> =>
+    encode: (value: Member): ReadonlyArray<number> =>
       String.codec
         .encode(value.name)
         .concat(String.codec.encode(value.description))
@@ -4132,10 +4102,7 @@ export const TypePartBodyProductMember: {
     decode: (
       index: number,
       binary: Uint8Array
-    ): {
-      readonly result: TypePartBodyProductMember;
-      readonly nextIndex: number;
-    } => {
+    ): { readonly result: Member; readonly nextIndex: number } => {
       const nameAndNextIndex: {
         readonly result: string;
         readonly nextIndex: number;
@@ -4163,11 +4130,9 @@ export const TypePartBodyProductMember: {
 /**
  * 直積型のパターン
  */
-export const TypePartBodySumPattern: {
-  readonly codec: Codec<TypePartBodySumPattern>;
-} = {
+export const Pattern: { readonly codec: Codec<Pattern> } = {
   codec: {
-    encode: (value: TypePartBodySumPattern): ReadonlyArray<number> =>
+    encode: (value: Pattern): ReadonlyArray<number> =>
       String.codec
         .encode(value.name)
         .concat(String.codec.encode(value.description))
@@ -4175,10 +4140,7 @@ export const TypePartBodySumPattern: {
     decode: (
       index: number,
       binary: Uint8Array
-    ): {
-      readonly result: TypePartBodySumPattern;
-      readonly nextIndex: number;
-    } => {
+    ): { readonly result: Pattern; readonly nextIndex: number } => {
       const nameAndNextIndex: {
         readonly result: string;
         readonly nextIndex: number;
