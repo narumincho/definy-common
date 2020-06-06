@@ -128,15 +128,9 @@ export const customTypeList: ReadonlyArray<CustomTypeDefinition> = [
         parameter: Maybe.Nothing(),
       },
       {
-        name: "CreateIdea",
-        description:
-          "アイデア作成ページ. パラメーターのprojectIdは対象のプロジェクト",
+        name: "Project",
+        description: "プロジェクトの詳細ページ",
         parameter: Maybe.Just(idAndToken.projectId),
-      },
-      {
-        name: "User",
-        description: "ユーザーの詳細ページ",
-        parameter: Maybe.Just(idAndToken.userId),
       },
       {
         name: "UserList",
@@ -144,14 +138,24 @@ export const customTypeList: ReadonlyArray<CustomTypeDefinition> = [
         parameter: Maybe.Nothing(),
       },
       {
-        name: "Project",
-        description: "プロジェクトの詳細ページ",
-        parameter: Maybe.Just(idAndToken.projectId),
+        name: "User",
+        description: "ユーザーの詳細ページ",
+        parameter: Maybe.Just(idAndToken.userId),
+      },
+      {
+        name: "IdeaList",
+        description: "アイデア一覧",
+        parameter: Maybe.Nothing(),
       },
       {
         name: "Idea",
         description: "アイデア詳細ページ",
         parameter: Maybe.Just(idAndToken.ideaId),
+      },
+      {
+        name: "SuggestionList",
+        description: "提案一覧",
+        parameter: Maybe.Nothing(),
       },
       {
         name: "Suggestion",

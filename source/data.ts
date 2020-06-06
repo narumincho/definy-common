@@ -87,11 +87,12 @@ export type ClientMode = "DebugMode" | "Release";
 export type Location =
   | { readonly _: "Home" }
   | { readonly _: "CreateProject" }
-  | { readonly _: "CreateIdea"; readonly projectId: ProjectId }
-  | { readonly _: "User"; readonly userId: UserId }
-  | { readonly _: "UserList" }
   | { readonly _: "Project"; readonly projectId: ProjectId }
+  | { readonly _: "UserList" }
+  | { readonly _: "User"; readonly userId: UserId }
+  | { readonly _: "IdeaList" }
   | { readonly _: "Idea"; readonly ideaId: IdeaId }
+  | { readonly _: "SuggestionList" }
   | { readonly _: "Suggestion"; readonly suggestionId: SuggestionId }
   | { readonly _: "PartList" }
   | { readonly _: "TypePartList" }
@@ -1924,25 +1925,29 @@ export const Location: {
    */
   readonly CreateProject: Location;
   /**
-   * アイデア作成ページ. パラメーターのprojectIdは対象のプロジェクト
+   * プロジェクトの詳細ページ
    */
-  readonly CreateIdea: (a: ProjectId) => Location;
-  /**
-   * ユーザーの詳細ページ
-   */
-  readonly User: (a: UserId) => Location;
+  readonly Project: (a: ProjectId) => Location;
   /**
    * ユーザー一覧ページ
    */
   readonly UserList: Location;
   /**
-   * プロジェクトの詳細ページ
+   * ユーザーの詳細ページ
    */
-  readonly Project: (a: ProjectId) => Location;
+  readonly User: (a: UserId) => Location;
+  /**
+   * アイデア一覧
+   */
+  readonly IdeaList: Location;
   /**
    * アイデア詳細ページ
    */
   readonly Idea: (a: IdeaId) => Location;
+  /**
+   * 提案一覧
+   */
+  readonly SuggestionList: Location;
   /**
    * 提案のページ
    */
@@ -1963,17 +1968,15 @@ export const Location: {
 } = {
   Home: { _: "Home" },
   CreateProject: { _: "CreateProject" },
-  CreateIdea: (projectId: ProjectId): Location => ({
-    _: "CreateIdea",
-    projectId: projectId,
-  }),
-  User: (userId: UserId): Location => ({ _: "User", userId: userId }),
-  UserList: { _: "UserList" },
   Project: (projectId: ProjectId): Location => ({
     _: "Project",
     projectId: projectId,
   }),
+  UserList: { _: "UserList" },
+  User: (userId: UserId): Location => ({ _: "User", userId: userId }),
+  IdeaList: { _: "IdeaList" },
   Idea: (ideaId: IdeaId): Location => ({ _: "Idea", ideaId: ideaId }),
+  SuggestionList: { _: "SuggestionList" },
   Suggestion: (suggestionId: SuggestionId): Location => ({
     _: "Suggestion",
     suggestionId: suggestionId,
@@ -1990,32 +1993,35 @@ export const Location: {
         case "CreateProject": {
           return [1];
         }
-        case "CreateIdea": {
+        case "Project": {
           return [2].concat(ProjectId.codec.encode(value.projectId));
         }
-        case "User": {
-          return [3].concat(UserId.codec.encode(value.userId));
-        }
         case "UserList": {
-          return [4];
+          return [3];
         }
-        case "Project": {
-          return [5].concat(ProjectId.codec.encode(value.projectId));
+        case "User": {
+          return [4].concat(UserId.codec.encode(value.userId));
+        }
+        case "IdeaList": {
+          return [5];
         }
         case "Idea": {
           return [6].concat(IdeaId.codec.encode(value.ideaId));
         }
+        case "SuggestionList": {
+          return [7];
+        }
         case "Suggestion": {
-          return [7].concat(SuggestionId.codec.encode(value.suggestionId));
+          return [8].concat(SuggestionId.codec.encode(value.suggestionId));
         }
         case "PartList": {
-          return [8];
-        }
-        case "TypePartList": {
           return [9];
         }
-        case "About": {
+        case "TypePartList": {
           return [10];
+        }
+        case "About": {
+          return [11];
         }
       }
     },
@@ -2042,11 +2048,14 @@ export const Location: {
           readonly nextIndex: number;
         } = ProjectId.codec.decode(patternIndex.nextIndex, binary);
         return {
-          result: Location.CreateIdea(result.result),
+          result: Location.Project(result.result),
           nextIndex: result.nextIndex,
         };
       }
       if (patternIndex.result === 3) {
+        return { result: Location.UserList, nextIndex: patternIndex.nextIndex };
+      }
+      if (patternIndex.result === 4) {
         const result: {
           readonly result: UserId;
           readonly nextIndex: number;
@@ -2056,18 +2065,8 @@ export const Location: {
           nextIndex: result.nextIndex,
         };
       }
-      if (patternIndex.result === 4) {
-        return { result: Location.UserList, nextIndex: patternIndex.nextIndex };
-      }
       if (patternIndex.result === 5) {
-        const result: {
-          readonly result: ProjectId;
-          readonly nextIndex: number;
-        } = ProjectId.codec.decode(patternIndex.nextIndex, binary);
-        return {
-          result: Location.Project(result.result),
-          nextIndex: result.nextIndex,
-        };
+        return { result: Location.IdeaList, nextIndex: patternIndex.nextIndex };
       }
       if (patternIndex.result === 6) {
         const result: {
@@ -2080,6 +2079,12 @@ export const Location: {
         };
       }
       if (patternIndex.result === 7) {
+        return {
+          result: Location.SuggestionList,
+          nextIndex: patternIndex.nextIndex,
+        };
+      }
+      if (patternIndex.result === 8) {
         const result: {
           readonly result: SuggestionId;
           readonly nextIndex: number;
@@ -2089,16 +2094,16 @@ export const Location: {
           nextIndex: result.nextIndex,
         };
       }
-      if (patternIndex.result === 8) {
+      if (patternIndex.result === 9) {
         return { result: Location.PartList, nextIndex: patternIndex.nextIndex };
       }
-      if (patternIndex.result === 9) {
+      if (patternIndex.result === 10) {
         return {
           result: Location.TypePartList,
           nextIndex: patternIndex.nextIndex,
         };
       }
-      if (patternIndex.result === 10) {
+      if (patternIndex.result === 11) {
         return { result: Location.About, nextIndex: patternIndex.nextIndex };
       }
       throw new Error("存在しないパターンを指定された 型を更新してください");
