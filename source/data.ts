@@ -102,7 +102,7 @@ export type Language = "Japanese" | "English" | "Esperanto";
 /**
  * ユーザーのデータのスナップショット
  */
-export type UserSnapshot = {
+export type User = {
   /**
    * ユーザー名. 表示される名前. 他のユーザーとかぶっても良い. 絵文字も使える. 全角英数は半角英数,半角カタカナは全角カタカナ, (株)の合字を分解するなどのNFKCの正規化がされる. U+0000-U+0019 と U+007F-U+00A0 の範囲の文字は入らない. 前後に空白を含められない. 間の空白は2文字以上連続しない. 文字数のカウント方法は正規化されたあとのCodePoint単位. Twitterと同じ, 1文字以上50文字以下
    */
@@ -138,23 +138,23 @@ export type UserSnapshot = {
 };
 
 /**
- * 最初に自分の情報を得るときに返ってくるデータ
+ * データを識別するIdとデータ
  */
-export type UserSnapshotAndId = {
+export type IdAndData<id, data> = {
   /**
-   * ユーザーID
+   * ID
    */
-  readonly id: UserId;
+  readonly id: id;
   /**
-   * ユーザーのスナップショット
+   * データ
    */
-  readonly snapshot: UserSnapshot;
+  readonly data: data;
 };
 
 /**
  * プロジェクト
  */
-export type ProjectSnapshot = {
+export type Project = {
   /**
    * プロジェクト名
    */
@@ -194,23 +194,9 @@ export type ProjectSnapshot = {
 };
 
 /**
- * プロジェクトを作成したときに返ってくるデータ
- */
-export type ProjectSnapshotAndId = {
-  /**
-   * プロジェクトID
-   */
-  readonly id: ProjectId;
-  /**
-   * プロジェクトのスナップショット
-   */
-  readonly snapshot: ProjectSnapshot;
-};
-
-/**
  * アイデア
  */
-export type IdeaSnapshot = {
+export type Idea = {
   /**
    * アイデア名
    */
@@ -239,20 +225,6 @@ export type IdeaSnapshot = {
    * 取得日時
    */
   readonly getTime: Time;
-};
-
-/**
- * アイデアとそのID. アイデア作成時に返ってくる
- */
-export type IdeaSnapshotAndId = {
-  /**
-   * アイデアID
-   */
-  readonly id: IdeaId;
-  /**
-   * アイデアのスナップショット
-   */
-  readonly snapshot: IdeaSnapshot;
 };
 
 /**
@@ -297,7 +269,7 @@ export type ItemBody =
 /**
  * 提案
  */
-export type SuggestionSnapshot = {
+export type Suggestion = {
   /**
    * 変更概要
    */
@@ -334,20 +306,6 @@ export type SuggestionSnapshot = {
    * 取得日時
    */
   readonly getTime: Time;
-};
-
-/**
- * Id付きのSuggestion
- */
-export type SuggestionSnapshotAndId = {
-  /**
-   * SuggestionId
-   */
-  readonly id: SuggestionId;
-  /**
-   * SuggestionSnapshot
-   */
-  readonly snapshot: SuggestionSnapshot;
 };
 
 /**
@@ -547,7 +505,7 @@ export type SuggestionBranchPartDefinition = {
 /**
  * 型パーツ
  */
-export type TypePartSnapshot = {
+export type TypePart = {
   /**
    * 型パーツの名前
    */
@@ -581,7 +539,7 @@ export type TypePartSnapshot = {
 /**
  * パーツの定義
  */
-export type PartSnapshot = {
+export type Part = {
   /**
    * パーツの名前
    */
@@ -906,11 +864,11 @@ export type EvalParameter = {
   /**
    * パーツのリスト
    */
-  readonly partList: ReadonlyArray<PartWithId>;
+  readonly partList: ReadonlyArray<IdAndData<PartId, Part>>;
   /**
    * 型パーツのリスト
    */
-  readonly typePartList: ReadonlyArray<TypePartWithId>;
+  readonly typePartList: ReadonlyArray<IdAndData<TypePartId, TypePart>>;
   /**
    * 変更点
    */
@@ -919,34 +877,6 @@ export type EvalParameter = {
    * 評価してほしい式
    */
   readonly expr: SuggestionExpr;
-};
-
-/**
- * パーツとPartId
- */
-export type PartWithId = {
-  /**
-   * PartId
-   */
-  readonly id: PartId;
-  /**
-   * PartSnapshot
-   */
-  readonly part: PartSnapshot;
-};
-
-/**
- * 型パーツとTypePartId
- */
-export type TypePartWithId = {
-  /**
-   * TypePartId
-   */
-  readonly id: TypePartId;
-  /**
-   * TypePartSnapshot
-   */
-  readonly typePart: TypePartSnapshot;
 };
 
 /**
@@ -2050,9 +1980,9 @@ export const Language: {
 /**
  * ユーザーのデータのスナップショット
  */
-export const UserSnapshot: { readonly codec: Codec<UserSnapshot> } = {
+export const User: { readonly codec: Codec<User> } = {
   codec: {
-    encode: (value: UserSnapshot): ReadonlyArray<number> =>
+    encode: (value: User): ReadonlyArray<number> =>
       String.codec
         .encode(value.name)
         .concat(ImageToken.codec.encode(value.imageHash))
@@ -2065,7 +1995,7 @@ export const UserSnapshot: { readonly codec: Codec<UserSnapshot> } = {
     decode: (
       index: number,
       binary: Uint8Array
-    ): { readonly result: UserSnapshot; readonly nextIndex: number } => {
+    ): { readonly result: User; readonly nextIndex: number } => {
       const nameAndNextIndex: {
         readonly result: string;
         readonly nextIndex: number;
@@ -2125,43 +2055,46 @@ export const UserSnapshot: { readonly codec: Codec<UserSnapshot> } = {
 };
 
 /**
- * 最初に自分の情報を得るときに返ってくるデータ
+ * データを識別するIdとデータ
  */
-export const UserSnapshotAndId: { readonly codec: Codec<UserSnapshotAndId> } = {
-  codec: {
-    encode: (value: UserSnapshotAndId): ReadonlyArray<number> =>
-      UserId.codec
-        .encode(value.id)
-        .concat(UserSnapshot.codec.encode(value.snapshot)),
+export const IdAndData: {
+  readonly codec: <id, data>(
+    a: Codec<id>,
+    b: Codec<data>
+  ) => Codec<IdAndData<id, data>>;
+} = {
+  codec: <id, data>(
+    idCodec: Codec<id>,
+    dataCodec: Codec<data>
+  ): Codec<IdAndData<id, data>> => ({
+    encode: (value: IdAndData<id, data>): ReadonlyArray<number> =>
+      idCodec.encode(value.id).concat(dataCodec.encode(value.data)),
     decode: (
       index: number,
       binary: Uint8Array
-    ): { readonly result: UserSnapshotAndId; readonly nextIndex: number } => {
+    ): { readonly result: IdAndData<id, data>; readonly nextIndex: number } => {
       const idAndNextIndex: {
-        readonly result: UserId;
+        readonly result: id;
         readonly nextIndex: number;
-      } = UserId.codec.decode(index, binary);
-      const snapshotAndNextIndex: {
-        readonly result: UserSnapshot;
+      } = idCodec.decode(index, binary);
+      const dataAndNextIndex: {
+        readonly result: data;
         readonly nextIndex: number;
-      } = UserSnapshot.codec.decode(idAndNextIndex.nextIndex, binary);
+      } = dataCodec.decode(idAndNextIndex.nextIndex, binary);
       return {
-        result: {
-          id: idAndNextIndex.result,
-          snapshot: snapshotAndNextIndex.result,
-        },
-        nextIndex: snapshotAndNextIndex.nextIndex,
+        result: { id: idAndNextIndex.result, data: dataAndNextIndex.result },
+        nextIndex: dataAndNextIndex.nextIndex,
       };
     },
-  },
+  }),
 };
 
 /**
  * プロジェクト
  */
-export const ProjectSnapshot: { readonly codec: Codec<ProjectSnapshot> } = {
+export const Project: { readonly codec: Codec<Project> } = {
   codec: {
-    encode: (value: ProjectSnapshot): ReadonlyArray<number> =>
+    encode: (value: Project): ReadonlyArray<number> =>
       String.codec
         .encode(value.name)
         .concat(ImageToken.codec.encode(value.iconHash))
@@ -2175,7 +2108,7 @@ export const ProjectSnapshot: { readonly codec: Codec<ProjectSnapshot> } = {
     decode: (
       index: number,
       binary: Uint8Array
-    ): { readonly result: ProjectSnapshot; readonly nextIndex: number } => {
+    ): { readonly result: Project; readonly nextIndex: number } => {
       const nameAndNextIndex: {
         readonly result: string;
         readonly nextIndex: number;
@@ -2237,48 +2170,11 @@ export const ProjectSnapshot: { readonly codec: Codec<ProjectSnapshot> } = {
 };
 
 /**
- * プロジェクトを作成したときに返ってくるデータ
- */
-export const ProjectSnapshotAndId: {
-  readonly codec: Codec<ProjectSnapshotAndId>;
-} = {
-  codec: {
-    encode: (value: ProjectSnapshotAndId): ReadonlyArray<number> =>
-      ProjectId.codec
-        .encode(value.id)
-        .concat(ProjectSnapshot.codec.encode(value.snapshot)),
-    decode: (
-      index: number,
-      binary: Uint8Array
-    ): {
-      readonly result: ProjectSnapshotAndId;
-      readonly nextIndex: number;
-    } => {
-      const idAndNextIndex: {
-        readonly result: ProjectId;
-        readonly nextIndex: number;
-      } = ProjectId.codec.decode(index, binary);
-      const snapshotAndNextIndex: {
-        readonly result: ProjectSnapshot;
-        readonly nextIndex: number;
-      } = ProjectSnapshot.codec.decode(idAndNextIndex.nextIndex, binary);
-      return {
-        result: {
-          id: idAndNextIndex.result,
-          snapshot: snapshotAndNextIndex.result,
-        },
-        nextIndex: snapshotAndNextIndex.nextIndex,
-      };
-    },
-  },
-};
-
-/**
  * アイデア
  */
-export const IdeaSnapshot: { readonly codec: Codec<IdeaSnapshot> } = {
+export const Idea: { readonly codec: Codec<Idea> } = {
   codec: {
-    encode: (value: IdeaSnapshot): ReadonlyArray<number> =>
+    encode: (value: Idea): ReadonlyArray<number> =>
       String.codec
         .encode(value.name)
         .concat(UserId.codec.encode(value.createUserId))
@@ -2290,7 +2186,7 @@ export const IdeaSnapshot: { readonly codec: Codec<IdeaSnapshot> } = {
     decode: (
       index: number,
       binary: Uint8Array
-    ): { readonly result: IdeaSnapshot; readonly nextIndex: number } => {
+    ): { readonly result: Idea; readonly nextIndex: number } => {
       const nameAndNextIndex: {
         readonly result: string;
         readonly nextIndex: number;
@@ -2333,38 +2229,6 @@ export const IdeaSnapshot: { readonly codec: Codec<IdeaSnapshot> } = {
           getTime: getTimeAndNextIndex.result,
         },
         nextIndex: getTimeAndNextIndex.nextIndex,
-      };
-    },
-  },
-};
-
-/**
- * アイデアとそのID. アイデア作成時に返ってくる
- */
-export const IdeaSnapshotAndId: { readonly codec: Codec<IdeaSnapshotAndId> } = {
-  codec: {
-    encode: (value: IdeaSnapshotAndId): ReadonlyArray<number> =>
-      IdeaId.codec
-        .encode(value.id)
-        .concat(IdeaSnapshot.codec.encode(value.snapshot)),
-    decode: (
-      index: number,
-      binary: Uint8Array
-    ): { readonly result: IdeaSnapshotAndId; readonly nextIndex: number } => {
-      const idAndNextIndex: {
-        readonly result: IdeaId;
-        readonly nextIndex: number;
-      } = IdeaId.codec.decode(index, binary);
-      const snapshotAndNextIndex: {
-        readonly result: IdeaSnapshot;
-        readonly nextIndex: number;
-      } = IdeaSnapshot.codec.decode(idAndNextIndex.nextIndex, binary);
-      return {
-        result: {
-          id: idAndNextIndex.result,
-          snapshot: snapshotAndNextIndex.result,
-        },
-        nextIndex: snapshotAndNextIndex.nextIndex,
       };
     },
   },
@@ -2581,11 +2445,9 @@ export const ItemBody: {
 /**
  * 提案
  */
-export const SuggestionSnapshot: {
-  readonly codec: Codec<SuggestionSnapshot>;
-} = {
+export const Suggestion: { readonly codec: Codec<Suggestion> } = {
   codec: {
-    encode: (value: SuggestionSnapshot): ReadonlyArray<number> =>
+    encode: (value: Suggestion): ReadonlyArray<number> =>
       String.codec
         .encode(value.name)
         .concat(UserId.codec.encode(value.createUserId))
@@ -2599,7 +2461,7 @@ export const SuggestionSnapshot: {
     decode: (
       index: number,
       binary: Uint8Array
-    ): { readonly result: SuggestionSnapshot; readonly nextIndex: number } => {
+    ): { readonly result: Suggestion; readonly nextIndex: number } => {
       const nameAndNextIndex: {
         readonly result: string;
         readonly nextIndex: number;
@@ -2649,43 +2511,6 @@ export const SuggestionSnapshot: {
           getTime: getTimeAndNextIndex.result,
         },
         nextIndex: getTimeAndNextIndex.nextIndex,
-      };
-    },
-  },
-};
-
-/**
- * Id付きのSuggestion
- */
-export const SuggestionSnapshotAndId: {
-  readonly codec: Codec<SuggestionSnapshotAndId>;
-} = {
-  codec: {
-    encode: (value: SuggestionSnapshotAndId): ReadonlyArray<number> =>
-      SuggestionId.codec
-        .encode(value.id)
-        .concat(SuggestionSnapshot.codec.encode(value.snapshot)),
-    decode: (
-      index: number,
-      binary: Uint8Array
-    ): {
-      readonly result: SuggestionSnapshotAndId;
-      readonly nextIndex: number;
-    } => {
-      const idAndNextIndex: {
-        readonly result: SuggestionId;
-        readonly nextIndex: number;
-      } = SuggestionId.codec.decode(index, binary);
-      const snapshotAndNextIndex: {
-        readonly result: SuggestionSnapshot;
-        readonly nextIndex: number;
-      } = SuggestionSnapshot.codec.decode(idAndNextIndex.nextIndex, binary);
-      return {
-        result: {
-          id: idAndNextIndex.result,
-          snapshot: snapshotAndNextIndex.result,
-        },
-        nextIndex: snapshotAndNextIndex.nextIndex,
       };
     },
   },
@@ -3564,9 +3389,9 @@ export const SuggestionBranchPartDefinition: {
 /**
  * 型パーツ
  */
-export const TypePartSnapshot: { readonly codec: Codec<TypePartSnapshot> } = {
+export const TypePart: { readonly codec: Codec<TypePart> } = {
   codec: {
-    encode: (value: TypePartSnapshot): ReadonlyArray<number> =>
+    encode: (value: TypePart): ReadonlyArray<number> =>
       String.codec
         .encode(value.name)
         .concat(List.codec(PartId.codec).encode(value.parentList))
@@ -3578,7 +3403,7 @@ export const TypePartSnapshot: { readonly codec: Codec<TypePartSnapshot> } = {
     decode: (
       index: number,
       binary: Uint8Array
-    ): { readonly result: TypePartSnapshot; readonly nextIndex: number } => {
+    ): { readonly result: TypePart; readonly nextIndex: number } => {
       const nameAndNextIndex: {
         readonly result: string;
         readonly nextIndex: number;
@@ -3626,9 +3451,9 @@ export const TypePartSnapshot: { readonly codec: Codec<TypePartSnapshot> } = {
 /**
  * パーツの定義
  */
-export const PartSnapshot: { readonly codec: Codec<PartSnapshot> } = {
+export const Part: { readonly codec: Codec<Part> } = {
   codec: {
-    encode: (value: PartSnapshot): ReadonlyArray<number> =>
+    encode: (value: Part): ReadonlyArray<number> =>
       String.codec
         .encode(value.name)
         .concat(List.codec(PartId.codec).encode(value.parentList))
@@ -3641,7 +3466,7 @@ export const PartSnapshot: { readonly codec: Codec<PartSnapshot> } = {
     decode: (
       index: number,
       binary: Uint8Array
-    ): { readonly result: PartSnapshot; readonly nextIndex: number } => {
+    ): { readonly result: Part; readonly nextIndex: number } => {
       const nameAndNextIndex: {
         readonly result: string;
         readonly nextIndex: number;
@@ -5024,9 +4849,13 @@ export const TypeError: { readonly codec: Codec<TypeError> } = {
 export const EvalParameter: { readonly codec: Codec<EvalParameter> } = {
   codec: {
     encode: (value: EvalParameter): ReadonlyArray<number> =>
-      List.codec(PartWithId.codec)
+      List.codec(IdAndData.codec(PartId.codec, Part.codec))
         .encode(value.partList)
-        .concat(List.codec(TypePartWithId.codec).encode(value.typePartList))
+        .concat(
+          List.codec(IdAndData.codec(TypePartId.codec, TypePart.codec)).encode(
+            value.typePartList
+          )
+        )
         .concat(List.codec(Change.codec).encode(value.changeList))
         .concat(SuggestionExpr.codec.encode(value.expr)),
     decode: (
@@ -5034,13 +4863,16 @@ export const EvalParameter: { readonly codec: Codec<EvalParameter> } = {
       binary: Uint8Array
     ): { readonly result: EvalParameter; readonly nextIndex: number } => {
       const partListAndNextIndex: {
-        readonly result: ReadonlyArray<PartWithId>;
+        readonly result: ReadonlyArray<IdAndData<PartId, Part>>;
         readonly nextIndex: number;
-      } = List.codec(PartWithId.codec).decode(index, binary);
+      } = List.codec(IdAndData.codec(PartId.codec, Part.codec)).decode(
+        index,
+        binary
+      );
       const typePartListAndNextIndex: {
-        readonly result: ReadonlyArray<TypePartWithId>;
+        readonly result: ReadonlyArray<IdAndData<TypePartId, TypePart>>;
         readonly nextIndex: number;
-      } = List.codec(TypePartWithId.codec).decode(
+      } = List.codec(IdAndData.codec(TypePartId.codec, TypePart.codec)).decode(
         partListAndNextIndex.nextIndex,
         binary
       );
@@ -5063,67 +4895,6 @@ export const EvalParameter: { readonly codec: Codec<EvalParameter> } = {
           expr: exprAndNextIndex.result,
         },
         nextIndex: exprAndNextIndex.nextIndex,
-      };
-    },
-  },
-};
-
-/**
- * パーツとPartId
- */
-export const PartWithId: { readonly codec: Codec<PartWithId> } = {
-  codec: {
-    encode: (value: PartWithId): ReadonlyArray<number> =>
-      PartId.codec
-        .encode(value.id)
-        .concat(PartSnapshot.codec.encode(value.part)),
-    decode: (
-      index: number,
-      binary: Uint8Array
-    ): { readonly result: PartWithId; readonly nextIndex: number } => {
-      const idAndNextIndex: {
-        readonly result: PartId;
-        readonly nextIndex: number;
-      } = PartId.codec.decode(index, binary);
-      const partAndNextIndex: {
-        readonly result: PartSnapshot;
-        readonly nextIndex: number;
-      } = PartSnapshot.codec.decode(idAndNextIndex.nextIndex, binary);
-      return {
-        result: { id: idAndNextIndex.result, part: partAndNextIndex.result },
-        nextIndex: partAndNextIndex.nextIndex,
-      };
-    },
-  },
-};
-
-/**
- * 型パーツとTypePartId
- */
-export const TypePartWithId: { readonly codec: Codec<TypePartWithId> } = {
-  codec: {
-    encode: (value: TypePartWithId): ReadonlyArray<number> =>
-      TypePartId.codec
-        .encode(value.id)
-        .concat(TypePartSnapshot.codec.encode(value.typePart)),
-    decode: (
-      index: number,
-      binary: Uint8Array
-    ): { readonly result: TypePartWithId; readonly nextIndex: number } => {
-      const idAndNextIndex: {
-        readonly result: TypePartId;
-        readonly nextIndex: number;
-      } = TypePartId.codec.decode(index, binary);
-      const typePartAndNextIndex: {
-        readonly result: TypePartSnapshot;
-        readonly nextIndex: number;
-      } = TypePartSnapshot.codec.decode(idAndNextIndex.nextIndex, binary);
-      return {
-        result: {
-          id: idAndNextIndex.result,
-          typePart: typePartAndNextIndex.result,
-        },
-        nextIndex: typePartAndNextIndex.nextIndex,
       };
     },
   },

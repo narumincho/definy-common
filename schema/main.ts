@@ -228,19 +228,19 @@ export const customTypeList: ReadonlyArray<CustomTypeDefinition> = [
     ]),
   },
   {
-    name: name.userWithId,
-    description: "最初に自分の情報を得るときに返ってくるデータ",
-    typeParameterList: [],
+    name: name.idAndData,
+    description: "データを識別するIdとデータ",
+    typeParameterList: ["id", "data"],
     body: CustomTypeDefinitionBody.Product([
       {
         name: "id",
-        description: "ユーザーID",
-        type: idAndToken.userId,
+        description: "ID",
+        type: Type.Parameter("id"),
       },
       {
-        name: "snapshot",
-        description: "ユーザーのスナップショット",
-        type: customType.userSnapshot,
+        name: "data",
+        description: "データ",
+        type: Type.Parameter("data"),
       },
     ]),
   },
@@ -297,23 +297,6 @@ export const customTypeList: ReadonlyArray<CustomTypeDefinition> = [
     ]),
   },
   {
-    name: name.projectWithId,
-    description: "プロジェクトを作成したときに返ってくるデータ",
-    typeParameterList: [],
-    body: CustomTypeDefinitionBody.Product([
-      {
-        name: "id",
-        description: "プロジェクトID",
-        type: idAndToken.projectId,
-      },
-      {
-        name: "snapshot",
-        description: "プロジェクトのスナップショット",
-        type: customType.projectSnapshot,
-      },
-    ]),
-  },
-  {
     name: name.idea,
     description: "アイデア",
     typeParameterList: [],
@@ -352,23 +335,6 @@ export const customTypeList: ReadonlyArray<CustomTypeDefinition> = [
         name: "getTime",
         description: "取得日時",
         type: customType.time,
-      },
-    ]),
-  },
-  {
-    name: name.ideaWithId,
-    description: "アイデアとそのID. アイデア作成時に返ってくる",
-    typeParameterList: [],
-    body: CustomTypeDefinitionBody.Product([
-      {
-        name: "id",
-        description: "アイデアID",
-        type: idAndToken.ideaId,
-      },
-      {
-        name: "snapshot",
-        description: "アイデアのスナップショット",
-        type: customType.ideaSnapshot,
       },
     ]),
   },
@@ -485,23 +451,6 @@ export const customTypeList: ReadonlyArray<CustomTypeDefinition> = [
         name: "getTime",
         description: "取得日時",
         type: customType.time,
-      },
-    ]),
-  },
-  {
-    name: name.suggestionWithId,
-    description: "Id付きのSuggestion",
-    typeParameterList: [],
-    body: CustomTypeDefinitionBody.Product([
-      {
-        name: "id",
-        description: "SuggestionId",
-        type: idAndToken.suggestionId,
-      },
-      {
-        name: "snapshot",
-        description: "SuggestionSnapshot",
-        type: customType.suggestionSnapshot,
       },
     ]),
   },
@@ -1376,12 +1325,16 @@ export const customTypeList: ReadonlyArray<CustomTypeDefinition> = [
       {
         name: "partList",
         description: "パーツのリスト",
-        type: Type.List(customType.partWithId),
+        type: Type.List(
+          customType.idAndData(idAndToken.partId, customType.part)
+        ),
       },
       {
         name: "typePartList",
         description: "型パーツのリスト",
-        type: Type.List(customType.typePartWithId),
+        type: Type.List(
+          customType.idAndData(idAndToken.typePartId, customType.typePart)
+        ),
       },
       {
         name: "changeList",
@@ -1392,40 +1345,6 @@ export const customTypeList: ReadonlyArray<CustomTypeDefinition> = [
         name: "expr",
         description: "評価してほしい式",
         type: customType.suggestionExpr,
-      },
-    ]),
-  },
-  {
-    name: name.partWith,
-    description: "パーツとPartId",
-    typeParameterList: [],
-    body: CustomTypeDefinitionBody.Product([
-      {
-        name: "id",
-        description: "PartId",
-        type: idAndToken.partId,
-      },
-      {
-        name: "part",
-        description: "PartSnapshot",
-        type: Type.Custom({ name: name.part, parameterList: [] }),
-      },
-    ]),
-  },
-  {
-    name: name.typePartWithId,
-    description: "型パーツとTypePartId",
-    typeParameterList: [],
-    body: CustomTypeDefinitionBody.Product([
-      {
-        name: "id",
-        description: "TypePartId",
-        type: idAndToken.typePartId,
-      },
-      {
-        name: "typePart",
-        description: "TypePartSnapshot",
-        type: customType.typePartSnapshot,
       },
     ]),
   },

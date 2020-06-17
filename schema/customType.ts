@@ -6,6 +6,12 @@ export const time = Type.Custom({
   parameterList: [],
 });
 
+export const idAndData = (id: Type, data: Type): Type =>
+  Type.Custom({
+    name: name.idAndData,
+    parameterList: [id, data],
+  });
+
 export const change = Type.Custom({
   name: name.change,
   parameterList: [],
@@ -16,7 +22,7 @@ export const suggestionState = Type.Custom({
   parameterList: [],
 });
 
-export const suggestionSnapshot = Type.Custom({
+export const suggestion = Type.Custom({
   name: name.suggestion,
   parameterList: [],
 });
@@ -101,6 +107,11 @@ export const type = Type.Custom({
   parameterList: [],
 });
 
+export const part = Type.Custom({
+  name: name.part,
+  parameterList: [],
+});
+
 export const expr = Type.Custom({
   name: name.expr,
   parameterList: [],
@@ -171,12 +182,12 @@ export const typeError = Type.Custom({
   parameterList: [],
 });
 
-export const userSnapshot = Type.Custom({
+export const user = Type.Custom({
   name: name.user,
   parameterList: [],
 });
 
-export const projectSnapshot = Type.Custom({
+export const project = Type.Custom({
   name: name.project,
   parameterList: [],
 });
@@ -186,13 +197,8 @@ export const ideaItem = Type.Custom({
   parameterList: [],
 });
 
-export const ideaSnapshot = Type.Custom({
+export const idea = Type.Custom({
   name: name.idea,
-  parameterList: [],
-});
-
-export const ideaSnapshotAndId = Type.Custom({
-  name: name.ideaWithId,
   parameterList: [],
 });
 
@@ -226,17 +232,7 @@ export const language = Type.Custom({
   parameterList: [],
 });
 
-export const partWithId = Type.Custom({
-  name: name.partWith,
-  parameterList: [],
-});
-
-export const typePartWithId = Type.Custom({
-  name: name.typePartWithId,
-  parameterList: [],
-});
-
-export const typePartSnapshot = Type.Custom({
+export const typePart = Type.Custom({
   name: name.typePart,
   parameterList: [],
 });

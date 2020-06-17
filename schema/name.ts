@@ -1,7 +1,7 @@
 export const time = "Time";
+export const idAndData = "IdAndData";
 
 export const suggestion = "Suggestion";
-export const suggestionWithId = "SuggestionWithId";
 
 export const suggestionState = "SuggestionState";
 export const change = "Change";
@@ -45,18 +45,10 @@ export const evaluateExprError = "EvaluateExprError";
 export const typeError = "TypeError";
 
 export const evalParameter = "EvalParameter";
-export const partWith = "PartWithId";
-export const typePartWithId = "TypePartWithId";
 
 export const user = "User";
-export const userWithId = "UserWithId";
-
 export const project = "Project";
-export const projectWithId = "ProjectWithId";
-
 export const idea = "Idea";
-export const ideaWithId = "IdeaWithId";
-
 export const ideaItem = "IdeaItem";
 export const itemBody = "ItemBody";
 
