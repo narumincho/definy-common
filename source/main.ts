@@ -42,24 +42,18 @@ const locationToPath = (location: data.Location): string => {
       return "/";
     case "CreateProject":
       return "/create-project";
-    case "CreateIdea":
-      return "/create-idea/" + (location.projectId as string);
     case "User":
       return "/user/" + (location.userId as string);
-    case "UserList":
-      return "/user";
     case "Project":
       return "/project/" + (location.projectId as string);
     case "Idea":
       return "/idea/" + (location.ideaId as string);
     case "Suggestion":
       return "/suggestion/" + (location.suggestionId as string);
-    case "PartList":
-      return "/part";
-    case "TypePartList":
-      return "/type-part";
     case "About":
       return "/about";
+    case "Debug":
+      return "/debug";
   }
 };
 
@@ -101,21 +95,11 @@ const locationFromUrl = (pathName: string): data.Location => {
   if (pathName === "/create-project") {
     return data.Location.CreateProject;
   }
-  if (pathName === "/user") {
-    return data.Location.UserList;
-  }
-  if (pathName === "/part") {
-    return data.Location.PartList;
-  }
-  if (pathName === "/type-part") {
-    return data.Location.TypePartList;
-  }
   if (pathName === "/about") {
     return data.Location.About;
   }
-  const createIdeaResult = pathName.match(/^\/create-idea\/([0-9a-f]{32})$/u);
-  if (createIdeaResult !== null) {
-    return data.Location.CreateIdea(createIdeaResult[1] as data.ProjectId);
+  if (pathName === "/debug") {
+    return data.Location.Debug;
   }
   const projectResult = pathName.match(/^\/project\/([0-9a-f]{32})$/u);
   if (projectResult !== null) {
@@ -340,9 +324,9 @@ const typeToSuggestion = (type: data.Type): data.SuggestionType => {
 
 type SourceAndCache = {
   /** 型パーツ */
-  typePartMap: ReadonlyMap<data.TypePartId, data.TypePartSnapshot>;
+  typePartMap: ReadonlyMap<data.TypePartId, data.TypePart>;
   /** パーツ */
-  partMap: ReadonlyMap<data.PartId, data.PartSnapshot>;
+  partMap: ReadonlyMap<data.PartId, data.Part>;
   /** Suggestion内で作ったパーツ */
   suggestionPartMap: ReadonlyMap<number, data.SuggestionExpr>;
   /** 評価されたパーツ (キャッシュ) */
@@ -363,10 +347,10 @@ export const evalExpr = (evalParameter: data.EvalParameter): EvaluationResult =>
   evaluateSuggestionExpr(
     {
       partMap: new Map(
-        evalParameter.partList.map(({ id, part }) => [id, part])
+        evalParameter.partList.map(({ id, data }) => [id, data])
       ),
       typePartMap: new Map(
-        evalParameter.typePartList.map(({ id, typePart }) => [id, typePart])
+        evalParameter.typePartList.map(({ id, data }) => [id, data])
       ),
       suggestionPartMap: changeListToSuggestionPartMap(
         evalParameter.changeList
