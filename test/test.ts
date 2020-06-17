@@ -1,5 +1,5 @@
+import * as data from "../source/data";
 import * as main from "../source/main";
-import { data } from "../source/main";
 
 describe("test", () => {
   it("https://definy.app/ is Home in English", () => {

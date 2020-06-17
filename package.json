@@ -71,7 +71,8 @@
       "sourceType": "module",
       "project": [
         "./source/tsconfig.json",
-        "./schema/tsconfig.json"
+        "./schema/tsconfig.json",
+        "./test/tsconfig.json"
       ]
     },
     "rules": {

@@ -239,7 +239,9 @@ export const stringToTypePartName = (text: string): string | undefined => {
       }
     } else if (/^[a-zA-Z0-9]$/u.test(char)) {
       result += isBeforeSpace ? char.toUpperCase() : char;
-      isBeforeSpace = char === "";
+      isBeforeSpace = false;
+    } else {
+      isBeforeSpace = true;
     }
   }
   return result.slice(0, 64);
