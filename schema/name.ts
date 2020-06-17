@@ -70,3 +70,11 @@ export const urlData = "UrlData";
 export const clientMode = "ClientMode";
 export const location = "Location";
 export const language = "Language";
+
+export const requestLogInUrlRequestData = "RequestLogInUrlRequestData";
+export const createProjectParameter = "CreateProjectParameter";
+export const createIdeaParameter = "CreateIdeaParameter";
+export const addCommentParameter = "AddCommentParameter";
+export const accessTokenAndSuggestionId = "AccessTokenAndSuggestionId";
+export const addSuggestionParameter = "AddSuggestionParameter";
+export const updateSuggestionParameter = "UpdateSuggestionParameter";

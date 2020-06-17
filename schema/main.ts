@@ -12,7 +12,7 @@ import * as idAndToken from "./idAndToken";
 import * as name from "./name";
 import * as customType from "./customType";
 
-const listCustomType: ReadonlyArray<CustomTypeDefinition> = [
+export const customTypeList: ReadonlyArray<CustomTypeDefinition> = [
   {
     name: name.time,
     description:
@@ -32,7 +32,7 @@ const listCustomType: ReadonlyArray<CustomTypeDefinition> = [
     ]),
   },
   {
-    name: "RequestLogInUrlRequestData",
+    name: name.requestLogInUrlRequestData,
     description: "ログインのURLを発行するために必要なデータ",
     typeParameterList: [],
     body: CustomTypeDefinitionBody.Product([
@@ -1484,16 +1484,12 @@ const listCustomType: ReadonlyArray<CustomTypeDefinition> = [
       {
         name: "partList",
         description: "パーツのリスト",
-        type: Type.List(
-          Type.Custom({ name: name.partWith, parameterList: [] })
-        ),
+        type: Type.List(customType.partWithId),
       },
       {
         name: "typePartList",
         description: "型パーツのリスト",
-        type: Type.List(
-          Type.Custom({ name: name.typePartWithId, parameterList: [] })
-        ),
+        type: Type.List(customType.typePartWithId),
       },
       {
         name: "changeList",
@@ -1537,15 +1533,12 @@ const listCustomType: ReadonlyArray<CustomTypeDefinition> = [
       {
         name: "typePart",
         description: "TypePartSnapshot",
-        type: Type.Custom({
-          name: name.typePartSnapshot,
-          parameterList: [],
-        }),
+        type: customType.typePartSnapshot,
       },
     ]),
   },
   {
-    name: "CreateProjectParameter",
+    name: name.createProjectParameter,
     description: "プロジェクト作成時に必要なパラメーター",
     typeParameterList: [],
     body: CustomTypeDefinitionBody.Product([
@@ -1562,7 +1555,7 @@ const listCustomType: ReadonlyArray<CustomTypeDefinition> = [
     ]),
   },
   {
-    name: "CreateIdeaParameter",
+    name: name.createIdeaParameter,
     description: "アイデアを作成時に必要なパラメーター",
     typeParameterList: [],
     body: CustomTypeDefinitionBody.Product([
@@ -1584,7 +1577,7 @@ const listCustomType: ReadonlyArray<CustomTypeDefinition> = [
     ]),
   },
   {
-    name: "AddCommentParameter",
+    name: name.addCommentParameter,
     description: "アイデアにコメントを追加するときに必要なパラメーター",
     typeParameterList: [],
     body: CustomTypeDefinitionBody.Product([
@@ -1606,7 +1599,7 @@ const listCustomType: ReadonlyArray<CustomTypeDefinition> = [
     ]),
   },
   {
-    name: "AddSuggestionParameter",
+    name: name.addSuggestionParameter,
     description: "提案を作成するときに必要なパラメーター",
     typeParameterList: [],
     body: CustomTypeDefinitionBody.Product([
@@ -1623,7 +1616,7 @@ const listCustomType: ReadonlyArray<CustomTypeDefinition> = [
     ]),
   },
   {
-    name: "UpdateSuggestionParameter",
+    name: name.updateSuggestionParameter,
     description: "提案を更新するときに必要なパラメーター",
     typeParameterList: [],
     body: CustomTypeDefinitionBody.Product([
@@ -1655,7 +1648,7 @@ const listCustomType: ReadonlyArray<CustomTypeDefinition> = [
     ]),
   },
   {
-    name: "AccessTokenAndSuggestionId",
+    name: name.accessTokenAndSuggestionId,
     description: "提案を承認待ちにしたり許可したりするときなどに使う",
     typeParameterList: [],
     body: CustomTypeDefinitionBody.Product([
@@ -1674,7 +1667,7 @@ const listCustomType: ReadonlyArray<CustomTypeDefinition> = [
 ];
 
 const typeScriptCode = codeGen.generateCodeAsString(
-  nt.generateTypeScriptCode(listCustomType),
+  nt.generateTypeScriptCode(customTypeList),
   "TypeScript"
 );
 

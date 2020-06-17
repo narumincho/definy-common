@@ -225,3 +225,18 @@ export const language = Type.Custom({
   name: name.language,
   parameterList: [],
 });
+
+export const partWithId = Type.Custom({
+  name: name.partWith,
+  parameterList: [],
+});
+
+export const typePartWithId = Type.Custom({
+  name: name.typePartWithId,
+  parameterList: [],
+});
+
+export const typePartSnapshot = Type.Custom({
+  name: name.typePartSnapshot,
+  parameterList: [],
+});
