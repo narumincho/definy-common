@@ -190,23 +190,18 @@ const normalizeMultiLineString = (text: string): string => {
   let result = "";
   for (const char of normalized) {
     const codePoint = char.codePointAt(0);
-    // LF
-    if (codePoint === 0x0a) {
-      result += char;
-      continue;
-    }
-    // 制御文字
     if (
-      codePoint === undefined ||
-      codePoint <= 0x1f ||
-      (codePoint >= 0x7f && codePoint <= 0xa0)
+      codePoint !== undefined &&
+      (codePoint === 0x0a ||
+        (codePoint > 0x1f && codePoint < 0x7f) ||
+        codePoint > 0xa0)
     ) {
-      continue;
+      result += char;
     }
-    result += char;
   }
   return result;
 };
+
 /**
  * NFKCで正規化して, 先頭末尾の空白をなくし, 空白の連続を1つの空白にまとめ, 改行を取り除く
  */
@@ -218,21 +213,14 @@ const normalizeOneLineString = (text: string): string => {
     const codePoint = char.codePointAt(0);
     // 制御文字
     if (
-      codePoint === undefined ||
-      codePoint <= 0x1f ||
-      (codePoint >= 0x7f && codePoint <= 0xa0)
+      codePoint !== undefined &&
+      ((codePoint > 0x1f && codePoint < 0x7f) || codePoint > 0xa0)
     ) {
-      continue;
-    }
-    if (char === " ") {
-      if (beforeSpace) {
-        continue;
+      if (!(beforeSpace && char === " ")) {
+        result += char;
+        beforeSpace = char === " ";
       }
-      beforeSpace = true;
-    } else {
-      beforeSpace = false;
     }
-    result += char;
   }
   return result;
 };
@@ -249,14 +237,10 @@ export const stringToTypePartName = (text: string): string | undefined => {
         result += char.toLowerCase();
         isFirstChar = false;
       }
-      continue;
-    }
-    if (/^[a-zA-Z0-9]$/u.test(char)) {
+    } else if (/^[a-zA-Z0-9]$/u.test(char)) {
       result += isBeforeSpace ? char.toUpperCase() : char;
-      isBeforeSpace = false;
-      continue;
+      isBeforeSpace = char === "";
     }
-    isBeforeSpace = true;
   }
   return result.slice(0, 64);
 };
@@ -422,8 +406,7 @@ export const evaluateSuggestionExpr = (
         suggestionExpr.suggestionFunctionCall
       );
     case "Lambda":
-      // TODO
-      return data.Result.Error([data.EvaluateExprError.Blank]);
+      return data.Result.Error([data.EvaluateExprError.NotSupported]);
     case "Blank":
       return data.Result.Error([data.EvaluateExprError.Blank]);
   }
@@ -456,7 +439,6 @@ const evaluatePartReference = (
     sourceAndCache,
     exprToSuggestionExpr(part.expr)
   );
-  // TODO パーツの評価に失敗したときはキャッシュに入れないよりも, エラーだったということを記録したほうが良いと思う
   if (result._ === "Ok") {
     sourceAndCache.evaluatedPartMap.set(partId, result.ok);
   }
