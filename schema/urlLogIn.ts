@@ -1,37 +1,11 @@
 import {
   Maybe,
-  Type,
   CustomTypeDefinition,
   CustomTypeDefinitionBody,
 } from "@narumincho/type/distribution/data";
 import * as idAndToken from "./idAndToken";
-
-const openIdConnectProviderName = "OpenIdConnectProvider";
-const urlDataName = "UrlData";
-const clientModeName = "ClientMode";
-const locationName = "Location";
-const languageName = "Language";
-
-const openIdConnectProviderType = Type.Custom({
-  name: openIdConnectProviderName,
-  parameterList: [],
-});
-const urlDataType = Type.Custom({
-  name: urlDataName,
-  parameterList: [],
-});
-const clientModeType = Type.Custom({
-  name: clientModeName,
-  parameterList: [],
-});
-const locationType = Type.Custom({
-  name: locationName,
-  parameterList: [],
-});
-const languageType = Type.Custom({
-  name: languageName,
-  parameterList: [],
-});
+import * as customType from "./customType";
+import * as name from "./name";
 
 export const customTypeList: ReadonlyArray<CustomTypeDefinition> = [
   {
@@ -42,17 +16,17 @@ export const customTypeList: ReadonlyArray<CustomTypeDefinition> = [
       {
         name: "openIdConnectProvider",
         description: "ログインに使用するプロバイダー",
-        type: openIdConnectProviderType,
+        type: customType.openIdConnectProviderType,
       },
       {
         name: "urlData",
         description: "ログインした後に返ってくるURLに必要なデータ",
-        type: urlDataType,
+        type: customType.urlDataType,
       },
     ]),
   },
   {
-    name: openIdConnectProviderName,
+    name: name.openIdConnectProviderName,
     description:
       "ソーシャルログインを提供するプロバイダー (例: Google, GitHub)",
     typeParameterList: [],
@@ -72,7 +46,7 @@ export const customTypeList: ReadonlyArray<CustomTypeDefinition> = [
     ]),
   },
   {
-    name: urlDataName,
+    name: name.urlDataName,
     description:
       "デバッグモードかどうか,言語とページの場所. URLとして表現されるデータ. Googleなどの検索エンジンの都合( https://support.google.com/webmasters/answer/182192?hl=ja )で,URLにページの言語を入れて,言語ごとに別のURLである必要がある. デバッグ時のホスト名は http://localhost になる",
     typeParameterList: [],
@@ -80,22 +54,22 @@ export const customTypeList: ReadonlyArray<CustomTypeDefinition> = [
       {
         name: "clientMode",
         description: "クライアントモード",
-        type: clientModeType,
+        type: customType.clientModeType,
       },
       {
         name: "location",
         description: "場所",
-        type: locationType,
+        type: customType.locationType,
       },
       {
         name: "language",
         description: "言語",
-        type: languageType,
+        type: customType.languageType,
       },
     ]),
   },
   {
-    name: clientModeName,
+    name: name.clientModeName,
     description: "デバッグモードか, リリースモード",
     typeParameterList: [],
     body: CustomTypeDefinitionBody.Sum([
@@ -112,7 +86,7 @@ export const customTypeList: ReadonlyArray<CustomTypeDefinition> = [
     ]),
   },
   {
-    name: locationName,
+    name: name.locationName,
     description:
       "DefinyWebアプリ内での場所を示すもの. URLから求められる. URLに変換できる",
     typeParameterList: [],
@@ -180,7 +154,7 @@ export const customTypeList: ReadonlyArray<CustomTypeDefinition> = [
     ]),
   },
   {
-    name: languageName,
+    name: name.languageName,
     description: "英語,日本語,エスペラント語などの言語",
     typeParameterList: [],
     body: CustomTypeDefinitionBody.Sum([

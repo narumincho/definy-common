@@ -9,12 +9,30 @@ import * as fs from "fs";
 import * as prettier from "prettier";
 import * as code from "./code";
 import * as idAndToken from "./idAndToken";
-import * as time from "./time";
+import * as name from "./name";
 import * as urlLogIn from "./urlLogIn";
 import * as resource from "./resource";
+import * as customType from "./customType";
 
 const listCustomType: ReadonlyArray<CustomTypeDefinition> = [
-  time.timeCustomType,
+  {
+    name: name.time,
+    description:
+      "日時. 0001-01-01T00:00:00.000Z to 9999-12-31T23:59:59.999Z 最小単位はミリ秒. ミリ秒の求め方は day*1000*60*60*24 + millisecond",
+    typeParameterList: [],
+    body: CustomTypeDefinitionBody.Product([
+      {
+        name: "day",
+        description: "1970-01-01からの経過日数. マイナスになることもある",
+        type: Type.Int32,
+      },
+      {
+        name: "millisecond",
+        description: "日にちの中のミリ秒. 0 to 86399999 (=1000*60*60*24-1)",
+        type: Type.Int32,
+      },
+    ]),
+  },
   ...urlLogIn.customTypeList,
   ...resource.customTypeList,
   ...code.customTypeList,
@@ -124,7 +142,7 @@ const listCustomType: ReadonlyArray<CustomTypeDefinition> = [
       {
         name: "changeList",
         description: "提案の変更",
-        type: Type.List(code.changeType),
+        type: Type.List(customType.changeType),
       },
     ]),
   },

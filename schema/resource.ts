@@ -5,53 +5,12 @@ import {
   CustomTypeDefinitionBody,
 } from "@narumincho/type/distribution/data";
 import * as idAndToken from "./idAndToken";
-import * as time from "./time";
-
-const userSnapshotName = "UserSnapshot";
-const userSnapshotAndIdName = "UserSnapshotAndId";
-const userResponseName = "UserResponse";
-
-const projectSnapshotName = "ProjectSnapshot";
-const projectSnapshotAndIdName = "ProjectSnapshotAndId";
-const projectResponseName = "ProjectResponse";
-
-const ideaSnapshotName = "IdeaSnapshot";
-const ideaSnapshotAndIdName = "IdeaSnapshotAndId";
-const ideaResponseName = "IdeaResponse";
-const IdeaListByProjectIdResponseName = "IdeaListByProjectIdResponse";
-
-const ideaItemName = "IdeaItem";
-const itemBodyName = "ItemBody";
-
-const userSnapshotType = Type.Custom({
-  name: userSnapshotName,
-  parameterList: [],
-});
-const projectSnapshotType = Type.Custom({
-  name: projectSnapshotName,
-  parameterList: [],
-});
-
-const ideaItemType = Type.Custom({
-  name: ideaItemName,
-  parameterList: [],
-});
-const ideaSnapshotType = Type.Custom({
-  name: ideaSnapshotName,
-  parameterList: [],
-});
-const ideaSnapshotAndIdType = Type.Custom({
-  name: ideaSnapshotAndIdName,
-  parameterList: [],
-});
-const itemBodyType = Type.Custom({
-  name: itemBodyName,
-  parameterList: [],
-});
+import * as customType from "./customType";
+import * as name from "./name";
 
 export const customTypeList: ReadonlyArray<CustomTypeDefinition> = [
   {
-    name: userSnapshotName,
+    name: name.userSnapshotName,
     description: "ユーザーのデータのスナップショット",
     typeParameterList: [],
     body: CustomTypeDefinitionBody.Product([
@@ -75,7 +34,7 @@ export const customTypeList: ReadonlyArray<CustomTypeDefinition> = [
       {
         name: "createTime",
         description: "Definyでユーザーが作成された日時",
-        type: time.time,
+        type: customType.time,
       },
       {
         name: "likeProjectIdList",
@@ -95,12 +54,12 @@ export const customTypeList: ReadonlyArray<CustomTypeDefinition> = [
       {
         name: "getTime",
         description: "取得日時",
-        type: time.time,
+        type: customType.time,
       },
     ]),
   },
   {
-    name: userSnapshotAndIdName,
+    name: name.userSnapshotAndIdName,
     description: "最初に自分の情報を得るときに返ってくるデータ",
     typeParameterList: [],
     body: CustomTypeDefinitionBody.Product([
@@ -112,12 +71,12 @@ export const customTypeList: ReadonlyArray<CustomTypeDefinition> = [
       {
         name: "snapshot",
         description: "ユーザーのスナップショット",
-        type: userSnapshotType,
+        type: customType.userSnapshotType,
       },
     ]),
   },
   {
-    name: userResponseName,
+    name: name.userResponseName,
     description:
       "Maybe プロジェクトのスナップショット と userId. TypeScript→Elmに渡す用",
     typeParameterList: [],
@@ -130,12 +89,12 @@ export const customTypeList: ReadonlyArray<CustomTypeDefinition> = [
       {
         name: "snapshotMaybe",
         description: "ユーザーのデータ",
-        type: Type.Maybe(userSnapshotType),
+        type: Type.Maybe(customType.userSnapshotType),
       },
     ]),
   },
   {
-    name: projectSnapshotName,
+    name: name.projectSnapshotName,
     description: "プロジェクト",
     typeParameterList: [],
     body: CustomTypeDefinitionBody.Product([
@@ -157,7 +116,7 @@ export const customTypeList: ReadonlyArray<CustomTypeDefinition> = [
       {
         name: "createTime",
         description: "作成日時",
-        type: time.time,
+        type: customType.time,
       },
       {
         name: "createUserId",
@@ -167,12 +126,12 @@ export const customTypeList: ReadonlyArray<CustomTypeDefinition> = [
       {
         name: "updateTime",
         description: "更新日時",
-        type: time.time,
+        type: customType.time,
       },
       {
         name: "getTime",
         description: "取得日時",
-        type: time.time,
+        type: customType.time,
       },
       {
         name: "partIdList",
@@ -187,7 +146,7 @@ export const customTypeList: ReadonlyArray<CustomTypeDefinition> = [
     ]),
   },
   {
-    name: projectSnapshotAndIdName,
+    name: name.projectSnapshotAndIdName,
     description: "プロジェクトを作成したときに返ってくるデータ",
     typeParameterList: [],
     body: CustomTypeDefinitionBody.Product([
@@ -199,12 +158,12 @@ export const customTypeList: ReadonlyArray<CustomTypeDefinition> = [
       {
         name: "snapshot",
         description: "プロジェクトのスナップショット",
-        type: projectSnapshotType,
+        type: customType.projectSnapshotType,
       },
     ]),
   },
   {
-    name: projectResponseName,
+    name: name.projectResponseName,
     description:
       "Maybe プロジェクトのスナップショット と projectId. TypeScript→Elmに渡す用",
     typeParameterList: [],
@@ -217,12 +176,12 @@ export const customTypeList: ReadonlyArray<CustomTypeDefinition> = [
       {
         name: "snapshotMaybe",
         description: "プロジェクトのデータ",
-        type: Type.Maybe(projectSnapshotType),
+        type: Type.Maybe(customType.projectSnapshotType),
       },
     ]),
   },
   {
-    name: ideaSnapshotName,
+    name: name.ideaSnapshotName,
     description: "アイデア",
     typeParameterList: [],
     body: CustomTypeDefinitionBody.Product([
@@ -239,7 +198,7 @@ export const customTypeList: ReadonlyArray<CustomTypeDefinition> = [
       {
         name: "createTime",
         description: "作成日時",
-        type: time.time,
+        type: customType.time,
       },
       {
         name: "projectId",
@@ -249,22 +208,22 @@ export const customTypeList: ReadonlyArray<CustomTypeDefinition> = [
       {
         name: "itemList",
         description: "アイデアの要素",
-        type: Type.List(ideaItemType),
+        type: Type.List(customType.ideaItemType),
       },
       {
         name: "updateTime",
         description: "更新日時",
-        type: time.time,
+        type: customType.time,
       },
       {
         name: "getTime",
         description: "取得日時",
-        type: time.time,
+        type: customType.time,
       },
     ]),
   },
   {
-    name: ideaSnapshotAndIdName,
+    name: name.ideaSnapshotAndIdName,
     description: "アイデアとそのID. アイデア作成時に返ってくる",
     typeParameterList: [],
     body: CustomTypeDefinitionBody.Product([
@@ -276,12 +235,12 @@ export const customTypeList: ReadonlyArray<CustomTypeDefinition> = [
       {
         name: "snapshot",
         description: "アイデアのスナップショット",
-        type: ideaSnapshotType,
+        type: customType.ideaSnapshotType,
       },
     ]),
   },
   {
-    name: ideaResponseName,
+    name: name.ideaResponseName,
     description: "Maybe アイデア と ideaId. TypeScript→Elmに渡す用",
     typeParameterList: [],
     body: CustomTypeDefinitionBody.Product([
@@ -293,12 +252,12 @@ export const customTypeList: ReadonlyArray<CustomTypeDefinition> = [
       {
         name: "snapshotMaybe",
         description: "アイデアのスナップショット",
-        type: Type.Maybe(ideaSnapshotType),
+        type: Type.Maybe(customType.ideaSnapshotType),
       },
     ]),
   },
   {
-    name: IdeaListByProjectIdResponseName,
+    name: name.IdeaListByProjectIdResponseName,
     description: "プロジェクトからアイデアの一覧を取得したときにElmに渡すもの",
     typeParameterList: [],
     body: CustomTypeDefinitionBody.Product([
@@ -310,12 +269,12 @@ export const customTypeList: ReadonlyArray<CustomTypeDefinition> = [
       {
         name: "ideaSnapshotAndIdList",
         description: "アイデアの一覧",
-        type: Type.List(ideaSnapshotAndIdType),
+        type: Type.List(customType.ideaSnapshotAndIdType),
       },
     ]),
   },
   {
-    name: ideaItemName,
+    name: name.ideaItemName,
     description: "アイデアのコメント",
     typeParameterList: [],
     body: CustomTypeDefinitionBody.Product([
@@ -327,17 +286,17 @@ export const customTypeList: ReadonlyArray<CustomTypeDefinition> = [
       {
         name: "createTime",
         description: "作成日時",
-        type: time.time,
+        type: customType.time,
       },
       {
         name: "body",
         description: "本文",
-        type: itemBodyType,
+        type: customType.itemBodyType,
       },
     ]),
   },
   {
-    name: itemBodyName,
+    name: name.itemBodyName,
     description: "アイデアのアイテム",
     typeParameterList: [],
     body: CustomTypeDefinitionBody.Sum([

@@ -5,192 +5,12 @@ import {
   CustomTypeDefinitionBody,
 } from "@narumincho/type/distribution/data";
 import * as idAndToken from "./idAndToken";
-import * as time from "./time";
-
-const suggestionSnapshotName = "SuggestionSnapshot";
-const suggestionSnapshotAndIdName = "SuggestionSnapshotAndId";
-const suggestionResponse = "SuggestionResponse";
-
-const suggestionStateName = "SuggestionState";
-const changeName = "Change";
-const addPartName = "AddPart";
-const suggestionTypeName = "SuggestionType";
-const suggestionTypeInputAndOutputName = "SuggestionTypeInputAndOutput";
-const typePartWithSuggestionTypeParameterName =
-  "TypePartWithSuggestionTypeParameter";
-const suggestionTypePartWithSuggestionTypeParameterName =
-  "SuggestionTypePartWithSuggestionTypeParameter";
-
-const suggestionExprName = "SuggestionExpr";
-const suggestionTagReferenceName = "SuggestionTagReference";
-const suggestionFunctionCallName = "SuggestionFunctionCall";
-const suggestionLambdaBranchName = "SuggestionLambdaBranch";
-const suggestionBranchPartDefinitionName = "SuggestionBranchPartDefinition";
-
-const typePartSnapshotName = "TypePartSnapshot";
-const partSnapshotName = "PartSnapshot";
-const typePartBodyName = "TypePartBody";
-const memberName = "Member";
-const patternName = "Pattern";
-const typePartBodyKernelName = "TypePartBodyKernel";
-const typeName = "Type";
-const typeInputAndOutputName = "TypeInputAndOutput";
-const typePartIdWithParameterName = "TypePartIdWithParameter";
-
-const exprName = "Expr";
-const evaluatedExprName = "EvaluatedExpr";
-const kernelCallName = "KernelCall";
-const kernelExprName = "KernelExpr";
-const localPartReferenceName = "LocalPartReference";
-const tagReferenceName = "TagReference";
-const functionCallName = "FunctionCall";
-const lambdaBranchName = "LambdaBranch";
-const conditionName = "Condition";
-const conditionTagName = "ConditionTag";
-const branchPartDefinitionName = "BranchPartDefinition";
-const conditionCaptureName = "ConditionCapture";
-const evaluateExprErrorName = "EvaluateExprError";
-const typeErrorName = "TypeError";
-
-const evalParameterName = "EvalParameter";
-const partWithId = "PartWithId";
-const typePartWithId = "TypePartWithId";
-export const changeType = Type.Custom({
-  name: changeName,
-  parameterList: [],
-});
-const suggestionStateType = Type.Custom({
-  name: suggestionStateName,
-  parameterList: [],
-});
-const suggestionSnapshotType = Type.Custom({
-  name: suggestionSnapshotName,
-  parameterList: [],
-});
-const addPartType = Type.Custom({
-  name: addPartName,
-  parameterList: [],
-});
-const suggestionTypeType = Type.Custom({
-  name: suggestionTypeName,
-  parameterList: [],
-});
-const suggestionExprType = Type.Custom({
-  name: suggestionExprName,
-  parameterList: [],
-});
-const suggestionTypeInputAndOutputType = Type.Custom({
-  name: suggestionTypeInputAndOutputName,
-  parameterList: [],
-});
-const typePartWithSuggestionTypeParameterType = Type.Custom({
-  name: typePartWithSuggestionTypeParameterName,
-  parameterList: [],
-});
-const suggestionTypePartWithSuggestionTypeParameterType = Type.Custom({
-  name: suggestionTypePartWithSuggestionTypeParameterName,
-  parameterList: [],
-});
-const kernelExprType = Type.Custom({
-  name: kernelExprName,
-  parameterList: [],
-});
-const localPartReferenceType = Type.Custom({
-  name: localPartReferenceName,
-  parameterList: [],
-});
-const TagReferenceType = Type.Custom({
-  name: tagReferenceName,
-  parameterList: [],
-});
-const suggestionTagReferenceType = Type.Custom({
-  name: suggestionTagReferenceName,
-  parameterList: [],
-});
-const suggestionFunctionCallType = Type.Custom({
-  name: suggestionFunctionCallName,
-  parameterList: [],
-});
-const suggestionLambdaBranchType = Type.Custom({
-  name: suggestionLambdaBranchName,
-  parameterList: [],
-});
-const conditionType = Type.Custom({
-  name: conditionName,
-  parameterList: [],
-});
-const suggestionBranchPartDefinitionType = Type.Custom({
-  name: suggestionBranchPartDefinitionName,
-  parameterList: [],
-});
-const typePartBodyType = Type.Custom({
-  name: typePartBodyName,
-  parameterList: [],
-});
-const typeType = Type.Custom({
-  name: typeName,
-  parameterList: [],
-});
-const exprType = Type.Custom({
-  name: exprName,
-  parameterList: [],
-});
-const memberType = Type.Custom({
-  name: memberName,
-  parameterList: [],
-});
-const patternType = Type.Custom({
-  name: patternName,
-  parameterList: [],
-});
-const typePartBodyKernelType = Type.Custom({
-  name: typePartBodyKernelName,
-  parameterList: [],
-});
-const typeInputAndOutputType = Type.Custom({
-  name: typeInputAndOutputName,
-  parameterList: [],
-});
-const typePartIdWithParameterType = Type.Custom({
-  name: typePartIdWithParameterName,
-  parameterList: [],
-});
-const functionCallType = Type.Custom({
-  name: functionCallName,
-  parameterList: [],
-});
-const lambdaBranchType = Type.Custom({
-  name: lambdaBranchName,
-  parameterList: [],
-});
-const kernelCallType = Type.Custom({
-  name: kernelCallName,
-  parameterList: [],
-});
-const evaluatedExprType = Type.Custom({
-  name: evaluatedExprName,
-  parameterList: [],
-});
-const branchPartDefinitionType = Type.Custom({
-  name: branchPartDefinitionName,
-  parameterList: [],
-});
-const conditionTagType = Type.Custom({
-  name: conditionTagName,
-  parameterList: [],
-});
-const conditionCaptureType = Type.Custom({
-  name: conditionCaptureName,
-  parameterList: [],
-});
-const typeErrorType = Type.Custom({
-  name: typeErrorName,
-  parameterList: [],
-});
+import * as customType from "./customType";
+import * as name from "./name";
 
 export const customTypeList: ReadonlyArray<CustomTypeDefinition> = [
   {
-    name: suggestionSnapshotName,
+    name: name.suggestionSnapshot,
     description: "提案",
     typeParameterList: [],
     body: CustomTypeDefinitionBody.Product([
@@ -212,12 +32,12 @@ export const customTypeList: ReadonlyArray<CustomTypeDefinition> = [
       {
         name: "state",
         description: "承認状態",
-        type: suggestionStateType,
+        type: customType.suggestionStateType,
       },
       {
         name: "changeList",
         description: "変更",
-        type: Type.List(changeType),
+        type: Type.List(customType.changeType),
       },
       {
         name: "projectId",
@@ -232,17 +52,17 @@ export const customTypeList: ReadonlyArray<CustomTypeDefinition> = [
       {
         name: "updateTime",
         description: "更新日時",
-        type: time.time,
+        type: customType.time,
       },
       {
         name: "getTime",
         description: "取得日時",
-        type: time.time,
+        type: customType.time,
       },
     ]),
   },
   {
-    name: suggestionSnapshotAndIdName,
+    name: name.suggestionSnapshotAndId,
     description: "Id付きのSuggestion",
     typeParameterList: [],
     body: CustomTypeDefinitionBody.Product([
@@ -254,12 +74,12 @@ export const customTypeList: ReadonlyArray<CustomTypeDefinition> = [
       {
         name: "snapshot",
         description: "SuggestionSnapshot",
-        type: suggestionSnapshotType,
+        type: customType.suggestionSnapshotType,
       },
     ]),
   },
   {
-    name: suggestionResponse,
+    name: name.suggestionResponse,
     description:
       "Maybe SuggestionSnapshotとSuggestionId TypeScript→Elmに渡す用",
     typeParameterList: [],
@@ -272,12 +92,12 @@ export const customTypeList: ReadonlyArray<CustomTypeDefinition> = [
       {
         name: "snapshotMaybe",
         description: "SuggestionSnapshot Maybe",
-        type: Type.Maybe(suggestionSnapshotType),
+        type: Type.Maybe(customType.suggestionSnapshotType),
       },
     ]),
   },
   {
-    name: suggestionStateName,
+    name: name.suggestionState,
     description: "提案の状況",
     typeParameterList: [],
     body: CustomTypeDefinitionBody.Sum([
@@ -304,7 +124,7 @@ export const customTypeList: ReadonlyArray<CustomTypeDefinition> = [
     ]),
   },
   {
-    name: changeName,
+    name: name.change,
     description: "変更点",
     typeParameterList: [],
     body: CustomTypeDefinitionBody.Sum([
@@ -316,12 +136,12 @@ export const customTypeList: ReadonlyArray<CustomTypeDefinition> = [
       {
         name: "AddPart",
         description: "パーツの追加",
-        parameter: Maybe.Just(addPartType),
+        parameter: Maybe.Just(customType.addPartType),
       },
     ]),
   },
   {
-    name: addPartName,
+    name: name.addPart,
     description: "パーツを追加するのに必要なもの",
     typeParameterList: [],
     body: CustomTypeDefinitionBody.Product([
@@ -343,58 +163,60 @@ export const customTypeList: ReadonlyArray<CustomTypeDefinition> = [
       {
         name: "type",
         description: "新しいパーツの型",
-        type: suggestionTypeType,
+        type: customType.suggestionTypeType,
       },
       {
         name: "expr",
         description: "新しいパーツの式",
-        type: suggestionExprType,
+        type: customType.suggestionExprType,
       },
     ]),
   },
   {
-    name: suggestionTypeName,
+    name: name.suggestionType,
     description: "ChangeのAddPartなどで使われる提案で作成した型を使えるType",
     typeParameterList: [],
     body: CustomTypeDefinitionBody.Sum([
       {
         name: "Function",
         description: "関数",
-        parameter: Maybe.Just(suggestionTypeInputAndOutputType),
+        parameter: Maybe.Just(customType.suggestionTypeInputAndOutputType),
       },
       {
         name: "TypePartWithParameter",
         description: "提案前に作られた型パーツとパラメーター",
-        parameter: Maybe.Just(typePartWithSuggestionTypeParameterType),
+        parameter: Maybe.Just(
+          customType.typePartWithSuggestionTypeParameterType
+        ),
       },
       {
         name: "SuggestionTypePartWithParameter",
         description: "提案時に作られた型パーツとパラメーター",
         parameter: Maybe.Just(
-          suggestionTypePartWithSuggestionTypeParameterType
+          customType.suggestionTypePartWithSuggestionTypeParameterType
         ),
       },
     ]),
   },
   {
-    name: suggestionTypeInputAndOutputName,
+    name: name.suggestionTypeInputAndOutput,
     description: "",
     typeParameterList: [],
     body: CustomTypeDefinitionBody.Product([
       {
         name: "inputType",
         description: "入力の型",
-        type: suggestionTypeType,
+        type: customType.suggestionTypeType,
       },
       {
         name: "outputType",
         description: "出力の型",
-        type: suggestionTypeType,
+        type: customType.suggestionTypeType,
       },
     ]),
   },
   {
-    name: typePartWithSuggestionTypeParameterName,
+    name: name.typePartWithSuggestionTypeParameter,
     description: "",
     typeParameterList: [],
     body: CustomTypeDefinitionBody.Product([
@@ -406,12 +228,12 @@ export const customTypeList: ReadonlyArray<CustomTypeDefinition> = [
       {
         name: "parameter",
         description: "型のパラメーター",
-        type: Type.List(suggestionTypeType),
+        type: Type.List(customType.suggestionTypeType),
       },
     ]),
   },
   {
-    name: suggestionTypePartWithSuggestionTypeParameterName,
+    name: name.suggestionTypePartWithSuggestionTypeParameter,
     description: "",
     typeParameterList: [],
     body: CustomTypeDefinitionBody.Product([
@@ -423,19 +245,19 @@ export const customTypeList: ReadonlyArray<CustomTypeDefinition> = [
       {
         name: "parameter",
         description: "型のパラメーター",
-        type: Type.List(suggestionTypeType),
+        type: Type.List(customType.suggestionTypeType),
       },
     ]),
   },
   {
-    name: suggestionExprName,
+    name: name.suggestionExpr,
     description: "提案時に含まれるパーツを参照できる式",
     typeParameterList: [],
     body: CustomTypeDefinitionBody.Sum([
       {
         name: "Kernel",
         description: "Definyだけでは表現できない式",
-        parameter: Maybe.Just(kernelExprType),
+        parameter: Maybe.Just(customType.kernelExprType),
       },
       {
         name: "Int32Literal",
@@ -455,27 +277,27 @@ export const customTypeList: ReadonlyArray<CustomTypeDefinition> = [
       {
         name: "LocalPartReference",
         description: "ローカルパーツの参照",
-        parameter: Maybe.Just(localPartReferenceType),
+        parameter: Maybe.Just(customType.localPartReferenceType),
       },
       {
         name: "TagReference",
         description: "タグを参照",
-        parameter: Maybe.Just(TagReferenceType),
+        parameter: Maybe.Just(customType.TagReferenceType),
       },
       {
         name: "SuggestionTagReference",
         description: "提案内で定義された型のタグ",
-        parameter: Maybe.Just(suggestionTagReferenceType),
+        parameter: Maybe.Just(customType.suggestionTagReferenceType),
       },
       {
         name: "FunctionCall",
         description: "関数呼び出し (中に含まれる型はSuggestionExpr)",
-        parameter: Maybe.Just(suggestionFunctionCallType),
+        parameter: Maybe.Just(customType.suggestionFunctionCallType),
       },
       {
         name: "Lambda",
         description: "ラムダ",
-        parameter: Maybe.Just(Type.List(suggestionLambdaBranchType)),
+        parameter: Maybe.Just(Type.List(customType.suggestionLambdaBranchType)),
       },
       {
         name: "Blank",
@@ -485,7 +307,7 @@ export const customTypeList: ReadonlyArray<CustomTypeDefinition> = [
     ]),
   },
   {
-    name: suggestionTagReferenceName,
+    name: name.suggestionTagReference,
     description: "提案内で定義された型のタグ",
     typeParameterList: [],
     body: CustomTypeDefinitionBody.Product([
@@ -502,31 +324,31 @@ export const customTypeList: ReadonlyArray<CustomTypeDefinition> = [
     ]),
   },
   {
-    name: suggestionFunctionCallName,
+    name: name.suggestionFunctionCall,
     description: "関数呼び出し (中に含まれる型はSuggestionExpr)",
     typeParameterList: [],
     body: CustomTypeDefinitionBody.Product([
       {
         name: "function",
         description: "関数",
-        type: suggestionExprType,
+        type: customType.suggestionExprType,
       },
       {
         name: "parameter",
         description: "パラメーター",
-        type: suggestionExprType,
+        type: customType.suggestionExprType,
       },
     ]),
   },
   {
-    name: suggestionLambdaBranchName,
+    name: name.suggestionLambdaBranch,
     description: "suggestionExprの入ったLambdaBranch",
     typeParameterList: [],
     body: CustomTypeDefinitionBody.Product([
       {
         name: "condition",
         description: "入力値の条件を書くところ",
-        type: conditionType,
+        type: customType.conditionType,
       },
       {
         name: "description",
@@ -536,17 +358,17 @@ export const customTypeList: ReadonlyArray<CustomTypeDefinition> = [
       {
         name: "localPartList",
         description: "",
-        type: Type.List(suggestionBranchPartDefinitionType),
+        type: Type.List(customType.suggestionBranchPartDefinitionType),
       },
       {
         name: "expr",
         description: "式",
-        type: suggestionExprType,
+        type: customType.suggestionExprType,
       },
     ]),
   },
   {
-    name: suggestionBranchPartDefinitionName,
+    name: name.suggestionBranchPartDefinition,
     description:
       "ラムダのブランチで使えるパーツを定義する部分 (SuggestionExpr バージョン)",
     typeParameterList: [],
@@ -569,17 +391,17 @@ export const customTypeList: ReadonlyArray<CustomTypeDefinition> = [
       {
         name: "type",
         description: "ローカルパーツの型",
-        type: suggestionTypeType,
+        type: customType.suggestionTypeType,
       },
       {
         name: "expr",
         description: "ローカルパーツの式",
-        type: suggestionExprType,
+        type: customType.suggestionExprType,
       },
     ]),
   },
   {
-    name: typePartSnapshotName,
+    name: name.typePartSnapshot,
     description: "型パーツ",
     typeParameterList: [],
     body: CustomTypeDefinitionBody.Product([
@@ -611,17 +433,17 @@ export const customTypeList: ReadonlyArray<CustomTypeDefinition> = [
       {
         name: "getTime",
         description: "取得日時",
-        type: time.time,
+        type: customType.time,
       },
       {
         name: "body",
         description: "定義本体",
-        type: typePartBodyType,
+        type: customType.typePartBodyType,
       },
     ]),
   },
   {
-    name: partSnapshotName,
+    name: name.partSnapshot,
     description: "パーツの定義",
     typeParameterList: [],
     body: CustomTypeDefinitionBody.Product([
@@ -643,12 +465,12 @@ export const customTypeList: ReadonlyArray<CustomTypeDefinition> = [
       {
         name: "type",
         description: "パーツの型",
-        type: typeType,
+        type: customType.typeType,
       },
       {
         name: "expr",
         description: "パーツの式",
-        type: exprType,
+        type: customType.exprType,
       },
       {
         name: "projectId",
@@ -663,34 +485,34 @@ export const customTypeList: ReadonlyArray<CustomTypeDefinition> = [
       {
         name: "getTime",
         description: "取得日時",
-        type: time.time,
+        type: customType.time,
       },
     ]),
   },
   {
-    name: typePartBodyName,
+    name: name.typePartBody,
     description: "型の定義本体",
     typeParameterList: [],
     body: CustomTypeDefinitionBody.Sum([
       {
         name: "Product",
         description: "直積型",
-        parameter: Maybe.Just(Type.List(memberType)),
+        parameter: Maybe.Just(Type.List(customType.memberType)),
       },
       {
         name: "Sum",
         description: "直和型",
-        parameter: Maybe.Just(Type.List(patternType)),
+        parameter: Maybe.Just(Type.List(customType.patternType)),
       },
       {
         name: "Kernel",
         description: "Definyだけでは表現できないデータ型",
-        parameter: Maybe.Just(typePartBodyKernelType),
+        parameter: Maybe.Just(customType.typePartBodyKernelType),
       },
     ]),
   },
   {
-    name: memberName,
+    name: name.member,
     description: "直積型のメンバー",
     typeParameterList: [],
     body: CustomTypeDefinitionBody.Product([
@@ -707,12 +529,12 @@ export const customTypeList: ReadonlyArray<CustomTypeDefinition> = [
       {
         name: "type",
         description: "メンバー値の型",
-        type: typeType,
+        type: customType.typeType,
       },
     ]),
   },
   {
-    name: patternName,
+    name: name.pattern,
     description: "直積型のパターン",
     typeParameterList: [],
     body: CustomTypeDefinitionBody.Product([
@@ -729,12 +551,12 @@ export const customTypeList: ReadonlyArray<CustomTypeDefinition> = [
       {
         name: "parameter",
         description: "パラメーター",
-        type: Type.Maybe(typeType),
+        type: Type.Maybe(customType.typeType),
       },
     ]),
   },
   {
-    name: typePartBodyKernelName,
+    name: name.typePartBodyKernel,
     description: "Definyだけでは表現できないデータ型",
     typeParameterList: [],
     body: CustomTypeDefinitionBody.Sum([
@@ -751,41 +573,41 @@ export const customTypeList: ReadonlyArray<CustomTypeDefinition> = [
     ]),
   },
   {
-    name: typeName,
+    name: name.type,
     description: "型",
     typeParameterList: [],
     body: CustomTypeDefinitionBody.Sum([
       {
         name: "Function",
         description: "関数",
-        parameter: Maybe.Just(typeInputAndOutputType),
+        parameter: Maybe.Just(customType.typeInputAndOutputType),
       },
       {
         name: "TypePartWithParameter",
         description: "型パーツと, パラメーターのリスト",
-        parameter: Maybe.Just(typePartIdWithParameterType),
+        parameter: Maybe.Just(customType.typePartIdWithParameterType),
       },
     ]),
   },
   {
-    name: typeInputAndOutputName,
+    name: name.typeInputAndOutput,
     description: "",
     typeParameterList: [],
     body: CustomTypeDefinitionBody.Product([
       {
         name: "inputType",
         description: "入力の型",
-        type: typeType,
+        type: customType.typeType,
       },
       {
         name: "outputType",
         description: "出力の型",
-        type: typeType,
+        type: customType.typeType,
       },
     ]),
   },
   {
-    name: typePartIdWithParameterName,
+    name: name.typePartIdWithParameter,
     description: "",
     typeParameterList: [],
     body: CustomTypeDefinitionBody.Product([
@@ -797,19 +619,19 @@ export const customTypeList: ReadonlyArray<CustomTypeDefinition> = [
       {
         name: "parameter",
         description: "型のパラメーター",
-        type: Type.List(typeType),
+        type: Type.List(customType.typeType),
       },
     ]),
   },
   {
-    name: exprName,
+    name: name.expr,
     description: "式",
     typeParameterList: [],
     body: CustomTypeDefinitionBody.Sum([
       {
         name: "Kernel",
         description: "Definyだけでは表現できない式",
-        parameter: Maybe.Just(kernelExprType),
+        parameter: Maybe.Just(customType.kernelExprType),
       },
       {
         name: "Int32Literal",
@@ -824,34 +646,34 @@ export const customTypeList: ReadonlyArray<CustomTypeDefinition> = [
       {
         name: "LocalPartReference",
         description: "ローカルパーツの参照",
-        parameter: Maybe.Just(localPartReferenceType),
+        parameter: Maybe.Just(customType.localPartReferenceType),
       },
       {
         name: "TagReference",
         description: "タグを参照",
-        parameter: Maybe.Just(TagReferenceType),
+        parameter: Maybe.Just(customType.TagReferenceType),
       },
       {
         name: "FunctionCall",
         description: "関数呼び出し",
-        parameter: Maybe.Just(functionCallType),
+        parameter: Maybe.Just(customType.functionCallType),
       },
       {
         name: "Lambda",
         description: "ラムダ",
-        parameter: Maybe.Just(Type.List(lambdaBranchType)),
+        parameter: Maybe.Just(Type.List(customType.lambdaBranchType)),
       },
     ]),
   },
   {
-    name: evaluatedExprName,
+    name: name.evaluatedExpr,
     description: "評価しきった式",
     typeParameterList: [],
     body: CustomTypeDefinitionBody.Sum([
       {
         name: "Kernel",
         description: "Definyだけでは表現できない式",
-        parameter: Maybe.Just(kernelExprType),
+        parameter: Maybe.Just(customType.kernelExprType),
       },
       {
         name: "Int32",
@@ -861,44 +683,44 @@ export const customTypeList: ReadonlyArray<CustomTypeDefinition> = [
       {
         name: "LocalPartReference",
         description: "ローカルパーツの参照",
-        parameter: Maybe.Just(localPartReferenceType),
+        parameter: Maybe.Just(customType.localPartReferenceType),
       },
       {
         name: "TagReference",
         description: "タグを参照",
-        parameter: Maybe.Just(TagReferenceType),
+        parameter: Maybe.Just(customType.TagReferenceType),
       },
       {
         name: "Lambda",
         description: "ラムダ",
-        parameter: Maybe.Just(Type.List(lambdaBranchType)),
+        parameter: Maybe.Just(Type.List(customType.lambdaBranchType)),
       },
       {
         name: "KernelCall",
         description: "内部関数呼び出し",
-        parameter: Maybe.Just(kernelCallType),
+        parameter: Maybe.Just(customType.kernelCallType),
       },
     ]),
   },
   {
-    name: kernelCallName,
+    name: name.kernelCall,
     description: "複数の引数が必要な内部関数の部分呼び出し",
     typeParameterList: [],
     body: CustomTypeDefinitionBody.Product([
       {
         name: "kernel",
         description: "関数",
-        type: kernelExprType,
+        type: customType.kernelExprType,
       },
       {
         name: "expr",
         description: "呼び出すパラメーター",
-        type: evaluatedExprType,
+        type: customType.evaluatedExprType,
       },
     ]),
   },
   {
-    name: kernelExprName,
+    name: name.kernelExpr,
     description: "Definyだけでは表現できない式",
     typeParameterList: [],
     body: CustomTypeDefinitionBody.Sum([
@@ -920,7 +742,7 @@ export const customTypeList: ReadonlyArray<CustomTypeDefinition> = [
     ]),
   },
   {
-    name: localPartReferenceName,
+    name: name.localPartReference,
     description: "ローカルパスの参照を表す",
     typeParameterList: [],
     body: CustomTypeDefinitionBody.Product([
@@ -937,7 +759,7 @@ export const customTypeList: ReadonlyArray<CustomTypeDefinition> = [
     ]),
   },
   {
-    name: tagReferenceName,
+    name: name.tagReference,
     description: "タグの参照を表す",
     typeParameterList: [],
     body: CustomTypeDefinitionBody.Product([
@@ -954,31 +776,31 @@ export const customTypeList: ReadonlyArray<CustomTypeDefinition> = [
     ]),
   },
   {
-    name: functionCallName,
+    name: name.functionCall,
     description: "関数呼び出し",
     typeParameterList: [],
     body: CustomTypeDefinitionBody.Product([
       {
         name: "function",
         description: "関数",
-        type: exprType,
+        type: customType.exprType,
       },
       {
         name: "parameter",
         description: "パラメーター",
-        type: exprType,
+        type: customType.exprType,
       },
     ]),
   },
   {
-    name: lambdaBranchName,
+    name: name.lambdaBranch,
     description: "ラムダのブランチ. Just x -> data x のようなところ",
     typeParameterList: [],
     body: CustomTypeDefinitionBody.Product([
       {
         name: "condition",
         description: "入力値の条件を書くところ. Just x",
-        type: conditionType,
+        type: customType.conditionType,
       },
       {
         name: "description",
@@ -988,29 +810,29 @@ export const customTypeList: ReadonlyArray<CustomTypeDefinition> = [
       {
         name: "localPartList",
         description: "",
-        type: Type.List(branchPartDefinitionType),
+        type: Type.List(customType.branchPartDefinitionType),
       },
       {
         name: "expr",
         description: "式",
-        type: exprType,
+        type: customType.exprType,
       },
     ]),
   },
   {
-    name: conditionName,
+    name: name.condition,
     description: "ブランチの式を使う条件",
     typeParameterList: [],
     body: CustomTypeDefinitionBody.Sum([
       {
         name: "ByTag",
         description: "タグ",
-        parameter: Maybe.Just(conditionTagType),
+        parameter: Maybe.Just(customType.conditionTagType),
       },
       {
         name: "ByCapture",
         description: "キャプチャパーツへのキャプチャ",
-        parameter: Maybe.Just(conditionCaptureType),
+        parameter: Maybe.Just(customType.conditionCaptureType),
       },
       {
         name: "Any",
@@ -1025,7 +847,7 @@ export const customTypeList: ReadonlyArray<CustomTypeDefinition> = [
     ]),
   },
   {
-    name: conditionTagName,
+    name: name.conditionTag,
     description: "タグによる条件",
     typeParameterList: [],
     body: CustomTypeDefinitionBody.Product([
@@ -1037,12 +859,12 @@ export const customTypeList: ReadonlyArray<CustomTypeDefinition> = [
       {
         name: "parameter",
         description: "パラメーター",
-        type: Type.Maybe(conditionType),
+        type: Type.Maybe(customType.conditionType),
       },
     ]),
   },
   {
-    name: conditionCaptureName,
+    name: name.conditionCapture,
     description: "キャプチャパーツへのキャプチャ",
     typeParameterList: [],
     body: CustomTypeDefinitionBody.Product([
@@ -1059,7 +881,7 @@ export const customTypeList: ReadonlyArray<CustomTypeDefinition> = [
     ]),
   },
   {
-    name: branchPartDefinitionName,
+    name: name.branchPartDefinition,
     description: "ラムダのブランチで使えるパーツを定義する部分",
     typeParameterList: [],
     body: CustomTypeDefinitionBody.Product([
@@ -1081,17 +903,17 @@ export const customTypeList: ReadonlyArray<CustomTypeDefinition> = [
       {
         name: "type",
         description: "ローカルパーツの型",
-        type: typeType,
+        type: customType.typeType,
       },
       {
         name: "expr",
         description: "ローカルパーツの式",
-        type: exprType,
+        type: customType.exprType,
       },
     ]),
   },
   {
-    name: evaluateExprErrorName,
+    name: name.evaluateExprError,
     description: "評価したときに失敗した原因を表すもの",
     typeParameterList: [],
     body: CustomTypeDefinitionBody.Sum([
@@ -1113,12 +935,12 @@ export const customTypeList: ReadonlyArray<CustomTypeDefinition> = [
       {
         name: "CannotFindLocalPartDefinition",
         description: "ローカルパーツの定義を見つけることができなかった",
-        parameter: Maybe.Just(localPartReferenceType),
+        parameter: Maybe.Just(customType.localPartReferenceType),
       },
       {
         name: "TypeError",
         description: "型が合わない",
-        parameter: Maybe.Just(typeErrorType),
+        parameter: Maybe.Just(customType.typeErrorType),
       },
       {
         name: "NotSupported",
@@ -1128,7 +950,7 @@ export const customTypeList: ReadonlyArray<CustomTypeDefinition> = [
     ]),
   },
   {
-    name: typeErrorName,
+    name: name.typeError,
     description: "型エラー",
     typeParameterList: [],
     body: CustomTypeDefinitionBody.Product([
@@ -1140,36 +962,38 @@ export const customTypeList: ReadonlyArray<CustomTypeDefinition> = [
     ]),
   },
   {
-    name: evalParameterName,
+    name: name.evalParameter,
     description: "評価する上で必要なソースコード",
     typeParameterList: [],
     body: CustomTypeDefinitionBody.Product([
       {
         name: "partList",
         description: "パーツのリスト",
-        type: Type.List(Type.Custom({ name: partWithId, parameterList: [] })),
+        type: Type.List(
+          Type.Custom({ name: name.partWith, parameterList: [] })
+        ),
       },
       {
         name: "typePartList",
         description: "型パーツのリスト",
         type: Type.List(
-          Type.Custom({ name: typePartWithId, parameterList: [] })
+          Type.Custom({ name: name.typePartWithId, parameterList: [] })
         ),
       },
       {
         name: "changeList",
         description: "変更点",
-        type: Type.List(changeType),
+        type: Type.List(customType.changeType),
       },
       {
         name: "expr",
         description: "評価してほしい式",
-        type: suggestionExprType,
+        type: customType.suggestionExprType,
       },
     ]),
   },
   {
-    name: partWithId,
+    name: name.partWith,
     description: "パーツとPartId",
     typeParameterList: [],
     body: CustomTypeDefinitionBody.Product([
@@ -1181,12 +1005,12 @@ export const customTypeList: ReadonlyArray<CustomTypeDefinition> = [
       {
         name: "part",
         description: "PartSnapshot",
-        type: Type.Custom({ name: partSnapshotName, parameterList: [] }),
+        type: Type.Custom({ name: name.partSnapshot, parameterList: [] }),
       },
     ]),
   },
   {
-    name: typePartWithId,
+    name: name.typePartWithId,
     description: "型パーツとTypePartId",
     typeParameterList: [],
     body: CustomTypeDefinitionBody.Product([
@@ -1198,7 +1022,10 @@ export const customTypeList: ReadonlyArray<CustomTypeDefinition> = [
       {
         name: "typePart",
         description: "TypePartSnapshot",
-        type: Type.Custom({ name: typePartSnapshotName, parameterList: [] }),
+        type: Type.Custom({
+          name: name.typePartSnapshot,
+          parameterList: [],
+        }),
       },
     ]),
   },
