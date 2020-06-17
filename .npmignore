@@ -4,8 +4,6 @@ node_modules
 .github
 .vscode
 test
-schema
-schemaJs
 generateCode.js
 *.ts
 !*.d.ts
