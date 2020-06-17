@@ -1,7 +1,7 @@
 export const time = "Time";
 
-export const suggestionSnapshot = "SuggestionSnapshot";
-export const suggestionSnapshotAndId = "SuggestionSnapshotAndId";
+export const suggestion = "Suggestion";
+export const suggestionWithId = "SuggestionWithId";
 
 export const suggestionState = "SuggestionState";
 export const change = "Change";
@@ -19,8 +19,8 @@ export const suggestionFunctionCall = "SuggestionFunctionCall";
 export const suggestionLambdaBranch = "SuggestionLambdaBranch";
 export const suggestionBranchPartDefinition = "SuggestionBranchPartDefinition";
 
-export const typePartSnapshot = "TypePartSnapshot";
-export const partSnapshot = "PartSnapshot";
+export const typePart = "TypePart";
+export const part = "Part";
 export const typePartBody = "TypePartBody";
 export const member = "Member";
 export const pattern = "Pattern";
@@ -48,14 +48,14 @@ export const evalParameter = "EvalParameter";
 export const partWith = "PartWithId";
 export const typePartWithId = "TypePartWithId";
 
-export const userSnapshot = "UserSnapshot";
-export const userSnapshotAndId = "UserSnapshotAndId";
+export const user = "User";
+export const userWithId = "UserWithId";
 
-export const projectSnapshot = "ProjectSnapshot";
-export const projectSnapshotAndId = "ProjectSnapshotAndId";
+export const project = "Project";
+export const projectWithId = "ProjectWithId";
 
-export const ideaSnapshot = "IdeaSnapshot";
-export const ideaSnapshotAndId = "IdeaSnapshotAndId";
+export const idea = "Idea";
+export const ideaWithId = "IdeaWithId";
 
 export const ideaItem = "IdeaItem";
 export const itemBody = "ItemBody";

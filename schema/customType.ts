@@ -17,7 +17,7 @@ export const suggestionState = Type.Custom({
 });
 
 export const suggestionSnapshot = Type.Custom({
-  name: name.suggestionSnapshot,
+  name: name.suggestion,
   parameterList: [],
 });
 
@@ -172,12 +172,12 @@ export const typeError = Type.Custom({
 });
 
 export const userSnapshot = Type.Custom({
-  name: name.userSnapshot,
+  name: name.user,
   parameterList: [],
 });
 
 export const projectSnapshot = Type.Custom({
-  name: name.projectSnapshot,
+  name: name.project,
   parameterList: [],
 });
 
@@ -187,12 +187,12 @@ export const ideaItem = Type.Custom({
 });
 
 export const ideaSnapshot = Type.Custom({
-  name: name.ideaSnapshot,
+  name: name.idea,
   parameterList: [],
 });
 
 export const ideaSnapshotAndId = Type.Custom({
-  name: name.ideaSnapshotAndId,
+  name: name.ideaWithId,
   parameterList: [],
 });
 
@@ -237,6 +237,6 @@ export const typePartWithId = Type.Custom({
 });
 
 export const typePartSnapshot = Type.Custom({
-  name: name.typePartSnapshot,
+  name: name.typePart,
   parameterList: [],
 });

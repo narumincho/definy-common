@@ -179,7 +179,7 @@ export const customTypeList: ReadonlyArray<CustomTypeDefinition> = [
     ]),
   },
   {
-    name: name.userSnapshot,
+    name: name.user,
     description: "ユーザーのデータのスナップショット",
     typeParameterList: [],
     body: CustomTypeDefinitionBody.Product([
@@ -228,7 +228,7 @@ export const customTypeList: ReadonlyArray<CustomTypeDefinition> = [
     ]),
   },
   {
-    name: name.userSnapshotAndId,
+    name: name.userWithId,
     description: "最初に自分の情報を得るときに返ってくるデータ",
     typeParameterList: [],
     body: CustomTypeDefinitionBody.Product([
@@ -245,7 +245,7 @@ export const customTypeList: ReadonlyArray<CustomTypeDefinition> = [
     ]),
   },
   {
-    name: name.projectSnapshot,
+    name: name.project,
     description: "プロジェクト",
     typeParameterList: [],
     body: CustomTypeDefinitionBody.Product([
@@ -297,7 +297,7 @@ export const customTypeList: ReadonlyArray<CustomTypeDefinition> = [
     ]),
   },
   {
-    name: name.projectSnapshotAndId,
+    name: name.projectWithId,
     description: "プロジェクトを作成したときに返ってくるデータ",
     typeParameterList: [],
     body: CustomTypeDefinitionBody.Product([
@@ -314,7 +314,7 @@ export const customTypeList: ReadonlyArray<CustomTypeDefinition> = [
     ]),
   },
   {
-    name: name.ideaSnapshot,
+    name: name.idea,
     description: "アイデア",
     typeParameterList: [],
     body: CustomTypeDefinitionBody.Product([
@@ -356,7 +356,7 @@ export const customTypeList: ReadonlyArray<CustomTypeDefinition> = [
     ]),
   },
   {
-    name: name.ideaSnapshotAndId,
+    name: name.ideaWithId,
     description: "アイデアとそのID. アイデア作成時に返ってくる",
     typeParameterList: [],
     body: CustomTypeDefinitionBody.Product([
@@ -437,7 +437,7 @@ export const customTypeList: ReadonlyArray<CustomTypeDefinition> = [
     ]),
   },
   {
-    name: name.suggestionSnapshot,
+    name: name.suggestion,
     description: "提案",
     typeParameterList: [],
     body: CustomTypeDefinitionBody.Product([
@@ -489,7 +489,7 @@ export const customTypeList: ReadonlyArray<CustomTypeDefinition> = [
     ]),
   },
   {
-    name: name.suggestionSnapshotAndId,
+    name: name.suggestionWithId,
     description: "Id付きのSuggestion",
     typeParameterList: [],
     body: CustomTypeDefinitionBody.Product([
@@ -808,7 +808,7 @@ export const customTypeList: ReadonlyArray<CustomTypeDefinition> = [
     ]),
   },
   {
-    name: name.typePartSnapshot,
+    name: name.typePart,
     description: "型パーツ",
     typeParameterList: [],
     body: CustomTypeDefinitionBody.Product([
@@ -850,7 +850,7 @@ export const customTypeList: ReadonlyArray<CustomTypeDefinition> = [
     ]),
   },
   {
-    name: name.partSnapshot,
+    name: name.part,
     description: "パーツの定義",
     typeParameterList: [],
     body: CustomTypeDefinitionBody.Product([
@@ -1408,7 +1408,7 @@ export const customTypeList: ReadonlyArray<CustomTypeDefinition> = [
       {
         name: "part",
         description: "PartSnapshot",
-        type: Type.Custom({ name: name.partSnapshot, parameterList: [] }),
+        type: Type.Custom({ name: name.part, parameterList: [] }),
       },
     ]),
   },
