@@ -130,19 +130,9 @@ export const customTypeList: ReadonlyArray<CustomTypeDefinition> = [
         parameter: Maybe.Just(idAndToken.projectId),
       },
       {
-        name: "UserList",
-        description: "ユーザー一覧ページ",
-        parameter: Maybe.Nothing(),
-      },
-      {
         name: "User",
         description: "ユーザーの詳細ページ",
         parameter: Maybe.Just(idAndToken.userId),
-      },
-      {
-        name: "IdeaList",
-        description: "アイデア一覧",
-        parameter: Maybe.Nothing(),
       },
       {
         name: "Idea",
@@ -150,28 +140,18 @@ export const customTypeList: ReadonlyArray<CustomTypeDefinition> = [
         parameter: Maybe.Just(idAndToken.ideaId),
       },
       {
-        name: "SuggestionList",
-        description: "提案一覧",
-        parameter: Maybe.Nothing(),
-      },
-      {
         name: "Suggestion",
         description: "提案のページ",
         parameter: Maybe.Just(idAndToken.suggestionId),
       },
       {
-        name: "PartList",
-        description: "パーツ一覧ページ",
-        parameter: Maybe.Nothing(),
-      },
-      {
-        name: "TypePartList",
-        description: "型パーツ一覧ページ",
-        parameter: Maybe.Nothing(),
-      },
-      {
         name: "About",
         description: "Definyについて説明したページ",
+        parameter: Maybe.Nothing(),
+      },
+      {
+        name: "Debug",
+        description: "デバッグページ",
         parameter: Maybe.Nothing(),
       },
     ]),
@@ -265,24 +245,6 @@ export const customTypeList: ReadonlyArray<CustomTypeDefinition> = [
     ]),
   },
   {
-    name: name.userResponse,
-    description:
-      "Maybe プロジェクトのスナップショット と userId. TypeScript→Elmに渡す用",
-    typeParameterList: [],
-    body: CustomTypeDefinitionBody.Product([
-      {
-        name: "id",
-        description: "ユーザーID",
-        type: idAndToken.userId,
-      },
-      {
-        name: "snapshotMaybe",
-        description: "ユーザーのデータ",
-        type: Type.Maybe(customType.userSnapshot),
-      },
-    ]),
-  },
-  {
     name: name.projectSnapshot,
     description: "プロジェクト",
     typeParameterList: [],
@@ -352,24 +314,6 @@ export const customTypeList: ReadonlyArray<CustomTypeDefinition> = [
     ]),
   },
   {
-    name: name.projectResponse,
-    description:
-      "Maybe プロジェクトのスナップショット と projectId. TypeScript→Elmに渡す用",
-    typeParameterList: [],
-    body: CustomTypeDefinitionBody.Product([
-      {
-        name: "id",
-        description: "プロジェクトのID",
-        type: idAndToken.projectId,
-      },
-      {
-        name: "snapshotMaybe",
-        description: "プロジェクトのデータ",
-        type: Type.Maybe(customType.projectSnapshot),
-      },
-    ]),
-  },
-  {
     name: name.ideaSnapshot,
     description: "アイデア",
     typeParameterList: [],
@@ -425,40 +369,6 @@ export const customTypeList: ReadonlyArray<CustomTypeDefinition> = [
         name: "snapshot",
         description: "アイデアのスナップショット",
         type: customType.ideaSnapshot,
-      },
-    ]),
-  },
-  {
-    name: name.ideaResponse,
-    description: "Maybe アイデア と ideaId. TypeScript→Elmに渡す用",
-    typeParameterList: [],
-    body: CustomTypeDefinitionBody.Product([
-      {
-        name: "id",
-        description: "アイデアID",
-        type: idAndToken.ideaId,
-      },
-      {
-        name: "snapshotMaybe",
-        description: "アイデアのスナップショット",
-        type: Type.Maybe(customType.ideaSnapshot),
-      },
-    ]),
-  },
-  {
-    name: name.IdeaListByProjectIdResponse,
-    description: "プロジェクトからアイデアの一覧を取得したときにElmに渡すもの",
-    typeParameterList: [],
-    body: CustomTypeDefinitionBody.Product([
-      {
-        name: "projectId",
-        description: "プロジェクトID",
-        type: idAndToken.projectId,
-      },
-      {
-        name: "ideaSnapshotAndIdList",
-        description: "アイデアの一覧",
-        type: Type.List(customType.ideaSnapshotAndId),
       },
     ]),
   },
@@ -592,24 +502,6 @@ export const customTypeList: ReadonlyArray<CustomTypeDefinition> = [
         name: "snapshot",
         description: "SuggestionSnapshot",
         type: customType.suggestionSnapshot,
-      },
-    ]),
-  },
-  {
-    name: name.suggestionResponse,
-    description:
-      "Maybe SuggestionSnapshotとSuggestionId TypeScript→Elmに渡す用",
-    typeParameterList: [],
-    body: CustomTypeDefinitionBody.Product([
-      {
-        name: "id",
-        description: "SuggestionId",
-        type: idAndToken.suggestionId,
-      },
-      {
-        name: "snapshotMaybe",
-        description: "SuggestionSnapshot Maybe",
-        type: Type.Maybe(customType.suggestionSnapshot),
       },
     ]),
   },

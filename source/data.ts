@@ -88,15 +88,11 @@ export type Location =
   | { readonly _: "Home" }
   | { readonly _: "CreateProject" }
   | { readonly _: "Project"; readonly projectId: ProjectId }
-  | { readonly _: "UserList" }
   | { readonly _: "User"; readonly userId: UserId }
-  | { readonly _: "IdeaList" }
   | { readonly _: "Idea"; readonly ideaId: IdeaId }
-  | { readonly _: "SuggestionList" }
   | { readonly _: "Suggestion"; readonly suggestionId: SuggestionId }
-  | { readonly _: "PartList" }
-  | { readonly _: "TypePartList" }
-  | { readonly _: "About" };
+  | { readonly _: "About" }
+  | { readonly _: "Debug" };
 
 /**
  * 英語,日本語,エスペラント語などの言語
@@ -156,20 +152,6 @@ export type UserSnapshotAndId = {
 };
 
 /**
- * Maybe プロジェクトのスナップショット と userId. TypeScript→Elmに渡す用
- */
-export type UserResponse = {
-  /**
-   * ユーザーID
-   */
-  readonly id: UserId;
-  /**
-   * ユーザーのデータ
-   */
-  readonly snapshotMaybe: Maybe<UserSnapshot>;
-};
-
-/**
  * プロジェクト
  */
 export type ProjectSnapshot = {
@@ -226,20 +208,6 @@ export type ProjectSnapshotAndId = {
 };
 
 /**
- * Maybe プロジェクトのスナップショット と projectId. TypeScript→Elmに渡す用
- */
-export type ProjectResponse = {
-  /**
-   * プロジェクトのID
-   */
-  readonly id: ProjectId;
-  /**
-   * プロジェクトのデータ
-   */
-  readonly snapshotMaybe: Maybe<ProjectSnapshot>;
-};
-
-/**
  * アイデア
  */
 export type IdeaSnapshot = {
@@ -285,34 +253,6 @@ export type IdeaSnapshotAndId = {
    * アイデアのスナップショット
    */
   readonly snapshot: IdeaSnapshot;
-};
-
-/**
- * Maybe アイデア と ideaId. TypeScript→Elmに渡す用
- */
-export type IdeaResponse = {
-  /**
-   * アイデアID
-   */
-  readonly id: IdeaId;
-  /**
-   * アイデアのスナップショット
-   */
-  readonly snapshotMaybe: Maybe<IdeaSnapshot>;
-};
-
-/**
- * プロジェクトからアイデアの一覧を取得したときにElmに渡すもの
- */
-export type IdeaListByProjectIdResponse = {
-  /**
-   * プロジェクトID
-   */
-  readonly projectId: ProjectId;
-  /**
-   * アイデアの一覧
-   */
-  readonly ideaSnapshotAndIdList: ReadonlyArray<IdeaSnapshotAndId>;
 };
 
 /**
@@ -408,20 +348,6 @@ export type SuggestionSnapshotAndId = {
    * SuggestionSnapshot
    */
   readonly snapshot: SuggestionSnapshot;
-};
-
-/**
- * Maybe SuggestionSnapshotとSuggestionId TypeScript→Elmに渡す用
- */
-export type SuggestionResponse = {
-  /**
-   * SuggestionId
-   */
-  readonly id: SuggestionId;
-  /**
-   * SuggestionSnapshot Maybe
-   */
-  readonly snapshotMaybe: Maybe<SuggestionSnapshot>;
 };
 
 /**
@@ -1929,41 +1855,25 @@ export const Location: {
    */
   readonly Project: (a: ProjectId) => Location;
   /**
-   * ユーザー一覧ページ
-   */
-  readonly UserList: Location;
-  /**
    * ユーザーの詳細ページ
    */
   readonly User: (a: UserId) => Location;
-  /**
-   * アイデア一覧
-   */
-  readonly IdeaList: Location;
   /**
    * アイデア詳細ページ
    */
   readonly Idea: (a: IdeaId) => Location;
   /**
-   * 提案一覧
-   */
-  readonly SuggestionList: Location;
-  /**
    * 提案のページ
    */
   readonly Suggestion: (a: SuggestionId) => Location;
   /**
-   * パーツ一覧ページ
-   */
-  readonly PartList: Location;
-  /**
-   * 型パーツ一覧ページ
-   */
-  readonly TypePartList: Location;
-  /**
    * Definyについて説明したページ
    */
   readonly About: Location;
+  /**
+   * デバッグページ
+   */
+  readonly Debug: Location;
   readonly codec: Codec<Location>;
 } = {
   Home: { _: "Home" },
@@ -1972,18 +1882,14 @@ export const Location: {
     _: "Project",
     projectId: projectId,
   }),
-  UserList: { _: "UserList" },
   User: (userId: UserId): Location => ({ _: "User", userId: userId }),
-  IdeaList: { _: "IdeaList" },
   Idea: (ideaId: IdeaId): Location => ({ _: "Idea", ideaId: ideaId }),
-  SuggestionList: { _: "SuggestionList" },
   Suggestion: (suggestionId: SuggestionId): Location => ({
     _: "Suggestion",
     suggestionId: suggestionId,
   }),
-  PartList: { _: "PartList" },
-  TypePartList: { _: "TypePartList" },
   About: { _: "About" },
+  Debug: { _: "Debug" },
   codec: {
     encode: (value: Location): ReadonlyArray<number> => {
       switch (value._) {
@@ -1996,32 +1902,20 @@ export const Location: {
         case "Project": {
           return [2].concat(ProjectId.codec.encode(value.projectId));
         }
-        case "UserList": {
-          return [3];
-        }
         case "User": {
-          return [4].concat(UserId.codec.encode(value.userId));
-        }
-        case "IdeaList": {
-          return [5];
+          return [3].concat(UserId.codec.encode(value.userId));
         }
         case "Idea": {
-          return [6].concat(IdeaId.codec.encode(value.ideaId));
-        }
-        case "SuggestionList": {
-          return [7];
+          return [4].concat(IdeaId.codec.encode(value.ideaId));
         }
         case "Suggestion": {
-          return [8].concat(SuggestionId.codec.encode(value.suggestionId));
-        }
-        case "PartList": {
-          return [9];
-        }
-        case "TypePartList": {
-          return [10];
+          return [5].concat(SuggestionId.codec.encode(value.suggestionId));
         }
         case "About": {
-          return [11];
+          return [6];
+        }
+        case "Debug": {
+          return [7];
         }
       }
     },
@@ -2053,9 +1947,6 @@ export const Location: {
         };
       }
       if (patternIndex.result === 3) {
-        return { result: Location.UserList, nextIndex: patternIndex.nextIndex };
-      }
-      if (patternIndex.result === 4) {
         const result: {
           readonly result: UserId;
           readonly nextIndex: number;
@@ -2065,10 +1956,7 @@ export const Location: {
           nextIndex: result.nextIndex,
         };
       }
-      if (patternIndex.result === 5) {
-        return { result: Location.IdeaList, nextIndex: patternIndex.nextIndex };
-      }
-      if (patternIndex.result === 6) {
+      if (patternIndex.result === 4) {
         const result: {
           readonly result: IdeaId;
           readonly nextIndex: number;
@@ -2078,13 +1966,7 @@ export const Location: {
           nextIndex: result.nextIndex,
         };
       }
-      if (patternIndex.result === 7) {
-        return {
-          result: Location.SuggestionList,
-          nextIndex: patternIndex.nextIndex,
-        };
-      }
-      if (patternIndex.result === 8) {
+      if (patternIndex.result === 5) {
         const result: {
           readonly result: SuggestionId;
           readonly nextIndex: number;
@@ -2094,17 +1976,11 @@ export const Location: {
           nextIndex: result.nextIndex,
         };
       }
-      if (patternIndex.result === 9) {
-        return { result: Location.PartList, nextIndex: patternIndex.nextIndex };
-      }
-      if (patternIndex.result === 10) {
-        return {
-          result: Location.TypePartList,
-          nextIndex: patternIndex.nextIndex,
-        };
-      }
-      if (patternIndex.result === 11) {
+      if (patternIndex.result === 6) {
         return { result: Location.About, nextIndex: patternIndex.nextIndex };
+      }
+      if (patternIndex.result === 7) {
+        return { result: Location.Debug, nextIndex: patternIndex.nextIndex };
       }
       throw new Error("存在しないパターンを指定された 型を更新してください");
     },
@@ -2281,41 +2157,6 @@ export const UserSnapshotAndId: { readonly codec: Codec<UserSnapshotAndId> } = {
 };
 
 /**
- * Maybe プロジェクトのスナップショット と userId. TypeScript→Elmに渡す用
- */
-export const UserResponse: { readonly codec: Codec<UserResponse> } = {
-  codec: {
-    encode: (value: UserResponse): ReadonlyArray<number> =>
-      UserId.codec
-        .encode(value.id)
-        .concat(Maybe.codec(UserSnapshot.codec).encode(value.snapshotMaybe)),
-    decode: (
-      index: number,
-      binary: Uint8Array
-    ): { readonly result: UserResponse; readonly nextIndex: number } => {
-      const idAndNextIndex: {
-        readonly result: UserId;
-        readonly nextIndex: number;
-      } = UserId.codec.decode(index, binary);
-      const snapshotMaybeAndNextIndex: {
-        readonly result: Maybe<UserSnapshot>;
-        readonly nextIndex: number;
-      } = Maybe.codec(UserSnapshot.codec).decode(
-        idAndNextIndex.nextIndex,
-        binary
-      );
-      return {
-        result: {
-          id: idAndNextIndex.result,
-          snapshotMaybe: snapshotMaybeAndNextIndex.result,
-        },
-        nextIndex: snapshotMaybeAndNextIndex.nextIndex,
-      };
-    },
-  },
-};
-
-/**
  * プロジェクト
  */
 export const ProjectSnapshot: { readonly codec: Codec<ProjectSnapshot> } = {
@@ -2433,41 +2274,6 @@ export const ProjectSnapshotAndId: {
 };
 
 /**
- * Maybe プロジェクトのスナップショット と projectId. TypeScript→Elmに渡す用
- */
-export const ProjectResponse: { readonly codec: Codec<ProjectResponse> } = {
-  codec: {
-    encode: (value: ProjectResponse): ReadonlyArray<number> =>
-      ProjectId.codec
-        .encode(value.id)
-        .concat(Maybe.codec(ProjectSnapshot.codec).encode(value.snapshotMaybe)),
-    decode: (
-      index: number,
-      binary: Uint8Array
-    ): { readonly result: ProjectResponse; readonly nextIndex: number } => {
-      const idAndNextIndex: {
-        readonly result: ProjectId;
-        readonly nextIndex: number;
-      } = ProjectId.codec.decode(index, binary);
-      const snapshotMaybeAndNextIndex: {
-        readonly result: Maybe<ProjectSnapshot>;
-        readonly nextIndex: number;
-      } = Maybe.codec(ProjectSnapshot.codec).decode(
-        idAndNextIndex.nextIndex,
-        binary
-      );
-      return {
-        result: {
-          id: idAndNextIndex.result,
-          snapshotMaybe: snapshotMaybeAndNextIndex.result,
-        },
-        nextIndex: snapshotMaybeAndNextIndex.nextIndex,
-      };
-    },
-  },
-};
-
-/**
  * アイデア
  */
 export const IdeaSnapshot: { readonly codec: Codec<IdeaSnapshot> } = {
@@ -2559,85 +2365,6 @@ export const IdeaSnapshotAndId: { readonly codec: Codec<IdeaSnapshotAndId> } = {
           snapshot: snapshotAndNextIndex.result,
         },
         nextIndex: snapshotAndNextIndex.nextIndex,
-      };
-    },
-  },
-};
-
-/**
- * Maybe アイデア と ideaId. TypeScript→Elmに渡す用
- */
-export const IdeaResponse: { readonly codec: Codec<IdeaResponse> } = {
-  codec: {
-    encode: (value: IdeaResponse): ReadonlyArray<number> =>
-      IdeaId.codec
-        .encode(value.id)
-        .concat(Maybe.codec(IdeaSnapshot.codec).encode(value.snapshotMaybe)),
-    decode: (
-      index: number,
-      binary: Uint8Array
-    ): { readonly result: IdeaResponse; readonly nextIndex: number } => {
-      const idAndNextIndex: {
-        readonly result: IdeaId;
-        readonly nextIndex: number;
-      } = IdeaId.codec.decode(index, binary);
-      const snapshotMaybeAndNextIndex: {
-        readonly result: Maybe<IdeaSnapshot>;
-        readonly nextIndex: number;
-      } = Maybe.codec(IdeaSnapshot.codec).decode(
-        idAndNextIndex.nextIndex,
-        binary
-      );
-      return {
-        result: {
-          id: idAndNextIndex.result,
-          snapshotMaybe: snapshotMaybeAndNextIndex.result,
-        },
-        nextIndex: snapshotMaybeAndNextIndex.nextIndex,
-      };
-    },
-  },
-};
-
-/**
- * プロジェクトからアイデアの一覧を取得したときにElmに渡すもの
- */
-export const IdeaListByProjectIdResponse: {
-  readonly codec: Codec<IdeaListByProjectIdResponse>;
-} = {
-  codec: {
-    encode: (value: IdeaListByProjectIdResponse): ReadonlyArray<number> =>
-      ProjectId.codec
-        .encode(value.projectId)
-        .concat(
-          List.codec(IdeaSnapshotAndId.codec).encode(
-            value.ideaSnapshotAndIdList
-          )
-        ),
-    decode: (
-      index: number,
-      binary: Uint8Array
-    ): {
-      readonly result: IdeaListByProjectIdResponse;
-      readonly nextIndex: number;
-    } => {
-      const projectIdAndNextIndex: {
-        readonly result: ProjectId;
-        readonly nextIndex: number;
-      } = ProjectId.codec.decode(index, binary);
-      const ideaSnapshotAndIdListAndNextIndex: {
-        readonly result: ReadonlyArray<IdeaSnapshotAndId>;
-        readonly nextIndex: number;
-      } = List.codec(IdeaSnapshotAndId.codec).decode(
-        projectIdAndNextIndex.nextIndex,
-        binary
-      );
-      return {
-        result: {
-          projectId: projectIdAndNextIndex.result,
-          ideaSnapshotAndIdList: ideaSnapshotAndIdListAndNextIndex.result,
-        },
-        nextIndex: ideaSnapshotAndIdListAndNextIndex.nextIndex,
       };
     },
   },
@@ -2959,45 +2686,6 @@ export const SuggestionSnapshotAndId: {
           snapshot: snapshotAndNextIndex.result,
         },
         nextIndex: snapshotAndNextIndex.nextIndex,
-      };
-    },
-  },
-};
-
-/**
- * Maybe SuggestionSnapshotとSuggestionId TypeScript→Elmに渡す用
- */
-export const SuggestionResponse: {
-  readonly codec: Codec<SuggestionResponse>;
-} = {
-  codec: {
-    encode: (value: SuggestionResponse): ReadonlyArray<number> =>
-      SuggestionId.codec
-        .encode(value.id)
-        .concat(
-          Maybe.codec(SuggestionSnapshot.codec).encode(value.snapshotMaybe)
-        ),
-    decode: (
-      index: number,
-      binary: Uint8Array
-    ): { readonly result: SuggestionResponse; readonly nextIndex: number } => {
-      const idAndNextIndex: {
-        readonly result: SuggestionId;
-        readonly nextIndex: number;
-      } = SuggestionId.codec.decode(index, binary);
-      const snapshotMaybeAndNextIndex: {
-        readonly result: Maybe<SuggestionSnapshot>;
-        readonly nextIndex: number;
-      } = Maybe.codec(SuggestionSnapshot.codec).decode(
-        idAndNextIndex.nextIndex,
-        binary
-      );
-      return {
-        result: {
-          id: idAndNextIndex.result,
-          snapshotMaybe: snapshotMaybeAndNextIndex.result,
-        },
-        nextIndex: snapshotMaybeAndNextIndex.nextIndex,
       };
     },
   },

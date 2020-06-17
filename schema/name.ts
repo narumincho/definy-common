@@ -2,7 +2,6 @@ export const time = "Time";
 
 export const suggestionSnapshot = "SuggestionSnapshot";
 export const suggestionSnapshotAndId = "SuggestionSnapshotAndId";
-export const suggestionResponse = "SuggestionResponse";
 
 export const suggestionState = "SuggestionState";
 export const change = "Change";
@@ -51,16 +50,12 @@ export const typePartWithId = "TypePartWithId";
 
 export const userSnapshot = "UserSnapshot";
 export const userSnapshotAndId = "UserSnapshotAndId";
-export const userResponse = "UserResponse";
 
 export const projectSnapshot = "ProjectSnapshot";
 export const projectSnapshotAndId = "ProjectSnapshotAndId";
-export const projectResponse = "ProjectResponse";
 
 export const ideaSnapshot = "IdeaSnapshot";
 export const ideaSnapshotAndId = "IdeaSnapshotAndId";
-export const ideaResponse = "IdeaResponse";
-export const IdeaListByProjectIdResponse = "IdeaListByProjectIdResponse";
 
 export const ideaItem = "IdeaItem";
 export const itemBody = "ItemBody";
