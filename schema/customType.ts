@@ -6,222 +6,222 @@ export const time = Type.Custom({
   parameterList: [],
 });
 
-export const changeType = Type.Custom({
+export const change = Type.Custom({
   name: name.change,
   parameterList: [],
 });
 
-export const suggestionStateType = Type.Custom({
+export const suggestionState = Type.Custom({
   name: name.suggestionState,
   parameterList: [],
 });
 
-export const suggestionSnapshotType = Type.Custom({
+export const suggestionSnapshot = Type.Custom({
   name: name.suggestionSnapshot,
   parameterList: [],
 });
 
-export const addPartType = Type.Custom({
+export const addPart = Type.Custom({
   name: name.addPart,
   parameterList: [],
 });
 
-export const suggestionTypeType = Type.Custom({
+export const suggestionType = Type.Custom({
   name: name.suggestionType,
   parameterList: [],
 });
 
-export const suggestionExprType = Type.Custom({
+export const suggestionExpr = Type.Custom({
   name: name.suggestionExpr,
   parameterList: [],
 });
 
-export const suggestionTypeInputAndOutputType = Type.Custom({
+export const suggestionTypeInputAndOutput = Type.Custom({
   name: name.suggestionTypeInputAndOutput,
   parameterList: [],
 });
 
-export const typePartWithSuggestionTypeParameterType = Type.Custom({
+export const typePartWithSuggestionTypeParameter = Type.Custom({
   name: name.typePartWithSuggestionTypeParameter,
   parameterList: [],
 });
 
-export const suggestionTypePartWithSuggestionTypeParameterType = Type.Custom({
+export const suggestionTypePartWithSuggestionTypeParameter = Type.Custom({
   name: name.suggestionTypePartWithSuggestionTypeParameter,
   parameterList: [],
 });
 
-export const kernelExprType = Type.Custom({
+export const kernelExpr = Type.Custom({
   name: name.kernelExpr,
   parameterList: [],
 });
 
-export const localPartReferenceType = Type.Custom({
+export const localPartReference = Type.Custom({
   name: name.localPartReference,
   parameterList: [],
 });
 
-export const TagReferenceType = Type.Custom({
+export const TagReference = Type.Custom({
   name: name.tagReference,
   parameterList: [],
 });
 
-export const suggestionTagReferenceType = Type.Custom({
+export const suggestionTagReference = Type.Custom({
   name: name.suggestionTagReference,
   parameterList: [],
 });
 
-export const suggestionFunctionCallType = Type.Custom({
+export const suggestionFunctionCall = Type.Custom({
   name: name.suggestionFunctionCall,
   parameterList: [],
 });
 
-export const suggestionLambdaBranchType = Type.Custom({
+export const suggestionLambdaBranch = Type.Custom({
   name: name.suggestionLambdaBranch,
   parameterList: [],
 });
 
-export const conditionType = Type.Custom({
+export const condition = Type.Custom({
   name: name.condition,
   parameterList: [],
 });
 
-export const suggestionBranchPartDefinitionType = Type.Custom({
+export const suggestionBranchPartDefinition = Type.Custom({
   name: name.suggestionBranchPartDefinition,
   parameterList: [],
 });
 
-export const typePartBodyType = Type.Custom({
+export const typePartBody = Type.Custom({
   name: name.typePartBody,
   parameterList: [],
 });
 
-export const typeType = Type.Custom({
+export const type = Type.Custom({
   name: name.type,
   parameterList: [],
 });
 
-export const exprType = Type.Custom({
+export const expr = Type.Custom({
   name: name.expr,
   parameterList: [],
 });
 
-export const memberType = Type.Custom({
+export const member = Type.Custom({
   name: name.member,
   parameterList: [],
 });
 
-export const patternType = Type.Custom({
+export const pattern = Type.Custom({
   name: name.pattern,
   parameterList: [],
 });
 
-export const typePartBodyKernelType = Type.Custom({
+export const typePartBodyKernel = Type.Custom({
   name: name.typePartBodyKernel,
   parameterList: [],
 });
 
-export const typeInputAndOutputType = Type.Custom({
+export const typeInputAndOutput = Type.Custom({
   name: name.typeInputAndOutput,
   parameterList: [],
 });
 
-export const typePartIdWithParameterType = Type.Custom({
+export const typePartIdWithParameter = Type.Custom({
   name: name.typePartIdWithParameter,
   parameterList: [],
 });
 
-export const functionCallType = Type.Custom({
+export const functionCall = Type.Custom({
   name: name.functionCall,
   parameterList: [],
 });
 
-export const lambdaBranchType = Type.Custom({
+export const lambdaBranch = Type.Custom({
   name: name.lambdaBranch,
   parameterList: [],
 });
 
-export const kernelCallType = Type.Custom({
+export const kernelCall = Type.Custom({
   name: name.kernelCall,
   parameterList: [],
 });
 
-export const evaluatedExprType = Type.Custom({
+export const evaluatedExpr = Type.Custom({
   name: name.evaluatedExpr,
   parameterList: [],
 });
 
-export const branchPartDefinitionType = Type.Custom({
+export const branchPartDefinition = Type.Custom({
   name: name.branchPartDefinition,
   parameterList: [],
 });
 
-export const conditionTagType = Type.Custom({
+export const conditionTag = Type.Custom({
   name: name.conditionTag,
   parameterList: [],
 });
 
-export const conditionCaptureType = Type.Custom({
+export const conditionCapture = Type.Custom({
   name: name.conditionCapture,
   parameterList: [],
 });
 
-export const typeErrorType = Type.Custom({
+export const typeError = Type.Custom({
   name: name.typeError,
   parameterList: [],
 });
 
-export const userSnapshotType = Type.Custom({
-  name: name.userSnapshotName,
+export const userSnapshot = Type.Custom({
+  name: name.userSnapshot,
   parameterList: [],
 });
 
-export const projectSnapshotType = Type.Custom({
-  name: name.projectSnapshotName,
+export const projectSnapshot = Type.Custom({
+  name: name.projectSnapshot,
   parameterList: [],
 });
 
-export const ideaItemType = Type.Custom({
-  name: name.ideaItemName,
+export const ideaItem = Type.Custom({
+  name: name.ideaItem,
   parameterList: [],
 });
 
-export const ideaSnapshotType = Type.Custom({
-  name: name.ideaSnapshotName,
+export const ideaSnapshot = Type.Custom({
+  name: name.ideaSnapshot,
   parameterList: [],
 });
 
-export const ideaSnapshotAndIdType = Type.Custom({
-  name: name.ideaSnapshotAndIdName,
+export const ideaSnapshotAndId = Type.Custom({
+  name: name.ideaSnapshotAndId,
   parameterList: [],
 });
 
-export const itemBodyType = Type.Custom({
-  name: name.itemBodyName,
+export const itemBody = Type.Custom({
+  name: name.itemBody,
   parameterList: [],
 });
 
-export const openIdConnectProviderType = Type.Custom({
-  name: name.openIdConnectProviderName,
+export const openIdConnectProvider = Type.Custom({
+  name: name.openIdConnectProvider,
   parameterList: [],
 });
 
-export const urlDataType = Type.Custom({
-  name: name.urlDataName,
+export const urlData = Type.Custom({
+  name: name.urlData,
   parameterList: [],
 });
 
-export const clientModeType = Type.Custom({
-  name: name.clientModeName,
+export const clientMode = Type.Custom({
+  name: name.clientMode,
   parameterList: [],
 });
 
-export const locationType = Type.Custom({
-  name: name.locationName,
+export const location = Type.Custom({
+  name: name.location,
   parameterList: [],
 });
 
-export const languageType = Type.Custom({
-  name: name.languageName,
+export const language = Type.Custom({
+  name: name.language,
   parameterList: [],
 });

@@ -49,24 +49,24 @@ export const evalParameter = "EvalParameter";
 export const partWith = "PartWithId";
 export const typePartWithId = "TypePartWithId";
 
-export const userSnapshotName = "UserSnapshot";
-export const userSnapshotAndIdName = "UserSnapshotAndId";
-export const userResponseName = "UserResponse";
+export const userSnapshot = "UserSnapshot";
+export const userSnapshotAndId = "UserSnapshotAndId";
+export const userResponse = "UserResponse";
 
-export const projectSnapshotName = "ProjectSnapshot";
-export const projectSnapshotAndIdName = "ProjectSnapshotAndId";
-export const projectResponseName = "ProjectResponse";
+export const projectSnapshot = "ProjectSnapshot";
+export const projectSnapshotAndId = "ProjectSnapshotAndId";
+export const projectResponse = "ProjectResponse";
 
-export const ideaSnapshotName = "IdeaSnapshot";
-export const ideaSnapshotAndIdName = "IdeaSnapshotAndId";
-export const ideaResponseName = "IdeaResponse";
-export const IdeaListByProjectIdResponseName = "IdeaListByProjectIdResponse";
+export const ideaSnapshot = "IdeaSnapshot";
+export const ideaSnapshotAndId = "IdeaSnapshotAndId";
+export const ideaResponse = "IdeaResponse";
+export const IdeaListByProjectIdResponse = "IdeaListByProjectIdResponse";
 
-export const ideaItemName = "IdeaItem";
-export const itemBodyName = "ItemBody";
+export const ideaItem = "IdeaItem";
+export const itemBody = "ItemBody";
 
-export const openIdConnectProviderName = "OpenIdConnectProvider";
-export const urlDataName = "UrlData";
-export const clientModeName = "ClientMode";
-export const locationName = "Location";
-export const languageName = "Language";
+export const openIdConnectProvider = "OpenIdConnectProvider";
+export const urlData = "UrlData";
+export const clientMode = "ClientMode";
+export const location = "Location";
+export const language = "Language";
