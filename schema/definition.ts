@@ -1,11 +1,11 @@
+import * as customType from "./customType";
 import * as idAndToken from "./idAndToken";
 import * as name from "./name";
-import * as customType from "./customType";
 import {
-  Type,
-  Maybe,
   CustomTypeDefinition,
   CustomTypeDefinitionBody,
+  Maybe,
+  Type,
 } from "@narumincho/type/distribution/data";
 
 export const customTypeList: ReadonlyArray<CustomTypeDefinition> = [

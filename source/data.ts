@@ -1033,8 +1033,8 @@ export const Int32: {
       index: number,
       binary: Uint8Array
     ): { readonly result: number; readonly nextIndex: number } => {
-      let result: number = 0;
-      let offset: number = 0;
+      let result = 0;
+      let offset = 0;
       while (true) {
         const byte: number = binary[index + offset];
         result |= (byte & 127) << (offset * 7);
@@ -1046,7 +1046,7 @@ export const Int32: {
               nextIndex: index + offset,
             };
           }
-          return { result: result, nextIndex: index + offset };
+          return { result, nextIndex: index + offset };
         }
       }
     },
@@ -1086,12 +1086,12 @@ export const String: {
       if (isBrowser) {
         return {
           result: new TextDecoder().decode(textBinary),
-          nextIndex: nextIndex,
+          nextIndex,
         };
       }
       return {
         result: new a.TextDecoder().decode(textBinary),
-        nextIndex: nextIndex,
+        nextIndex,
       };
     },
   },
@@ -1141,7 +1141,7 @@ export const Binary: {
       const nextIndex: number = length.nextIndex + length.result;
       return {
         result: binary.slice(length.nextIndex, nextIndex),
-        nextIndex: nextIndex,
+        nextIndex,
       };
     },
   },
@@ -1186,7 +1186,7 @@ export const List: {
         result.push(resultAndNextIndex.result);
         index = resultAndNextIndex.nextIndex;
       }
-      return { result: result, nextIndex: index };
+      return { result, nextIndex: index };
     },
   }),
 };
@@ -1443,7 +1443,7 @@ export const Maybe: {
   readonly Nothing: <value>() => Maybe<value>;
   readonly codec: <value>(a: Codec<value>) => Codec<Maybe<value>>;
 } = {
-  Just: <value>(value: value): Maybe<value> => ({ _: "Just", value: value }),
+  Just: <value>(value: value): Maybe<value> => ({ _: "Just", value }),
   Nothing: <value>(): Maybe<value> => ({ _: "Nothing" }),
   codec: <value>(valueCodec: Codec<value>): Codec<Maybe<value>> => ({
     encode: (value: Maybe<value>): ReadonlyArray<number> => {
@@ -1499,10 +1499,10 @@ export const Result: {
     b: Codec<error>
   ) => Codec<Result<ok, error>>;
 } = {
-  Ok: <ok, error>(ok: ok): Result<ok, error> => ({ _: "Ok", ok: ok }),
+  Ok: <ok, error>(ok: ok): Result<ok, error> => ({ _: "Ok", ok }),
   Error: <ok, error>(error: error): Result<ok, error> => ({
     _: "Error",
-    error: error,
+    error,
   }),
   codec: <ok, error>(
     okCodec: Codec<ok>,
@@ -1810,13 +1810,13 @@ export const Location: {
   CreateProject: { _: "CreateProject" },
   Project: (projectId: ProjectId): Location => ({
     _: "Project",
-    projectId: projectId,
+    projectId,
   }),
-  User: (userId: UserId): Location => ({ _: "User", userId: userId }),
-  Idea: (ideaId: IdeaId): Location => ({ _: "Idea", ideaId: ideaId }),
+  User: (userId: UserId): Location => ({ _: "User", userId }),
+  Idea: (ideaId: IdeaId): Location => ({ _: "Idea", ideaId }),
   Suggestion: (suggestionId: SuggestionId): Location => ({
     _: "Suggestion",
-    suggestionId: suggestionId,
+    suggestionId,
   }),
   About: { _: "About" },
   Debug: { _: "Debug" },
@@ -2306,32 +2306,32 @@ export const ItemBody: {
   readonly SuggestionCancelRejection: (a: SuggestionId) => ItemBody;
   readonly codec: Codec<ItemBody>;
 } = {
-  Comment: (string_: string): ItemBody => ({ _: "Comment", string_: string_ }),
+  Comment: (string_: string): ItemBody => ({ _: "Comment", string_ }),
   SuggestionCreate: (suggestionId: SuggestionId): ItemBody => ({
     _: "SuggestionCreate",
-    suggestionId: suggestionId,
+    suggestionId,
   }),
   SuggestionToApprovalPending: (suggestionId: SuggestionId): ItemBody => ({
     _: "SuggestionToApprovalPending",
-    suggestionId: suggestionId,
+    suggestionId,
   }),
   SuggestionCancelToApprovalPending: (
     suggestionId: SuggestionId
   ): ItemBody => ({
     _: "SuggestionCancelToApprovalPending",
-    suggestionId: suggestionId,
+    suggestionId,
   }),
   SuggestionApprove: (suggestionId: SuggestionId): ItemBody => ({
     _: "SuggestionApprove",
-    suggestionId: suggestionId,
+    suggestionId,
   }),
   SuggestionReject: (suggestionId: SuggestionId): ItemBody => ({
     _: "SuggestionReject",
-    suggestionId: suggestionId,
+    suggestionId,
   }),
   SuggestionCancelRejection: (suggestionId: SuggestionId): ItemBody => ({
     _: "SuggestionCancelRejection",
-    suggestionId: suggestionId,
+    suggestionId,
   }),
   codec: {
     encode: (value: ItemBody): ReadonlyArray<number> => {
@@ -2612,9 +2612,9 @@ export const Change: {
 } = {
   ProjectName: (string_: string): Change => ({
     _: "ProjectName",
-    string_: string_,
+    string_,
   }),
-  AddPart: (addPart: AddPart): Change => ({ _: "AddPart", addPart: addPart }),
+  AddPart: (addPart: AddPart): Change => ({ _: "AddPart", addPart }),
   codec: {
     encode: (value: Change): ReadonlyArray<number> => {
       switch (value._) {
@@ -2669,7 +2669,7 @@ export const AddPart: { readonly codec: Codec<AddPart> } = {
         .encode(value.id)
         .concat(String.codec.encode(value.name))
         .concat(String.codec.encode(value.description))
-        .concat(SuggestionType.codec.encode(value["type"]))
+        .concat(SuggestionType.codec.encode(value.type))
         .concat(SuggestionExpr.codec.encode(value.expr)),
     decode: (
       index: number,
@@ -2738,19 +2738,19 @@ export const SuggestionType: {
     suggestionTypeInputAndOutput: SuggestionTypeInputAndOutput
   ): SuggestionType => ({
     _: "Function",
-    suggestionTypeInputAndOutput: suggestionTypeInputAndOutput,
+    suggestionTypeInputAndOutput,
   }),
   TypePartWithParameter: (
     typePartWithSuggestionTypeParameter: TypePartWithSuggestionTypeParameter
   ): SuggestionType => ({
     _: "TypePartWithParameter",
-    typePartWithSuggestionTypeParameter: typePartWithSuggestionTypeParameter,
+    typePartWithSuggestionTypeParameter,
   }),
   SuggestionTypePartWithParameter: (
     suggestionTypePartWithSuggestionTypeParameter: SuggestionTypePartWithSuggestionTypeParameter
   ): SuggestionType => ({
     _: "SuggestionTypePartWithParameter",
-    suggestionTypePartWithSuggestionTypeParameter: suggestionTypePartWithSuggestionTypeParameter,
+    suggestionTypePartWithSuggestionTypeParameter,
   }),
   codec: {
     encode: (value: SuggestionType): ReadonlyArray<number> => {
@@ -2992,47 +2992,47 @@ export const SuggestionExpr: {
 } = {
   Kernel: (kernelExpr: KernelExpr): SuggestionExpr => ({
     _: "Kernel",
-    kernelExpr: kernelExpr,
+    kernelExpr,
   }),
   Int32Literal: (int32: number): SuggestionExpr => ({
     _: "Int32Literal",
-    int32: int32,
+    int32,
   }),
   PartReference: (partId: PartId): SuggestionExpr => ({
     _: "PartReference",
-    partId: partId,
+    partId,
   }),
   SuggestionPartReference: (int32: number): SuggestionExpr => ({
     _: "SuggestionPartReference",
-    int32: int32,
+    int32,
   }),
   LocalPartReference: (
     localPartReference: LocalPartReference
   ): SuggestionExpr => ({
     _: "LocalPartReference",
-    localPartReference: localPartReference,
+    localPartReference,
   }),
   TagReference: (tagReference: TagReference): SuggestionExpr => ({
     _: "TagReference",
-    tagReference: tagReference,
+    tagReference,
   }),
   SuggestionTagReference: (
     suggestionTagReference: SuggestionTagReference
   ): SuggestionExpr => ({
     _: "SuggestionTagReference",
-    suggestionTagReference: suggestionTagReference,
+    suggestionTagReference,
   }),
   FunctionCall: (
     suggestionFunctionCall: SuggestionFunctionCall
   ): SuggestionExpr => ({
     _: "FunctionCall",
-    suggestionFunctionCall: suggestionFunctionCall,
+    suggestionFunctionCall,
   }),
   Lambda: (
     suggestionLambdaBranchList: ReadonlyArray<SuggestionLambdaBranch>
   ): SuggestionExpr => ({
     _: "Lambda",
-    suggestionLambdaBranchList: suggestionLambdaBranchList,
+    suggestionLambdaBranchList,
   }),
   Blank: { _: "Blank" },
   codec: {
@@ -3241,7 +3241,7 @@ export const SuggestionFunctionCall: {
   codec: {
     encode: (value: SuggestionFunctionCall): ReadonlyArray<number> =>
       SuggestionExpr.codec
-        .encode(value["function"])
+        .encode(value.function)
         .concat(SuggestionExpr.codec.encode(value.parameter)),
     decode: (
       index: number,
@@ -3340,7 +3340,7 @@ export const SuggestionBranchPartDefinition: {
         .encode(value.localPartId)
         .concat(String.codec.encode(value.name))
         .concat(String.codec.encode(value.description))
-        .concat(SuggestionType.codec.encode(value["type"]))
+        .concat(SuggestionType.codec.encode(value.type))
         .concat(SuggestionExpr.codec.encode(value.expr)),
     decode: (
       index: number,
@@ -3458,7 +3458,7 @@ export const Part: { readonly codec: Codec<Part> } = {
         .encode(value.name)
         .concat(List.codec(PartId.codec).encode(value.parentList))
         .concat(String.codec.encode(value.description))
-        .concat(Type.codec.encode(value["type"]))
+        .concat(Type.codec.encode(value.type))
         .concat(Expr.codec.encode(value.expr))
         .concat(ProjectId.codec.encode(value.projectId))
         .concat(SuggestionId.codec.encode(value.createSuggestionId))
@@ -3536,15 +3536,15 @@ export const TypePartBody: {
 } = {
   Product: (memberList: ReadonlyArray<Member>): TypePartBody => ({
     _: "Product",
-    memberList: memberList,
+    memberList,
   }),
   Sum: (patternList: ReadonlyArray<Pattern>): TypePartBody => ({
     _: "Sum",
-    patternList: patternList,
+    patternList,
   }),
   Kernel: (typePartBodyKernel: TypePartBodyKernel): TypePartBody => ({
     _: "Kernel",
-    typePartBodyKernel: typePartBodyKernel,
+    typePartBodyKernel,
   }),
   codec: {
     encode: (value: TypePartBody): ReadonlyArray<number> => {
@@ -3616,7 +3616,7 @@ export const Member: { readonly codec: Codec<Member> } = {
       String.codec
         .encode(value.name)
         .concat(String.codec.encode(value.description))
-        .concat(Type.codec.encode(value["type"])),
+        .concat(Type.codec.encode(value.type)),
     decode: (
       index: number,
       binary: Uint8Array
@@ -3754,13 +3754,13 @@ export const Type: {
 } = {
   Function: (typeInputAndOutput: TypeInputAndOutput): Type => ({
     _: "Function",
-    typeInputAndOutput: typeInputAndOutput,
+    typeInputAndOutput,
   }),
   TypePartWithParameter: (
     typePartIdWithParameter: TypePartIdWithParameter
   ): Type => ({
     _: "TypePartWithParameter",
-    typePartIdWithParameter: typePartIdWithParameter,
+    typePartIdWithParameter,
   }),
   codec: {
     encode: (value: Type): ReadonlyArray<number> => {
@@ -3917,28 +3917,28 @@ export const Expr: {
 } = {
   Kernel: (kernelExpr: KernelExpr): Expr => ({
     _: "Kernel",
-    kernelExpr: kernelExpr,
+    kernelExpr,
   }),
-  Int32Literal: (int32: number): Expr => ({ _: "Int32Literal", int32: int32 }),
+  Int32Literal: (int32: number): Expr => ({ _: "Int32Literal", int32 }),
   PartReference: (partId: PartId): Expr => ({
     _: "PartReference",
-    partId: partId,
+    partId,
   }),
   LocalPartReference: (localPartReference: LocalPartReference): Expr => ({
     _: "LocalPartReference",
-    localPartReference: localPartReference,
+    localPartReference,
   }),
   TagReference: (tagReference: TagReference): Expr => ({
     _: "TagReference",
-    tagReference: tagReference,
+    tagReference,
   }),
   FunctionCall: (functionCall: FunctionCall): Expr => ({
     _: "FunctionCall",
-    functionCall: functionCall,
+    functionCall,
   }),
   Lambda: (lambdaBranchList: ReadonlyArray<LambdaBranch>): Expr => ({
     _: "Lambda",
-    lambdaBranchList: lambdaBranchList,
+    lambdaBranchList,
   }),
   codec: {
     encode: (value: Expr): ReadonlyArray<number> => {
@@ -4088,26 +4088,26 @@ export const EvaluatedExpr: {
 } = {
   Kernel: (kernelExpr: KernelExpr): EvaluatedExpr => ({
     _: "Kernel",
-    kernelExpr: kernelExpr,
+    kernelExpr,
   }),
-  Int32: (int32: number): EvaluatedExpr => ({ _: "Int32", int32: int32 }),
+  Int32: (int32: number): EvaluatedExpr => ({ _: "Int32", int32 }),
   LocalPartReference: (
     localPartReference: LocalPartReference
   ): EvaluatedExpr => ({
     _: "LocalPartReference",
-    localPartReference: localPartReference,
+    localPartReference,
   }),
   TagReference: (tagReference: TagReference): EvaluatedExpr => ({
     _: "TagReference",
-    tagReference: tagReference,
+    tagReference,
   }),
   Lambda: (lambdaBranchList: ReadonlyArray<LambdaBranch>): EvaluatedExpr => ({
     _: "Lambda",
-    lambdaBranchList: lambdaBranchList,
+    lambdaBranchList,
   }),
   KernelCall: (kernelCall: KernelCall): EvaluatedExpr => ({
     _: "KernelCall",
-    kernelCall: kernelCall,
+    kernelCall,
   }),
   codec: {
     encode: (value: EvaluatedExpr): ReadonlyArray<number> => {
@@ -4383,7 +4383,7 @@ export const FunctionCall: { readonly codec: Codec<FunctionCall> } = {
   codec: {
     encode: (value: FunctionCall): ReadonlyArray<number> =>
       Expr.codec
-        .encode(value["function"])
+        .encode(value.function)
         .concat(Expr.codec.encode(value.parameter)),
     decode: (
       index: number,
@@ -4481,14 +4481,14 @@ export const Condition: {
 } = {
   ByTag: (conditionTag: ConditionTag): Condition => ({
     _: "ByTag",
-    conditionTag: conditionTag,
+    conditionTag,
   }),
   ByCapture: (conditionCapture: ConditionCapture): Condition => ({
     _: "ByCapture",
-    conditionCapture: conditionCapture,
+    conditionCapture,
   }),
   Any: { _: "Any" },
-  Int32: (int32: number): Condition => ({ _: "Int32", int32: int32 }),
+  Int32: (int32: number): Condition => ({ _: "Int32", int32 }),
   codec: {
     encode: (value: Condition): ReadonlyArray<number> => {
       switch (value._) {
@@ -4633,7 +4633,7 @@ export const BranchPartDefinition: {
         .encode(value.localPartId)
         .concat(String.codec.encode(value.name))
         .concat(String.codec.encode(value.description))
-        .concat(Type.codec.encode(value["type"]))
+        .concat(Type.codec.encode(value.type))
         .concat(Expr.codec.encode(value.expr)),
     decode: (
       index: number,
@@ -4710,22 +4710,22 @@ export const EvaluateExprError: {
 } = {
   NeedPartDefinition: (partId: PartId): EvaluateExprError => ({
     _: "NeedPartDefinition",
-    partId: partId,
+    partId,
   }),
   NeedSuggestionPart: (int32: number): EvaluateExprError => ({
     _: "NeedSuggestionPart",
-    int32: int32,
+    int32,
   }),
   Blank: { _: "Blank" },
   CannotFindLocalPartDefinition: (
     localPartReference: LocalPartReference
   ): EvaluateExprError => ({
     _: "CannotFindLocalPartDefinition",
-    localPartReference: localPartReference,
+    localPartReference,
   }),
   TypeError: (typeError: TypeError): EvaluateExprError => ({
     _: "TypeError",
-    typeError: typeError,
+    typeError,
   }),
   NotSupported: { _: "NotSupported" },
   codec: {

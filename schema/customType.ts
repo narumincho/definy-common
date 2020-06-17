@@ -1,5 +1,5 @@
-import { Type } from "@narumincho/type/distribution/data";
 import * as name from "./name";
+import { Type } from "@narumincho/type/distribution/data";
 
 export const time = Type.Custom({
   name: name.time,

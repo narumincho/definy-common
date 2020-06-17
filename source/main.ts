@@ -82,7 +82,7 @@ export const urlDataAndAccessTokenFromUrl = (
     urlData: {
       clientMode: clientModeFromUrl(url.origin),
       location: locationFromUrl(url.pathname),
-      language: language,
+      language,
     },
     accessToken: accessTokenFromUrl(url.hash),
   };
@@ -101,21 +101,25 @@ const locationFromUrl = (pathName: string): data.Location => {
   if (pathName === "/debug") {
     return data.Location.Debug;
   }
-  const projectResult = pathName.match(/^\/project\/([0-9a-f]{32})$/u);
-  if (projectResult !== null) {
-    return data.Location.Project(projectResult[1] as data.ProjectId);
+  const projectResult = pathName.match(/^\/project\/(?<id>[0-9a-f]{32})$/u);
+  if (projectResult !== null && projectResult.groups !== undefined) {
+    return data.Location.Project(projectResult.groups.id as data.ProjectId);
   }
-  const userResult = pathName.match(/^\/user\/([0-9a-f]{32})$/u);
-  if (userResult !== null) {
-    return data.Location.User(userResult[1] as data.UserId);
+  const userResult = pathName.match(/^\/user\/(?<id>[0-9a-f]{32})$/u);
+  if (userResult !== null && userResult.groups !== undefined) {
+    return data.Location.User(userResult.groups.id as data.UserId);
   }
-  const ideaResult = pathName.match(/^\/idea\/([0-9a-f]{32})$/);
-  if (ideaResult !== null) {
-    return data.Location.Idea(ideaResult[1] as data.IdeaId);
+  const ideaResult = pathName.match(/^\/idea\/(?<id>[0-9a-f]{32})$/u);
+  if (ideaResult !== null && ideaResult.groups !== undefined) {
+    return data.Location.Idea(ideaResult.groups.id as data.IdeaId);
   }
-  const suggestionResult = pathName.match(/^\/suggestion\/([0-9a-f]{32})$/);
-  if (suggestionResult !== null) {
-    return data.Location.Suggestion(suggestionResult[1] as data.SuggestionId);
+  const suggestionResult = pathName.match(
+    /^\/suggestion\/(?<id>[0-9a-f]{32})$/u
+  );
+  if (suggestionResult !== null && suggestionResult.groups !== undefined) {
+    return data.Location.Suggestion(
+      suggestionResult.groups.id as data.SuggestionId
+    );
   }
   return data.Location.Home;
 };
@@ -133,17 +137,17 @@ const languageFromIdString = (languageAsString: string): data.Language => {
 };
 
 const accessTokenFromUrl = (hash: string): data.Maybe<data.AccessToken> => {
-  const matchResult = hash.match(/access-token=([0-9a-f]{64})/u);
-  if (matchResult === null) {
+  const matchResult = hash.match(/access-token=(?<token>[0-9a-f]{64})/u);
+  if (matchResult === null || matchResult.groups === undefined) {
     return data.Maybe.Nothing();
   }
-  return data.Maybe.Just(matchResult[1] as data.AccessToken);
+  return data.Maybe.Just(matchResult.groups.token as data.AccessToken);
 };
 
 export const stringToValidUserName = (userName: string): string | null => {
   const normalized = normalizeOneLineString(userName);
-  const length = [...normalized].length;
-  if (length <= 0 || 50 < length) {
+  const { length } = [...normalized];
+  if (length <= 0 || length > 50) {
     return null;
   }
   return normalized;
@@ -153,8 +157,8 @@ export const stringToValidProjectName = (
   projectName: string
 ): string | null => {
   const normalized = normalizeOneLineString(projectName);
-  const length = [...normalized].length;
-  if (length <= 0 || 50 < length) {
+  const { length } = [...normalized];
+  if (length <= 0 || length > 50) {
     return null;
   }
   return normalized;
@@ -162,8 +166,8 @@ export const stringToValidProjectName = (
 
 export const stringToValidIdeaName = (ideaName: string): string | null => {
   const normalized = normalizeOneLineString(ideaName);
-  const length = [...normalized].length;
-  if (length <= 0 || 100 < length) {
+  const { length } = [...normalized];
+  if (length <= 0 || length > 100) {
     return null;
   }
   return normalized;
@@ -171,8 +175,8 @@ export const stringToValidIdeaName = (ideaName: string): string | null => {
 
 export const stringToValidComment = (comment: string): string | null => {
   const normalized = normalizeMultiLineString(comment);
-  const length = [...normalized].length;
-  if (length <= 0 || 1500 < length) {
+  const { length } = [...normalized];
+  if (length <= 0 || length > 1500) {
     return null;
   }
   return normalized;
@@ -195,7 +199,7 @@ const normalizeMultiLineString = (text: string): string => {
     if (
       codePoint === undefined ||
       codePoint <= 0x1f ||
-      (0x7f <= codePoint && codePoint <= 0xa0)
+      (codePoint >= 0x7f && codePoint <= 0xa0)
     ) {
       continue;
     }
@@ -216,7 +220,7 @@ const normalizeOneLineString = (text: string): string => {
     if (
       codePoint === undefined ||
       codePoint <= 0x1f ||
-      (0x7f <= codePoint && codePoint <= 0xa0)
+      (codePoint >= 0x7f && codePoint <= 0xa0)
     ) {
       continue;
     }
@@ -235,11 +239,11 @@ const normalizeOneLineString = (text: string): string => {
 
 /** エディタ上で型の名前を作る. 先頭は小文字だがエディタ上は大文字 */
 export const stringToTypePartName = (text: string): string | undefined => {
-  text = text.normalize("NFKC");
+  const normalizedText = text.normalize("NFKC");
   let isBeforeSpace = false;
   let isFirstChar = true;
   let result = "";
-  for (const char of text) {
+  for (const char of normalizedText) {
     if (isFirstChar) {
       if (/^[a-zA-Z]$/u.test(char)) {
         result += char.toLowerCase();
@@ -347,10 +351,16 @@ export const evalExpr = (evalParameter: data.EvalParameter): EvaluationResult =>
   evaluateSuggestionExpr(
     {
       partMap: new Map(
-        evalParameter.partList.map(({ id, data }) => [id, data])
+        evalParameter.partList.map((partAndId) => [
+          partAndId.id,
+          partAndId.data,
+        ])
       ),
       typePartMap: new Map(
-        evalParameter.typePartList.map(({ id, data }) => [id, data])
+        evalParameter.typePartList.map((typeAndId) => [
+          typeAndId.id,
+          typeAndId.data,
+        ])
       ),
       suggestionPartMap: changeListToSuggestionPartMap(
         evalParameter.changeList
