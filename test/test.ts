@@ -136,7 +136,7 @@ describe("test", () => {
     const result = main.evaluateSuggestionExpr(
       {
         typePartMap: new Map(),
-        partMap: new Map<data.PartId, data.PartSnapshot>([
+        partMap: new Map<data.PartId, data.Part>([
           [
             oneName,
             {
