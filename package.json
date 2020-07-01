@@ -1,5 +1,5 @@
 {
-  "name": "definy-common",
+  "name": "definy-core",
   "version": "0.2.3",
   "description": "Definy common logic and type definition",
   "main": "source/main.js",
