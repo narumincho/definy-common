@@ -763,9 +763,10 @@ export const customTypeList: ReadonlyArray<CustomTypeDefinition> = [
         type: Type.String,
       },
       {
-        name: "parentList",
-        description: "この型パーツの元",
-        type: Type.List(idAndToken.partId),
+        name: "migrationPartId",
+        description:
+          "Justのときは型パーツは非推奨になっていて移行プログラムのパーツIDが含まれる",
+        type: Type.Maybe(idAndToken.partId),
       },
       {
         name: "description",
@@ -805,9 +806,10 @@ export const customTypeList: ReadonlyArray<CustomTypeDefinition> = [
         type: Type.String,
       },
       {
-        name: "parentList",
-        description: "このパーツの元",
-        type: Type.List(idAndToken.partId),
+        name: "migrationPartId",
+        description:
+          "Justのときはパーツは非推奨になっていて移行プログラムのパーツIDが含まれる",
+        type: Type.Maybe(idAndToken.partId),
       },
       {
         name: "description",
