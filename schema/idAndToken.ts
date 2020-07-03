@@ -1,4 +1,4 @@
-import { Type } from "@narumincho/type/distribution/data";
+import { Type } from "../source/type/data";
 
 export const accessToken = Type.Token("AccessToken");
 export const userId = Type.Id("UserId");

@@ -1,5 +1,5 @@
 import * as name from "./name";
-import { Type } from "@narumincho/type/distribution/data";
+import { Type } from "../source/type/data";
 
 export const time = Type.Custom({
   name: name.time,
@@ -234,5 +234,31 @@ export const language = Type.Custom({
 
 export const typePart = Type.Custom({
   name: name.typePart,
+  parameterList: [],
+});
+
+export const nType = Type.Custom({ name: name.nType, parameterList: [] });
+export const okAndErrorType = Type.Custom({
+  name: name.nOkAndErrorType,
+  parameterList: [],
+});
+export const nameAndTypeParameterList = Type.Custom({
+  name: name.nNameAndTypeParameterList,
+  parameterList: [],
+});
+export const nCustomTypeDefinition = Type.Custom({
+  name: name.nCustomTypeDefinition,
+  parameterList: [],
+});
+export const nCustomTypeDefinitionBody = Type.Custom({
+  name: name.nCustomTypeDefinitionBody,
+  parameterList: [],
+});
+export const nMember = Type.Custom({
+  name: name.nMember,
+  parameterList: [],
+});
+export const nPattern = Type.Custom({
+  name: name.nPattern,
   parameterList: [],
 });

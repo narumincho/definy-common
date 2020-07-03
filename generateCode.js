@@ -11,8 +11,8 @@ ts.createProgram({
     moduleResolution: ts.ModuleResolutionKind.NodeJs,
     newLine: ts.NewLineKind.LineFeed,
     outDir: "schemaJs",
-    strict: true
-  }
+    strict: true,
+  },
 }).emit();
 
-require("./schemaJs/main.js");
+require("./schemaJs/schema/main.js");
