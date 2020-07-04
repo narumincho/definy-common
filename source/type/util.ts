@@ -1,6 +1,6 @@
 import * as binary from "./kernel/binary";
 import * as bool from "./kernel/bool";
-import * as data from "./data";
+import * as data from "../data";
 import * as int32 from "./kernel/int32";
 import * as kernelString from "./kernel/string";
 import * as list from "./kernel/list";
@@ -10,7 +10,7 @@ import * as ts from "js-ts-code-generator/distribution/newData";
 import * as url from "./kernel/url";
 import { identifer } from "js-ts-code-generator";
 
-export const typeToTypeScriptType = (type_: data.Type): ts.Type => {
+export const typeToTypeScriptType = (type_: data.NType): ts.Type => {
   switch (type_._) {
     case "Int32":
       return int32.type;
@@ -28,15 +28,15 @@ export const typeToTypeScriptType = (type_: data.Type): ts.Type => {
       return url.type;
 
     case "List":
-      return list.type(typeToTypeScriptType(type_.type));
+      return list.type(typeToTypeScriptType(type_.nType));
 
     case "Maybe":
-      return maybe.type(typeToTypeScriptType(type_.type));
+      return maybe.type(typeToTypeScriptType(type_.nType));
 
     case "Result":
       return result.type(
-        typeToTypeScriptType(type_.okAndErrorType.error),
-        typeToTypeScriptType(type_.okAndErrorType.ok)
+        typeToTypeScriptType(type_.nOkAndErrorType.error),
+        typeToTypeScriptType(type_.nOkAndErrorType.ok)
       );
 
     case "Id":
@@ -44,16 +44,16 @@ export const typeToTypeScriptType = (type_: data.Type): ts.Type => {
       return ts.Type.ScopeInFile(identifer.fromString(type_.string));
 
     case "Custom": {
-      if (type_.nameAndTypeParameterList.parameterList.length === 0) {
+      if (type_.nNameAndTypeParameterList.parameterList.length === 0) {
         return ts.Type.ScopeInFile(
-          identifer.fromString(type_.nameAndTypeParameterList.name)
+          identifer.fromString(type_.nNameAndTypeParameterList.name)
         );
       }
       return ts.Type.WithTypeParameter({
         type: ts.Type.ScopeInFile(
-          identifer.fromString(type_.nameAndTypeParameterList.name)
+          identifer.fromString(type_.nNameAndTypeParameterList.name)
         ),
-        typeParameterList: type_.nameAndTypeParameterList.parameterList.map(
+        typeParameterList: type_.nNameAndTypeParameterList.parameterList.map(
           typeToTypeScriptType
         ),
       });
@@ -64,7 +64,7 @@ export const typeToTypeScriptType = (type_: data.Type): ts.Type => {
   }
 };
 
-export const typeToMemberOrParameterName = (type_: data.Type): string => {
+export const typeToMemberOrParameterName = (type_: data.NType): string => {
   return firstLowerCase(toTypeName(type_));
 };
 
@@ -74,7 +74,7 @@ export const decodePropertyName = "decode";
 export const resultProperty = "result";
 export const nextIndexProperty = "nextIndex";
 
-export const toTypeName = (type_: data.Type): string => {
+export const toTypeName = (type_: data.NType): string => {
   switch (type_._) {
     case "Int32":
       return "Int32";
@@ -87,27 +87,27 @@ export const toTypeName = (type_: data.Type): string => {
     case "Url":
       return "Url";
     case "List":
-      return toTypeName(type_.type) + "List";
+      return toTypeName(type_.nType) + "List";
     case "Maybe":
-      return toTypeName(type_.type) + "Maybe";
+      return toTypeName(type_.nType) + "Maybe";
     case "Result":
       return (
-        toTypeName(type_.okAndErrorType.error) +
-        toTypeName(type_.okAndErrorType.ok) +
+        toTypeName(type_.nOkAndErrorType.error) +
+        toTypeName(type_.nOkAndErrorType.ok) +
         "Result"
       );
     case "Id":
     case "Token":
       return type_.string;
     case "Custom":
-      return type_.nameAndTypeParameterList.name;
+      return type_.nNameAndTypeParameterList.name;
     case "Parameter":
       return type_.string;
   }
 };
 
 export const isTagTypeAllNoParameter = (
-  tagNameAndParameterArray: ReadonlyArray<data.Pattern>
+  tagNameAndParameterArray: ReadonlyArray<data.NPattern>
 ): boolean =>
   tagNameAndParameterArray.every(
     (tagNameAndParameter) => tagNameAndParameter.parameter._ === "Nothing"
@@ -119,29 +119,29 @@ export type IdAndTokenNameSet = {
 };
 
 export const collectIdOrTokenTypeNameSet = (
-  customTypeList: ReadonlyArray<data.CustomTypeDefinition>
+  customTypeList: ReadonlyArray<data.NCustomTypeDefinition>
 ): IdAndTokenNameSet =>
   flatIdAndTokenNameSetList(
     customTypeList.map(collectIdOrTokenTypeNameSetInCustomType)
   );
 
 const collectIdOrTokenTypeNameSetInCustomType = (
-  customType: data.CustomTypeDefinition
+  customType: data.NCustomTypeDefinition
 ): IdAndTokenNameSet => {
   switch (customType.body._) {
     case "Product":
       return flatIdAndTokenNameSetList(
-        customType.body.memberList.map((memberNameAndType) =>
+        customType.body.nMemberList.map((memberNameAndType) =>
           getIdAndTokenTypeNameInType(memberNameAndType.type)
         )
       );
     case "Sum":
-      return collectIdOrTokenTypeNameSetInSum(customType.body.patternList);
+      return collectIdOrTokenTypeNameSetInSum(customType.body.nPatternList);
   }
 };
 
 const collectIdOrTokenTypeNameSetInSum = (
-  tagNameAndParameterList: ReadonlyArray<data.Pattern>
+  tagNameAndParameterList: ReadonlyArray<data.NPattern>
 ): IdAndTokenNameSet => {
   const idSet: Set<string> = new Set();
   const tokenSet: Set<string> = new Set();
@@ -166,7 +166,7 @@ const collectIdOrTokenTypeNameSetInSum = (
   };
 };
 
-const getIdAndTokenTypeNameInType = (type_: data.Type): IdAndTokenNameSet => {
+const getIdAndTokenTypeNameInType = (type_: data.NType): IdAndTokenNameSet => {
   switch (type_._) {
     case "Int32":
     case "String":
@@ -181,15 +181,15 @@ const getIdAndTokenTypeNameInType = (type_: data.Type): IdAndTokenNameSet => {
       return { id: new Set(), token: new Set([type_.string]) };
     case "List":
     case "Maybe":
-      return getIdAndTokenTypeNameInType(type_.type);
+      return getIdAndTokenTypeNameInType(type_.nType);
     case "Result":
       return flatIdAndTokenNameSetList([
-        getIdAndTokenTypeNameInType(type_.okAndErrorType.ok),
-        getIdAndTokenTypeNameInType(type_.okAndErrorType.error),
+        getIdAndTokenTypeNameInType(type_.nOkAndErrorType.ok),
+        getIdAndTokenTypeNameInType(type_.nOkAndErrorType.error),
       ]);
     case "Custom":
       return flatIdAndTokenNameSetList(
-        type_.nameAndTypeParameterList.parameterList.map(
+        type_.nNameAndTypeParameterList.parameterList.map(
           getIdAndTokenTypeNameInType
         )
       );

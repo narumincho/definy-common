@@ -1,5 +1,5 @@
 import * as name from "./name";
-import { Type } from "../source/type/data";
+import { NType as Type } from "../source/data";
 
 const noParamterType = (typeName: string) =>
   Type.Custom({

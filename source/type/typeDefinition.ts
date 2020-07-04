@@ -1,5 +1,5 @@
 import * as codec from "./kernel/codec";
-import * as data from "./data";
+import * as data from "../data";
 import * as hexString from "./kernel/hexString";
 import * as maybe from "./kernel/maybe";
 import * as result from "./kernel/result";
@@ -8,7 +8,7 @@ import * as util from "./util";
 import { identifer } from "js-ts-code-generator";
 
 export const generateTypeDefinition = (
-  customTypeList: ReadonlyArray<data.CustomTypeDefinition>,
+  customTypeList: ReadonlyArray<data.NCustomTypeDefinition>,
   idOrTokenTypeNameSet: util.IdAndTokenNameSet
 ): ReadonlyArray<ts.TypeAlias> => {
   return [
@@ -29,7 +29,7 @@ export const generateTypeDefinition = (
  */
 
 export const customTypeToDefinition = (
-  customType: data.CustomTypeDefinition
+  customType: data.NCustomTypeDefinition
 ): ts.TypeAlias => ({
   name: identifer.fromString(customType.name),
   document: customType.description,
@@ -38,21 +38,23 @@ export const customTypeToDefinition = (
 });
 
 const customTypeDefinitionBodyToTsType = (
-  body: data.CustomTypeDefinitionBody
+  body: data.NCustomTypeDefinitionBody
 ): ts.Type => {
   switch (body._) {
     case "Sum":
-      if (util.isTagTypeAllNoParameter(body.patternList)) {
+      if (util.isTagTypeAllNoParameter(body.nPatternList)) {
         return ts.Type.Union(
-          body.patternList.map((pattern) => ts.Type.StringLiteral(pattern.name))
+          body.nPatternList.map((pattern) =>
+            ts.Type.StringLiteral(pattern.name)
+          )
         );
       }
       return ts.Type.Union(
-        body.patternList.map((pattern) => patternListToObjectType(pattern))
+        body.nPatternList.map((pattern) => patternListToObjectType(pattern))
       );
     case "Product":
       return ts.Type.Object(
-        body.memberList.map((member) => ({
+        body.nMemberList.map((member) => ({
           name: member.name,
           required: true,
           type: util.typeToTypeScriptType(member.type),
@@ -62,7 +64,7 @@ const customTypeDefinitionBodyToTsType = (
   }
 };
 
-const patternListToObjectType = (patternList: data.Pattern): ts.Type => {
+const patternListToObjectType = (patternList: data.NPattern): ts.Type => {
   const tagField: ts.MemberType = {
     name: "_",
     required: true,

@@ -1,10 +1,10 @@
 import * as ts from "js-ts-code-generator/distribution/newData";
 import {
-  CustomTypeDefinition,
-  CustomTypeDefinitionBody,
   Maybe,
-  Type,
-} from "../data";
+  NCustomTypeDefinition,
+  NCustomTypeDefinitionBody,
+  NType,
+} from "../../data";
 import { identifer } from "js-ts-code-generator";
 
 const name = "Maybe";
@@ -15,16 +15,16 @@ export const type = (elementType: ts.Type): ts.Type =>
     typeParameterList: [elementType],
   });
 
-export const customTypeDefinition: CustomTypeDefinition = {
+export const customTypeDefinition: NCustomTypeDefinition = {
   name,
   typeParameterList: ["value"],
   description:
     "Maybe. nullableのようなもの. Elmに標準で定義されているものに変換をするためにデフォルトで用意した",
-  body: CustomTypeDefinitionBody.Sum([
+  body: NCustomTypeDefinitionBody.Sum([
     {
       name: "Just",
       description: "値があるということ",
-      parameter: Maybe.Just(Type.Parameter("value")),
+      parameter: Maybe.Just(NType.Parameter("value")),
     },
     {
       name: "Nothing",

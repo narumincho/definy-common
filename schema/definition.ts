@@ -2,11 +2,11 @@ import * as customType from "./customType";
 import * as idAndToken from "./idAndToken";
 import * as name from "./name";
 import {
-  CustomTypeDefinition,
-  CustomTypeDefinitionBody,
+  NCustomTypeDefinition as CustomTypeDefinition,
+  NCustomTypeDefinitionBody as CustomTypeDefinitionBody,
   Maybe,
-  Type,
-} from "../source/type/data";
+  NType as Type,
+} from "../source/data";
 
 export const customTypeList: ReadonlyArray<CustomTypeDefinition> = [
   {

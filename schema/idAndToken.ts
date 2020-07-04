@@ -1,4 +1,4 @@
-import { Type } from "../source/type/data";
+import { NType as Type } from "../source/data";
 
 export const accessToken = Type.Token("AccessToken");
 export const userId = Type.Id("UserId");
