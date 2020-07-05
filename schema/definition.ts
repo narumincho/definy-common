@@ -789,6 +789,17 @@ export const customTypeList: ReadonlyArray<CustomTypeDefinition> = [
         type: customType.time,
       },
       {
+        name: "attribute",
+        description:
+          "コンパイラに与える,この型を表現するのにどういう特殊な状態にするかという情報",
+        type: customType.typeAttribute,
+      },
+      {
+        name: "typeParameterList",
+        description: "型パラメーター",
+        type: idAndToken.typePartId,
+      },
+      {
         name: "body",
         description: "定義本体",
         type: customType.typePartBody,
@@ -837,11 +848,6 @@ export const customTypeList: ReadonlyArray<CustomTypeDefinition> = [
         type: idAndToken.suggestionId,
       },
       {
-        name: "attribute",
-        description: "",
-        type: customType.typeAttribute,
-      },
-      {
         name: "getTime",
         description: "取得日時",
         type: customType.time,
@@ -882,7 +888,7 @@ export const customTypeList: ReadonlyArray<CustomTypeDefinition> = [
       },
       {
         name: "description",
-        description: "説明文",
+        description: "メンバーの説明",
         type: Type.String,
       },
       {
@@ -904,12 +910,12 @@ export const customTypeList: ReadonlyArray<CustomTypeDefinition> = [
       },
       {
         name: "description",
-        description: "説明文",
+        description: "パターンの説明",
         type: Type.String,
       },
       {
         name: "parameter",
-        description: "パラメーター",
+        description: "そのパターンにつけるデータの型",
         type: Type.Maybe(customType.type),
       },
     ]),
@@ -934,6 +940,18 @@ export const customTypeList: ReadonlyArray<CustomTypeDefinition> = [
         name: "Binary",
         description: "バイナリ型. TypeScriptではUint8Arrayとして扱う",
         parameter: Maybe.Nothing(),
+      },
+      {
+        name: "Id",
+        description:
+          "UUID (16byte) を表現する. 内部表現はとりあえず0-f長さ32の文字列",
+        parameter: Maybe.Just(Type.String),
+      },
+      {
+        name: "Token",
+        description:
+          "sha256などでハッシュ化したもの (32byte) を表現する. 内部表現はとりあえず0-f長さ64の文字列",
+        parameter: Maybe.Just(Type.String),
       },
     ]),
   },
@@ -1485,196 +1503,19 @@ export const customTypeList: ReadonlyArray<CustomTypeDefinition> = [
     ]),
   },
   {
-    name: name.nType,
-    description: "型",
-    typeParameterList: [],
-    body: CustomTypeDefinitionBody.Sum([
-      {
-        name: "Int32",
-        description:
-          "32bit 符号付き整数. (-2 147 483 648 ～ 2147483647). JavaScriptのnumberとして扱える",
-        parameter: Maybe.Nothing(),
-      },
-      {
-        name: "String",
-        description: "文字列. JavaScriptのStringとして扱える",
-        parameter: Maybe.Nothing(),
-      },
-      {
-        name: "Bool",
-        description: "真偽値. JavaScriptのbooleanとして扱える",
-        parameter: Maybe.Nothing(),
-      },
-      {
-        name: "Binary",
-        description: "バイナリ. JavaScriptのUint8Arrayとして扱える",
-        parameter: Maybe.Nothing(),
-      },
-      {
-        name: "Url",
-        description: "URL. JavaScriptのURLとして扱える",
-        parameter: Maybe.Nothing(),
-      },
-      {
-        name: "List",
-        description: "リスト. JavaScriptのArrayとして扱える",
-        parameter: Maybe.Just(customType.nType),
-      },
-      {
-        name: "Maybe",
-        description:
-          "Maybe. 指定した型の値があるJustと値がないNothingのどちらか",
-        parameter: Maybe.Just(customType.nType),
-      },
-      {
-        name: "Result",
-        description: "Result. 成功と失敗を表す",
-        parameter: Maybe.Just(customType.okAndErrorType),
-      },
-      {
-        name: "Id",
-        description:
-          "データを識別するためのもの. `UserId`などの型名を指定する. 16byte. 16進数文字列で32文字",
-        parameter: Maybe.Just(Type.String),
-      },
-      {
-        name: "Token",
-        description:
-          "データを識別,証明するため. `AccessToken`などの型名を指定する. 32byte. 16進数文字列で64文字",
-        parameter: Maybe.Just(Type.String),
-      },
-      {
-        name: "Custom",
-        description: "用意されていないアプリ特有の型",
-        parameter: Maybe.Just(customType.nameAndTypeParameterList),
-      },
-      {
-        name: "Parameter",
-        description: "カスタム型の定義で使う型変数",
-        parameter: Maybe.Just(Type.String),
-      },
-    ]),
-  },
-  {
-    name: name.nOkAndErrorType,
-    description: "正常値と異常値",
-    typeParameterList: [],
-    body: CustomTypeDefinitionBody.Product([
-      {
-        name: "ok",
-        description: "正常値",
-        type: customType.nType,
-      },
-      {
-        name: "error",
-        description: "異常値",
-        type: customType.nType,
-      },
-    ]),
-  },
-  {
-    name: name.nNameAndTypeParameterList,
-    description: "カスタム型の指定",
+    name: name.typeParameter,
+    description: "型パラメーター",
     typeParameterList: [],
     body: CustomTypeDefinitionBody.Product([
       {
         name: "name",
-        description: "カスタム型名",
+        description: "型パラメーターの名前",
         type: Type.String,
       },
       {
-        name: "parameterList",
-        description: "型パラメーター",
-        type: Type.List(customType.nType),
-      },
-    ]),
-  },
-  {
-    name: name.nCustomTypeDefinition,
-    description: "カスタム型の定義",
-    typeParameterList: [],
-    body: CustomTypeDefinitionBody.Product([
-      {
-        name: "name",
-        description: "型の名前. [A-Z][a-zA-Z0-9]* の正規表現を満たせばOK",
-        type: Type.String,
-      },
-      {
-        name: "description",
-        description: "型の説明. DOCコメントそしてコードに出力される",
-        type: Type.String,
-      },
-      {
-        name: "typeParameterList",
-        description:
-          "型パラメーターは小文字で始めなければならない. Elmでの出力と外部の型を隠さないようにするため",
-        type: Type.List(Type.String),
-      },
-      {
-        name: "body",
-        description: "型の定義の本体",
-        type: customType.nCustomTypeDefinitionBody,
-      },
-    ]),
-  },
-  {
-    name: name.nCustomTypeDefinitionBody,
-    description: "カスタム型の定義の本体",
-    typeParameterList: [],
-    body: CustomTypeDefinitionBody.Sum([
-      {
-        name: "Product",
-        description: "直積型. AとBとC",
-        parameter: Maybe.Just(Type.List(customType.nMember)),
-      },
-      {
-        name: "Sum",
-        description: "直和型. AかBかC",
-        parameter: Maybe.Just(Type.List(customType.nPattern)),
-      },
-    ]),
-  },
-  {
-    name: name.nMember,
-    description: "直積型の構成要素. 名前と型を持つ",
-    typeParameterList: [],
-    body: CustomTypeDefinitionBody.Product([
-      {
-        name: "name",
-        description: "メンバー名",
-        type: Type.String,
-      },
-      {
-        name: "description",
-        description: "メンバーの説明",
-        type: Type.String,
-      },
-      {
-        name: "type",
-        description: "型",
-        type: customType.nType,
-      },
-    ]),
-  },
-  {
-    name: name.nPattern,
-    description: "直和型の構成要素. タグと,パラメーターの型がついている",
-    typeParameterList: [],
-    body: CustomTypeDefinitionBody.Product([
-      {
-        name: "name",
-        description: "タグ名",
-        type: Type.String,
-      },
-      {
-        name: "description",
-        description: "パターンの説明",
-        type: Type.String,
-      },
-      {
-        name: "parameter",
-        description: "そのパターンにある型",
-        type: Type.Maybe(customType.nType),
+        name: "typePartId",
+        description: "型パラメーターの型ID",
+        type: idAndToken.typePartId,
       },
     ]),
   },

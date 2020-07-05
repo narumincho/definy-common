@@ -66,12 +66,5 @@ export const accessTokenAndSuggestionId = "AccessTokenAndSuggestionId";
 export const addSuggestionParameter = "AddSuggestionParameter";
 export const updateSuggestionParameter = "UpdateSuggestionParameter";
 
-export const nType = "NType";
-export const nOkAndErrorType = "NOkAndErrorType";
-export const nNameAndTypeParameterList = "NNameAndTypeParameterList";
-export const nCustomTypeDefinition = "NCustomTypeDefinition";
-export const nCustomTypeDefinitionBody = "NCustomTypeDefinitionBody";
-export const nMember = "NMember";
-export const nPattern = "NPattern";
-
 export const typeAttribute = "TypeAttribute";
+export const typeParameter = "TypeParameter";
