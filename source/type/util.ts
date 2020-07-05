@@ -258,3 +258,7 @@ export const isFirstLowerCaseName = (text: string): boolean => {
   }
   return true;
 };
+
+export const definyCodeProjectId = "1e4531eba1d93cd9f9f31a8bc49551a2" as data.ProjectId;
+
+export const codeSuggestionId = "009a2b68a9239b0bf1f541d8b88582dd" as data.SuggestionId;
