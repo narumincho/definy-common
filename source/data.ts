@@ -580,10 +580,6 @@ export type Part = {
    */
   readonly createSuggestionId: SuggestionId;
   /**
-   * 型パラメーター
-   */
-  readonly typeParameterList: TypePartId;
-  /**
    * 取得日時
    */
   readonly getTime: Time;
@@ -3567,7 +3563,6 @@ export const Part: { readonly codec: Codec<Part> } = {
           expr: exprAndNextIndex.result,
           projectId: projectIdAndNextIndex.result,
           createSuggestionId: createSuggestionIdAndNextIndex.result,
-          attribute: attributeAndNextIndex.result,
           getTime: getTimeAndNextIndex.result,
         },
         nextIndex: getTimeAndNextIndex.nextIndex,

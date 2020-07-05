@@ -792,7 +792,7 @@ export const customTypeList: ReadonlyArray<CustomTypeDefinition> = [
         name: "attribute",
         description:
           "コンパイラに与える,この型を表現するのにどういう特殊な状態にするかという情報",
-        type: customType.typeAttribute,
+        type: Type.Maybe(customType.typeAttribute),
       },
       {
         name: "typeParameterList",
