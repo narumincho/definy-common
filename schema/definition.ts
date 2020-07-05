@@ -2,11 +2,11 @@ import * as customType from "./customType";
 import * as idAndToken from "./idAndToken";
 import * as name from "./name";
 import {
-  NCustomTypeDefinition as CustomTypeDefinition,
-  NCustomTypeDefinitionBody as CustomTypeDefinitionBody,
+  CustomTypeDefinition,
+  CustomTypeDefinitionBody,
   Maybe,
-  NType as Type,
-} from "../source/data";
+  Type,
+} from "@narumincho/type/source/data";
 
 export const customTypeList: ReadonlyArray<CustomTypeDefinition> = [
   {
@@ -797,7 +797,7 @@ export const customTypeList: ReadonlyArray<CustomTypeDefinition> = [
       {
         name: "typeParameterList",
         description: "型パラメーター",
-        type: idAndToken.typePartId,
+        type: Type.List(idAndToken.typePartId),
       },
       {
         name: "body",
@@ -926,6 +926,11 @@ export const customTypeList: ReadonlyArray<CustomTypeDefinition> = [
     typeParameterList: [],
     body: CustomTypeDefinitionBody.Sum([
       {
+        name: "Function",
+        description: "関数",
+        parameter: Maybe.Nothing(),
+      },
+      {
         name: "Int32",
         description: "32bit整数",
         parameter: Maybe.Nothing(),
@@ -959,16 +964,16 @@ export const customTypeList: ReadonlyArray<CustomTypeDefinition> = [
     name: name.type,
     description: "型",
     typeParameterList: [],
-    body: CustomTypeDefinitionBody.Sum([
+    body: CustomTypeDefinitionBody.Product([
       {
-        name: "Function",
-        description: "関数",
-        parameter: Maybe.Just(customType.typeInputAndOutput),
+        name: "typePartId",
+        description: "型の参照",
+        type: idAndToken.typePartId,
       },
       {
-        name: "TypePartWithParameter",
-        description: "型パーツと, パラメーターのリスト",
-        parameter: Maybe.Just(customType.typePartIdWithParameter),
+        name: "parameter",
+        description: "型のパラメーター",
+        type: Type.List(customType.type),
       },
     ]),
   },
@@ -986,23 +991,6 @@ export const customTypeList: ReadonlyArray<CustomTypeDefinition> = [
         name: "outputType",
         description: "出力の型",
         type: customType.type,
-      },
-    ]),
-  },
-  {
-    name: name.typePartIdWithParameter,
-    description: "",
-    typeParameterList: [],
-    body: CustomTypeDefinitionBody.Product([
-      {
-        name: "typePartId",
-        description: "型の参照",
-        type: idAndToken.typePartId,
-      },
-      {
-        name: "parameter",
-        description: "型のパラメーター",
-        type: Type.List(customType.type),
       },
     ]),
   },

@@ -1,5 +1,5 @@
 import * as name from "./name";
-import { NType as Type } from "../source/data";
+import { Type } from "@narumincho/type/source/data";
 
 const noParamterType = (typeName: string) =>
   Type.Custom({
@@ -78,10 +78,6 @@ export const pattern = noParamterType(name.pattern);
 export const typePartBodyKernel = noParamterType(name.typePartBodyKernel);
 
 export const typeInputAndOutput = noParamterType(name.typeInputAndOutput);
-
-export const typePartIdWithParameter = noParamterType(
-  name.typePartIdWithParameter
-);
 
 export const functionCall = noParamterType(name.functionCall);
 

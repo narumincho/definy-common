@@ -27,7 +27,6 @@ export const pattern = "Pattern";
 export const typePartBodyKernel = "TypePartBodyKernel";
 export const type = "Type";
 export const typeInputAndOutput = "TypeInputAndOutput";
-export const typePartIdWithParameter = "TypePartIdWithParameter";
 
 export const expr = "Expr";
 export const evaluatedExpr = "EvaluatedExpr";

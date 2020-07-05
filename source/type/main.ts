@@ -7,9 +7,9 @@ import * as util from "./util";
 export { data };
 
 export const generateTypeScriptCode = (
-  customTypeList: ReadonlyArray<data.NCustomTypeDefinition>
+  customTypeList: ReadonlyArray<data.TypePart>
 ): ts.Code => {
-  checkCustomTypeListValidation(customTypeList);
+  checkTypePartListValidation(customTypeList);
   const idOrTokenTypeNameSet = util.collectIdOrTokenTypeNameSet(customTypeList);
   return {
     exportDefinitionList: [
@@ -29,23 +29,23 @@ export const generateTypeScriptCode = (
  * Elmの予約語判定はここではやらない
  * @throws 型の定義が正しくできていない場合
  */
-const checkCustomTypeListValidation = (
-  customTypeList: ReadonlyArray<data.NCustomTypeDefinition>
+const checkTypePartListValidation = (
+  typePartList: ReadonlyArray<data.TypePart>
 ): void => {
-  const customTypeNameAndTypeParameterListMap: Map<
+  const typePartNameAndTypeParameterListMap: Map<
     string,
     Set<string>
   > = new Map();
-  for (const customType of customTypeList) {
-    if (!util.isFirstUpperCaseName(customType.name)) {
-      throw new Error("custom type name is invalid. name = " + customType.name);
+  for (const typePart of typePartList) {
+    if (!util.isFirstUpperCaseName(typePart.name)) {
+      throw new Error("custom type name is invalid. name = " + typePart.name);
     }
-    if (customTypeNameAndTypeParameterListMap.has(customType.name)) {
-      throw new Error("duplicate custom type name. name =" + customType.name);
+    if (typePartNameAndTypeParameterListMap.has(typePart.name)) {
+      throw new Error("duplicate custom type name. name =" + typePart.name);
     }
 
     const typeParameterSet: Set<string> = new Set();
-    for (const typeParameter of customType.typeParameterList) {
+    for (const typeParameter of typePart.typeParameterList) {
       if (typeParameterSet.has(typeParameter)) {
         throw new Error(
           "duplicate type parameter name. name =" + typeParameter
@@ -58,44 +58,41 @@ const checkCustomTypeListValidation = (
         );
       }
     }
-    customTypeNameAndTypeParameterListMap.set(
-      customType.name,
-      typeParameterSet
-    );
+    typePartNameAndTypeParameterListMap.set(typePart.name, typeParameterSet);
   }
 
-  for (const customType of customTypeList) {
-    const scopedTypeParameterList = customTypeNameAndTypeParameterListMap.get(
-      customType.name
+  for (const typePart of typePartList) {
+    const scopedTypeParameterList = typePartNameAndTypeParameterListMap.get(
+      typePart.name
     );
     if (scopedTypeParameterList === undefined) {
       throw new Error("internal error. fail collect custom type");
     }
 
     checkCustomTypeBodyValidation(
-      customType.body,
-      customTypeNameAndTypeParameterListMap,
+      typePart.body,
+      typePartNameAndTypeParameterListMap,
       scopedTypeParameterList
     );
   }
 };
 
 const checkCustomTypeBodyValidation = (
-  customTypeBody: data.NCustomTypeDefinitionBody,
+  typePartBody: data.TypePartBody,
   customTypeNameAndTypeParameterListMap: Map<string, Set<string>>,
   scopedTypeParameterList: Set<string>
 ): void => {
-  switch (customTypeBody._) {
+  switch (typePartBody._) {
     case "Product":
       checkProductTypeValidation(
-        customTypeBody.nMemberList,
+        typePartBody.memberList,
         customTypeNameAndTypeParameterListMap,
         scopedTypeParameterList
       );
       return;
     case "Sum":
       checkSumTypeValidation(
-        customTypeBody.nPatternList,
+        typePartBody.patternList,
         customTypeNameAndTypeParameterListMap,
         scopedTypeParameterList
       );
@@ -103,7 +100,7 @@ const checkCustomTypeBodyValidation = (
 };
 
 const checkProductTypeValidation = (
-  memberList: ReadonlyArray<data.NMember>,
+  memberList: ReadonlyArray<data.Member>,
   customTypeNameAndTypeParameterListMap: Map<string, Set<string>>,
   scopedTypeParameterList: Set<string>
 ): void => {
@@ -126,7 +123,7 @@ const checkProductTypeValidation = (
 };
 
 const checkSumTypeValidation = (
-  patternList: ReadonlyArray<data.NPattern>,
+  patternList: ReadonlyArray<data.Pattern>,
   customTypeNameAndTypeParameterListMap: Map<string, Set<string>>,
   scopedTypeParameterList: Set<string>
 ): void => {
@@ -151,79 +148,7 @@ const checkSumTypeValidation = (
 };
 
 const checkTypeValidation = (
-  type_: data.NType,
+  type_: data.Type,
   customTypeNameAndTypeParameterMap: Map<string, Set<string>>,
   scopedTypeParameterList: Set<string>
-): void => {
-  switch (type_._) {
-    case "List":
-    case "Maybe":
-      checkTypeValidation(
-        type_.nType,
-        customTypeNameAndTypeParameterMap,
-        scopedTypeParameterList
-      );
-      return;
-    case "Result":
-      checkTypeValidation(
-        type_.nOkAndErrorType.ok,
-        customTypeNameAndTypeParameterMap,
-        scopedTypeParameterList
-      );
-      checkTypeValidation(
-        type_.nOkAndErrorType.error,
-        customTypeNameAndTypeParameterMap,
-        scopedTypeParameterList
-      );
-      return;
-    case "Id":
-      if (!util.isFirstUpperCaseName(type_.string)) {
-        throw new Error("Id type name is invalid. name =" + type_.string);
-      }
-      return;
-    case "Token": {
-      if (!util.isFirstUpperCaseName(type_.string)) {
-        throw new Error("Token type name is invalid. name =" + type_.string);
-      }
-      return;
-    }
-    case "Custom": {
-      const customTypeTypeParameterList = customTypeNameAndTypeParameterMap.get(
-        type_.nNameAndTypeParameterList.name
-      );
-      if (customTypeTypeParameterList === undefined) {
-        throw new Error(
-          "custom type " +
-            type_.nNameAndTypeParameterList.name +
-            " is not defined."
-        );
-      }
-      if (
-        customTypeTypeParameterList.size !==
-        type_.nNameAndTypeParameterList.parameterList.length
-      ) {
-        throw new Error(
-          "type parameter count error. " +
-            type_.nNameAndTypeParameterList.name +
-            " need " +
-            customTypeTypeParameterList.size.toString() +
-            " parameter(s). but you specified " +
-            type_.nNameAndTypeParameterList.parameterList.length.toString() +
-            " parameter(s)"
-        );
-      }
-      for (const parameter of type_.nNameAndTypeParameterList.parameterList) {
-        checkTypeValidation(
-          parameter,
-          customTypeNameAndTypeParameterMap,
-          scopedTypeParameterList
-        );
-      }
-      return;
-    }
-    case "Parameter":
-      if (!scopedTypeParameterList.has(type_.string)) {
-        throw new Error("type parameter " + type_.string + " is not defined.");
-      }
-  }
-};
+): void => {};

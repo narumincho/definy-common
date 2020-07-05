@@ -17,6 +17,7 @@
     "js-ts-code-generator": "^0.3.1"
   },
   "devDependencies": {
+    "@narumincho/type": "^1.1.0",
     "@types/jest": "^26.0.3",
     "@types/node": "^14.0.14",
     "@types/prettier": "^2.0.1",
