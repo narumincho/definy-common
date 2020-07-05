@@ -138,3 +138,5 @@ export const nCustomTypeDefinitionBody = noParamterType(
 export const nMember = noParamterType(name.nMember);
 
 export const nPattern = noParamterType(name.nPattern);
+
+export const typeAttribute = noParamterType(name.typeAttribute);

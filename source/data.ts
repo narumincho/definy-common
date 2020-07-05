@@ -571,6 +571,7 @@ export type Part = {
    * このパーツが作成された提案
    */
   readonly createSuggestionId: SuggestionId;
+  readonly attribute: TypeAttribute;
   /**
    * 取得日時
    */
@@ -624,7 +625,7 @@ export type Pattern = {
 /**
  * Definyだけでは表現できないデータ型
  */
-export type TypePartBodyKernel = "Int32" | "List";
+export type TypePartBodyKernel = "Int32" | "String" | "Binary";
 
 /**
  * 型
@@ -1098,6 +1099,11 @@ export type NPattern = {
    */
   readonly parameter: Maybe<NType>;
 };
+
+/**
+ * コンパイラに向けた, 型のデータ形式をどうするかの情報
+ */
+export type TypeAttribute = "AsArray" | "AsBoolean";
 
 export type ProjectId = string & { readonly _projectId: never };
 
@@ -3583,6 +3589,7 @@ export const Part: { readonly codec: Codec<Part> } = {
         .concat(Expr.codec.encode(value.expr))
         .concat(ProjectId.codec.encode(value.projectId))
         .concat(SuggestionId.codec.encode(value.createSuggestionId))
+        .concat(TypeAttribute.codec.encode(value.attribute))
         .concat(Time.codec.encode(value.getTime)),
     decode: (
       index: number,
@@ -3616,10 +3623,17 @@ export const Part: { readonly codec: Codec<Part> } = {
         readonly result: SuggestionId;
         readonly nextIndex: number;
       } = SuggestionId.codec.decode(projectIdAndNextIndex.nextIndex, binary);
+      const attributeAndNextIndex: {
+        readonly result: TypeAttribute;
+        readonly nextIndex: number;
+      } = TypeAttribute.codec.decode(
+        createSuggestionIdAndNextIndex.nextIndex,
+        binary
+      );
       const getTimeAndNextIndex: {
         readonly result: Time;
         readonly nextIndex: number;
-      } = Time.codec.decode(createSuggestionIdAndNextIndex.nextIndex, binary);
+      } = Time.codec.decode(attributeAndNextIndex.nextIndex, binary);
       return {
         result: {
           name: nameAndNextIndex.result,
@@ -3629,6 +3643,7 @@ export const Part: { readonly codec: Codec<Part> } = {
           expr: exprAndNextIndex.result,
           projectId: projectIdAndNextIndex.result,
           createSuggestionId: createSuggestionIdAndNextIndex.result,
+          attribute: attributeAndNextIndex.result,
           getTime: getTimeAndNextIndex.result,
         },
         nextIndex: getTimeAndNextIndex.nextIndex,
@@ -3816,21 +3831,29 @@ export const TypePartBodyKernel: {
    */
   readonly Int32: TypePartBodyKernel;
   /**
-   * リスト
+   * 文字列. Definyだけで表現できるが, TypeScriptでstringとして扱うために必要
    */
-  readonly List: TypePartBodyKernel;
+  readonly String: TypePartBodyKernel;
+  /**
+   * バイナリ型. TypeScriptではUint8Arrayとして扱う
+   */
+  readonly Binary: TypePartBodyKernel;
   readonly codec: Codec<TypePartBodyKernel>;
 } = {
   Int32: "Int32",
-  List: "List",
+  String: "String",
+  Binary: "Binary",
   codec: {
     encode: (value: TypePartBodyKernel): ReadonlyArray<number> => {
       switch (value) {
         case "Int32": {
           return [0];
         }
-        case "List": {
+        case "String": {
           return [1];
+        }
+        case "Binary": {
+          return [2];
         }
       }
     },
@@ -3850,7 +3873,13 @@ export const TypePartBodyKernel: {
       }
       if (patternIndex.result === 1) {
         return {
-          result: TypePartBodyKernel.List,
+          result: TypePartBodyKernel.String,
+          nextIndex: patternIndex.nextIndex,
+        };
+      }
+      if (patternIndex.result === 2) {
+        return {
+          result: TypePartBodyKernel.Binary,
           nextIndex: patternIndex.nextIndex,
         };
       }
@@ -5738,6 +5767,58 @@ export const NPattern: { readonly codec: Codec<NPattern> } = {
         },
         nextIndex: parameterAndNextIndex.nextIndex,
       };
+    },
+  },
+};
+
+/**
+ * コンパイラに向けた, 型のデータ形式をどうするかの情報
+ */
+export const TypeAttribute: {
+  /**
+   * JavaScriptのArrayとして扱うように指示する. 定義が Nil | Cons a (List a) のような形のみをサポートする
+   */
+  readonly AsArray: TypeAttribute;
+  /**
+   * JavaScriptのbooleanとしれ扱うように指示する. 定義が True | Falseのような形のみをサポートする
+   */
+  readonly AsBoolean: TypeAttribute;
+  readonly codec: Codec<TypeAttribute>;
+} = {
+  AsArray: "AsArray",
+  AsBoolean: "AsBoolean",
+  codec: {
+    encode: (value: TypeAttribute): ReadonlyArray<number> => {
+      switch (value) {
+        case "AsArray": {
+          return [0];
+        }
+        case "AsBoolean": {
+          return [1];
+        }
+      }
+    },
+    decode: (
+      index: number,
+      binary: Uint8Array
+    ): { readonly result: TypeAttribute; readonly nextIndex: number } => {
+      const patternIndex: {
+        readonly result: number;
+        readonly nextIndex: number;
+      } = Int32.codec.decode(index, binary);
+      if (patternIndex.result === 0) {
+        return {
+          result: TypeAttribute.AsArray,
+          nextIndex: patternIndex.nextIndex,
+        };
+      }
+      if (patternIndex.result === 1) {
+        return {
+          result: TypeAttribute.AsBoolean,
+          nextIndex: patternIndex.nextIndex,
+        };
+      }
+      throw new Error("存在しないパターンを指定された 型を更新してください");
     },
   },
 };

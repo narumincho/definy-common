@@ -73,3 +73,5 @@ export const nCustomTypeDefinition = "NCustomTypeDefinition";
 export const nCustomTypeDefinitionBody = "NCustomTypeDefinitionBody";
 export const nMember = "NMember";
 export const nPattern = "NPattern";
+
+export const typeAttribute = "TypeAttribute";

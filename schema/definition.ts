@@ -837,6 +837,11 @@ export const customTypeList: ReadonlyArray<CustomTypeDefinition> = [
         type: idAndToken.suggestionId,
       },
       {
+        name: "attribute",
+        description: "",
+        type: customType.typeAttribute,
+      },
+      {
         name: "getTime",
         description: "取得日時",
         type: customType.time,
@@ -920,8 +925,14 @@ export const customTypeList: ReadonlyArray<CustomTypeDefinition> = [
         parameter: Maybe.Nothing(),
       },
       {
-        name: "List",
-        description: "リスト",
+        name: "String",
+        description:
+          "文字列. Definyだけで表現できるが, TypeScriptでstringとして扱うために必要",
+        parameter: Maybe.Nothing(),
+      },
+      {
+        name: "Binary",
+        description: "バイナリ型. TypeScriptではUint8Arrayとして扱う",
         parameter: Maybe.Nothing(),
       },
     ]),
@@ -1664,6 +1675,25 @@ export const customTypeList: ReadonlyArray<CustomTypeDefinition> = [
         name: "parameter",
         description: "そのパターンにある型",
         type: Type.Maybe(customType.nType),
+      },
+    ]),
+  },
+  {
+    name: name.typeAttribute,
+    description: "コンパイラに向けた, 型のデータ形式をどうするかの情報",
+    typeParameterList: [],
+    body: CustomTypeDefinitionBody.Sum([
+      {
+        name: "AsArray",
+        description:
+          "JavaScriptのArrayとして扱うように指示する. 定義が Nil | Cons a (List a) のような形のみをサポートする",
+        parameter: Maybe.Nothing(),
+      },
+      {
+        name: "AsBoolean",
+        description:
+          "JavaScriptのbooleanとしれ扱うように指示する. 定義が True | Falseのような形のみをサポートする",
+        parameter: Maybe.Nothing(),
       },
     ]),
   },
