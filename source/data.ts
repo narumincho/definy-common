@@ -536,11 +536,11 @@ export type TypePart = {
   /**
    * コンパイラに与える,この型を表現するのにどういう特殊な状態にするかという情報
    */
-  readonly attribute: TypeAttribute;
+  readonly attribute: Maybe<TypeAttribute>;
   /**
    * 型パラメーター
    */
-  readonly typeParameterList: TypePartId;
+  readonly typeParameterList: ReadonlyArray<TypePartId>;
   /**
    * 定義本体
    */
@@ -633,6 +633,7 @@ export type Pattern = {
  * Definyだけでは表現できないデータ型
  */
 export type TypePartBodyKernel =
+  | { readonly _: "Function" }
   | { readonly _: "Int32" }
   | { readonly _: "String" }
   | { readonly _: "Binary" }
@@ -642,12 +643,16 @@ export type TypePartBodyKernel =
 /**
  * 型
  */
-export type Type =
-  | { readonly _: "Function"; readonly typeInputAndOutput: TypeInputAndOutput }
-  | {
-      readonly _: "TypePartWithParameter";
-      readonly typePartIdWithParameter: TypePartIdWithParameter;
-    };
+export type Type = {
+  /**
+   * 型の参照
+   */
+  readonly typePartId: TypePartId;
+  /**
+   * 型のパラメーター
+   */
+  readonly parameter: ReadonlyArray<Type>;
+};
 
 export type TypeInputAndOutput = {
   /**
@@ -658,17 +663,6 @@ export type TypeInputAndOutput = {
    * 出力の型
    */
   readonly outputType: Type;
-};
-
-export type TypePartIdWithParameter = {
-  /**
-   * 型の参照
-   */
-  readonly typePartId: TypePartId;
-  /**
-   * 型のパラメーター
-   */
-  readonly parameter: ReadonlyArray<Type>;
 };
 
 /**
@@ -3439,8 +3433,8 @@ export const TypePart: { readonly codec: Codec<TypePart> } = {
         .concat(ProjectId.codec.encode(value.projectId))
         .concat(SuggestionId.codec.encode(value.createSuggestionId))
         .concat(Time.codec.encode(value.getTime))
-        .concat(TypeAttribute.codec.encode(value.attribute))
-        .concat(TypePartId.codec.encode(value.typeParameterList))
+        .concat(Maybe.codec(TypeAttribute.codec).encode(value.attribute))
+        .concat(List.codec(TypePartId.codec).encode(value.typeParameterList))
         .concat(TypePartBody.codec.encode(value.body)),
     decode: (
       index: number,
@@ -3471,13 +3465,19 @@ export const TypePart: { readonly codec: Codec<TypePart> } = {
         readonly nextIndex: number;
       } = Time.codec.decode(createSuggestionIdAndNextIndex.nextIndex, binary);
       const attributeAndNextIndex: {
-        readonly result: TypeAttribute;
+        readonly result: Maybe<TypeAttribute>;
         readonly nextIndex: number;
-      } = TypeAttribute.codec.decode(getTimeAndNextIndex.nextIndex, binary);
+      } = Maybe.codec(TypeAttribute.codec).decode(
+        getTimeAndNextIndex.nextIndex,
+        binary
+      );
       const typeParameterListAndNextIndex: {
-        readonly result: TypePartId;
+        readonly result: ReadonlyArray<TypePartId>;
         readonly nextIndex: number;
-      } = TypePartId.codec.decode(attributeAndNextIndex.nextIndex, binary);
+      } = List.codec(TypePartId.codec).decode(
+        attributeAndNextIndex.nextIndex,
+        binary
+      );
       const bodyAndNextIndex: {
         readonly result: TypePartBody;
         readonly nextIndex: number;
@@ -3746,6 +3746,10 @@ export const Pattern: { readonly codec: Codec<Pattern> } = {
  */
 export const TypePartBodyKernel: {
   /**
+   * 関数
+   */
+  readonly Function: TypePartBodyKernel;
+  /**
    * 32bit整数
    */
   readonly Int32: TypePartBodyKernel;
@@ -3767,6 +3771,7 @@ export const TypePartBodyKernel: {
   readonly Token: (a: string) => TypePartBodyKernel;
   readonly codec: Codec<TypePartBodyKernel>;
 } = {
+  Function: { _: "Function" },
   Int32: { _: "Int32" },
   String: { _: "String" },
   Binary: { _: "Binary" },
@@ -3778,20 +3783,23 @@ export const TypePartBodyKernel: {
   codec: {
     encode: (value: TypePartBodyKernel): ReadonlyArray<number> => {
       switch (value._) {
-        case "Int32": {
+        case "Function": {
           return [0];
         }
-        case "String": {
+        case "Int32": {
           return [1];
         }
-        case "Binary": {
+        case "String": {
           return [2];
         }
+        case "Binary": {
+          return [3];
+        }
         case "Id": {
-          return [3].concat(String.codec.encode(value.string));
+          return [4].concat(String.codec.encode(value.string));
         }
         case "Token": {
-          return [4].concat(String.codec.encode(value.string));
+          return [5].concat(String.codec.encode(value.string));
         }
       }
     },
@@ -3805,23 +3813,29 @@ export const TypePartBodyKernel: {
       } = Int32.codec.decode(index, binary);
       if (patternIndex.result === 0) {
         return {
-          result: TypePartBodyKernel.Int32,
+          result: TypePartBodyKernel.Function,
           nextIndex: patternIndex.nextIndex,
         };
       }
       if (patternIndex.result === 1) {
         return {
-          result: TypePartBodyKernel.String,
+          result: TypePartBodyKernel.Int32,
           nextIndex: patternIndex.nextIndex,
         };
       }
       if (patternIndex.result === 2) {
         return {
-          result: TypePartBodyKernel.Binary,
+          result: TypePartBodyKernel.String,
           nextIndex: patternIndex.nextIndex,
         };
       }
       if (patternIndex.result === 3) {
+        return {
+          result: TypePartBodyKernel.Binary,
+          nextIndex: patternIndex.nextIndex,
+        };
+      }
+      if (patternIndex.result === 4) {
         const result: {
           readonly result: string;
           readonly nextIndex: number;
@@ -3831,7 +3845,7 @@ export const TypePartBodyKernel: {
           nextIndex: result.nextIndex,
         };
       }
-      if (patternIndex.result === 4) {
+      if (patternIndex.result === 5) {
         const result: {
           readonly result: string;
           readonly nextIndex: number;
@@ -3849,71 +3863,34 @@ export const TypePartBodyKernel: {
 /**
  * 型
  */
-export const Type: {
-  /**
-   * 関数
-   */
-  readonly Function: (a: TypeInputAndOutput) => Type;
-  /**
-   * 型パーツと, パラメーターのリスト
-   */
-  readonly TypePartWithParameter: (a: TypePartIdWithParameter) => Type;
-  readonly codec: Codec<Type>;
-} = {
-  Function: (typeInputAndOutput: TypeInputAndOutput): Type => ({
-    _: "Function",
-    typeInputAndOutput,
-  }),
-  TypePartWithParameter: (
-    typePartIdWithParameter: TypePartIdWithParameter
-  ): Type => ({ _: "TypePartWithParameter", typePartIdWithParameter }),
+export const Type: { readonly codec: Codec<Type> } = {
   codec: {
-    encode: (value: Type): ReadonlyArray<number> => {
-      switch (value._) {
-        case "Function": {
-          return [0].concat(
-            TypeInputAndOutput.codec.encode(value.typeInputAndOutput)
-          );
-        }
-        case "TypePartWithParameter": {
-          return [1].concat(
-            TypePartIdWithParameter.codec.encode(value.typePartIdWithParameter)
-          );
-        }
-      }
-    },
+    encode: (value: Type): ReadonlyArray<number> =>
+      TypePartId.codec
+        .encode(value.typePartId)
+        .concat(List.codec(Type.codec).encode(value.parameter)),
     decode: (
       index: number,
       binary: Uint8Array
     ): { readonly result: Type; readonly nextIndex: number } => {
-      const patternIndex: {
-        readonly result: number;
+      const typePartIdAndNextIndex: {
+        readonly result: TypePartId;
         readonly nextIndex: number;
-      } = Int32.codec.decode(index, binary);
-      if (patternIndex.result === 0) {
-        const result: {
-          readonly result: TypeInputAndOutput;
-          readonly nextIndex: number;
-        } = TypeInputAndOutput.codec.decode(patternIndex.nextIndex, binary);
-        return {
-          result: Type.Function(result.result),
-          nextIndex: result.nextIndex,
-        };
-      }
-      if (patternIndex.result === 1) {
-        const result: {
-          readonly result: TypePartIdWithParameter;
-          readonly nextIndex: number;
-        } = TypePartIdWithParameter.codec.decode(
-          patternIndex.nextIndex,
-          binary
-        );
-        return {
-          result: Type.TypePartWithParameter(result.result),
-          nextIndex: result.nextIndex,
-        };
-      }
-      throw new Error("存在しないパターンを指定された 型を更新してください");
+      } = TypePartId.codec.decode(index, binary);
+      const parameterAndNextIndex: {
+        readonly result: ReadonlyArray<Type>;
+        readonly nextIndex: number;
+      } = List.codec(Type.codec).decode(
+        typePartIdAndNextIndex.nextIndex,
+        binary
+      );
+      return {
+        result: {
+          typePartId: typePartIdAndNextIndex.result,
+          parameter: parameterAndNextIndex.result,
+        },
+        nextIndex: parameterAndNextIndex.nextIndex,
+      };
     },
   },
 };
@@ -3944,43 +3921,6 @@ export const TypeInputAndOutput: {
           outputType: outputTypeAndNextIndex.result,
         },
         nextIndex: outputTypeAndNextIndex.nextIndex,
-      };
-    },
-  },
-};
-
-export const TypePartIdWithParameter: {
-  readonly codec: Codec<TypePartIdWithParameter>;
-} = {
-  codec: {
-    encode: (value: TypePartIdWithParameter): ReadonlyArray<number> =>
-      TypePartId.codec
-        .encode(value.typePartId)
-        .concat(List.codec(Type.codec).encode(value.parameter)),
-    decode: (
-      index: number,
-      binary: Uint8Array
-    ): {
-      readonly result: TypePartIdWithParameter;
-      readonly nextIndex: number;
-    } => {
-      const typePartIdAndNextIndex: {
-        readonly result: TypePartId;
-        readonly nextIndex: number;
-      } = TypePartId.codec.decode(index, binary);
-      const parameterAndNextIndex: {
-        readonly result: ReadonlyArray<Type>;
-        readonly nextIndex: number;
-      } = List.codec(Type.codec).decode(
-        typePartIdAndNextIndex.nextIndex,
-        binary
-      );
-      return {
-        result: {
-          typePartId: typePartIdAndNextIndex.result,
-          parameter: parameterAndNextIndex.result,
-        },
-        nextIndex: parameterAndNextIndex.nextIndex,
       };
     },
   },
