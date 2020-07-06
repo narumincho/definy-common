@@ -8,14 +8,14 @@ import * as util from "./util";
 import { identifer } from "js-ts-code-generator";
 
 export const generateTypeDefinition = (
-  customTypeList: ReadonlyArray<data.NCustomTypeDefinition>,
+  typePartList: ReadonlyArray<data.TypePart>,
   idOrTokenTypeNameSet: util.IdAndTokenNameSet
 ): ReadonlyArray<ts.TypeAlias> => {
   return [
     codec.codecTypeDefinition(),
-    customTypeToDefinition(maybe.customTypeDefinition),
-    customTypeToDefinition(result.customTypeDefinition),
-    ...customTypeList.map(customTypeToDefinition),
+    typePartToDefinition(maybe.customTypeDefinition),
+    typePartToDefinition(result.customTypeDefinition),
+    ...typePartList.map(typePartToDefinition),
     ...[...idOrTokenTypeNameSet.id, ...idOrTokenTypeNameSet.token].map(
       hexString.typeDefinition
     ),
@@ -28,33 +28,29 @@ export const generateTypeDefinition = (
  * ========================================
  */
 
-export const customTypeToDefinition = (
-  customType: data.NCustomTypeDefinition
+export const typePartToDefinition = (
+  typePart: data.TypePart
 ): ts.TypeAlias => ({
-  name: identifer.fromString(customType.name),
-  document: customType.description,
-  typeParameterList: customType.typeParameterList.map(identifer.fromString),
-  type: customTypeDefinitionBodyToTsType(customType.body),
+  name: identifer.fromString(typePart.name),
+  document: typePart.description,
+  typeParameterList: typePart.typeParameterList.map(identifer.fromString),
+  type: customTypeDefinitionBodyToTsType(typePart.body),
 });
 
-const customTypeDefinitionBodyToTsType = (
-  body: data.NCustomTypeDefinitionBody
-): ts.Type => {
+const customTypeDefinitionBodyToTsType = (body: data.TypePartBody): ts.Type => {
   switch (body._) {
     case "Sum":
-      if (util.isTagTypeAllNoParameter(body.nPatternList)) {
+      if (util.isTagTypeAllNoParameter(body.patternList)) {
         return ts.Type.Union(
-          body.nPatternList.map((pattern) =>
-            ts.Type.StringLiteral(pattern.name)
-          )
+          body.patternList.map((pattern) => ts.Type.StringLiteral(pattern.name))
         );
       }
       return ts.Type.Union(
-        body.nPatternList.map((pattern) => patternListToObjectType(pattern))
+        body.patternList.map((pattern) => patternListToObjectType(pattern))
       );
     case "Product":
       return ts.Type.Object(
-        body.nMemberList.map((member) => ({
+        body.memberList.map((member) => ({
           name: member.name,
           required: true,
           type: util.typeToTypeScriptType(member.type),
@@ -64,7 +60,7 @@ const customTypeDefinitionBodyToTsType = (
   }
 };
 
-const patternListToObjectType = (patternList: data.NPattern): ts.Type => {
+const patternListToObjectType = (patternList: data.Pattern): ts.Type => {
   const tagField: ts.MemberType = {
     name: "_",
     required: true,

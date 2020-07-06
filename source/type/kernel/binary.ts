@@ -2,9 +2,30 @@ import * as c from "./codec";
 import * as int32 from "./int32";
 import * as ts from "js-ts-code-generator/distribution/newData";
 import * as util from "../util";
+import {
+  Maybe,
+  TypePart,
+  TypePartBody,
+  TypePartBodyKernel,
+  TypePartId,
+} from "../../data";
 import { identifer, data as tsUtil } from "js-ts-code-generator";
 
 export const name = identifer.fromString("Binary");
+
+export const typePartId = "743d625544767e750c453fa344194599" as TypePartId;
+
+export const typePart: TypePart = {
+  name: "Binary",
+  migrationPartId: Maybe.Nothing(),
+  description: "バイナリ. JavaScriptのUint8Arrayで扱える",
+  projectId: util.definyCodeProjectId,
+  createSuggestionId: util.codeSuggestionId,
+  getTime: { day: 0, millisecond: 0 },
+  attribute: Maybe.Nothing(),
+  typeParameterList: [],
+  body: TypePartBody.Kernel(TypePartBodyKernel.Binary),
+};
 
 export const type: ts.Type = tsUtil.uint8ArrayType;
 

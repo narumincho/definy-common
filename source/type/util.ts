@@ -10,7 +10,7 @@ import * as ts from "js-ts-code-generator/distribution/newData";
 import * as url from "./kernel/url";
 import { identifer } from "js-ts-code-generator";
 
-export const typeToTypeScriptType = (type_: data.NType): ts.Type => {
+export const typeToTypeScriptType = (type_: data.Type): ts.Type => {
   switch (type_._) {
     case "Int32":
       return int32.type;
@@ -64,7 +64,7 @@ export const typeToTypeScriptType = (type_: data.NType): ts.Type => {
   }
 };
 
-export const typeToMemberOrParameterName = (type_: data.NType): string => {
+export const typeToMemberOrParameterName = (type_: data.Type): string => {
   return firstLowerCase(toTypeName(type_));
 };
 
@@ -74,7 +74,7 @@ export const decodePropertyName = "decode";
 export const resultProperty = "result";
 export const nextIndexProperty = "nextIndex";
 
-export const toTypeName = (type_: data.NType): string => {
+export const toTypeName = (type_: data.Type): string => {
   switch (type_._) {
     case "Int32":
       return "Int32";
@@ -119,29 +119,29 @@ export type IdAndTokenNameSet = {
 };
 
 export const collectIdOrTokenTypeNameSet = (
-  customTypeList: ReadonlyArray<data.NCustomTypeDefinition>
+  typePartList: ReadonlyArray<data.TypePart>
 ): IdAndTokenNameSet =>
   flatIdAndTokenNameSetList(
-    customTypeList.map(collectIdOrTokenTypeNameSetInCustomType)
+    typePartList.map(collectIdOrTokenTypeNameSetInCustomType)
   );
 
 const collectIdOrTokenTypeNameSetInCustomType = (
-  customType: data.NCustomTypeDefinition
+  typePart: data.TypePart
 ): IdAndTokenNameSet => {
-  switch (customType.body._) {
+  switch (typePart.body._) {
     case "Product":
       return flatIdAndTokenNameSetList(
-        customType.body.nMemberList.map((memberNameAndType) =>
+        typePart.body.memberList.map((memberNameAndType) =>
           getIdAndTokenTypeNameInType(memberNameAndType.type)
         )
       );
     case "Sum":
-      return collectIdOrTokenTypeNameSetInSum(customType.body.nPatternList);
+      return collectIdOrTokenTypeNameSetInSum(typePart.body.patternList);
   }
 };
 
 const collectIdOrTokenTypeNameSetInSum = (
-  tagNameAndParameterList: ReadonlyArray<data.NPattern>
+  tagNameAndParameterList: ReadonlyArray<data.Pattern>
 ): IdAndTokenNameSet => {
   const idSet: Set<string> = new Set();
   const tokenSet: Set<string> = new Set();
@@ -166,7 +166,7 @@ const collectIdOrTokenTypeNameSetInSum = (
   };
 };
 
-const getIdAndTokenTypeNameInType = (type_: data.NType): IdAndTokenNameSet => {
+const getIdAndTokenTypeNameInType = (type_: data.Type): IdAndTokenNameSet => {
   switch (type_._) {
     case "Int32":
     case "String":
