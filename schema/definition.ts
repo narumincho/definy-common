@@ -950,13 +950,13 @@ export const customTypeList: ReadonlyArray<CustomTypeDefinition> = [
         name: "Id",
         description:
           "UUID (16byte) を表現する. 内部表現はとりあえず0-f長さ32の文字列",
-        parameter: Maybe.Just(Type.String),
+        parameter: Maybe.Nothing(),
       },
       {
         name: "Token",
         description:
           "sha256などでハッシュ化したもの (32byte) を表現する. 内部表現はとりあえず0-f長さ64の文字列",
-        parameter: Maybe.Just(Type.String),
+        parameter: Maybe.Nothing(),
       },
     ]),
   },

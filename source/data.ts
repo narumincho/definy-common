@@ -633,12 +633,12 @@ export type Pattern = {
  * Definyだけでは表現できないデータ型
  */
 export type TypePartBodyKernel =
-  | { readonly _: "Function" }
-  | { readonly _: "Int32" }
-  | { readonly _: "String" }
-  | { readonly _: "Binary" }
-  | { readonly _: "Id"; readonly string: string }
-  | { readonly _: "Token"; readonly string: string };
+  | "Function"
+  | "Int32"
+  | "String"
+  | "Binary"
+  | "Id"
+  | "Token";
 
 /**
  * 型
@@ -3764,25 +3764,22 @@ export const TypePartBodyKernel: {
   /**
    * UUID (16byte) を表現する. 内部表現はとりあえず0-f長さ32の文字列
    */
-  readonly Id: (a: string) => TypePartBodyKernel;
+  readonly Id: TypePartBodyKernel;
   /**
    * sha256などでハッシュ化したもの (32byte) を表現する. 内部表現はとりあえず0-f長さ64の文字列
    */
-  readonly Token: (a: string) => TypePartBodyKernel;
+  readonly Token: TypePartBodyKernel;
   readonly codec: Codec<TypePartBodyKernel>;
 } = {
-  Function: { _: "Function" },
-  Int32: { _: "Int32" },
-  String: { _: "String" },
-  Binary: { _: "Binary" },
-  Id: (string_: string): TypePartBodyKernel => ({ _: "Id", string: string_ }),
-  Token: (string_: string): TypePartBodyKernel => ({
-    _: "Token",
-    string: string_,
-  }),
+  Function: "Function",
+  Int32: "Int32",
+  String: "String",
+  Binary: "Binary",
+  Id: "Id",
+  Token: "Token",
   codec: {
     encode: (value: TypePartBodyKernel): ReadonlyArray<number> => {
-      switch (value._) {
+      switch (value) {
         case "Function": {
           return [0];
         }
@@ -3796,10 +3793,10 @@ export const TypePartBodyKernel: {
           return [3];
         }
         case "Id": {
-          return [4].concat(String.codec.encode(value.string));
+          return [4];
         }
         case "Token": {
-          return [5].concat(String.codec.encode(value.string));
+          return [5];
         }
       }
     },
@@ -3836,23 +3833,15 @@ export const TypePartBodyKernel: {
         };
       }
       if (patternIndex.result === 4) {
-        const result: {
-          readonly result: string;
-          readonly nextIndex: number;
-        } = String.codec.decode(patternIndex.nextIndex, binary);
         return {
-          result: TypePartBodyKernel.Id(result.result),
-          nextIndex: result.nextIndex,
+          result: TypePartBodyKernel.Id,
+          nextIndex: patternIndex.nextIndex,
         };
       }
       if (patternIndex.result === 5) {
-        const result: {
-          readonly result: string;
-          readonly nextIndex: number;
-        } = String.codec.decode(patternIndex.nextIndex, binary);
         return {
-          result: TypePartBodyKernel.Token(result.result),
-          nextIndex: result.nextIndex,
+          result: TypePartBodyKernel.Token,
+          nextIndex: patternIndex.nextIndex,
         };
       }
       throw new Error("存在しないパターンを指定された 型を更新してください");

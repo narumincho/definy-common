@@ -133,7 +133,7 @@ const typePartBodyKernelToTsType = (
   typePart: data.TypePart,
   kernel: data.TypePartBodyKernel
 ): ts.Type => {
-  switch (kernel._) {
+  switch (kernel) {
     case "Function":
       if (typePart.typeParameterList.length !== 2) {
         throw new Error("kernel function type need 2 type parameter");
