@@ -5,18 +5,17 @@ import * as maybe from "./kernel/maybe";
 import * as result from "./kernel/result";
 import * as ts from "js-ts-code-generator/distribution/newData";
 import * as tsUtil from "js-ts-code-generator/distribution/data";
-import * as util from "./util";
+import * as util from "../util";
 import { identifer } from "js-ts-code-generator";
 
 export const generateTypeDefinition = (
-  typePartList: ReadonlyArray<data.TypePart>,
-  idOrTokenTypeNameSet: util.IdAndTokenNameSet
+  typePartMap: ReadonlyMap<data.TypePartId, data.TypePart>
 ): ReadonlyArray<ts.TypeAlias> => {
   return [
     codec.codecTypeDefinition(),
     typePartToDefinition(maybe.customTypeDefinition),
     typePartToDefinition(result.customTypeDefinition),
-    ...typePartList.map(typePartToDefinition),
+    ...typePartMap.map(typePartToDefinition),
     ...[...idOrTokenTypeNameSet.id, ...idOrTokenTypeNameSet.token].map(
       hexString.typeDefinition
     ),

@@ -1,7 +1,7 @@
 import * as c from "./codec";
 import * as int32 from "./int32";
 import * as ts from "js-ts-code-generator/distribution/newData";
-import * as util from "../util";
+import * as util from "../../util";
 import { identifer, data as tsUtil } from "js-ts-code-generator";
 
 export const name = identifer.fromString("String");

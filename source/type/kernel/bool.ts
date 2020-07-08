@@ -1,6 +1,6 @@
 import * as c from "./codec";
 import * as ts from "js-ts-code-generator/distribution/newData";
-import * as util from "../util";
+import * as util from "../../util";
 import { identifer, data as tsUtil } from "js-ts-code-generator";
 
 const name = identifer.fromString("Bool");
