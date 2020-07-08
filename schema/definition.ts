@@ -797,7 +797,7 @@ export const customTypeList: ReadonlyArray<CustomTypeDefinition> = [
       {
         name: "typeParameterList",
         description: "型パラメーター",
-        type: Type.List(idAndToken.typePartId),
+        type: Type.List(customType.typeParameter),
       },
       {
         name: "body",

@@ -540,7 +540,7 @@ export type TypePart = {
   /**
    * 型パラメーター
    */
-  readonly typeParameterList: ReadonlyArray<TypePartId>;
+  readonly typeParameterList: ReadonlyArray<TypeParameter>;
   /**
    * 定義本体
    */
@@ -3434,7 +3434,7 @@ export const TypePart: { readonly codec: Codec<TypePart> } = {
         .concat(SuggestionId.codec.encode(value.createSuggestionId))
         .concat(Time.codec.encode(value.getTime))
         .concat(Maybe.codec(TypeAttribute.codec).encode(value.attribute))
-        .concat(List.codec(TypePartId.codec).encode(value.typeParameterList))
+        .concat(List.codec(TypeParameter.codec).encode(value.typeParameterList))
         .concat(TypePartBody.codec.encode(value.body)),
     decode: (
       index: number,
@@ -3472,9 +3472,9 @@ export const TypePart: { readonly codec: Codec<TypePart> } = {
         binary
       );
       const typeParameterListAndNextIndex: {
-        readonly result: ReadonlyArray<TypePartId>;
+        readonly result: ReadonlyArray<TypeParameter>;
         readonly nextIndex: number;
-      } = List.codec(TypePartId.codec).decode(
+      } = List.codec(TypeParameter.codec).decode(
         attributeAndNextIndex.nextIndex,
         binary
       );
