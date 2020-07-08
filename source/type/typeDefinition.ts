@@ -4,6 +4,7 @@ import * as hexString from "./kernel/hexString";
 import * as maybe from "./kernel/maybe";
 import * as result from "./kernel/result";
 import * as ts from "js-ts-code-generator/distribution/newData";
+import * as tsUtil from "js-ts-code-generator/distribution/data";
 import * as util from "./util";
 import { identifer } from "js-ts-code-generator";
 
@@ -33,30 +34,74 @@ export const typePartToDefinition = (
 ): ts.TypeAlias => ({
   name: identifer.fromString(typePart.name),
   document: typePart.description,
-  typeParameterList: typePart.typeParameterList.map(identifer.fromString),
-  type: customTypeDefinitionBodyToTsType(typePart.body),
+  typeParameterList: typePart.typeParameterList.map((typeParameter) =>
+    identifer.fromString(typeParameter.name)
+  ),
+  type: customTypeDefinitionBodyToTsType(typePart),
 });
 
-const customTypeDefinitionBodyToTsType = (body: data.TypePartBody): ts.Type => {
-  switch (body._) {
+const customTypeDefinitionBodyToTsType = (typePart: data.TypePart): ts.Type => {
+  if (typePart.attribute._ === "Just") {
+    typePartWIthAttributeToTsType(typePart, typePart.attribute.value);
+  }
+  switch (typePart.body._) {
     case "Sum":
-      if (util.isTagTypeAllNoParameter(body.patternList)) {
+      if (util.isTagTypeAllNoParameter(typePart.body.patternList)) {
         return ts.Type.Union(
-          body.patternList.map((pattern) => ts.Type.StringLiteral(pattern.name))
+          typePart.body.patternList.map((pattern) =>
+            ts.Type.StringLiteral(pattern.name)
+          )
         );
       }
       return ts.Type.Union(
-        body.patternList.map((pattern) => patternListToObjectType(pattern))
+        typePart.body.patternList.map((pattern) =>
+          patternListToObjectType(pattern)
+        )
       );
     case "Product":
       return ts.Type.Object(
-        body.memberList.map((member) => ({
+        typePart.body.memberList.map((member) => ({
           name: member.name,
           required: true,
           type: util.typeToTypeScriptType(member.type),
           document: member.description,
         }))
       );
+    case "Kernel":
+      return typePartBodyKernelToTsType(
+        typePart,
+        typePart.body.typePartBodyKernel
+      );
+  }
+};
+
+/**
+ * コンパイラに向けた属性付きのDefinyの型をTypeScriptの型に変換する
+ * @param typeAttribute
+ */
+const typePartWIthAttributeToTsType = (
+  typePart: data.TypePart,
+  typeAttribute: data.TypeAttribute
+): ts.Type => {
+  switch (typeAttribute) {
+    case "AsArray":
+      if (typePart.typeParameterList.length !== 1) {
+        throw new Error(
+          "attribute == Just(AsArray) type part need one type parameter"
+        );
+      }
+      return tsUtil.readonlyArrayType(
+        ts.Type.ScopeInFile(
+          identifer.fromString(typePart.typeParameterList[0].name)
+        )
+      );
+    case "AsBoolean":
+      if (typePart.body._ !== "Sum" || typePart.body.patternList.length !== 2) {
+        throw new Error(
+          "attribute == Just(AsBoolean) type part need sum and have 2 patterns"
+        );
+      }
+      return ts.Type.Boolean;
   }
 };
 
@@ -81,5 +126,52 @@ const patternListToObjectType = (patternList: data.Pattern): ts.Type => {
       ]);
     case "Nothing":
       return ts.Type.Object([tagField]);
+  }
+};
+
+const typePartBodyKernelToTsType = (
+  typePart: data.TypePart,
+  kernel: data.TypePartBodyKernel
+): ts.Type => {
+  switch (kernel._) {
+    case "Function":
+      if (typePart.typeParameterList.length !== 2) {
+        throw new Error("kernel function type need 2 type parameter");
+      }
+      return ts.Type.Function({
+        parameterList: [
+          ts.Type.ScopeInFile(
+            identifer.fromString(typePart.typeParameterList[0].name)
+          ),
+        ],
+        return: ts.Type.ScopeInFile(
+          identifer.fromString(typePart.typeParameterList[1].name)
+        ),
+        typeParameterList: [],
+      });
+    case "Int32":
+      return ts.Type.Intersection({
+        left: ts.Type.Number,
+        right: ts.Type.Object([
+          { name: "_int32", required: true, type: ts.Type.Never, document: "" },
+        ]),
+      });
+    case "String":
+      return ts.Type.String;
+    case "Binary":
+      return tsUtil.uint8ArrayType;
+    case "Id":
+    case "Token":
+      return ts.Type.Intersection({
+        left: ts.Type.String,
+        right: ts.Type.Object([
+          {
+            name: "_" + util.firstLowerCase(typePart.name),
+            required: true,
+            type: ts.Type.Never,
+            document: "",
+          },
+        ]),
+      });
   }
 };
