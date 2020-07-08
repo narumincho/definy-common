@@ -3,21 +3,19 @@ import * as tag from "./tag";
 import * as ts from "js-ts-code-generator/distribution/newData";
 import * as typeDefinition from "./typeDefinition";
 import * as util from "../util";
-import { identifer } from "js-ts-code-generator";
 
 export const generateTypeScriptCode = (
   customTypeMap: ReadonlyMap<data.TypePartId, data.TypePart>
 ): ts.Code => {
-  checkTypePartListValidation(customTypeMap);
-  const idOrTokenTypeNameSet = util.collectIdOrTokenTypeNameSet(customTypeMap);
+  const allTypePartIdTypePartNameMap = checkTypePartListValidation(
+    customTypeMap
+  );
   return {
     exportDefinitionList: [
       ...typeDefinition
-        .generateTypeDefinition(customTypeMap, idOrTokenTypeNameSet)
+        .generateTypeDefinition(customTypeMap)
         .map(ts.ExportDefinition.TypeAlias),
-      ...tag
-        .generate(customTypeMap, idOrTokenTypeNameSet)
-        .map(ts.ExportDefinition.Variable),
+      ...tag.generate(customTypeMap).map(ts.ExportDefinition.Variable),
     ],
     statementList: [],
   };
@@ -27,24 +25,44 @@ export const generateTypeScriptCode = (
  * 指定した型の定義が正しくできているか調べる
  * Elmの予約語判定はここではやらない
  * @throws 型の定義が正しくできていない場合
+ * @returns 型パラメーターまで含めたTypePartの名前の辞書
  */
 const checkTypePartListValidation = (
   typePartMap: ReadonlyMap<data.TypePartId, data.TypePart>
-): ReadonlyMap<data.TypePartId, ts.Type> => {
+): ReadonlyMap<data.TypePartId, string> => {
   const typeNameSet = new Set<string>();
-  const typeIdTsTypeMap = new Map<data.TypePartId, ts.Type>();
-  const typeIdTypeParameterSizeMap = new Map<data.TypePartId, number>();
+  const typePartIdSet = new Set<data.TypePartId>();
+  const typePartIdTypeParameterSizeMap = new Map<data.TypePartId, number>();
+  const allTypePartIdTypePartNameMap = new Map<data.TypePartId, string>();
   for (const [typePartId, typePart] of typePartMap) {
+    if (typePartIdSet.has(typePartId)) {
+      throw new Error(
+        "duplicate type part id. typePartId = " +
+          (typePartId as string) +
+          " typePart = " +
+          JSON.stringify(typePart)
+      );
+    }
+    typePartIdSet.add(typePartId);
     if (!util.isValidTypePartName(typePart.name)) {
-      throw new Error("custom type name is invalid. name = " + typePart.name);
+      throw new Error("type part name is invalid. name = " + typePart.name);
     }
     if (typeNameSet.has(typePart.name)) {
-      throw new Error("duplicate custom type name. name =" + typePart.name);
+      throw new Error("duplicate type part name. name =" + typePart.name);
     }
     typeNameSet.add(typePart.name);
 
+    allTypePartIdTypePartNameMap.set(typePartId, typePart.name);
+
     const typeParameterNameSet: Set<string> = new Set();
     for (const typeParameter of typePart.typeParameterList) {
+      if (typePartIdSet.has(typeParameter.typePartId)) {
+        throw new Error(
+          "duplicate type part id. (type parameter) typePartId = " +
+            (typeParameter.typePartId as string)
+        );
+      }
+      typePartIdSet.add(typeParameter.typePartId);
       if (typeParameterNameSet.has(typeParameter.name)) {
         throw new Error(
           "duplicate type parameter name. name =" + typeParameter.name
@@ -56,46 +74,56 @@ const checkTypePartListValidation = (
           "type parameter name is invalid. name =" + typeParameter.name
         );
       }
+
+      allTypePartIdTypePartNameMap.set(
+        typeParameter.typePartId,
+        typeParameter.name
+      );
     }
-    typeIdTsTypeMap.set(
-      typePartId,
-      ts.Type.ScopeInFile(identifer.fromString(typePart.name))
-    );
-    typeIdTypeParameterSizeMap.set(
+    typePartIdTypeParameterSizeMap.set(
       typePartId,
       typePart.typeParameterList.length
     );
   }
 
-  for (const [typePartId, typePart] of typePartMap) {
-    checkCustomTypeBodyValidation(typePart.body, typeIdTypeParameterSizeMap);
+  for (const typePart of typePartMap.values()) {
+    checkCustomTypeBodyValidation(
+      typePart.body,
+      typePartIdTypeParameterSizeMap,
+      new Set(
+        typePart.typeParameterList.map((parameter) => parameter.typePartId)
+      )
+    );
   }
-
-  return typeIdTsTypeMap;
+  return allTypePartIdTypePartNameMap;
 };
 
 const checkCustomTypeBodyValidation = (
   typePartBody: data.TypePartBody,
-  typeIdTypeParameterSizeMap: ReadonlyMap<data.TypePartId, number>
+  typeIdTypeParameterSizeMap: ReadonlyMap<data.TypePartId, number>,
+  typeParameterTypePartIdSet: ReadonlySet<data.TypePartId>
 ): void => {
   switch (typePartBody._) {
     case "Product":
       checkProductTypeValidation(
         typePartBody.memberList,
-        typeIdTypeParameterSizeMap
+        typeIdTypeParameterSizeMap,
+        typeParameterTypePartIdSet
       );
       return;
     case "Sum":
       checkSumTypeValidation(
         typePartBody.patternList,
-        typeIdTypeParameterSizeMap
+        typeIdTypeParameterSizeMap,
+        typeParameterTypePartIdSet
       );
   }
 };
 
 const checkProductTypeValidation = (
   memberList: ReadonlyArray<data.Member>,
-  typeIdTypeParameterSizeMap: ReadonlyMap<data.TypePartId, number>
+  typeIdTypeParameterSizeMap: ReadonlyMap<data.TypePartId, number>,
+  typeParameterTypePartIdSet: ReadonlySet<data.TypePartId>
 ): void => {
   const memberNameSet: Set<string> = new Set();
   for (const member of memberList) {
@@ -107,13 +135,18 @@ const checkProductTypeValidation = (
     if (!util.isFirstLowerCaseName(member.name)) {
       throw new Error("member name is invalid. name =" + member.name);
     }
-    checkTypeValidation(member.type, typeIdTypeParameterSizeMap);
+    checkTypeValidation(
+      member.type,
+      typeIdTypeParameterSizeMap,
+      typeParameterTypePartIdSet
+    );
   }
 };
 
 const checkSumTypeValidation = (
   patternList: ReadonlyArray<data.Pattern>,
-  typeIdTypeParameterSizeMap: ReadonlyMap<data.TypePartId, number>
+  typeIdTypeParameterSizeMap: ReadonlyMap<data.TypePartId, number>,
+  typeParameterTypePartIdSet: ReadonlySet<data.TypePartId>
 ): void => {
   const tagNameSet: Set<string> = new Set();
   for (const pattern of patternList) {
@@ -126,21 +159,25 @@ const checkSumTypeValidation = (
       throw new Error("tag name is invalid. name =" + pattern.name);
     }
     if (pattern.parameter._ === "Just") {
-      checkTypeValidation(pattern.parameter.value, typeIdTypeParameterSizeMap);
+      checkTypeValidation(
+        pattern.parameter.value,
+        typeIdTypeParameterSizeMap,
+        typeParameterTypePartIdSet
+      );
     }
   }
 };
 
 const checkTypeValidation = (
   type: data.Type,
-  typeIdTypeParameterSizeMap: ReadonlyMap<data.TypePartId, number>
+  typeIdTypeParameterSizeMap: ReadonlyMap<data.TypePartId, number>,
+  typeParameterTypePartIdSet: ReadonlySet<data.TypePartId>
 ): void => {
-  const typeParameterSize = typeIdTypeParameterSizeMap.get(type.typePartId);
-  if (typeParameterSize === undefined) {
-    throw new Error(
-      "typePart (typePartId =" + (type.typePartId as string) + ") is not found"
-    );
-  }
+  const typeParameterSize = typeParamterCountFromTypePartId(
+    type.typePartId,
+    typeIdTypeParameterSizeMap,
+    typeParameterTypePartIdSet
+  );
   if (typeParameterSize !== type.parameter.length) {
     throw new Error(
       "type parameter size not match. type part need " +
@@ -150,4 +187,22 @@ const checkTypeValidation = (
         "parameter(s)"
     );
   }
+};
+
+const typeParamterCountFromTypePartId = (
+  typePartId: data.TypePartId,
+  typeIdTypeParameterSizeMap: ReadonlyMap<data.TypePartId, number>,
+  typeParameterTypePartIdSet: ReadonlySet<data.TypePartId>
+) => {
+  const typeParameterSize = typeIdTypeParameterSizeMap.get(typePartId);
+  if (typeParameterSize !== undefined) {
+    return typeParameterSize;
+  }
+  const existTypeParamter = typeParameterTypePartIdSet.has(typePartId);
+  if (existTypeParamter) {
+    return 0;
+  }
+  throw new Error(
+    "typePart (typePartId =" + (typePartId as string) + ") is not found"
+  );
 };

@@ -1,23 +1,18 @@
 import * as codec from "./kernel/codec";
 import * as data from "../data";
-import * as hexString from "./kernel/hexString";
-import * as maybe from "./kernel/maybe";
-import * as result from "./kernel/result";
 import * as ts from "js-ts-code-generator/distribution/newData";
 import * as tsUtil from "js-ts-code-generator/distribution/data";
 import * as util from "../util";
 import { identifer } from "js-ts-code-generator";
 
 export const generateTypeDefinition = (
-  typePartMap: ReadonlyMap<data.TypePartId, data.TypePart>
+  typePartMap: ReadonlyMap<data.TypePartId, data.TypePart>,
+  allTypePartIdTypePartNameMap: ReadonlyMap<data.TypePartId, string>
 ): ReadonlyArray<ts.TypeAlias> => {
   return [
     codec.codecTypeDefinition(),
-    typePartToDefinition(maybe.customTypeDefinition),
-    typePartToDefinition(result.customTypeDefinition),
-    ...typePartMap.map(typePartToDefinition),
-    ...[...idOrTokenTypeNameSet.id, ...idOrTokenTypeNameSet.token].map(
-      hexString.typeDefinition
+    ...[...typePartMap].map(([typePartId, typePart]) =>
+      typePartToDefinition(typePartId, typePart, allTypePartIdTypePartNameMap)
     ),
   ];
 };
@@ -29,17 +24,25 @@ export const generateTypeDefinition = (
  */
 
 export const typePartToDefinition = (
-  typePart: data.TypePart
+  typePartId: data.TypePartId,
+  typePart: data.TypePart,
+  allTypePartIdTypePartNameMap: ReadonlyMap<data.TypePartId, string>
 ): ts.TypeAlias => ({
   name: identifer.fromString(typePart.name),
-  document: typePart.description,
+  document: typePart.description + "\n @typePartId" + (typePartId as string),
   typeParameterList: typePart.typeParameterList.map((typeParameter) =>
     identifer.fromString(typeParameter.name)
   ),
-  type: customTypeDefinitionBodyToTsType(typePart),
+  type: customTypeDefinitionBodyToTsType(
+    typePart,
+    allTypePartIdTypePartNameMap
+  ),
 });
 
-const customTypeDefinitionBodyToTsType = (typePart: data.TypePart): ts.Type => {
+const customTypeDefinitionBodyToTsType = (
+  typePart: data.TypePart,
+  allTypePartIdTypePartNameMap: ReadonlyMap<data.TypePartId, string>
+): ts.Type => {
   if (typePart.attribute._ === "Just") {
     typePartWIthAttributeToTsType(typePart, typePart.attribute.value);
   }
@@ -54,7 +57,7 @@ const customTypeDefinitionBodyToTsType = (typePart: data.TypePart): ts.Type => {
       }
       return ts.Type.Union(
         typePart.body.patternList.map((pattern) =>
-          patternListToObjectType(pattern)
+          patternListToObjectType(pattern, allTypePartIdTypePartNameMap)
         )
       );
     case "Product":
@@ -62,7 +65,7 @@ const customTypeDefinitionBodyToTsType = (typePart: data.TypePart): ts.Type => {
         typePart.body.memberList.map((member) => ({
           name: member.name,
           required: true,
-          type: util.typeToTypeScriptType(member.type),
+          type: util.typeToTsType(member.type, allTypePartIdTypePartNameMap),
           document: member.description,
         }))
       );
@@ -104,7 +107,10 @@ const typePartWIthAttributeToTsType = (
   }
 };
 
-const patternListToObjectType = (patternList: data.Pattern): ts.Type => {
+const patternListToObjectType = (
+  patternList: data.Pattern,
+  allTypePartIdTypePartNameMap: ReadonlyMap<data.TypePartId, string>
+): ts.Type => {
   const tagField: ts.MemberType = {
     name: "_",
     required: true,
@@ -117,10 +123,16 @@ const patternListToObjectType = (patternList: data.Pattern): ts.Type => {
       return ts.Type.Object([
         tagField,
         {
-          name: util.typeToMemberOrParameterName(patternList.parameter.value),
+          name: util.typeToMemberOrParameterName(
+            patternList.parameter.value,
+            allTypePartIdTypePartNameMap
+          ),
           required: true,
           document: "",
-          type: util.typeToTypeScriptType(patternList.parameter.value),
+          type: util.typeToTsType(
+            patternList.parameter.value,
+            allTypePartIdTypePartNameMap
+          ),
         },
       ]);
     case "Nothing":

@@ -12,7 +12,8 @@ import * as util from "../util";
 import { identifer, data as tsUtil } from "js-ts-code-generator";
 
 export const generate = (
-  typePartMap: ReadonlyMap<data.TypePartId, data.TypePart>
+  typePartMap: ReadonlyMap<data.TypePartId, data.TypePart>,
+  allTypePartIdTypePartNameMap: ReadonlyMap<data.TypePartId, string>
 ): ReadonlyArray<ts.Variable> => {
   return [
     int32.variableDefinition(),
@@ -23,13 +24,9 @@ export const generate = (
     hexString.idKernelExprDefinition,
     hexString.tokenKernelExprDefinition,
     url.variableDefinition(),
-    ...[...idAndTokenNameSet.id].map((name) =>
-      hexString.idVariableDefinition(name)
+    ...[...typePartMap].map(([typePartId, typePart]) =>
+      typePartToTagVariable(typePartId, typePart)
     ),
-    ...[...idAndTokenNameSet.token].map((name) =>
-      hexString.tokenVariableDefinition(name)
-    ),
-    ...typePartList.map(typePartToTagVariable),
   ];
 };
 
@@ -53,10 +50,13 @@ export const customTypeVar = (
 ): ts.Expr =>
   ts.Expr.Variable(customTypeNameIdentifer(customTypeName, tagName));
 
-const typePartToTagVariable = (typePart: data.TypePart): ts.Variable => {
+const typePartToTagVariable = (
+  typePartId: data.TypePartId,
+  typePart: data.TypePart
+): ts.Variable => {
   return {
     name: identifer.fromString(typePart.name),
-    document: typePart.description,
+    document: typePart.description + "\n@typePartId" + (typePartId as string),
     type: customTypeDefinitionToType(typePart),
     expr: customTypeDefinitionToExpr(typePart),
   };
@@ -146,7 +146,7 @@ const tagNameAndParameterToTagExprType = (
     case "Just":
       return ts.Type.Function({
         typeParameterList: typeParameterIdentiferList,
-        parameterList: [util.typeToTypeScriptType(pattern.parameter.value)],
+        parameterList: [util.typeToTsType(pattern.parameter.value)],
         return: returnType,
       });
 
@@ -188,7 +188,7 @@ const patternToTagExpr = (
         parameterList: [
           {
             name: parameterIdentifer,
-            type: util.typeToTypeScriptType(pattern.parameter.value),
+            type: util.typeToTsType(pattern.parameter.value),
           },
         ],
         returnType,
@@ -433,7 +433,7 @@ const productDecodeDefinitionStatementList = (
             isConst: true,
             name: resultAndNextIndexName,
             type: codec.decodeReturnType(
-              util.typeToTypeScriptType(memberNameAndType.type)
+              util.typeToTsType(memberNameAndType.type)
             ),
             expr: decodeExprUse(
               memberNameAndType.type,
@@ -523,7 +523,7 @@ const tagNameAndParameterCode = (
             isConst: true,
             name: identifer.fromString("result"),
             type: codec.decodeReturnType(
-              util.typeToTypeScriptType(pattern.parameter.value)
+              util.typeToTsType(pattern.parameter.value)
             ),
             expr: decodeExprUse(
               pattern.parameter.value,
