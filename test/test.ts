@@ -1,5 +1,6 @@
 import * as data from "../source/data";
 import * as main from "../source/main";
+import * as util from "../source/util";
 
 describe("test", () => {
   it("https://definy.app/ is Home in English", () => {
@@ -78,7 +79,7 @@ describe("test", () => {
     );
   });
   it("stringToTypePartName", () => {
-    expect(main.stringToTypePartName("Definy is web  app! for.web::App")).toBe(
+    expect(util.stringToTypePartName("Definy is web  app! for.web::App")).toBe(
       "definyIsWebAppForWebApp"
     );
   });
@@ -127,10 +128,10 @@ describe("test", () => {
      *
      * = (add (addOneHundred one)) one
      */
-    const intType: data.Type = data.Type.TypePartWithParameter({
+    const intType: data.Type = {
       typePartId: "int" as data.TypePartId,
       parameter: [],
-    });
+    };
     const oneName = "0" as data.PartId;
     const addOneHundredName = "1" as data.PartId;
     const result = main.evaluateSuggestionExpr(
@@ -142,7 +143,7 @@ describe("test", () => {
             {
               name: "one",
               description: "1を表す",
-              parentList: [],
+              migrationPartId: data.Maybe.Nothing(),
               type: intType,
               expr: data.Expr.Int32Literal(1),
               createSuggestionId: "oneCreateSuggestionId" as data.SuggestionId,
@@ -158,7 +159,7 @@ describe("test", () => {
             {
               name: "addOneHundred",
               description: "100を足す関数",
-              parentList: [],
+              migrationPartId: data.Maybe.Nothing(),
               type: intType,
               expr: data.Expr.FunctionCall({
                 function: data.Expr.Kernel("Int32Add"),

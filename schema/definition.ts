@@ -532,11 +532,6 @@ export const customTypeList: ReadonlyArray<CustomTypeDefinition> = [
     typeParameterList: [],
     body: CustomTypeDefinitionBody.Sum([
       {
-        name: "Function",
-        description: "関数",
-        parameter: Maybe.Just(customType.suggestionTypeInputAndOutput),
-      },
-      {
         name: "TypePartWithParameter",
         description: "提案前に作られた型パーツとパラメーター",
         parameter: Maybe.Just(customType.typePartWithSuggestionTypeParameter),

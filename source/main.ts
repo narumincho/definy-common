@@ -271,18 +271,10 @@ const branchPartDefinitionToSuggestion = (
 });
 
 const typeToSuggestion = (type: data.Type): data.SuggestionType => {
-  switch (type._) {
-    case "Function":
-      return data.SuggestionType.Function({
-        inputType: typeToSuggestion(type.typeInputAndOutput.inputType),
-        outputType: typeToSuggestion(type.typeInputAndOutput.outputType),
-      });
-    case "TypePartWithParameter":
-      return data.SuggestionType.TypePartWithParameter({
-        parameter: type.typePartIdWithParameter.parameter.map(typeToSuggestion),
-        typePartId: type.typePartIdWithParameter.typePartId,
-      });
-  }
+  return data.SuggestionType.TypePartWithParameter({
+    parameter: type.parameter.map(typeToSuggestion),
+    typePartId: type.typePartId,
+  });
 };
 
 type SourceAndCache = {

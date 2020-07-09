@@ -358,10 +358,6 @@ export type AddPart = {
  */
 export type SuggestionType =
   | {
-      readonly _: "Function";
-      readonly suggestionTypeInputAndOutput: SuggestionTypeInputAndOutput;
-    }
-  | {
       readonly _: "TypePartWithParameter";
       readonly typePartWithSuggestionTypeParameter: TypePartWithSuggestionTypeParameter;
     }
@@ -2764,10 +2760,6 @@ export const AddPart: { readonly codec: Codec<AddPart> } = {
  */
 export const SuggestionType: {
   /**
-   * 関数
-   */
-  readonly Function: (a: SuggestionTypeInputAndOutput) => SuggestionType;
-  /**
    * 提案前に作られた型パーツとパラメーター
    */
   readonly TypePartWithParameter: (
@@ -2781,9 +2773,6 @@ export const SuggestionType: {
   ) => SuggestionType;
   readonly codec: Codec<SuggestionType>;
 } = {
-  Function: (
-    suggestionTypeInputAndOutput: SuggestionTypeInputAndOutput
-  ): SuggestionType => ({ _: "Function", suggestionTypeInputAndOutput }),
   TypePartWithParameter: (
     typePartWithSuggestionTypeParameter: TypePartWithSuggestionTypeParameter
   ): SuggestionType => ({
@@ -2799,22 +2788,15 @@ export const SuggestionType: {
   codec: {
     encode: (value: SuggestionType): ReadonlyArray<number> => {
       switch (value._) {
-        case "Function": {
-          return [0].concat(
-            SuggestionTypeInputAndOutput.codec.encode(
-              value.suggestionTypeInputAndOutput
-            )
-          );
-        }
         case "TypePartWithParameter": {
-          return [1].concat(
+          return [0].concat(
             TypePartWithSuggestionTypeParameter.codec.encode(
               value.typePartWithSuggestionTypeParameter
             )
           );
         }
         case "SuggestionTypePartWithParameter": {
-          return [2].concat(
+          return [1].concat(
             SuggestionTypePartWithSuggestionTypeParameter.codec.encode(
               value.suggestionTypePartWithSuggestionTypeParameter
             )
@@ -2832,19 +2814,6 @@ export const SuggestionType: {
       } = Int32.codec.decode(index, binary);
       if (patternIndex.result === 0) {
         const result: {
-          readonly result: SuggestionTypeInputAndOutput;
-          readonly nextIndex: number;
-        } = SuggestionTypeInputAndOutput.codec.decode(
-          patternIndex.nextIndex,
-          binary
-        );
-        return {
-          result: SuggestionType.Function(result.result),
-          nextIndex: result.nextIndex,
-        };
-      }
-      if (patternIndex.result === 1) {
-        const result: {
           readonly result: TypePartWithSuggestionTypeParameter;
           readonly nextIndex: number;
         } = TypePartWithSuggestionTypeParameter.codec.decode(
@@ -2856,7 +2825,7 @@ export const SuggestionType: {
           nextIndex: result.nextIndex,
         };
       }
-      if (patternIndex.result === 2) {
+      if (patternIndex.result === 1) {
         const result: {
           readonly result: SuggestionTypePartWithSuggestionTypeParameter;
           readonly nextIndex: number;
