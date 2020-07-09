@@ -118,11 +118,14 @@ const typePartToVariableExpr = (
   typePart: data.TypePart,
   allTypePartIdTypePartNameMap: ReadonlyMap<data.TypePartId, string>
 ): ts.Expr => {
+  const codecMember = typePartToCodecMember(
+    typePart,
+    allTypePartIdTypePartNameMap
+  );
   switch (typePart.body._) {
     case "Product":
-      return ts.Expr.ObjectLiteral(
-        typePartToCodecMember(typePart, allTypePartIdTypePartNameMap)
-      );
+    case "Kernel":
+      return ts.Expr.ObjectLiteral(codecMember);
 
     case "Sum": {
       const { patternList } = typePart.body;
@@ -141,12 +144,9 @@ const typePartToVariableExpr = (
                   ),
             })
           )
-          .concat(typePartToCodecMember(typePart, allTypePartIdTypePartNameMap))
+          .concat(codecMember)
       );
     }
-    case "Kernel":
-      // TODO
-      return ts.Expr.StringLiteral("Kernelの変数出力は調整中");
   }
 };
 
@@ -321,8 +321,10 @@ const encodeExprDefinition = (
             allTypePartIdTypePartNameMap
           );
         case "Kernel":
-          // TODO
-          return [];
+          return kernelEncodeDefinitionStatementList(
+            typePart.body.typePartBodyKernel,
+            valueVar
+          );
       }
     }
   );
@@ -417,6 +419,26 @@ const patternToSwitchPattern = (
   };
 };
 
+const kernelEncodeDefinitionStatementList = (
+  typePartBodyKernel: data.TypePartBodyKernel,
+  valueVar: ts.Expr
+): ReadonlyArray<ts.Statement> => {
+  switch (typePartBodyKernel) {
+    case "Function":
+      throw new Error("cannot encode function");
+    case "Int32":
+      return int32.encodeDefinitionStatementList(valueVar);
+    case "String":
+      return kernelString.encodeDefinitionStatementList(valueVar);
+    case "Binary":
+      return binary.encodeDefinitionStatementList(valueVar);
+    case "Id":
+      return hexString.idEncodeDefinitionStatementList(valueVar);
+    case "Token":
+      return hexString.tokenEncodeDefinitionStatementList(valueVar);
+  }
+};
+
 /**
  * Decode Definition
  */
@@ -450,8 +472,12 @@ const decodeExprDefinition = (
             allTypePartIdTypePartNameMap
           );
         case "Kernel":
-          // TODO
-          return [];
+          return kernelDecodeDefinitionStatementList(
+            typePart.body.typePartBodyKernel,
+            typePart,
+            parameterIndex,
+            parameterBinary
+          );
       }
     }
   );
@@ -625,6 +651,45 @@ const tagNameAndParameterCode = (
           ),
         ],
       });
+  }
+};
+
+const kernelDecodeDefinitionStatementList = (
+  typePartBodyKernel: data.TypePartBodyKernel,
+  typePart: data.TypePart,
+  parameterIndex: ts.Expr,
+  parameterBinary: ts.Expr
+): ReadonlyArray<ts.Statement> => {
+  switch (typePartBodyKernel) {
+    case "Function":
+      throw new Error("cannot decode function");
+    case "Int32":
+      return int32.decodeDefinitionStatementList(
+        parameterIndex,
+        parameterBinary
+      );
+    case "String":
+      return kernelString.decodeDefinitionStatementList(
+        parameterIndex,
+        parameterBinary
+      );
+    case "Binary":
+      return binary.decodeDefinitionStatementList(
+        parameterIndex,
+        parameterBinary
+      );
+    case "Id":
+      return hexString.idDecodeDefinitionStatementList(
+        typePart.name,
+        parameterIndex,
+        parameterBinary
+      );
+    case "Token":
+      return hexString.tokenDecodeDefinitionStatementList(
+        typePart.name,
+        parameterIndex,
+        parameterBinary
+      );
   }
 };
 

@@ -23,11 +23,13 @@ export const exprDefinition = (): ts.Variable =>
 
 const globalProcess = ts.Expr.GlobalObjects(identifer.fromString("process"));
 
-const encodeDefinition = (): ts.Expr => {
+export const encodeDefinitionStatementList = (
+  valueVar: ts.Expr
+): ReadonlyArray<ts.Statement> => {
   const resultName = identifer.fromString("result");
   const resultVar = ts.Expr.Variable(resultName);
 
-  return c.encodeLambda(type, (valueVar) => [
+  return [
     ts.Statement.VariableDefinition({
       isConst: true,
       name: resultName,
@@ -68,10 +70,13 @@ const encodeDefinition = (): ts.Expr => {
         [resultVar]
       )
     ),
-  ]);
+  ];
 };
 
-const decodeDefinition = (): ts.Expr => {
+export const decodeDefinitionStatementList = (
+  parameterIndex: ts.Expr,
+  parameterBinary: ts.Expr
+): ReadonlyArray<ts.Statement> => {
   const lengthName = identifer.fromString("length");
   const lengthVar = ts.Expr.Variable(lengthName);
   const nextIndexName = identifer.fromString("nextIndex");
@@ -80,7 +85,7 @@ const decodeDefinition = (): ts.Expr => {
   const textBinaryVar = ts.Expr.Variable(textBinaryName);
   const isBrowserName = identifer.fromString("isBrowser");
 
-  return c.decodeLambda(type, (parameterIndex, parameterBinary) => [
+  return [
     ts.Statement.VariableDefinition({
       isConst: true,
       name: lengthName,
@@ -144,5 +149,5 @@ const decodeDefinition = (): ts.Expr => {
       ),
       nextIndexVar
     ),
-  ]);
+  ];
 };

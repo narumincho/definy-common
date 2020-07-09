@@ -42,24 +42,26 @@ export const variableDefinition = (): ts.Variable =>
     decodeDefinition()
   );
 
-const encodeDefinition = (): ts.Expr =>
-  c.encodeLambda(type, (valueVar) => [
-    ts.Statement.Return(
-      tsUtil.callMethod(
-        int32.encode(tsUtil.get(valueVar, "length")),
-        "concat",
-        [ts.Expr.ArrayLiteral([{ expr: valueVar, spread: true }])]
-      )
-    ),
-  ]);
+export const encodeDefinitionStatementList = (
+  valueVar: ts.Expr
+): ReadonlyArray<ts.Statement> => [
+  ts.Statement.Return(
+    tsUtil.callMethod(int32.encode(tsUtil.get(valueVar, "length")), "concat", [
+      ts.Expr.ArrayLiteral([{ expr: valueVar, spread: true }]),
+    ])
+  ),
+];
 
-const decodeDefinition = (): ts.Expr => {
+export const decodeDefinitionStatementList = (
+  parameterIndex: ts.Expr,
+  parameterBinary: ts.Expr
+): ReadonlyArray<ts.Statement> => {
   const lengthName = identifer.fromString("length");
   const lengthVar = ts.Expr.Variable(lengthName);
   const nextIndexName = identifer.fromString("nextIndex");
   const nextIndexVar = ts.Expr.Variable(nextIndexName);
 
-  return c.decodeLambda(type, (parameterIndex, parameterBinary) => [
+  return [
     ts.Statement.VariableDefinition({
       isConst: true,
       name: lengthName,
@@ -79,5 +81,5 @@ const decodeDefinition = (): ts.Expr => {
       ]),
       nextIndexVar
     ),
-  ]);
+  ];
 };
