@@ -13,9 +13,11 @@ export const generateTypeScriptCode = (
   return {
     exportDefinitionList: [
       ...typeDefinition
-        .generateTypeDefinition(customTypeMap)
+        .generateTypeDefinition(customTypeMap, allTypePartIdTypePartNameMap)
         .map(ts.ExportDefinition.TypeAlias),
-      ...tag.generate(customTypeMap).map(ts.ExportDefinition.Variable),
+      ...tag
+        .generate(customTypeMap, allTypePartIdTypePartNameMap)
+        .map(ts.ExportDefinition.Variable),
     ],
     statementList: [],
   };
