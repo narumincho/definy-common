@@ -1,11 +1,11 @@
-import * as util from "../../util";
+import * as util from "../util";
 import {
   Maybe,
   TypeAttribute,
   TypePart,
   TypePartBody,
   TypePartId,
-} from "../../data";
+} from "../data";
 
 export const typePartId = "93e91ed730b5e7689250a76096ae60a4" as TypePartId;
 

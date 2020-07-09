@@ -1,5 +1,5 @@
-import { Maybe, TypePart, TypePartBody, TypePartId } from "../../data";
-import { util } from "../../main";
+import * as util from "../util";
+import { Maybe, TypePart, TypePartBody, TypePartId } from "../data";
 
 export const typePartId = "cdd7dd74dd0f2036b44dcae6aaac46f5" as TypePartId;
 
