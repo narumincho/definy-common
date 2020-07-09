@@ -1,7 +1,7 @@
 import * as data from "../data";
 import * as tag from "./tag";
 import * as ts from "js-ts-code-generator/distribution/newData";
-import * as typeDefinition from "./typeDefinition";
+import * as typeAlias from "./typeAlias";
 import * as util from "../util";
 
 export const generateTypeScriptCode = (
@@ -10,8 +10,8 @@ export const generateTypeScriptCode = (
   const allTypePartIdTypePartNameMap = checkTypePartListValidation(typePartMap);
   return {
     exportDefinitionList: [
-      ...typeDefinition
-        .generateTypeDefinition(typePartMap, allTypePartIdTypePartNameMap)
+      ...typeAlias
+        .typePartMapToTypeAlias(typePartMap, allTypePartIdTypePartNameMap)
         .map(ts.ExportDefinition.TypeAlias),
       ...tag
         .generate(typePartMap, allTypePartIdTypePartNameMap)

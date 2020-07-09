@@ -5,25 +5,19 @@ import * as tsUtil from "js-ts-code-generator/distribution/data";
 import * as util from "../util";
 import { identifer } from "js-ts-code-generator";
 
-export const generateTypeDefinition = (
+export const typePartMapToTypeAlias = (
   typePartMap: ReadonlyMap<data.TypePartId, data.TypePart>,
   allTypePartIdTypePartNameMap: ReadonlyMap<data.TypePartId, string>
 ): ReadonlyArray<ts.TypeAlias> => {
   return [
-    codec.codecTypeDefinition(),
+    codec.codecTypeAlias(),
     ...[...typePartMap].map(([typePartId, typePart]) =>
-      typePartToDefinition(typePartId, typePart, allTypePartIdTypePartNameMap)
+      typePartToTypeAlias(typePartId, typePart, allTypePartIdTypePartNameMap)
     ),
   ];
 };
 
-/*
- * ========================================
- *             Custom Type
- * ========================================
- */
-
-export const typePartToDefinition = (
+export const typePartToTypeAlias = (
   typePartId: data.TypePartId,
   typePart: data.TypePart,
   allTypePartIdTypePartNameMap: ReadonlyMap<data.TypePartId, string>

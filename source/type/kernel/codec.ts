@@ -33,7 +33,7 @@ export const codecType = (type_: ts.Type): ts.Type =>
     typeParameterList: [type_],
   });
 
-export const codecTypeDefinition = (): ts.TypeAlias => {
+export const codecTypeAlias = (): ts.TypeAlias => {
   const typeParameterIdentifer = identifer.fromString("T");
   return {
     name: codecName,
