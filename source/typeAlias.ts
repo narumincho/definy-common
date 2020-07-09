@@ -1,8 +1,8 @@
-import * as codec from "./kernel/codec";
-import * as data from "../data";
+import * as codec from "./kernelType/codec";
+import * as data from "./data";
 import * as ts from "js-ts-code-generator/distribution/newData";
 import * as tsUtil from "js-ts-code-generator/distribution/data";
-import * as util from "../util";
+import * as util from "./util";
 import { identifer } from "js-ts-code-generator";
 
 export const typePartMapToTypeAlias = (
