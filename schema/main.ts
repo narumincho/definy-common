@@ -1,7 +1,7 @@
 import * as codeGen from "js-ts-code-generator";
 import * as definition from "./definition";
 import * as fs from "fs";
-import * as nt from "../source/type/main";
+import * as nt from "@narumincho/type";
 import * as prettier from "prettier";
 
 const typeScriptCode = codeGen.generateCodeAsString(

@@ -1,4 +1,6 @@
 /// @ts-check
+/* eslint-disable @typescript-eslint/no-var-requires */
+/* eslint-disable @typescript-eslint/no-require-imports */
 
 const ts = require("typescript");
 
@@ -15,4 +17,4 @@ ts.createProgram({
   },
 }).emit();
 
-require("./schemaJs/schema/main.js");
+require("../schemaJs/main.js");

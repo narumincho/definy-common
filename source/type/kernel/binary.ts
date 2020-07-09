@@ -1,44 +1,51 @@
 import * as c from "./codec";
 import * as int32 from "./int32";
 import * as ts from "js-ts-code-generator/distribution/newData";
-import * as util from "../util";
+import * as util from "../../util";
+import {
+  Maybe,
+  TypePart,
+  TypePartBody,
+  TypePartBodyKernel,
+  TypePartId,
+} from "../../data";
 import { identifer, data as tsUtil } from "js-ts-code-generator";
 
-export const name = identifer.fromString("Binary");
+export const typePartId = "743d625544767e750c453fa344194599" as TypePartId;
 
-export const type: ts.Type = tsUtil.uint8ArrayType;
+export const typePart: TypePart = {
+  name: "Binary",
+  migrationPartId: Maybe.Nothing(),
+  description:
+    "バイナリ. JavaScriptのUint8Arrayで扱える. 最初にLED128でバイト数, その次にバイナリそのまま",
+  projectId: util.definyCodeProjectId,
+  createSuggestionId: util.codeSuggestionId,
+  getTime: { day: 0, millisecond: 0 },
+  attribute: Maybe.Nothing(),
+  typeParameterList: [],
+  body: TypePartBody.Kernel(TypePartBodyKernel.Binary),
+};
 
-export const codec = (): ts.Expr =>
-  tsUtil.get(ts.Expr.Variable(name), util.codecPropertyName);
+export const encodeDefinitionStatementList = (
+  valueVar: ts.Expr
+): ReadonlyArray<ts.Statement> => [
+  ts.Statement.Return(
+    tsUtil.callMethod(int32.encode(tsUtil.get(valueVar, "length")), "concat", [
+      ts.Expr.ArrayLiteral([{ expr: valueVar, spread: true }]),
+    ])
+  ),
+];
 
-export const variableDefinition = (): ts.Variable =>
-  c.variableDefinition(
-    name,
-    type,
-    "バイナリ. JavaScriptのUint8Arrayで扱える",
-    "最初にLED128でバイト数, その次にバイナリそのまま",
-    encodeDefinition(),
-    decodeDefinition()
-  );
-
-const encodeDefinition = (): ts.Expr =>
-  c.encodeLambda(type, (valueVar) => [
-    ts.Statement.Return(
-      tsUtil.callMethod(
-        int32.encode(tsUtil.get(valueVar, "length")),
-        "concat",
-        [ts.Expr.ArrayLiteral([{ expr: valueVar, spread: true }])]
-      )
-    ),
-  ]);
-
-const decodeDefinition = (): ts.Expr => {
+export const decodeDefinitionStatementList = (
+  parameterIndex: ts.Expr,
+  parameterBinary: ts.Expr
+): ReadonlyArray<ts.Statement> => {
   const lengthName = identifer.fromString("length");
   const lengthVar = ts.Expr.Variable(lengthName);
   const nextIndexName = identifer.fromString("nextIndex");
   const nextIndexVar = ts.Expr.Variable(nextIndexName);
 
-  return c.decodeLambda(type, (parameterIndex, parameterBinary) => [
+  return [
     ts.Statement.VariableDefinition({
       isConst: true,
       name: lengthName,
@@ -58,5 +65,5 @@ const decodeDefinition = (): ts.Expr => {
       ]),
       nextIndexVar
     ),
-  ]);
+  ];
 };

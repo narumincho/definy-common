@@ -1,30 +1,30 @@
-import * as ts from "js-ts-code-generator/distribution/newData";
-import {
-  Maybe,
-  NCustomTypeDefinition,
-  NCustomTypeDefinitionBody,
-  NType,
-} from "../../data";
-import { identifer } from "js-ts-code-generator";
+import { Maybe, TypePart, TypePartBody, TypePartId } from "../../data";
+import { util } from "../../main";
 
-const name = "Maybe";
+export const typePartId = "cdd7dd74dd0f2036b44dcae6aaac46f5" as TypePartId;
 
-export const type = (elementType: ts.Type): ts.Type =>
-  ts.Type.WithTypeParameter({
-    type: ts.Type.ScopeInFile(identifer.fromString(name)),
-    typeParameterList: [elementType],
-  });
+const valueTypePartId = "7340e6b552af43695335a64e057f4250" as TypePartId;
 
-export const customTypeDefinition: NCustomTypeDefinition = {
-  name,
-  typeParameterList: ["value"],
+export const typePart: TypePart = {
+  name: "Maybe",
+  migrationPartId: Maybe.Nothing(),
   description:
-    "Maybe. nullableのようなもの. Elmに標準で定義されているものに変換をするためにデフォルトで用意した",
-  body: NCustomTypeDefinitionBody.Sum([
+    "Maybe. nullableのようなもの. 今後はRustのstd::Optionに出力するために属性をつける?",
+  projectId: util.definyCodeProjectId,
+  createSuggestionId: util.codeSuggestionId,
+  getTime: { day: 0, millisecond: 0 },
+  attribute: Maybe.Nothing(),
+  typeParameterList: [
+    {
+      typePartId: valueTypePartId,
+      name: "value",
+    },
+  ],
+  body: TypePartBody.Sum([
     {
       name: "Just",
       description: "値があるということ",
-      parameter: Maybe.Just(NType.Parameter("value")),
+      parameter: Maybe.Just({ typePartId: valueTypePartId, parameter: [] }),
     },
     {
       name: "Nothing",

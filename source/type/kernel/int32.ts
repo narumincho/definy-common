@@ -1,14 +1,20 @@
 import * as c from "./codec";
 import * as ts from "js-ts-code-generator/distribution/newData";
-import * as util from "../util";
+import * as util from "../../util";
+import {
+  Maybe,
+  TypePart,
+  TypePartBody,
+  TypePartBodyKernel,
+  TypePartId,
+} from "../../data";
 import { identifer, data as tsUtil } from "js-ts-code-generator";
 
-const name = identifer.fromString("Int32");
-
-export const type = ts.Type.Number;
-
-export const codec = (): ts.Expr =>
-  tsUtil.get(ts.Expr.Variable(name), util.codecPropertyName);
+const codec = (): ts.Expr =>
+  tsUtil.get(
+    ts.Expr.Variable(identifer.fromString("Int32")),
+    util.codecPropertyName
+  );
 
 export const encode = (target: ts.Expr): ts.Expr =>
   ts.Expr.Call({
@@ -22,20 +28,27 @@ export const decode = (index: ts.Expr, binary: ts.Expr): ts.Expr =>
     parameterList: [index, binary],
   });
 
-export const variableDefinition = (): ts.Variable =>
-  c.variableDefinition(
-    name,
-    type,
-    "-2 147 483 648 ～ 2 147 483 647. 32bit 符号付き整数. JavaScriptのnumberで扱う",
-    "numberの32bit符号あり整数をSigned Leb128のバイナリに変換する",
-    encodeDefinition(),
-    decodeDefinition()
-  );
+export const typePartId = "ccf22e92cea3639683c0271d65d00673" as TypePartId;
+
+export const typePart: TypePart = {
+  name: "Int32",
+  migrationPartId: Maybe.Nothing(),
+  description:
+    "-2 147 483 648 ～ 2 147 483 647. 32bit 符号付き整数. JavaScriptのnumberとして扱える. numberの32bit符号あり整数をSigned Leb128のバイナリに変換する",
+  projectId: util.definyCodeProjectId,
+  createSuggestionId: util.codeSuggestionId,
+  getTime: { day: 0, millisecond: 0 },
+  attribute: Maybe.Nothing(),
+  typeParameterList: [],
+  body: TypePartBody.Kernel(TypePartBodyKernel.Int32),
+};
 
 /**
  * numberの32bit符号あり整数をSigned Leb128のバイナリに変換するコード
  */
-const encodeDefinition = (): ts.Expr => {
+export const encodeDefinitionStatementList = (
+  valueVar: ts.Expr
+): ReadonlyArray<ts.Statement> => {
   const resultName = identifer.fromString("result");
   const resultVar = ts.Expr.Variable(resultName);
   const byteName = identifer.fromString("byte");
@@ -43,7 +56,7 @@ const encodeDefinition = (): ts.Expr => {
   const restName = identifer.fromString("rest");
   const restVar = ts.Expr.Variable(restName);
 
-  return c.encodeLambda(type, (valueVar) => [
+  return [
     ts.Statement.VariableDefinition({
       isConst: false,
       name: restName,
@@ -98,10 +111,13 @@ const encodeDefinition = (): ts.Expr => {
         ])
       ),
     ]),
-  ]);
+  ];
 };
 
-export const decodeDefinition = (): ts.Expr => {
+export const decodeDefinitionStatementList = (
+  parameterIndex: ts.Expr,
+  parameterBinary: ts.Expr
+): ReadonlyArray<ts.Statement> => {
   const resultName = identifer.fromString("result");
   const resultVar = ts.Expr.Variable(resultName);
   const offsetName = identifer.fromString("offset");
@@ -109,7 +125,7 @@ export const decodeDefinition = (): ts.Expr => {
   const byteName = identifer.fromString("byte");
   const byteVar = ts.Expr.Variable(byteName);
 
-  return c.decodeLambda(ts.Type.Number, (parameterIndex, parameterBinary) => [
+  return [
     ts.Statement.VariableDefinition({
       isConst: false,
       name: resultName,
@@ -182,5 +198,5 @@ export const decodeDefinition = (): ts.Expr => {
         ],
       }),
     ]),
-  ]);
+  ];
 };

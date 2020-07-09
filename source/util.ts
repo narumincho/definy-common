@@ -1,18 +1,23 @@
-import { Maybe, Result, Time } from "./data";
+import * as data from "./data";
+import * as ts from "js-ts-code-generator/distribution/newData";
+import { identifer } from "js-ts-code-generator";
 
 export const maybeMap = <Input, Output>(
-  maybe: Maybe<Input>,
+  maybe: data.Maybe<Input>,
   func: (input: Input) => Output
-): Maybe<Output> => {
+): data.Maybe<Output> => {
   switch (maybe._) {
     case "Just":
-      return Maybe.Just(func(maybe.value));
+      return data.Maybe.Just(func(maybe.value));
     case "Nothing":
-      return Maybe.Nothing();
+      return data.Maybe.Nothing();
   }
 };
 
-export const maybeWithDefault = <T>(maybe: Maybe<T>, defaultValue: T): T => {
+export const maybeWithDefault = <T>(
+  maybe: data.Maybe<T>,
+  defaultValue: T
+): T => {
   switch (maybe._) {
     case "Just":
       return maybe.value;
@@ -22,7 +27,7 @@ export const maybeWithDefault = <T>(maybe: Maybe<T>, defaultValue: T): T => {
 };
 
 export const maybeUnwrap = <T, U>(
-  maybe: Maybe<T>,
+  maybe: data.Maybe<T>,
   func: (t: T) => U,
   defaultValue: U
 ): U => {
@@ -35,56 +40,56 @@ export const maybeUnwrap = <T, U>(
 };
 
 export const maybeAndThen = <T, U>(
-  maybe: Maybe<T>,
-  func: (t: T) => Maybe<U>
-): Maybe<U> => {
+  maybe: data.Maybe<T>,
+  func: (t: T) => data.Maybe<U>
+): data.Maybe<U> => {
   switch (maybe._) {
     case "Just":
       return func(maybe.value);
     case "Nothing":
-      return Maybe.Nothing();
+      return data.Maybe.Nothing();
   }
 };
 
 export const resultMap = <InputOk, InputError, OutputOk, OutputError>(
-  result: Result<InputOk, InputError>,
+  result: data.Result<InputOk, InputError>,
   okFunc: (input: InputOk) => OutputOk,
   errorFunc: (input: InputError) => OutputError
-): Result<OutputOk, OutputError> => {
+): data.Result<OutputOk, OutputError> => {
   switch (result._) {
     case "Ok":
-      return Result.Ok(okFunc(result.ok));
+      return data.Result.Ok(okFunc(result.ok));
     case "Error":
-      return Result.Error(errorFunc(result.error));
+      return data.Result.Error(errorFunc(result.error));
   }
 };
 
 export const resultMapOk = <InputOk, OutputOk, Error>(
-  result: Result<InputOk, Error>,
+  result: data.Result<InputOk, Error>,
   func: (input: InputOk) => OutputOk
-): Result<OutputOk, Error> => {
+): data.Result<OutputOk, Error> => {
   switch (result._) {
     case "Ok":
-      return Result.Ok(func(result.ok));
+      return data.Result.Ok(func(result.ok));
     case "Error":
       return result;
   }
 };
 
 export const resultMapError = <Ok, InputError, OutputError>(
-  result: Result<Ok, InputError>,
+  result: data.Result<Ok, InputError>,
   func: (input: InputError) => OutputError
-): Result<Ok, OutputError> => {
+): data.Result<Ok, OutputError> => {
   switch (result._) {
     case "Ok":
       return result;
     case "Error":
-      return Result.Error(func(result.error));
+      return data.Result.Error(func(result.error));
   }
 };
 
 export const resultWithDefault = <Ok, Error>(
-  result: Result<Ok, Error>,
+  result: data.Result<Ok, Error>,
   defaultValue: Ok
 ): Ok => {
   switch (result._) {
@@ -96,37 +101,169 @@ export const resultWithDefault = <Ok, Error>(
 };
 
 export const resultToMaybe = <Ok, Error>(
-  result: Result<Ok, Error>
-): Maybe<Ok> => {
+  result: data.Result<Ok, Error>
+): data.Maybe<Ok> => {
   switch (result._) {
     case "Ok":
-      return Maybe.Just(result.ok);
+      return data.Maybe.Just(result.ok);
     case "Error":
-      return Maybe.Nothing();
+      return data.Maybe.Nothing();
   }
 };
 
 export const resultFromMaybe = <Ok, Error>(
-  maybe: Maybe<Ok>,
+  maybe: data.Maybe<Ok>,
   error: Error
-): Result<Ok, Error> => {
+): data.Result<Ok, Error> => {
   switch (maybe._) {
     case "Just":
-      return Result.Ok(maybe.value);
+      return data.Result.Ok(maybe.value);
     case "Nothing":
-      return Result.Error(error);
+      return data.Result.Error(error);
   }
 };
 
 const millisecondInDay = 1000 * 60 * 60 * 24;
 
-export const timeToDate = (dateTime: Time): Date =>
+export const timeToDate = (dateTime: data.Time): Date =>
   new Date(dateTime.day * millisecondInDay + dateTime.millisecond);
 
-export const timeFromDate = (date: Date): Time => {
+export const timeFromDate = (date: Date): data.Time => {
   const millisecond = date.getTime();
   return {
     day: Math.floor(millisecond / millisecondInDay),
     millisecond: millisecond % millisecondInDay,
   };
+};
+
+export const typeToTsType = (
+  type: data.Type,
+  allTypePartIdTypePartNameMap: ReadonlyMap<data.TypePartId, string>
+): ts.Type => {
+  const typePartName = allTypePartIdTypePartNameMap.get(type.typePartId);
+  if (typePartName === undefined) {
+    throw new Error(
+      "internal error not found type part name in typeToTsType. typePartId =" +
+        (type.typePartId as string)
+    );
+  }
+  return ts.Type.WithTypeParameter({
+    type: ts.Type.ScopeInFile(identifer.fromString(typePartName)),
+    typeParameterList: type.parameter.map((parameter) =>
+      typeToTsType(parameter, allTypePartIdTypePartNameMap)
+    ),
+  });
+};
+
+export const typeToMemberOrParameterName = (
+  type: data.Type,
+  allTypePartIdTypePartNameMap: ReadonlyMap<data.TypePartId, string>
+): string => {
+  return firstLowerCase(toTypeName(type, allTypePartIdTypePartNameMap));
+};
+
+export const codecPropertyName = "codec";
+export const encodePropertyName = "encode";
+export const decodePropertyName = "decode";
+export const resultProperty = "result";
+export const nextIndexProperty = "nextIndex";
+
+export const toTypeName = (
+  type: data.Type,
+  allTypePartIdTypePartNameMap: ReadonlyMap<data.TypePartId, string>
+): string => {
+  const typePartName = allTypePartIdTypePartNameMap.get(type.typePartId);
+  if (typePartName === undefined) {
+    throw new Error(
+      "internal error not found type part name in toTypeName. typePartId =" +
+        (type.typePartId as string)
+    );
+  }
+  return (
+    type.parameter
+      .map((parameter) => toTypeName(parameter, allTypePartIdTypePartNameMap))
+      .join("") + typePartName
+  );
+};
+
+export const isTagTypeAllNoParameter = (
+  patternList: ReadonlyArray<data.Pattern>
+): boolean =>
+  patternList.every(
+    (tagNameAndParameter) => tagNameAndParameter.parameter._ === "Nothing"
+  );
+
+export const firstUpperCase = (text: string): string =>
+  text.substring(0, 1).toUpperCase() + text.substring(1);
+
+export const firstLowerCase = (text: string): string =>
+  text.substring(0, 1).toLowerCase() + text.substring(1);
+
+export const isFirstUpperCaseName = (text: string): boolean => {
+  if (text === "") {
+    return false;
+  }
+  if (!"ABCDEFGHIJKLMNOPQRSTUVWXYZ".includes(text[0])) {
+    return false;
+  }
+  for (const char of text.slice(1)) {
+    if (
+      !"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789".includes(
+        char
+      )
+    ) {
+      return false;
+    }
+  }
+  return true;
+};
+
+export const isFirstLowerCaseName = (text: string): boolean => {
+  if (text === "") {
+    return false;
+  }
+  if (!"abcdefghijklmnopqrstuvwxyz".includes(text[0])) {
+    return false;
+  }
+  for (const char of text.slice(1)) {
+    if (
+      !"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789".includes(
+        char
+      )
+    ) {
+      return false;
+    }
+  }
+  return true;
+};
+
+export const definyCodeProjectId = "1e4531eba1d93cd9f9f31a8bc49551a2" as data.ProjectId;
+
+export const codeSuggestionId = "009a2b68a9239b0bf1f541d8b88582dd" as data.SuggestionId;
+
+/** エディタ上で型の名前を作る. 先頭は小文字だがエディタ上は大文字 */
+export const stringToTypePartName = (text: string): string | undefined => {
+  const normalizedText = text.normalize("NFKC");
+  let isBeforeSpace = false;
+  let isFirstChar = true;
+  let result = "";
+  for (const char of normalizedText) {
+    if (isFirstChar) {
+      if (/^[a-zA-Z]$/u.test(char)) {
+        result += char.toLowerCase();
+        isFirstChar = false;
+      }
+    } else if (/^[a-zA-Z0-9]$/u.test(char)) {
+      result += isBeforeSpace ? char.toUpperCase() : char;
+      isBeforeSpace = false;
+    } else {
+      isBeforeSpace = true;
+    }
+  }
+  return result.slice(0, 64);
+};
+
+/** サーバー上での型の名前のバリテーション */
+export const isValidTypePartName = (text: string): boolean => {
+  return /^[a-z][a-zA-Z0-9]*$/u.test(text) && text.length <= 64;
 };

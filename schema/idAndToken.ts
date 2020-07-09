@@ -1,4 +1,4 @@
-import { NType as Type } from "../source/data";
+import { Type } from "@narumincho/type/source/data";
 
 export const accessToken = Type.Token("AccessToken");
 export const userId = Type.Id("UserId");

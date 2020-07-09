@@ -1,5 +1,5 @@
 import * as name from "./name";
-import { NType as Type } from "../source/data";
+import { Type } from "@narumincho/type/source/data";
 
 const noParamterType = (typeName: string) =>
   Type.Custom({
@@ -79,10 +79,6 @@ export const typePartBodyKernel = noParamterType(name.typePartBodyKernel);
 
 export const typeInputAndOutput = noParamterType(name.typeInputAndOutput);
 
-export const typePartIdWithParameter = noParamterType(
-  name.typePartIdWithParameter
-);
-
 export const functionCall = noParamterType(name.functionCall);
 
 export const lambdaBranch = noParamterType(name.lambdaBranch);
@@ -121,22 +117,5 @@ export const language = noParamterType(name.language);
 
 export const typePart = noParamterType(name.typePart);
 
-export const nType = noParamterType(name.nType);
-
-export const okAndErrorType = noParamterType(name.nOkAndErrorType);
-
-export const nameAndTypeParameterList = noParamterType(
-  name.nNameAndTypeParameterList
-);
-
-export const nCustomTypeDefinition = noParamterType(name.nCustomTypeDefinition);
-
-export const nCustomTypeDefinitionBody = noParamterType(
-  name.nCustomTypeDefinitionBody
-);
-
-export const nMember = noParamterType(name.nMember);
-
-export const nPattern = noParamterType(name.nPattern);
-
 export const typeAttribute = noParamterType(name.typeAttribute);
+export const typeParameter = noParamterType(name.typeParameter);

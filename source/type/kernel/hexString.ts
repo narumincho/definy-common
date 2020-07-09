@@ -1,6 +1,6 @@
 import * as codec from "./codec";
 import * as ts from "js-ts-code-generator/distribution/newData";
-import * as util from "../util";
+import * as util from "../../util";
 import { identifer, data as tsUtil } from "js-ts-code-generator";
 
 const type = ts.Type.String;
@@ -113,6 +113,11 @@ const idName = identifer.fromString("Id");
 const tokenName = identifer.fromString("Token");
 export const idKernelExprDefinition = variableDefinition(16, idName);
 export const tokenKernelExprDefinition = variableDefinition(32, tokenName);
+const idCodec = tsUtil.get(ts.Expr.Variable(idName), util.codecPropertyName);
+const tokenCodec = tsUtil.get(
+  ts.Expr.Variable(tokenName),
+  util.codecPropertyName
+);
 
 export const typeDefinition = (name: string): ts.TypeAlias => ({
   name: identifer.fromString(name),
@@ -133,7 +138,6 @@ export const typeDefinition = (name: string): ts.TypeAlias => ({
 
 export const idVariableDefinition = (name: string): ts.Variable => {
   const targetType = ts.Type.ScopeInFile(identifer.fromString(name));
-  const idCodec = tsUtil.get(ts.Expr.Variable(idName), util.codecPropertyName);
   return {
     name: identifer.fromString(name),
     document: name,
@@ -168,10 +172,6 @@ export const idVariableDefinition = (name: string): ts.Variable => {
 
 export const tokenVariableDefinition = (name: string): ts.Variable => {
   const targetType = ts.Type.ScopeInFile(identifer.fromString(name));
-  const tokenCodec = tsUtil.get(
-    ts.Expr.Variable(tokenName),
-    util.codecPropertyName
-  );
   return {
     name: identifer.fromString(name),
     document: name,
@@ -203,4 +203,58 @@ export const tokenVariableDefinition = (name: string): ts.Variable => {
       }),
     ]),
   };
+};
+
+export const idEncodeDefinitionStatementList = (
+  valueVar: ts.Expr
+): ReadonlyArray<ts.Statement> => [
+  ts.Statement.Return(
+    ts.Expr.Call({
+      expr: tsUtil.get(idCodec, util.encodePropertyName),
+      parameterList: [valueVar],
+    })
+  ),
+];
+
+export const idDecodeDefinitionStatementList = (
+  typePartName: string,
+  parameterIndex: ts.Expr,
+  parameterBinary: ts.Expr
+): ReadonlyArray<ts.Statement> => {
+  const targetType = ts.Type.ScopeInFile(identifer.fromString(typePartName));
+  return [
+    ts.Statement.Return(
+      ts.Expr.TypeAssertion({
+        expr: tsUtil.get(idCodec, util.decodePropertyName),
+        type: codec.decodeFunctionType(targetType),
+      })
+    ),
+  ];
+};
+
+export const tokenEncodeDefinitionStatementList = (
+  valueVar: ts.Expr
+): ReadonlyArray<ts.Statement> => [
+  ts.Statement.Return(
+    ts.Expr.Call({
+      expr: tsUtil.get(tokenCodec, util.encodePropertyName),
+      parameterList: [valueVar],
+    })
+  ),
+];
+
+export const tokenDecodeDefinitionStatementList = (
+  typePartName: string,
+  parameterIndex: ts.Expr,
+  parameterBinary: ts.Expr
+): ReadonlyArray<ts.Statement> => {
+  const targetType = ts.Type.ScopeInFile(identifer.fromString(typePartName));
+  return [
+    ts.Statement.Return(
+      ts.Expr.TypeAssertion({
+        expr: tsUtil.get(tokenCodec, util.decodePropertyName),
+        type: codec.decodeFunctionType(targetType),
+      })
+    ),
+  ];
 };
