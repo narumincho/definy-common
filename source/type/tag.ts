@@ -131,17 +131,16 @@ const typePartToVariableExpr = (
       const { patternList } = typePart.body;
       return ts.Expr.ObjectLiteral(
         patternList
-          .map((pattern) =>
+          .map((pattern, index) =>
             ts.Member.KeyValue({
               key: pattern.name,
-              value: util.isTagTypeAllNoParameter(patternList)
-                ? ts.Expr.StringLiteral(pattern.name)
-                : patternToTagExpr(
-                    identifer.fromString(typePart.name),
-                    typePart.typeParameterList,
-                    pattern,
-                    allTypePartIdTypePartNameMap
-                  ),
+              value: patternToTagExpr(
+                typePart,
+                patternList,
+                pattern,
+                index,
+                allTypePartIdTypePartNameMap
+              ),
             })
           )
           .concat(codecMember)
@@ -151,18 +150,40 @@ const typePartToVariableExpr = (
 };
 
 const patternToTagExpr = (
-  typeName: ts.Identifer,
-  typeParameterList: ReadonlyArray<data.TypeParameter>,
+  typePart: data.TypePart,
+  patternList: ReadonlyArray<data.Pattern>,
+  pattern: data.Pattern,
+  patternIndex: number,
+  allTypePartIdTypePartNameMap: ReadonlyMap<data.TypePartId, string>
+) => {
+  if (util.isTagTypeAllNoParameter(patternList)) {
+    if (
+      typePart.attribute._ === "Just" &&
+      typePart.attribute.value === "AsBoolean"
+    ) {
+      return ts.Expr.BooleanLiteral(patternIndex === 0);
+    }
+    return ts.Expr.StringLiteral(pattern.name);
+  }
+  return patternWithParameterToTagExpr(
+    typePart,
+    pattern,
+    allTypePartIdTypePartNameMap
+  );
+};
+
+const patternWithParameterToTagExpr = (
+  typePart: data.TypePart,
   pattern: data.Pattern,
   allTypePartIdTypePartNameMap: ReadonlyMap<data.TypePartId, string>
 ): ts.Expr => {
-  const tagField: ts.Member = ts.Member.KeyValue({
+  const tagMember: ts.Member = ts.Member.KeyValue({
     key: "_",
     value: ts.Expr.StringLiteral(pattern.name),
   });
   const returnType = ts.Type.WithTypeParameter({
-    type: ts.Type.ScopeInFile(typeName),
-    typeParameterList: typeParameterList.map((typeParameter) =>
+    type: ts.Type.ScopeInFile(identifer.fromString(typePart.name)),
+    typeParameterList: typePart.typeParameterList.map((typeParameter) =>
       ts.Type.ScopeInFile(identifer.fromString(typeParameter.name))
     ),
   });
@@ -176,7 +197,7 @@ const patternToTagExpr = (
         )
       );
       return ts.Expr.Lambda({
-        typeParameterList: typeParameterList.map((typeParameter) =>
+        typeParameterList: typePart.typeParameterList.map((typeParameter) =>
           identifer.fromString(typeParameter.name)
         ),
         parameterList: [
@@ -192,7 +213,7 @@ const patternToTagExpr = (
         statementList: [
           ts.Statement.Return(
             ts.Expr.ObjectLiteral([
-              tagField,
+              tagMember,
               ts.Member.KeyValue({
                 key: util.typeToMemberOrParameterName(
                   pattern.parameter.value,
@@ -207,16 +228,18 @@ const patternToTagExpr = (
     }
 
     case "Nothing":
-      if (typeParameterList.length === 0) {
-        return ts.Expr.ObjectLiteral([tagField]);
+      if (typePart.typeParameterList.length === 0) {
+        return ts.Expr.ObjectLiteral([tagMember]);
       }
       return ts.Expr.Lambda({
-        typeParameterList: typeParameterList.map((typeParameter) =>
+        typeParameterList: typePart.typeParameterList.map((typeParameter) =>
           identifer.fromString(typeParameter.name)
         ),
         parameterList: [],
         returnType,
-        statementList: [ts.Statement.Return(ts.Expr.ObjectLiteral([tagField]))],
+        statementList: [
+          ts.Statement.Return(ts.Expr.ObjectLiteral([tagMember])),
+        ],
       });
   }
 };
@@ -569,7 +592,7 @@ const sumDecodeDefinitionStatementList = (
       expr: int32.decode(parameterIndex, parameterBinary),
     }),
     ...patternList.map((pattern, index) =>
-      tagNameAndParameterCode(
+      tagPatternCode(
         typePartName,
         pattern,
         index,
@@ -587,7 +610,7 @@ const sumDecodeDefinitionStatementList = (
   ];
 };
 
-const tagNameAndParameterCode = (
+const tagPatternCode = (
   typePartName: string,
   pattern: data.Pattern,
   index: number,

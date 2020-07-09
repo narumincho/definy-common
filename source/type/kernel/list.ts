@@ -2,62 +2,42 @@ import * as c from "./codec";
 import * as int32 from "./int32";
 import * as ts from "js-ts-code-generator/distribution/newData";
 import * as util from "../../util";
+import {
+  Maybe,
+  TypePart,
+  TypePartBody,
+  TypePartBodyKernel,
+  TypePartId,
+} from "../../data";
 import { identifer, data as tsUtil } from "js-ts-code-generator";
+
+const elementTypeName = "element";
+const elementCodecName = identifer.fromString("elementCodec");
+const elementCodecVar = ts.Expr.Variable(elementCodecName);
 
 export const name = identifer.fromString("List");
 
+export const typePartId = "d7a1efe440138793962eed5625de8196" as TypePartId;
+
+export const typePart: TypePart = {
+  name: "List",
+  migrationPartId: Maybe.Nothing(),
+  description: "リスト. JavaScriptのArrayで扱う",
+  projectId: util.definyCodeProjectId,
+  createSuggestionId: util.codeSuggestionId,
+  getTime: { day: 0, millisecond: 0 },
+  attribute: Maybe.Nothing(),
+  typeParameterList: [
+    {
+      name: elementTypeName,
+      typePartId: "cf95a75adf60a7eecabe7d0b4c3e68cd" as TypePartId,
+    },
+  ],
+  body: TypePartBody.Kernel(TypePartBodyKernel.List),
+};
+
 export const type = (element: ts.Type): ts.Type =>
   tsUtil.readonlyArrayType(element);
-
-const elementTypeName = identifer.fromString("element");
-const elementCodecName = identifer.fromString("elementCodec");
-const elementCodecVar = ts.Expr.Variable(elementCodecName);
-const elementType = ts.Type.ScopeInFile(elementTypeName);
-
-export const variableDefinition = (): ts.Variable => ({
-  name,
-  document: "リスト. JavaScriptのArrayで扱う",
-  type: ts.Type.Object([
-    {
-      name: util.codecPropertyName,
-      required: true,
-      type: c.codecTypeWithTypeParameter(
-        ts.Type.ScopeInGlobal(identifer.fromString("ReadonlyArray")),
-        ["element"]
-      ),
-      document: "",
-    },
-  ]),
-  expr: ts.Expr.ObjectLiteral([
-    ts.Member.KeyValue({
-      key: util.codecPropertyName,
-      value: ts.Expr.Lambda({
-        typeParameterList: [elementTypeName],
-        parameterList: [
-          {
-            name: elementCodecName,
-            type: c.codecType(elementType),
-          },
-        ],
-        returnType: c.codecType(type(elementType)),
-        statementList: [
-          ts.Statement.Return(
-            ts.Expr.ObjectLiteral([
-              ts.Member.KeyValue({
-                key: util.encodePropertyName,
-                value: encodeDefinition(),
-              }),
-              ts.Member.KeyValue({
-                key: util.decodePropertyName,
-                value: decodeDefinition(),
-              }),
-            ])
-          ),
-        ],
-      }),
-    }),
-  ]),
-});
 
 export const encodeDefinitionStatementList = (
   valueVar: ts.Expr
@@ -98,7 +78,9 @@ export const decodeDefinitionStatementList = (
   parameterIndex: ts.Expr,
   parameterBinary: ts.Expr
 ): ReadonlyArray<ts.Statement> => {
-  const elementTypeVar = ts.Type.ScopeInFile(elementTypeName);
+  const elementTypeVar = ts.Type.ScopeInFile(
+    identifer.fromString(elementTypeName)
+  );
   const resultName = identifer.fromString("result");
   const resultVar = ts.Expr.Variable(resultName);
   const lengthResultName = identifer.fromString("lengthResult");

@@ -1,7 +1,6 @@
 import * as c from "./codec";
 import * as ts from "js-ts-code-generator/distribution/newData";
 import * as util from "../../util";
-import { identifer, data as tsUtil } from "js-ts-code-generator";
 import {
   Maybe,
   TypePart,
@@ -9,13 +8,13 @@ import {
   TypePartBodyKernel,
   TypePartId,
 } from "../../data";
+import { identifer, data as tsUtil } from "js-ts-code-generator";
 
-const name = identifer.fromString("Int32");
-
-export const type = ts.Type.Number;
-
-export const codec = (): ts.Expr =>
-  tsUtil.get(ts.Expr.Variable(name), util.codecPropertyName);
+const codec = (): ts.Expr =>
+  tsUtil.get(
+    ts.Expr.Variable(identifer.fromString("Int32")),
+    util.codecPropertyName
+  );
 
 export const encode = (target: ts.Expr): ts.Expr =>
   ts.Expr.Call({

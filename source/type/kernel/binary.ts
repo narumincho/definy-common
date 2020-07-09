@@ -11,14 +11,13 @@ import {
 } from "../../data";
 import { identifer, data as tsUtil } from "js-ts-code-generator";
 
-export const name = identifer.fromString("Binary");
-
 export const typePartId = "743d625544767e750c453fa344194599" as TypePartId;
 
 export const typePart: TypePart = {
   name: "Binary",
   migrationPartId: Maybe.Nothing(),
-  description: "バイナリ. JavaScriptのUint8Arrayで扱える",
+  description:
+    "バイナリ. JavaScriptのUint8Arrayで扱える. 最初にLED128でバイト数, その次にバイナリそのまま",
   projectId: util.definyCodeProjectId,
   createSuggestionId: util.codeSuggestionId,
   getTime: { day: 0, millisecond: 0 },
@@ -26,21 +25,6 @@ export const typePart: TypePart = {
   typeParameterList: [],
   body: TypePartBody.Kernel(TypePartBodyKernel.Binary),
 };
-
-export const type: ts.Type = tsUtil.uint8ArrayType;
-
-export const codec = (): ts.Expr =>
-  tsUtil.get(ts.Expr.Variable(name), util.codecPropertyName);
-
-export const variableDefinition = (): ts.Variable =>
-  c.variableDefinition(
-    name,
-    type,
-    "バイナリ. JavaScriptのUint8Arrayで扱える",
-    "最初にLED128でバイト数, その次にバイナリそのまま",
-    encodeDefinition(),
-    decodeDefinition()
-  );
 
 export const encodeDefinitionStatementList = (
   valueVar: ts.Expr

@@ -83,17 +83,6 @@ const typePartWIthAttributeToTsType = (
   typeAttribute: data.TypeAttribute
 ): ts.Type => {
   switch (typeAttribute) {
-    case "AsArray":
-      if (typePart.typeParameterList.length !== 1) {
-        throw new Error(
-          "attribute == Just(AsArray) type part need one type parameter"
-        );
-      }
-      return tsUtil.readonlyArrayType(
-        ts.Type.ScopeInFile(
-          identifer.fromString(typePart.typeParameterList[0].name)
-        )
-      );
     case "AsBoolean":
       if (typePart.body._ !== "Sum" || typePart.body.patternList.length !== 2) {
         throw new Error(
@@ -181,5 +170,16 @@ const typePartBodyKernelToTsType = (
           },
         ]),
       });
+    case "List":
+      if (typePart.typeParameterList.length !== 1) {
+        throw new Error(
+          "attribute == Just(AsArray) type part need one type parameter"
+        );
+      }
+      return tsUtil.readonlyArrayType(
+        ts.Type.ScopeInFile(
+          identifer.fromString(typePart.typeParameterList[0].name)
+        )
+      );
   }
 };

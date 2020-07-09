@@ -2,6 +2,13 @@ import * as c from "./codec";
 import * as int32 from "./int32";
 import * as ts from "js-ts-code-generator/distribution/newData";
 import * as util from "../../util";
+import {
+  Maybe,
+  TypePart,
+  TypePartBody,
+  TypePartBodyKernel,
+  TypePartId,
+} from "../../data";
 import { identifer, data as tsUtil } from "js-ts-code-generator";
 
 export const name = identifer.fromString("String");
@@ -11,15 +18,20 @@ export const type = ts.Type.String;
 export const codec = (): ts.Expr =>
   tsUtil.get(ts.Expr.Variable(name), util.codecPropertyName);
 
-export const exprDefinition = (): ts.Variable =>
-  c.variableDefinition(
-    name,
-    type,
-    "文字列. JavaScriptのstringで扱う",
-    "stringをUTF-8のバイナリに変換する",
-    encodeDefinition(),
-    decodeDefinition()
-  );
+export const typePartId = "f1f830d23ffab8cec4d0191d157b9fc4" as TypePartId;
+
+export const typePart: TypePart = {
+  name: "String",
+  migrationPartId: Maybe.Nothing(),
+  description:
+    "文字列. JavaScriptのstringで扱う. バイナリ形式はUTF-8. 不正な文字が入っている可能性がある",
+  projectId: util.definyCodeProjectId,
+  createSuggestionId: util.codeSuggestionId,
+  getTime: { day: 0, millisecond: 0 },
+  attribute: Maybe.Nothing(),
+  typeParameterList: [],
+  body: TypePartBody.Kernel(TypePartBodyKernel.String),
+};
 
 const globalProcess = ts.Expr.GlobalObjects(identifer.fromString("process"));
 
