@@ -638,7 +638,8 @@ export type TypePartBodyKernel =
   | "String"
   | "Binary"
   | "Id"
-  | "Token";
+  | "Token"
+  | "List";
 
 /**
  * 型
@@ -1010,7 +1011,7 @@ export type TypeParameter = {
 /**
  * コンパイラに向けた, 型のデータ形式をどうするかの情報
  */
-export type TypeAttribute = "AsArray" | "AsBoolean";
+export type TypeAttribute = "AsBoolean";
 
 export type ProjectId = string & { readonly _projectId: never };
 
@@ -3769,6 +3770,10 @@ export const TypePartBodyKernel: {
    * sha256などでハッシュ化したもの (32byte) を表現する. 内部表現はとりあえず0-f長さ64の文字列
    */
   readonly Token: TypePartBodyKernel;
+  /**
+   * 配列型. TypeScriptではReadonlyArrayとして扱う
+   */
+  readonly List: TypePartBodyKernel;
   readonly codec: Codec<TypePartBodyKernel>;
 } = {
   Function: "Function",
@@ -3777,6 +3782,7 @@ export const TypePartBodyKernel: {
   Binary: "Binary",
   Id: "Id",
   Token: "Token",
+  List: "List",
   codec: {
     encode: (value: TypePartBodyKernel): ReadonlyArray<number> => {
       switch (value) {
@@ -3797,6 +3803,9 @@ export const TypePartBodyKernel: {
         }
         case "Token": {
           return [5];
+        }
+        case "List": {
+          return [6];
         }
       }
     },
@@ -3841,6 +3850,12 @@ export const TypePartBodyKernel: {
       if (patternIndex.result === 5) {
         return {
           result: TypePartBodyKernel.Token,
+          nextIndex: patternIndex.nextIndex,
+        };
+      }
+      if (patternIndex.result === 6) {
+        return {
+          result: TypePartBodyKernel.List,
           nextIndex: patternIndex.nextIndex,
         };
       }
@@ -5208,25 +5223,17 @@ export const TypeParameter: { readonly codec: Codec<TypeParameter> } = {
  */
 export const TypeAttribute: {
   /**
-   * JavaScriptのArrayとして扱うように指示する. 定義が Nil | Cons a (List a) のような形のみをサポートする
-   */
-  readonly AsArray: TypeAttribute;
-  /**
    * JavaScriptのbooleanとしれ扱うように指示する. 定義が True | Falseのような形のみをサポートする
    */
   readonly AsBoolean: TypeAttribute;
   readonly codec: Codec<TypeAttribute>;
 } = {
-  AsArray: "AsArray",
   AsBoolean: "AsBoolean",
   codec: {
     encode: (value: TypeAttribute): ReadonlyArray<number> => {
       switch (value) {
-        case "AsArray": {
-          return [0];
-        }
         case "AsBoolean": {
-          return [1];
+          return [0];
         }
       }
     },
@@ -5239,12 +5246,6 @@ export const TypeAttribute: {
         readonly nextIndex: number;
       } = Int32.codec.decode(index, binary);
       if (patternIndex.result === 0) {
-        return {
-          result: TypeAttribute.AsArray,
-          nextIndex: patternIndex.nextIndex,
-        };
-      }
-      if (patternIndex.result === 1) {
         return {
           result: TypeAttribute.AsBoolean,
           nextIndex: patternIndex.nextIndex,

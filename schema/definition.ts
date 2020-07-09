@@ -958,6 +958,11 @@ export const customTypeList: ReadonlyArray<CustomTypeDefinition> = [
           "sha256などでハッシュ化したもの (32byte) を表現する. 内部表現はとりあえず0-f長さ64の文字列",
         parameter: Maybe.Nothing(),
       },
+      {
+        name: "List",
+        description: "配列型. TypeScriptではReadonlyArrayとして扱う",
+        parameter: Maybe.Nothing(),
+      },
     ]),
   },
   {
@@ -1512,12 +1517,6 @@ export const customTypeList: ReadonlyArray<CustomTypeDefinition> = [
     description: "コンパイラに向けた, 型のデータ形式をどうするかの情報",
     typeParameterList: [],
     body: CustomTypeDefinitionBody.Sum([
-      {
-        name: "AsArray",
-        description:
-          "JavaScriptのArrayとして扱うように指示する. 定義が Nil | Cons a (List a) のような形のみをサポートする",
-        parameter: Maybe.Nothing(),
-      },
       {
         name: "AsBoolean",
         description:

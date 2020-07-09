@@ -436,6 +436,8 @@ const kernelEncodeDefinitionStatementList = (
       return hexString.idEncodeDefinitionStatementList(valueVar);
     case "Token":
       return hexString.tokenEncodeDefinitionStatementList(valueVar);
+    case "List":
+      return list.encodeDefinitionStatementList(valueVar);
   }
 };
 
@@ -687,6 +689,11 @@ const kernelDecodeDefinitionStatementList = (
     case "Token":
       return hexString.tokenDecodeDefinitionStatementList(
         typePart.name,
+        parameterIndex,
+        parameterBinary
+      );
+    case "List":
+      return list.decodeDefinitionStatementList(
         parameterIndex,
         parameterBinary
       );
