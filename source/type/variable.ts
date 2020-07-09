@@ -9,7 +9,7 @@ import * as ts from "js-ts-code-generator/distribution/newData";
 import * as util from "../util";
 import { identifer, data as tsUtil } from "js-ts-code-generator";
 
-export const generate = (
+export const typePartMapToVariable = (
   typePartMap: ReadonlyMap<data.TypePartId, data.TypePart>,
   allTypePartIdTypePartNameMap: ReadonlyMap<data.TypePartId, string>
 ): ReadonlyArray<ts.Variable> => {

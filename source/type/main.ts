@@ -1,8 +1,8 @@
 import * as data from "../data";
-import * as tag from "./tag";
 import * as ts from "js-ts-code-generator/distribution/newData";
 import * as typeAlias from "./typeAlias";
 import * as util from "../util";
+import * as variable from "./variable";
 
 export const generateTypeScriptCode = (
   typePartMap: ReadonlyMap<data.TypePartId, data.TypePart>
@@ -13,8 +13,8 @@ export const generateTypeScriptCode = (
       ...typeAlias
         .typePartMapToTypeAlias(typePartMap, allTypePartIdTypePartNameMap)
         .map(ts.ExportDefinition.TypeAlias),
-      ...tag
-        .generate(typePartMap, allTypePartIdTypePartNameMap)
+      ...variable
+        .typePartMapToVariable(typePartMap, allTypePartIdTypePartNameMap)
         .map(ts.ExportDefinition.Variable),
     ],
     statementList: [],
