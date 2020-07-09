@@ -5,18 +5,16 @@ import * as typeDefinition from "./typeDefinition";
 import * as util from "../util";
 
 export const generateTypeScriptCode = (
-  customTypeMap: ReadonlyMap<data.TypePartId, data.TypePart>
+  typePartMap: ReadonlyMap<data.TypePartId, data.TypePart>
 ): ts.Code => {
-  const allTypePartIdTypePartNameMap = checkTypePartListValidation(
-    customTypeMap
-  );
+  const allTypePartIdTypePartNameMap = checkTypePartListValidation(typePartMap);
   return {
     exportDefinitionList: [
       ...typeDefinition
-        .generateTypeDefinition(customTypeMap, allTypePartIdTypePartNameMap)
+        .generateTypeDefinition(typePartMap, allTypePartIdTypePartNameMap)
         .map(ts.ExportDefinition.TypeAlias),
       ...tag
-        .generate(customTypeMap, allTypePartIdTypePartNameMap)
+        .generate(typePartMap, allTypePartIdTypePartNameMap)
         .map(ts.ExportDefinition.Variable),
     ],
     statementList: [],
@@ -89,7 +87,7 @@ const checkTypePartListValidation = (
   }
 
   for (const typePart of typePartMap.values()) {
-    checkCustomTypeBodyValidation(
+    checkTypePartBodyValidation(
       typePart.body,
       typePartIdTypeParameterSizeMap,
       new Set(
@@ -100,7 +98,7 @@ const checkTypePartListValidation = (
   return allTypePartIdTypePartNameMap;
 };
 
-const checkCustomTypeBodyValidation = (
+const checkTypePartBodyValidation = (
   typePartBody: data.TypePartBody,
   typeIdTypeParameterSizeMap: ReadonlyMap<data.TypePartId, number>,
   typeParameterTypePartIdSet: ReadonlySet<data.TypePartId>

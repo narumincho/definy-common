@@ -33,13 +33,10 @@ export const typePartToDefinition = (
   typeParameterList: typePart.typeParameterList.map((typeParameter) =>
     identifer.fromString(typeParameter.name)
   ),
-  type: customTypeDefinitionBodyToTsType(
-    typePart,
-    allTypePartIdTypePartNameMap
-  ),
+  type: typePartToTsType(typePart, allTypePartIdTypePartNameMap),
 });
 
-const customTypeDefinitionBodyToTsType = (
+const typePartToTsType = (
   typePart: data.TypePart,
   allTypePartIdTypePartNameMap: ReadonlyMap<data.TypePartId, string>
 ): ts.Type => {

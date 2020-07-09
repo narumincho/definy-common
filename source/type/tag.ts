@@ -41,17 +41,17 @@ const typePartToVariableType = (
   typePart: data.TypePart,
   allTypePartIdTypePartNameMap: ReadonlyMap<data.TypePartId, string>
 ): ts.Type => {
+  const codecTsMemberType: ts.MemberType = {
+    name: util.codecPropertyName,
+    required: true,
+    type: typePartToCodecType(typePart),
+    document: "",
+  };
+
   switch (typePart.body._) {
     case "Product":
     case "Kernel":
-      return ts.Type.Object([
-        {
-          name: util.codecPropertyName,
-          required: true,
-          type: typePartToCodecType(typePart),
-          document: "",
-        },
-      ]);
+      return ts.Type.Object([codecTsMemberType]);
     case "Sum":
       return ts.Type.Object(
         typePart.body.patternList
@@ -59,7 +59,7 @@ const typePartToVariableType = (
             (pattern): ts.MemberType => ({
               name: pattern.name,
               required: true,
-              type: tagNameAndParameterToTagExprType(
+              type: patternToTagType(
                 identifer.fromString(typePart.name),
                 typePart.typeParameterList,
                 pattern,
@@ -68,61 +68,12 @@ const typePartToVariableType = (
               document: pattern.description,
             })
           )
-          .concat({
-            name: util.codecPropertyName,
-            required: true,
-            type: typePartToCodecType(typePart),
-            document: "",
-          })
+          .concat(codecTsMemberType)
       );
   }
 };
 
-const typePartToVariableExpr = (
-  customType: data.TypePart,
-  allTypePartIdTypePartNameMap: ReadonlyMap<data.TypePartId, string>
-): ts.Expr => {
-  switch (customType.body._) {
-    case "Product":
-      return ts.Expr.ObjectLiteral(
-        typePartToCodecDefinitionMember(
-          customType,
-          allTypePartIdTypePartNameMap
-        )
-      );
-
-    case "Sum": {
-      const { patternList } = customType.body;
-      return ts.Expr.ObjectLiteral(
-        patternList
-          .map((pattern) =>
-            ts.Member.KeyValue({
-              key: pattern.name,
-              value: util.isTagTypeAllNoParameter(patternList)
-                ? ts.Expr.StringLiteral(pattern.name)
-                : patternToTagExpr(
-                    identifer.fromString(customType.name),
-                    customType.typeParameterList,
-                    pattern,
-                    allTypePartIdTypePartNameMap
-                  ),
-            })
-          )
-          .concat(
-            typePartToCodecDefinitionMember(
-              customType,
-              allTypePartIdTypePartNameMap
-            )
-          )
-      );
-    }
-    case "Kernel":
-      // TODO
-      return ts.Expr.StringLiteral("Kernelの変数出力は調整中");
-  }
-};
-
-const tagNameAndParameterToTagExprType = (
+const patternToTagType = (
   typeName: ts.Identifer,
   typeParameterList: ReadonlyArray<data.TypeParameter>,
   pattern: data.Pattern,
@@ -160,6 +111,42 @@ const tagNameAndParameterToTagExprType = (
         parameterList: [],
         return: returnType,
       });
+  }
+};
+
+const typePartToVariableExpr = (
+  typePart: data.TypePart,
+  allTypePartIdTypePartNameMap: ReadonlyMap<data.TypePartId, string>
+): ts.Expr => {
+  switch (typePart.body._) {
+    case "Product":
+      return ts.Expr.ObjectLiteral(
+        typePartToCodecMember(typePart, allTypePartIdTypePartNameMap)
+      );
+
+    case "Sum": {
+      const { patternList } = typePart.body;
+      return ts.Expr.ObjectLiteral(
+        patternList
+          .map((pattern) =>
+            ts.Member.KeyValue({
+              key: pattern.name,
+              value: util.isTagTypeAllNoParameter(patternList)
+                ? ts.Expr.StringLiteral(pattern.name)
+                : patternToTagExpr(
+                    identifer.fromString(typePart.name),
+                    typePart.typeParameterList,
+                    pattern,
+                    allTypePartIdTypePartNameMap
+                  ),
+            })
+          )
+          .concat(typePartToCodecMember(typePart, allTypePartIdTypePartNameMap))
+      );
+    }
+    case "Kernel":
+      // TODO
+      return ts.Expr.StringLiteral("Kernelの変数出力は調整中");
   }
 };
 
@@ -241,7 +228,7 @@ const typePartToCodecType = (typePart: data.TypePart): ts.Type =>
     typePart.typeParameterList.map((typeParameter) => typeParameter.name)
   );
 
-const typePartToCodecDefinitionMember = (
+const typePartToCodecMember = (
   typePart: data.TypePart,
   allTypePartIdTypePartNameMap: ReadonlyMap<data.TypePartId, string>
 ): ReadonlyArray<ts.Member> => {
@@ -535,7 +522,7 @@ const productDecodeDefinitionStatementList = (
 
 const sumDecodeDefinitionStatementList = (
   patternList: ReadonlyArray<data.Pattern>,
-  customTypeName: string,
+  typePartName: string,
   parameterIndex: ts.Expr,
   parameterBinary: ts.Expr,
   noTypeParameter: boolean,
@@ -555,7 +542,7 @@ const sumDecodeDefinitionStatementList = (
     }),
     ...patternList.map((pattern, index) =>
       tagNameAndParameterCode(
-        customTypeName,
+        typePartName,
         pattern,
         index,
         patternIndexAndNextIndexVar,
@@ -573,7 +560,7 @@ const sumDecodeDefinitionStatementList = (
 };
 
 const tagNameAndParameterCode = (
-  customTypeName: string,
+  typePartName: string,
   pattern: data.Pattern,
   index: number,
   patternIndexAndNextIndexVar: ts.Expr,
@@ -607,7 +594,7 @@ const tagNameAndParameterCode = (
           }),
           codec.returnStatement(
             patternUse(
-              customTypeName,
+              typePartName,
               noTypeParameter,
               pattern.name,
               data.Maybe.Just(
@@ -629,7 +616,7 @@ const tagNameAndParameterCode = (
         thenStatementList: [
           codec.returnStatement(
             patternUse(
-              customTypeName,
+              typePartName,
               noTypeParameter,
               pattern.name,
               data.Maybe.Nothing()
@@ -642,13 +629,13 @@ const tagNameAndParameterCode = (
 };
 
 const patternUse = (
-  customTypeName: string,
+  typePartName: string,
   noTypeParameter: boolean,
   tagName: string,
   parameter: data.Maybe<ts.Expr>
 ): ts.Expr => {
   const tagExpr = tsUtil.get(
-    ts.Expr.Variable(identifer.fromString(customTypeName)),
+    ts.Expr.Variable(identifer.fromString(typePartName)),
     tagName
   );
   switch (parameter._) {
