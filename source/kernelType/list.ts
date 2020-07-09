@@ -2,39 +2,12 @@ import * as c from "./codec";
 import * as int32 from "./int32";
 import * as ts from "js-ts-code-generator/distribution/newData";
 import * as util from "../util";
-import {
-  Maybe,
-  TypePart,
-  TypePartBody,
-  TypePartBodyKernel,
-  TypePartId,
-} from "../data";
 import { identifer, data as tsUtil } from "js-ts-code-generator";
 
-const elementTypeName = "element";
 const elementCodecName = identifer.fromString("elementCodec");
 const elementCodecVar = ts.Expr.Variable(elementCodecName);
 
 export const name = identifer.fromString("List");
-
-export const typePartId = "d7a1efe440138793962eed5625de8196" as TypePartId;
-
-export const typePart: TypePart = {
-  name: "List",
-  migrationPartId: Maybe.Nothing(),
-  description: "リスト. JavaScriptのArrayで扱う",
-  projectId: util.definyCodeProjectId,
-  createSuggestionId: util.codeSuggestionId,
-  getTime: { day: 0, millisecond: 0 },
-  attribute: Maybe.Nothing(),
-  typeParameterList: [
-    {
-      name: elementTypeName,
-      typePartId: "cf95a75adf60a7eecabe7d0b4c3e68cd" as TypePartId,
-    },
-  ],
-  body: TypePartBody.Kernel(TypePartBodyKernel.List),
-};
 
 export const type = (element: ts.Type): ts.Type =>
   tsUtil.readonlyArrayType(element);
@@ -75,11 +48,12 @@ export const encodeDefinitionStatementList = (
 };
 
 export const decodeDefinitionStatementList = (
+  typeParameterName: string,
   parameterIndex: ts.Expr,
   parameterBinary: ts.Expr
 ): ReadonlyArray<ts.Statement> => {
   const elementTypeVar = ts.Type.ScopeInFile(
-    identifer.fromString(elementTypeName)
+    identifer.fromString(typeParameterName)
   );
   const resultName = identifer.fromString("result");
   const resultVar = ts.Expr.Variable(resultName);

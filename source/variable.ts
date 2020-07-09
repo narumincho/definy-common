@@ -713,11 +713,16 @@ const kernelDecodeDefinitionStatementList = (
         parameterIndex,
         parameterBinary
       );
-    case "List":
+    case "List": {
+      if (typePart.typeParameterList.length !== 1) {
+        throw new Error("List type need one type paramter");
+      }
       return list.decodeDefinitionStatementList(
+        typePart.typeParameterList[0].name,
         parameterIndex,
         parameterBinary
       );
+    }
   }
 };
 
