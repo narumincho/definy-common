@@ -1,15 +1,16 @@
 import * as codeGen from "js-ts-code-generator";
-import * as definition from "./definition";
+import * as definyCore from "../source/main";
 import * as fs from "fs";
-import * as nt from "@narumincho/type";
 import * as prettier from "prettier";
+import * as typePartMap from "./typePartMap";
 
 const typeScriptCode = codeGen.generateCodeAsString(
-  nt.generateTypeScriptCode(definition.customTypeList),
+  definyCore.generateTypeScriptCode(typePartMap.typePartMap),
   "TypeScript"
 );
+console.log(typeScriptCode);
 
-const typeScriptPath = "source/data.ts";
+const typeScriptPath = "source/newData.ts";
 fs.promises
   .writeFile(
     typeScriptPath,

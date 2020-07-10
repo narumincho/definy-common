@@ -738,7 +738,7 @@ const checkTypePartListValidation = (
       );
     }
     typePartIdSet.add(typePartId);
-    if (!util.isValidTypePartName(typePart.name)) {
+    if (util.isValidTypePartName(typePart.name)) {
       throw new Error("type part name is invalid. name = " + typePart.name);
     }
     if (typeNameSet.has(typePart.name)) {

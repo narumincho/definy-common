@@ -219,3 +219,6 @@ export const getResult = (resultAndNextIndexExpr: ts.Expr): ts.Expr =>
  */
 export const getNextIndex = (resultAndNextIndexExpr: ts.Expr): ts.Expr =>
   tsUtil.get(resultAndNextIndexExpr, util.nextIndexProperty);
+
+export const codecParameterName = (name: string): ts.Identifer =>
+  identifer.fromString(name + "Codec");

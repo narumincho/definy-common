@@ -4,15 +4,13 @@ import * as ts from "js-ts-code-generator/distribution/newData";
 import * as util from "../util";
 import { identifer, data as tsUtil } from "js-ts-code-generator";
 
-const elementCodecName = identifer.fromString("elementCodec");
-const elementCodecVar = ts.Expr.Variable(elementCodecName);
-
 export const name = identifer.fromString("List");
 
 export const type = (element: ts.Type): ts.Type =>
   tsUtil.readonlyArrayType(element);
 
 export const encodeDefinitionStatementList = (
+  typeParameterName: string,
   valueVar: ts.Expr
 ): ReadonlyArray<ts.Statement> => {
   const resultName = identifer.fromString("result");
@@ -36,7 +34,10 @@ export const encodeDefinitionStatementList = (
           operatorMaybe: ts.Maybe.Nothing(),
           expr: tsUtil.callMethod(ts.Expr.Variable(resultName), "concat", [
             ts.Expr.Call({
-              expr: tsUtil.get(elementCodecVar, util.encodePropertyName),
+              expr: tsUtil.get(
+                ts.Expr.Variable(c.codecParameterName(typeParameterName)),
+                util.encodePropertyName
+              ),
               parameterList: [ts.Expr.Variable(elementName)],
             }),
           ]),
@@ -92,7 +93,10 @@ export const decodeDefinitionStatementList = (
           name: resultAndNextIndexName,
           type: c.decodeReturnType(elementTypeVar),
           expr: ts.Expr.Call({
-            expr: tsUtil.get(elementCodecVar, util.decodePropertyName),
+            expr: tsUtil.get(
+              ts.Expr.Variable(c.codecParameterName(typeParameterName)),
+              util.decodePropertyName
+            ),
             parameterList: [nextIndexVar, parameterBinary],
           }),
         }),

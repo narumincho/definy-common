@@ -261,9 +261,6 @@ const typePartToCodecMember = (
   ];
 };
 
-const codecParameterName = (name: string): ts.Identifer =>
-  identifer.fromString(name + "Codec");
-
 const codecExprDefinition = (
   typePart: data.TypePart,
   allTypePartIdTypePartNameMap: ReadonlyMap<data.TypePartId, string>
@@ -276,7 +273,7 @@ const codecExprDefinition = (
       identifer.fromString(typeParameter.name)
     ),
     parameterList: typePart.typeParameterList.map((typeParameter) => ({
-      name: codecParameterName(typeParameter.name),
+      name: codec.codecParameterName(typeParameter.name),
       type: codec.codecType(
         ts.Type.ScopeInFile(identifer.fromString(typeParameter.name))
       ),
@@ -344,7 +341,8 @@ const encodeExprDefinition = (
         case "Kernel":
           return kernelEncodeDefinitionStatementList(
             typePart.body.typePartBodyKernel,
-            valueVar
+            valueVar,
+            typePart
           );
       }
     }
@@ -442,7 +440,8 @@ const patternToSwitchPattern = (
 
 const kernelEncodeDefinitionStatementList = (
   typePartBodyKernel: data.TypePartBodyKernel,
-  valueVar: ts.Expr
+  valueVar: ts.Expr,
+  typePart: data.TypePart
 ): ReadonlyArray<ts.Statement> => {
   switch (typePartBodyKernel) {
     case "Function":
@@ -457,8 +456,15 @@ const kernelEncodeDefinitionStatementList = (
       return hexString.idEncodeDefinitionStatementList(valueVar);
     case "Token":
       return hexString.tokenEncodeDefinitionStatementList(valueVar);
-    case "List":
-      return list.encodeDefinitionStatementList(valueVar);
+    case "List": {
+      if (typePart.typeParameterList.length !== 1) {
+        throw new Error("List type need one type paramter");
+      }
+      return list.encodeDefinitionStatementList(
+        typePart.typeParameterList[0].name,
+        valueVar
+      );
+    }
   }
 };
 
@@ -786,18 +792,23 @@ const codecExprUse = (
     );
   }
   if (type.parameter.length === 0) {
-    return tsUtil.get(
-      ts.Expr.Variable(identifer.fromString(typePartName)),
-      util.codecPropertyName
-    );
+    return typePartNameToCodecExpr(typePartName);
   }
   return ts.Expr.Call({
-    expr: tsUtil.get(
-      ts.Expr.Variable(identifer.fromString(typePartName)),
-      util.codecPropertyName
-    ),
+    expr: typePartNameToCodecExpr(typePartName),
     parameterList: type.parameter.map((parameter) =>
       codecExprUse(parameter, allTypePartIdTypePartNameMap)
     ),
   });
+};
+
+const typePartNameToCodecExpr = (typePartName: string): ts.Expr => {
+  // TODO 型パラメーターの判定を名前でしてしまっている
+  if (util.isFirstLowerCaseName(typePartName)) {
+    ts.Expr.Variable(codec.codecParameterName(typePartName));
+  }
+  return tsUtil.get(
+    ts.Expr.Variable(identifer.fromString(typePartName)),
+    util.codecPropertyName
+  );
 };
