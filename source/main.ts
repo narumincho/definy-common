@@ -1,4 +1,5 @@
 import * as data from "./data";
+import * as hexString from "./kernelType/hexString";
 import * as ts from "js-ts-code-generator/distribution/newData";
 import * as typeAlias from "./typeAlias";
 import * as util from "./util";
@@ -705,6 +706,10 @@ export const generateTypeScriptCode = (
   const allTypePartIdTypePartNameMap = checkTypePartListValidation(typePartMap);
   return {
     exportDefinitionList: [
+      ts.ExportDefinition.Function(hexString.encodeIdFunction),
+      ts.ExportDefinition.Function(hexString.idDecodeFunction),
+      ts.ExportDefinition.Function(hexString.tokenEncodeFunction),
+      ts.ExportDefinition.Function(hexString.decodeTokenFunction),
       ...typeAlias
         .typePartMapToTypeAlias(typePartMap, allTypePartIdTypePartNameMap)
         .map(ts.ExportDefinition.TypeAlias),

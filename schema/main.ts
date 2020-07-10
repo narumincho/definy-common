@@ -8,7 +8,6 @@ const typeScriptCode = codeGen.generateCodeAsString(
   definyCore.generateTypeScriptCode(typePartMap.typePartMap),
   "TypeScript"
 );
-console.log(typeScriptCode);
 
 const typeScriptPath = "source/newData.ts";
 fs.promises

@@ -35,7 +35,7 @@ const typePartToTsType = (
   allTypePartIdTypePartNameMap: ReadonlyMap<data.TypePartId, string>
 ): ts.Type => {
   if (typePart.attribute._ === "Just") {
-    typePartWIthAttributeToTsType(typePart, typePart.attribute.value);
+    return typePartWIthAttributeToTsType(typePart, typePart.attribute.value);
   }
   switch (typePart.body._) {
     case "Sum":

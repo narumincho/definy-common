@@ -13,13 +13,9 @@ export const typePartMapToVariable = (
   typePartMap: ReadonlyMap<data.TypePartId, data.TypePart>,
   allTypePartIdTypePartNameMap: ReadonlyMap<data.TypePartId, string>
 ): ReadonlyArray<ts.Variable> => {
-  return [
-    hexString.idKernelExprDefinition,
-    hexString.tokenKernelExprDefinition,
-    ...[...typePartMap].map(([typePartId, typePart]) =>
-      typePartToVariable(typePartId, typePart, allTypePartIdTypePartNameMap)
-    ),
-  ];
+  return [...typePartMap].map(([typePartId, typePart]) =>
+    typePartToVariable(typePartId, typePart, allTypePartIdTypePartNameMap)
+  );
 };
 
 const typePartToVariable = (

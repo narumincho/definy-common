@@ -3,120 +3,161 @@ import * as ts from "js-ts-code-generator/distribution/newData";
 import * as util from "../util";
 import { identifer, data as tsUtil } from "js-ts-code-generator";
 
-const type = ts.Type.String;
-
-const hexEncodeDefinition = (byteSize: number): ts.Expr => {
+const encodeDefinition = (
+  byteSize: number,
+  functionName: ts.Identifer,
+  document: string
+): ts.Function => {
+  const valueName = identifer.fromString("value");
+  const valueVar = ts.Expr.Variable(valueName);
   const resultName = identifer.fromString("result");
   const resultVar = ts.Expr.Variable(resultName);
   const iName = identifer.fromString("i");
   const iVar = ts.Expr.Variable(iName);
 
-  return codec.encodeLambda(type, (value) => [
-    ts.Statement.VariableDefinition({
-      isConst: true,
-      name: resultName,
-      type: tsUtil.arrayType(ts.Type.Number),
-      expr: ts.Expr.ArrayLiteral([]),
-    }),
-    ts.Statement.For({
-      counterVariableName: iName,
-      untilExpr: ts.Expr.NumberLiteral(byteSize),
-      statementList: [
-        ts.Statement.Set({
-          target: ts.Expr.Get({ expr: resultVar, propertyExpr: iVar }),
-          operatorMaybe: ts.Maybe.Nothing(),
-          expr: tsUtil.callNumberMethod("parseInt", [
-            tsUtil.callMethod(value, "slice", [
-              tsUtil.multiplication(iVar, ts.Expr.NumberLiteral(2)),
-              tsUtil.addition(
+  return {
+    name: functionName,
+    document,
+    typeParameterList: [],
+    returnType: codec.encodeReturnType,
+    parameterList: [
+      {
+        name: valueName,
+        document: "",
+        type: ts.Type.String,
+      },
+    ],
+    statementList: [
+      ts.Statement.VariableDefinition({
+        isConst: true,
+        name: resultName,
+        type: tsUtil.arrayType(ts.Type.Number),
+        expr: ts.Expr.ArrayLiteral([]),
+      }),
+      ts.Statement.For({
+        counterVariableName: iName,
+        untilExpr: ts.Expr.NumberLiteral(byteSize),
+        statementList: [
+          ts.Statement.Set({
+            target: ts.Expr.Get({ expr: resultVar, propertyExpr: iVar }),
+            operatorMaybe: ts.Maybe.Nothing(),
+            expr: tsUtil.callNumberMethod("parseInt", [
+              tsUtil.callMethod(valueVar, "slice", [
                 tsUtil.multiplication(iVar, ts.Expr.NumberLiteral(2)),
-                ts.Expr.NumberLiteral(2)
-              ),
-            ]),
-            ts.Expr.NumberLiteral(16),
-          ]),
-        }),
-      ],
-    }),
-    ts.Statement.Return(resultVar),
-  ]);
-};
-
-const decodeDefinition = (byteSize: number): ts.Expr => {
-  return codec.decodeLambda(type, (parameterIndex, parameterBinary) => [
-    codec.returnStatement(
-      tsUtil.callMethod(
-        tsUtil.callMethod(
-          ts.Expr.ArrayLiteral([
-            {
-              expr: tsUtil.callMethod(parameterBinary, "slice", [
-                parameterIndex,
                 tsUtil.addition(
-                  parameterIndex,
-                  ts.Expr.NumberLiteral(byteSize)
+                  tsUtil.multiplication(iVar, ts.Expr.NumberLiteral(2)),
+                  ts.Expr.NumberLiteral(2)
                 ),
               ]),
-              spread: true,
-            },
-          ]),
-          "map",
-          [
-            ts.Expr.Lambda({
-              typeParameterList: [],
-              parameterList: [
-                {
-                  name: identifer.fromString("n"),
-                  type: ts.Type.Number,
-                },
-              ],
-              returnType: ts.Type.String,
-              statementList: [
-                ts.Statement.Return(
-                  tsUtil.callMethod(
-                    tsUtil.callMethod(
-                      ts.Expr.Variable(identifer.fromString("n")),
-                      "toString",
-                      [ts.Expr.NumberLiteral(16)]
-                    ),
-                    "padStart",
-                    [ts.Expr.NumberLiteral(2), ts.Expr.StringLiteral("0")]
-                  )
-                ),
-              ],
-            }),
-          ]
-        ),
-        "join",
-        [ts.Expr.StringLiteral("")]
-      ),
-
-      tsUtil.addition(parameterIndex, ts.Expr.NumberLiteral(byteSize))
-    ),
-  ]);
+              ts.Expr.NumberLiteral(16),
+            ]),
+          }),
+        ],
+      }),
+      ts.Statement.Return(resultVar),
+    ],
+  };
 };
 
-const variableDefinition = (
+const decodeDefinition = (
   byteSize: number,
-  name: ts.Identifer
-): ts.Variable =>
-  codec.variableDefinition(
-    name,
-    type,
-    byteSize.toString() +
-      "byteのバイナリ. JSでは 0-fの16進数の文字列として扱う",
-    "",
-    hexEncodeDefinition(byteSize),
-    decodeDefinition(byteSize)
-  );
+  functionName: ts.Identifer,
+  document: string
+): ts.Function => {
+  const parameterIndex = ts.Expr.Variable(codec.indexIdentifer);
+  const parameterBinary = ts.Expr.Variable(codec.binaryIdentifer);
+  return {
+    name: functionName,
+    document,
+    typeParameterList: [],
+    returnType: codec.decodeReturnType(ts.Type.String),
+    parameterList: codec.decodeParameterList,
+    statementList: [
+      codec.returnStatement(
+        tsUtil.callMethod(
+          tsUtil.callMethod(
+            ts.Expr.ArrayLiteral([
+              {
+                expr: tsUtil.callMethod(parameterBinary, "slice", [
+                  parameterIndex,
+                  tsUtil.addition(
+                    parameterIndex,
+                    ts.Expr.NumberLiteral(byteSize)
+                  ),
+                ]),
+                spread: true,
+              },
+            ]),
+            "map",
+            [
+              ts.Expr.Lambda({
+                typeParameterList: [],
+                parameterList: [
+                  {
+                    name: identifer.fromString("n"),
+                    type: ts.Type.Number,
+                  },
+                ],
+                returnType: ts.Type.String,
+                statementList: [
+                  ts.Statement.Return(
+                    tsUtil.callMethod(
+                      tsUtil.callMethod(
+                        ts.Expr.Variable(identifer.fromString("n")),
+                        "toString",
+                        [ts.Expr.NumberLiteral(16)]
+                      ),
+                      "padStart",
+                      [ts.Expr.NumberLiteral(2), ts.Expr.StringLiteral("0")]
+                    )
+                  ),
+                ],
+              }),
+            ]
+          ),
+          "join",
+          [ts.Expr.StringLiteral("")]
+        ),
 
-const idName = identifer.fromString("Id");
-const tokenName = identifer.fromString("Token");
-export const idKernelExprDefinition = variableDefinition(16, idName);
-export const tokenKernelExprDefinition = variableDefinition(32, tokenName);
-const idCodec = tsUtil.get(ts.Expr.Variable(idName), util.codecPropertyName);
-const tokenCodec = tsUtil.get(
-  ts.Expr.Variable(tokenName),
-  util.codecPropertyName
+        tsUtil.addition(parameterIndex, ts.Expr.NumberLiteral(byteSize))
+      ),
+    ],
+  };
+};
+
+const idByteSize = 16;
+const tokenByteSize = 32;
+
+const encodeIdIdentifer = identifer.fromString("encodeId");
+const encodeIdVariable = ts.Expr.Variable(encodeIdIdentifer);
+export const encodeIdFunction: ts.Function = encodeDefinition(
+  idByteSize,
+  encodeIdIdentifer,
+  "UserId, ProjectIdなどのIdをバイナリ形式にエンコードする"
+);
+
+const encodeTokenIdentifer = identifer.fromString("encodeToken");
+const encodeTokenVariable = ts.Expr.Variable(encodeTokenIdentifer);
+export const tokenEncodeFunction: ts.Function = encodeDefinition(
+  tokenByteSize,
+  encodeTokenIdentifer,
+  "ImageTokenなどのTokenをバイナリ形式にエンコードする"
+);
+
+const decodeIdIdentifer = identifer.fromString("decodeId");
+const decodeIdVariable = ts.Expr.Variable(decodeIdIdentifer);
+export const idDecodeFunction: ts.Function = decodeDefinition(
+  idByteSize,
+  decodeIdIdentifer,
+  "バイナリ形式をUserId, ProjectIdなどのIdにデコードする"
+);
+
+const decodeTokenIdentifer = identifer.fromString("decodeToken");
+const decodeTokenVariable = ts.Expr.Variable(decodeTokenIdentifer);
+export const decodeTokenFunction: ts.Function = decodeDefinition(
+  tokenByteSize,
+  decodeTokenIdentifer,
+  "バイナリ形式をImageTokenなどのTokenにエンコードする"
 );
 
 export const idEncodeDefinitionStatementList = (
@@ -124,7 +165,7 @@ export const idEncodeDefinitionStatementList = (
 ): ReadonlyArray<ts.Statement> => [
   ts.Statement.Return(
     ts.Expr.Call({
-      expr: tsUtil.get(idCodec, util.encodePropertyName),
+      expr: encodeIdVariable,
       parameterList: [valueVar],
     })
   ),
@@ -139,8 +180,11 @@ export const idDecodeDefinitionStatementList = (
   return [
     ts.Statement.Return(
       ts.Expr.TypeAssertion({
-        expr: tsUtil.get(idCodec, util.decodePropertyName),
-        type: codec.decodeFunctionType(targetType),
+        expr: ts.Expr.Call({
+          expr: decodeIdVariable,
+          parameterList: [parameterIndex, parameterBinary],
+        }),
+        type: codec.decodeReturnType(targetType),
       })
     ),
   ];
@@ -151,7 +195,10 @@ export const tokenEncodeDefinitionStatementList = (
 ): ReadonlyArray<ts.Statement> => [
   ts.Statement.Return(
     ts.Expr.Call({
-      expr: tsUtil.get(tokenCodec, util.encodePropertyName),
+      expr: ts.Expr.Call({
+        expr: encodeTokenVariable,
+        parameterList: [valueVar],
+      }),
       parameterList: [valueVar],
     })
   ),
@@ -166,7 +213,10 @@ export const tokenDecodeDefinitionStatementList = (
   return [
     ts.Statement.Return(
       ts.Expr.TypeAssertion({
-        expr: tsUtil.get(tokenCodec, util.decodePropertyName),
+        expr: ts.Expr.Call({
+          expr: decodeTokenVariable,
+          parameterList: [parameterIndex, parameterBinary],
+        }),
         type: codec.decodeFunctionType(targetType),
       })
     ),
