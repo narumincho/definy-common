@@ -70,7 +70,7 @@ export type Codec<T extends unknown> = {
  * -2 147 483 648 ～ 2 147 483 647. 32bit 符号付き整数. JavaScriptのnumberとして扱える. numberの32bit符号あり整数をSigned Leb128のバイナリに変換する
  *  @typePartIdccf22e92cea3639683c0271d65d00673
  */
-export type Int32 = number & { readonly _int32: never };
+export type Int32 = number;
 
 /**
  * バイナリ. JavaScriptのUint8Arrayで扱える. 最初にLED128でバイト数, その次にバイナリそのまま
@@ -303,16 +303,7 @@ export const Bool: {
   True: true,
   False: false,
   codec: {
-    encode: (value: Bool): ReadonlyArray<number> => {
-      switch (value) {
-        case "True": {
-          return [0];
-        }
-        case "False": {
-          return [1];
-        }
-      }
-    },
+    encode: (value: Bool): ReadonlyArray<number> => [value ? 1 : 0],
     decode: (
       index: number,
       binary: Uint8Array

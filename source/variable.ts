@@ -329,6 +329,25 @@ const encodeExprDefinition = (
             allTypePartIdTypePartNameMap
           );
         case "Sum":
+          if (
+            typePart.attribute._ === "Just" &&
+            typePart.attribute.value === data.TypeAttribute.AsBoolean
+          ) {
+            return [
+              ts.Statement.Return(
+                ts.Expr.ArrayLiteral([
+                  {
+                    expr: ts.Expr.ConditionalOperator({
+                      condition: valueVar,
+                      thenExpr: ts.Expr.NumberLiteral(1),
+                      elseExpr: ts.Expr.NumberLiteral(0),
+                    }),
+                    spread: false,
+                  },
+                ])
+              ),
+            ];
+          }
           return sumEncodeDefinitionStatementList(
             typePart.body.patternList,
             valueVar,

@@ -141,12 +141,7 @@ const typePartBodyKernelToTsType = (
         typeParameterList: [],
       });
     case "Int32":
-      return ts.Type.Intersection({
-        left: ts.Type.Number,
-        right: ts.Type.Object([
-          { name: "_int32", required: true, type: ts.Type.Never, document: "" },
-        ]),
-      });
+      return ts.Type.Number;
     case "String":
       return ts.Type.String;
     case "Binary":
