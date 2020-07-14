@@ -761,6 +761,89 @@ export type TypeError = {
 };
 
 /**
+ * プロジェクト作成時に必要なパラメーター
+ *  @typePartId 8ac0f1e4609a750afb9e068d9914a2db
+ */
+export type CreateProjectParameter = {
+  /**
+   * プロジェクトを作るときのアカウント
+   */
+  readonly accessToken: AccessToken;
+  /**
+   * プロジェクト名
+   */
+  readonly projectName: String;
+};
+
+/**
+ * アイデアを作成時に必要なパラメーター
+ *  @typePartId 036e55068c26060c3632062801b0216b
+ */
+export type CreateIdeaParameter = {
+  /**
+   * プロジェクトを作るときのアカウント
+   */
+  readonly accessToken: AccessToken;
+  /**
+   * アイデア名
+   */
+  readonly ideaName: String;
+  /**
+   * 対象のプロジェクトID
+   */
+  readonly projectId: ProjectId;
+};
+
+/**
+ * アイデアにコメントを追加するときに必要なパラメーター
+ *  @typePartId ad7a6a667a36a79c3bbc81f8f0789fe8
+ */
+export type AddCommentParameter = {
+  /**
+   * コメントをするユーザー
+   */
+  readonly accessToken: AccessToken;
+  /**
+   * コメントを追加するアイデア
+   */
+  readonly ideaId: IdeaId;
+  /**
+   * コメント本文
+   */
+  readonly comment: String;
+};
+
+/**
+ * 提案を作成するときに必要なパラメーター
+ *  @typePartId 8b40f4351fe048ff78f14c523b6f76f1
+ */
+export type AddSuggestionParameter = {
+  /**
+   * 提案を作成するユーザー
+   */
+  readonly accessToken: AccessToken;
+  /**
+   * 提案に関連付けられるアイデア
+   */
+  readonly ideaId: IdeaId;
+};
+
+/**
+ * 提案を承認待ちにしたり許可したりするときなどに使う
+ *  @typePartId 74280d6a5db1d48b6815a73a819756c3
+ */
+export type AccessTokenAndSuggestionId = {
+  /**
+   * アクセストークン
+   */
+  readonly accessToken: AccessToken;
+  /**
+   * SuggestionId
+   */
+  readonly suggestionId: SuggestionId;
+};
+
+/**
  * プロジェクトの識別子
  *  @typePartId 4e3ab0f9499404a5fa100c4b57835906
  */
@@ -807,6 +890,12 @@ export type TypePartId = string & { readonly _typePartId: never };
  *  @typePartId 3133b45b0078dd3b79b067c3ce0c4a67
  */
 export type TagId = string & { readonly _tagId: never };
+
+/**
+ * アクセストークン. アクセストークンを持っていれば特定のユーザーであるが証明される. これが盗まれた場合,不正に得た相手はそのユーザーになりすますことができる
+ *  @typePartId be993929300452364c8bb658609f682d
+ */
+export type AccessToken = string & { readonly _accessToken: never };
 
 /**
  * -2 147 483 648 ～ 2 147 483 647. 32bit 符号付き整数. JavaScriptのnumberとして扱える. numberの32bit符号あり整数をSigned Leb128のバイナリに変換する
@@ -3476,6 +3565,202 @@ export const TypeError: { readonly codec: Codec<TypeError> } = {
 };
 
 /**
+ * プロジェクト作成時に必要なパラメーター
+ * @typePartId 8ac0f1e4609a750afb9e068d9914a2db
+ */
+export const CreateProjectParameter: {
+  readonly codec: Codec<CreateProjectParameter>;
+} = {
+  codec: {
+    encode: (value: CreateProjectParameter): ReadonlyArray<number> =>
+      AccessToken.codec
+        .encode(value.accessToken)
+        .concat(String.codec.encode(value.projectName)),
+    decode: (
+      index: number,
+      binary: Uint8Array
+    ): {
+      readonly result: CreateProjectParameter;
+      readonly nextIndex: number;
+    } => {
+      const accessTokenAndNextIndex: {
+        readonly result: AccessToken;
+        readonly nextIndex: number;
+      } = AccessToken.codec.decode(index, binary);
+      const projectNameAndNextIndex: {
+        readonly result: String;
+        readonly nextIndex: number;
+      } = String.codec.decode(accessTokenAndNextIndex.nextIndex, binary);
+      return {
+        result: {
+          accessToken: accessTokenAndNextIndex.result,
+          projectName: projectNameAndNextIndex.result,
+        },
+        nextIndex: projectNameAndNextIndex.nextIndex,
+      };
+    },
+  },
+};
+
+/**
+ * アイデアを作成時に必要なパラメーター
+ * @typePartId 036e55068c26060c3632062801b0216b
+ */
+export const CreateIdeaParameter: {
+  readonly codec: Codec<CreateIdeaParameter>;
+} = {
+  codec: {
+    encode: (value: CreateIdeaParameter): ReadonlyArray<number> =>
+      AccessToken.codec
+        .encode(value.accessToken)
+        .concat(String.codec.encode(value.ideaName))
+        .concat(ProjectId.codec.encode(value.projectId)),
+    decode: (
+      index: number,
+      binary: Uint8Array
+    ): { readonly result: CreateIdeaParameter; readonly nextIndex: number } => {
+      const accessTokenAndNextIndex: {
+        readonly result: AccessToken;
+        readonly nextIndex: number;
+      } = AccessToken.codec.decode(index, binary);
+      const ideaNameAndNextIndex: {
+        readonly result: String;
+        readonly nextIndex: number;
+      } = String.codec.decode(accessTokenAndNextIndex.nextIndex, binary);
+      const projectIdAndNextIndex: {
+        readonly result: ProjectId;
+        readonly nextIndex: number;
+      } = ProjectId.codec.decode(ideaNameAndNextIndex.nextIndex, binary);
+      return {
+        result: {
+          accessToken: accessTokenAndNextIndex.result,
+          ideaName: ideaNameAndNextIndex.result,
+          projectId: projectIdAndNextIndex.result,
+        },
+        nextIndex: projectIdAndNextIndex.nextIndex,
+      };
+    },
+  },
+};
+
+/**
+ * アイデアにコメントを追加するときに必要なパラメーター
+ * @typePartId ad7a6a667a36a79c3bbc81f8f0789fe8
+ */
+export const AddCommentParameter: {
+  readonly codec: Codec<AddCommentParameter>;
+} = {
+  codec: {
+    encode: (value: AddCommentParameter): ReadonlyArray<number> =>
+      AccessToken.codec
+        .encode(value.accessToken)
+        .concat(IdeaId.codec.encode(value.ideaId))
+        .concat(String.codec.encode(value.comment)),
+    decode: (
+      index: number,
+      binary: Uint8Array
+    ): { readonly result: AddCommentParameter; readonly nextIndex: number } => {
+      const accessTokenAndNextIndex: {
+        readonly result: AccessToken;
+        readonly nextIndex: number;
+      } = AccessToken.codec.decode(index, binary);
+      const ideaIdAndNextIndex: {
+        readonly result: IdeaId;
+        readonly nextIndex: number;
+      } = IdeaId.codec.decode(accessTokenAndNextIndex.nextIndex, binary);
+      const commentAndNextIndex: {
+        readonly result: String;
+        readonly nextIndex: number;
+      } = String.codec.decode(ideaIdAndNextIndex.nextIndex, binary);
+      return {
+        result: {
+          accessToken: accessTokenAndNextIndex.result,
+          ideaId: ideaIdAndNextIndex.result,
+          comment: commentAndNextIndex.result,
+        },
+        nextIndex: commentAndNextIndex.nextIndex,
+      };
+    },
+  },
+};
+
+/**
+ * 提案を作成するときに必要なパラメーター
+ * @typePartId 8b40f4351fe048ff78f14c523b6f76f1
+ */
+export const AddSuggestionParameter: {
+  readonly codec: Codec<AddSuggestionParameter>;
+} = {
+  codec: {
+    encode: (value: AddSuggestionParameter): ReadonlyArray<number> =>
+      AccessToken.codec
+        .encode(value.accessToken)
+        .concat(IdeaId.codec.encode(value.ideaId)),
+    decode: (
+      index: number,
+      binary: Uint8Array
+    ): {
+      readonly result: AddSuggestionParameter;
+      readonly nextIndex: number;
+    } => {
+      const accessTokenAndNextIndex: {
+        readonly result: AccessToken;
+        readonly nextIndex: number;
+      } = AccessToken.codec.decode(index, binary);
+      const ideaIdAndNextIndex: {
+        readonly result: IdeaId;
+        readonly nextIndex: number;
+      } = IdeaId.codec.decode(accessTokenAndNextIndex.nextIndex, binary);
+      return {
+        result: {
+          accessToken: accessTokenAndNextIndex.result,
+          ideaId: ideaIdAndNextIndex.result,
+        },
+        nextIndex: ideaIdAndNextIndex.nextIndex,
+      };
+    },
+  },
+};
+
+/**
+ * 提案を承認待ちにしたり許可したりするときなどに使う
+ * @typePartId 74280d6a5db1d48b6815a73a819756c3
+ */
+export const AccessTokenAndSuggestionId: {
+  readonly codec: Codec<AccessTokenAndSuggestionId>;
+} = {
+  codec: {
+    encode: (value: AccessTokenAndSuggestionId): ReadonlyArray<number> =>
+      AccessToken.codec
+        .encode(value.accessToken)
+        .concat(SuggestionId.codec.encode(value.suggestionId)),
+    decode: (
+      index: number,
+      binary: Uint8Array
+    ): {
+      readonly result: AccessTokenAndSuggestionId;
+      readonly nextIndex: number;
+    } => {
+      const accessTokenAndNextIndex: {
+        readonly result: AccessToken;
+        readonly nextIndex: number;
+      } = AccessToken.codec.decode(index, binary);
+      const suggestionIdAndNextIndex: {
+        readonly result: SuggestionId;
+        readonly nextIndex: number;
+      } = SuggestionId.codec.decode(accessTokenAndNextIndex.nextIndex, binary);
+      return {
+        result: {
+          accessToken: accessTokenAndNextIndex.result,
+          suggestionId: suggestionIdAndNextIndex.result,
+        },
+        nextIndex: suggestionIdAndNextIndex.nextIndex,
+      };
+    },
+  },
+};
+
+/**
  * プロジェクトの識別子
  * @typePartId 4e3ab0f9499404a5fa100c4b57835906
  */
@@ -3614,6 +3899,24 @@ export const TagId: { readonly codec: Codec<TagId> } = {
     ): { readonly result: TagId; readonly nextIndex: number } =>
       decodeId(index, binary) as {
         readonly result: TagId;
+        readonly nextIndex: number;
+      },
+  },
+};
+
+/**
+ * アクセストークン. アクセストークンを持っていれば特定のユーザーであるが証明される. これが盗まれた場合,不正に得た相手はそのユーザーになりすますことができる
+ * @typePartId be993929300452364c8bb658609f682d
+ */
+export const AccessToken: { readonly codec: Codec<AccessToken> } = {
+  codec: {
+    encode: (value: AccessToken): ReadonlyArray<number> => encodeId(value),
+    decode: (
+      index: number,
+      binary: Uint8Array
+    ): { readonly result: AccessToken; readonly nextIndex: number } =>
+      decodeId(index, binary) as {
+        readonly result: AccessToken;
         readonly nextIndex: number;
       },
   },

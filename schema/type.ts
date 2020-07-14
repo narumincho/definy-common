@@ -103,6 +103,22 @@ export const EvaluateExprError = noParameterType(id.EvaluateExprError);
 
 export const TypeError = noParameterType(id.TypeError);
 
+export const CreateProjectParameter = noParameterType(
+  id.CreateProjectParameter
+);
+
+export const CreateIdeaParameter = noParameterType(id.CreateIdeaParameter);
+
+export const AddCommentParameter = noParameterType(id.AddCommentParameter);
+
+export const AddSuggestionParameter = noParameterType(
+  id.AddSuggestionParameter
+);
+
+export const AccessTokenAndSuggestionId = noParameterType(
+  id.AccessTokenAndSuggestionId
+);
+
 export const ProjectId = noParameterType(id.ProjectId);
 
 export const UserId = noParameterType(id.UserId);
@@ -118,3 +134,5 @@ export const PartId = noParameterType(id.PartId);
 export const TypePartId = noParameterType(id.TypePartId);
 
 export const TagId = noParameterType(id.TagId);
+
+export const AccessToken = noParameterType(id.AccessToken);

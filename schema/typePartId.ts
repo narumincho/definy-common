@@ -44,6 +44,11 @@ export const ConditionCapture = "1e0084ab494ca046f98cd6334ecf0944" as T;
 export const BranchPartDefinition = "7591b507c8c0477470c0eadca88b86c3" as T;
 export const EvaluateExprError = "6519a080b86da2627bef4032319ac621" as T;
 export const TypeError = "466fbfeeb2d6ead0f6bd0833b5ea3d71" as T;
+export const CreateProjectParameter = "8ac0f1e4609a750afb9e068d9914a2db" as T;
+export const CreateIdeaParameter = "036e55068c26060c3632062801b0216b" as T;
+export const AddCommentParameter = "ad7a6a667a36a79c3bbc81f8f0789fe8" as T;
+export const AddSuggestionParameter = "8b40f4351fe048ff78f14c523b6f76f1" as T;
+export const AccessTokenAndSuggestionId = "74280d6a5db1d48b6815a73a819756c3" as T;
 
 export const ProjectId = "4e3ab0f9499404a5fa100c4b57835906" as T;
 export const UserId = "5a71cddc0b95298cb57ec66089190e9b" as T;
@@ -53,3 +58,4 @@ export const ImageToken = "b193be207840b5b489517eb5d7b492b2" as T;
 export const PartId = "d2c65983f602ee7e0a7be06e6af61acf" as T;
 export const TypePartId = "2562ffbc386c801f5132e10b945786e0" as T;
 export const TagId = "3133b45b0078dd3b79b067c3ce0c4a67" as T;
+export const AccessToken = "be993929300452364c8bb658609f682d" as T;

@@ -1476,6 +1476,141 @@ export const typePartMap: ReadonlyMap<TypePartId, TypePart> = new Map<
     },
   ],
   [
+    id.CreateProjectParameter,
+    {
+      name: "CreateProjectParameter",
+      description: "プロジェクト作成時に必要なパラメーター",
+      migrationPartId: Maybe.Nothing(),
+      projectId: util.definyCodeProjectId,
+      createSuggestionId: util.codeSuggestionId,
+      getTime: { day: 0, millisecond: 0 },
+      attribute: Maybe.Nothing(),
+      typeParameterList: [],
+      body: TypePartBody.Product([
+        {
+          name: "accessToken",
+          description: "プロジェクトを作るときのアカウント",
+          type: type.AccessToken,
+        },
+        {
+          name: "projectName",
+          description: "プロジェクト名",
+          type: type.String,
+        },
+      ]),
+    },
+  ],
+  [
+    id.CreateIdeaParameter,
+    {
+      name: "CreateIdeaParameter",
+      description: "アイデアを作成時に必要なパラメーター",
+      migrationPartId: Maybe.Nothing(),
+      projectId: util.definyCodeProjectId,
+      createSuggestionId: util.codeSuggestionId,
+      getTime: { day: 0, millisecond: 0 },
+      attribute: Maybe.Nothing(),
+      typeParameterList: [],
+      body: TypePartBody.Product([
+        {
+          name: "accessToken",
+          description: "プロジェクトを作るときのアカウント",
+          type: type.AccessToken,
+        },
+        {
+          name: "ideaName",
+          description: "アイデア名",
+          type: type.String,
+        },
+        {
+          name: "projectId",
+          description: "対象のプロジェクトID",
+          type: type.ProjectId,
+        },
+      ]),
+    },
+  ],
+  [
+    id.AddCommentParameter,
+    {
+      name: "AddCommentParameter",
+      description: "アイデアにコメントを追加するときに必要なパラメーター",
+      migrationPartId: Maybe.Nothing(),
+      projectId: util.definyCodeProjectId,
+      createSuggestionId: util.codeSuggestionId,
+      getTime: { day: 0, millisecond: 0 },
+      attribute: Maybe.Nothing(),
+      typeParameterList: [],
+      body: TypePartBody.Product([
+        {
+          name: "accessToken",
+          description: "コメントをするユーザー",
+          type: type.AccessToken,
+        },
+        {
+          name: "ideaId",
+          description: "コメントを追加するアイデア",
+          type: type.IdeaId,
+        },
+        {
+          name: "comment",
+          description: "コメント本文",
+          type: type.String,
+        },
+      ]),
+    },
+  ],
+  [
+    id.AddSuggestionParameter,
+    {
+      name: "AddSuggestionParameter",
+      description: "提案を作成するときに必要なパラメーター",
+      migrationPartId: Maybe.Nothing(),
+      projectId: util.definyCodeProjectId,
+      createSuggestionId: util.codeSuggestionId,
+      getTime: { day: 0, millisecond: 0 },
+      attribute: Maybe.Nothing(),
+      typeParameterList: [],
+      body: TypePartBody.Product([
+        {
+          name: "accessToken",
+          description: "提案を作成するユーザー",
+          type: type.AccessToken,
+        },
+        {
+          name: "ideaId",
+          description: "提案に関連付けられるアイデア",
+          type: type.IdeaId,
+        },
+      ]),
+    },
+  ],
+  [
+    id.AccessTokenAndSuggestionId,
+    {
+      name: "AccessTokenAndSuggestionId",
+      description: "提案を承認待ちにしたり許可したりするときなどに使う",
+      migrationPartId: Maybe.Nothing(),
+      projectId: util.definyCodeProjectId,
+      createSuggestionId: util.codeSuggestionId,
+      getTime: { day: 0, millisecond: 0 },
+      attribute: Maybe.Nothing(),
+      typeParameterList: [],
+      body: TypePartBody.Product([
+        {
+          name: "accessToken",
+          description: "アクセストークン",
+          type: type.AccessToken,
+        },
+        {
+          name: "suggestionId",
+          description: "SuggestionId",
+          type: type.SuggestionId,
+        },
+      ]),
+    },
+  ],
+  [
     id.ProjectId,
     {
       name: "ProjectId",
@@ -1580,6 +1715,21 @@ export const typePartMap: ReadonlyMap<TypePartId, TypePart> = new Map<
       name: "TagId",
       migrationPartId: Maybe.Nothing(),
       description: "タグの識別子",
+      projectId: util.definyCodeProjectId,
+      createSuggestionId: util.codeSuggestionId,
+      getTime: { day: 0, millisecond: 0 },
+      attribute: Maybe.Nothing(),
+      typeParameterList: [],
+      body: TypePartBody.Kernel(TypePartBodyKernel.Id),
+    },
+  ],
+  [
+    id.AccessToken,
+    {
+      name: "AccessToken",
+      migrationPartId: Maybe.Nothing(),
+      description:
+        "アクセストークン. アクセストークンを持っていれば特定のユーザーであるが証明される. これが盗まれた場合,不正に得た相手はそのユーザーになりすますことができる",
       projectId: util.definyCodeProjectId,
       createSuggestionId: util.codeSuggestionId,
       getTime: { day: 0, millisecond: 0 },
