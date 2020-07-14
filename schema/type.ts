@@ -60,6 +60,11 @@ export const IdAndData = (idType: Type, dataType: Type): Type => ({
   parameter: [idType, dataType],
 });
 
+export const Project: Type = {
+  typePartId: id.Project,
+  parameter: [],
+};
+
 export const ProjectId: Type = {
   typePartId: id.ProjectId,
   parameter: [],
@@ -82,5 +87,15 @@ export const SuggestionId: Type = {
 
 export const ImageToken: Type = {
   typePartId: id.ImageToken,
+  parameter: [],
+};
+
+export const PartId: Type = {
+  typePartId: id.PartId,
+  parameter: [],
+};
+
+export const TypePartId: Type = {
+  typePartId: id.TypePartId,
   parameter: [],
 };

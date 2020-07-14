@@ -494,11 +494,71 @@ export const typePartMap: ReadonlyMap<TypePartId, TypePart> = new Map<
     },
   ],
   [
+    id.Project,
+    {
+      name: "Project",
+      description: "プロジェクト",
+      migrationPartId: Maybe.Nothing(),
+      projectId: util.definyCodeProjectId,
+      createSuggestionId: util.codeSuggestionId,
+      getTime: { day: 0, millisecond: 0 },
+      attribute: Maybe.Nothing(),
+      typeParameterList: [],
+      body: TypePartBody.Product([
+        {
+          name: "name",
+          description: "プロジェクト名",
+          type: type.String,
+        },
+        {
+          name: "iconHash",
+          description: "プロジェクトのアイコン画像",
+          type: type.ImageToken,
+        },
+        {
+          name: "imageHash",
+          description: "プロジェクトのカバー画像",
+          type: type.ImageToken,
+        },
+        {
+          name: "createTime",
+          description: "作成日時",
+          type: type.Time,
+        },
+        {
+          name: "createUserId",
+          description: "作成アカウント",
+          type: type.UserId,
+        },
+        {
+          name: "updateTime",
+          description: "更新日時",
+          type: type.Time,
+        },
+        {
+          name: "getTime",
+          description: "取得日時",
+          type: type.Time,
+        },
+        {
+          name: "partIdList",
+          description: "所属しているのパーツのIDのリスト",
+          type: type.List(type.PartId),
+        },
+        {
+          name: "typePartIdList",
+          description: "所属している型パーツのIDのリスト",
+          type: type.List(type.TypePartId),
+        },
+      ]),
+    },
+  ],
+  [
     id.ProjectId,
     {
       name: "ProjectId",
       migrationPartId: Maybe.Nothing(),
-      description: "プロジェクトを区別するためのID",
+      description: "プロジェクトの識別子",
       projectId: util.definyCodeProjectId,
       createSuggestionId: util.codeSuggestionId,
       getTime: { day: 0, millisecond: 0 },
@@ -512,7 +572,7 @@ export const typePartMap: ReadonlyMap<TypePartId, TypePart> = new Map<
     {
       name: "UserId",
       migrationPartId: Maybe.Nothing(),
-      description: "ユーザーを区別するためのID",
+      description: "ユーザーの識別子",
       projectId: util.definyCodeProjectId,
       createSuggestionId: util.codeSuggestionId,
       getTime: { day: 0, millisecond: 0 },
@@ -526,7 +586,7 @@ export const typePartMap: ReadonlyMap<TypePartId, TypePart> = new Map<
     {
       name: "IdeaId",
       migrationPartId: Maybe.Nothing(),
-      description: "アイデアを区別するためのID",
+      description: "アイデアの識別子",
       projectId: util.definyCodeProjectId,
       createSuggestionId: util.codeSuggestionId,
       getTime: { day: 0, millisecond: 0 },
@@ -540,7 +600,7 @@ export const typePartMap: ReadonlyMap<TypePartId, TypePart> = new Map<
     {
       name: "SuggestionId",
       migrationPartId: Maybe.Nothing(),
-      description: "提案を区別するためのID",
+      description: "提案の識別子",
       projectId: util.definyCodeProjectId,
       createSuggestionId: util.codeSuggestionId,
       getTime: { day: 0, millisecond: 0 },
@@ -556,6 +616,34 @@ export const typePartMap: ReadonlyMap<TypePartId, TypePart> = new Map<
       migrationPartId: Maybe.Nothing(),
       description:
         "画像から求められるトークン.キャッシュのキーとして使われる.1つのトークンに対して永久に1つの画像データしか表さない. キャッシュを更新する必要はない",
+      projectId: util.definyCodeProjectId,
+      createSuggestionId: util.codeSuggestionId,
+      getTime: { day: 0, millisecond: 0 },
+      attribute: Maybe.Nothing(),
+      typeParameterList: [],
+      body: TypePartBody.Kernel(TypePartBodyKernel.Id),
+    },
+  ],
+  [
+    id.PartId,
+    {
+      name: "PartId",
+      migrationPartId: Maybe.Nothing(),
+      description: "パーツの識別子",
+      projectId: util.definyCodeProjectId,
+      createSuggestionId: util.codeSuggestionId,
+      getTime: { day: 0, millisecond: 0 },
+      attribute: Maybe.Nothing(),
+      typeParameterList: [],
+      body: TypePartBody.Kernel(TypePartBodyKernel.Id),
+    },
+  ],
+  [
+    id.TypePartId,
+    {
+      name: "TypePartId",
+      migrationPartId: Maybe.Nothing(),
+      description: "型パーツの識別子",
       projectId: util.definyCodeProjectId,
       createSuggestionId: util.codeSuggestionId,
       getTime: { day: 0, millisecond: 0 },

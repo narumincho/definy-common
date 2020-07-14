@@ -248,25 +248,68 @@ export type IdAndData<id extends unknown, data extends unknown> = {
 };
 
 /**
- * プロジェクトを区別するためのID
+ * プロジェクト
+ *  @typePartId 3fb93c7e94724891d2a224c6f945acbd
+ */
+export type Project = {
+  /**
+   * プロジェクト名
+   */
+  readonly name: String;
+  /**
+   * プロジェクトのアイコン画像
+   */
+  readonly iconHash: ImageToken;
+  /**
+   * プロジェクトのカバー画像
+   */
+  readonly imageHash: ImageToken;
+  /**
+   * 作成日時
+   */
+  readonly createTime: Time;
+  /**
+   * 作成アカウント
+   */
+  readonly createUserId: UserId;
+  /**
+   * 更新日時
+   */
+  readonly updateTime: Time;
+  /**
+   * 取得日時
+   */
+  readonly getTime: Time;
+  /**
+   * 所属しているのパーツのIDのリスト
+   */
+  readonly partIdList: List<PartId>;
+  /**
+   * 所属している型パーツのIDのリスト
+   */
+  readonly typePartIdList: List<TypePartId>;
+};
+
+/**
+ * プロジェクトの識別子
  *  @typePartId 4e3ab0f9499404a5fa100c4b57835906
  */
 export type ProjectId = string & { readonly _projectId: never };
 
 /**
- * ユーザーを区別するためのID
+ * ユーザーの識別子
  *  @typePartId 5a71cddc0b95298cb57ec66089190e9b
  */
 export type UserId = string & { readonly _userId: never };
 
 /**
- * アイデアを区別するためのID
+ * アイデアの識別子
  *  @typePartId 719fa4020ae23a96d301d9fa31d8fcaf
  */
 export type IdeaId = string & { readonly _ideaId: never };
 
 /**
- * 提案を区別するためのID
+ * 提案の識別子
  *  @typePartId 72cc637f6803ef5ca7536889a7fff52e
  */
 export type SuggestionId = string & { readonly _suggestionId: never };
@@ -276,6 +319,18 @@ export type SuggestionId = string & { readonly _suggestionId: never };
  *  @typePartId b193be207840b5b489517eb5d7b492b2
  */
 export type ImageToken = string & { readonly _imageToken: never };
+
+/**
+ * パーツの識別子
+ *  @typePartId d2c65983f602ee7e0a7be06e6af61acf
+ */
+export type PartId = string & { readonly _partId: never };
+
+/**
+ * 型パーツの識別子
+ *  @typePartId 2562ffbc386c801f5132e10b945786e0
+ */
+export type TypePartId = string & { readonly _typePartId: never };
 
 /**
  * -2 147 483 648 ～ 2 147 483 647. 32bit 符号付き整数. JavaScriptのnumberとして扱える. numberの32bit符号あり整数をSigned Leb128のバイナリに変換する
@@ -1138,7 +1193,88 @@ export const IdAndData: {
 };
 
 /**
- * プロジェクトを区別するためのID
+ * プロジェクト
+ * @typePartId 3fb93c7e94724891d2a224c6f945acbd
+ */
+export const Project: { readonly codec: Codec<Project> } = {
+  codec: {
+    encode: (value: Project): ReadonlyArray<number> =>
+      String.codec
+        .encode(value.name)
+        .concat(ImageToken.codec.encode(value.iconHash))
+        .concat(ImageToken.codec.encode(value.imageHash))
+        .concat(Time.codec.encode(value.createTime))
+        .concat(UserId.codec.encode(value.createUserId))
+        .concat(Time.codec.encode(value.updateTime))
+        .concat(Time.codec.encode(value.getTime))
+        .concat(List.codec(PartId.codec).encode(value.partIdList))
+        .concat(List.codec(TypePartId.codec).encode(value.typePartIdList)),
+    decode: (
+      index: number,
+      binary: Uint8Array
+    ): { readonly result: Project; readonly nextIndex: number } => {
+      const nameAndNextIndex: {
+        readonly result: String;
+        readonly nextIndex: number;
+      } = String.codec.decode(index, binary);
+      const iconHashAndNextIndex: {
+        readonly result: ImageToken;
+        readonly nextIndex: number;
+      } = ImageToken.codec.decode(nameAndNextIndex.nextIndex, binary);
+      const imageHashAndNextIndex: {
+        readonly result: ImageToken;
+        readonly nextIndex: number;
+      } = ImageToken.codec.decode(iconHashAndNextIndex.nextIndex, binary);
+      const createTimeAndNextIndex: {
+        readonly result: Time;
+        readonly nextIndex: number;
+      } = Time.codec.decode(imageHashAndNextIndex.nextIndex, binary);
+      const createUserIdAndNextIndex: {
+        readonly result: UserId;
+        readonly nextIndex: number;
+      } = UserId.codec.decode(createTimeAndNextIndex.nextIndex, binary);
+      const updateTimeAndNextIndex: {
+        readonly result: Time;
+        readonly nextIndex: number;
+      } = Time.codec.decode(createUserIdAndNextIndex.nextIndex, binary);
+      const getTimeAndNextIndex: {
+        readonly result: Time;
+        readonly nextIndex: number;
+      } = Time.codec.decode(updateTimeAndNextIndex.nextIndex, binary);
+      const partIdListAndNextIndex: {
+        readonly result: List<PartId>;
+        readonly nextIndex: number;
+      } = List.codec(PartId.codec).decode(
+        getTimeAndNextIndex.nextIndex,
+        binary
+      );
+      const typePartIdListAndNextIndex: {
+        readonly result: List<TypePartId>;
+        readonly nextIndex: number;
+      } = List.codec(TypePartId.codec).decode(
+        partIdListAndNextIndex.nextIndex,
+        binary
+      );
+      return {
+        result: {
+          name: nameAndNextIndex.result,
+          iconHash: iconHashAndNextIndex.result,
+          imageHash: imageHashAndNextIndex.result,
+          createTime: createTimeAndNextIndex.result,
+          createUserId: createUserIdAndNextIndex.result,
+          updateTime: updateTimeAndNextIndex.result,
+          getTime: getTimeAndNextIndex.result,
+          partIdList: partIdListAndNextIndex.result,
+          typePartIdList: typePartIdListAndNextIndex.result,
+        },
+        nextIndex: typePartIdListAndNextIndex.nextIndex,
+      };
+    },
+  },
+};
+
+/**
+ * プロジェクトの識別子
  * @typePartId 4e3ab0f9499404a5fa100c4b57835906
  */
 export const ProjectId: { readonly codec: Codec<ProjectId> } = {
@@ -1156,7 +1292,7 @@ export const ProjectId: { readonly codec: Codec<ProjectId> } = {
 };
 
 /**
- * ユーザーを区別するためのID
+ * ユーザーの識別子
  * @typePartId 5a71cddc0b95298cb57ec66089190e9b
  */
 export const UserId: { readonly codec: Codec<UserId> } = {
@@ -1174,7 +1310,7 @@ export const UserId: { readonly codec: Codec<UserId> } = {
 };
 
 /**
- * アイデアを区別するためのID
+ * アイデアの識別子
  * @typePartId 719fa4020ae23a96d301d9fa31d8fcaf
  */
 export const IdeaId: { readonly codec: Codec<IdeaId> } = {
@@ -1192,7 +1328,7 @@ export const IdeaId: { readonly codec: Codec<IdeaId> } = {
 };
 
 /**
- * 提案を区別するためのID
+ * 提案の識別子
  * @typePartId 72cc637f6803ef5ca7536889a7fff52e
  */
 export const SuggestionId: { readonly codec: Codec<SuggestionId> } = {
@@ -1222,6 +1358,42 @@ export const ImageToken: { readonly codec: Codec<ImageToken> } = {
     ): { readonly result: ImageToken; readonly nextIndex: number } =>
       decodeId(index, binary) as {
         readonly result: ImageToken;
+        readonly nextIndex: number;
+      },
+  },
+};
+
+/**
+ * パーツの識別子
+ * @typePartId d2c65983f602ee7e0a7be06e6af61acf
+ */
+export const PartId: { readonly codec: Codec<PartId> } = {
+  codec: {
+    encode: (value: PartId): ReadonlyArray<number> => encodeId(value),
+    decode: (
+      index: number,
+      binary: Uint8Array
+    ): { readonly result: PartId; readonly nextIndex: number } =>
+      decodeId(index, binary) as {
+        readonly result: PartId;
+        readonly nextIndex: number;
+      },
+  },
+};
+
+/**
+ * 型パーツの識別子
+ * @typePartId 2562ffbc386c801f5132e10b945786e0
+ */
+export const TypePartId: { readonly codec: Codec<TypePartId> } = {
+  codec: {
+    encode: (value: TypePartId): ReadonlyArray<number> => encodeId(value),
+    decode: (
+      index: number,
+      binary: Uint8Array
+    ): { readonly result: TypePartId; readonly nextIndex: number } =>
+      decodeId(index, binary) as {
+        readonly result: TypePartId;
         readonly nextIndex: number;
       },
   },
