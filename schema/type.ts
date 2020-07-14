@@ -99,6 +99,10 @@ export const ConditionCapture = noParameterType(id.ConditionCapture);
 
 export const BranchPartDefinition = noParameterType(id.BranchPartDefinition);
 
+export const EvaluatedExpr = noParameterType(id.EvaluatedExpr);
+
+export const KernelCall = noParameterType(id.KernelCall);
+
 export const EvaluateExprError = noParameterType(id.EvaluateExprError);
 
 export const TypeError = noParameterType(id.TypeError);

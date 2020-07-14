@@ -9,7 +9,7 @@ const typeScriptCode = codeGen.generateCodeAsString(
   "TypeScript"
 );
 
-const typeScriptPath = "source/newData.ts";
+const typeScriptPath = "source/data.ts";
 fs.promises
   .writeFile(
     typeScriptPath,

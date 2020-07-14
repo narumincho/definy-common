@@ -1416,6 +1416,71 @@ export const typePartMap: ReadonlyMap<TypePartId, TypePart> = new Map<
     },
   ],
   [
+    id.EvaluatedExpr,
+    {
+      name: "EvaluatedExpr",
+      description: "評価しきった式",
+      migrationPartId: Maybe.Nothing(),
+      projectId: util.definyCodeProjectId,
+      createSuggestionId: util.codeSuggestionId,
+      getTime: { day: 0, millisecond: 0 },
+      attribute: Maybe.Nothing(),
+      typeParameterList: [],
+      body: TypePartBody.Sum([
+        {
+          name: "Kernel",
+          description: "Definyだけでは表現できない式",
+          parameter: Maybe.Just(type.KernelExpr),
+        },
+        {
+          name: "Int32",
+          description: "32bit整数",
+          parameter: Maybe.Just(type.Int32),
+        },
+        {
+          name: "TagReference",
+          description: "タグを参照",
+          parameter: Maybe.Just(type.TagReference),
+        },
+        {
+          name: "Lambda",
+          description: "ラムダ",
+          parameter: Maybe.Just(type.List(type.LambdaBranch)),
+        },
+        {
+          name: "KernelCall",
+          description: "内部関数呼び出し",
+          parameter: Maybe.Just(type.KernelCall),
+        },
+      ]),
+    },
+  ],
+  [
+    id.KernelCall,
+    {
+      name: "KernelCall",
+      description: "複数の引数が必要な内部関数の部分呼び出し",
+      migrationPartId: Maybe.Nothing(),
+      projectId: util.definyCodeProjectId,
+      createSuggestionId: util.codeSuggestionId,
+      getTime: { day: 0, millisecond: 0 },
+      attribute: Maybe.Nothing(),
+      typeParameterList: [],
+      body: TypePartBody.Product([
+        {
+          name: "kernel",
+          description: "関数",
+          type: type.KernelExpr,
+        },
+        {
+          name: "expr",
+          description: "呼び出すパラメーター",
+          type: type.EvaluatedExpr,
+        },
+      ]),
+    },
+  ],
+  [
     id.EvaluateExprError,
     {
       name: "EvaluateExprError",

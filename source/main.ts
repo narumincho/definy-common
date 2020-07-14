@@ -226,80 +226,32 @@ const normalizeOneLineString = (text: string): string => {
   return result;
 };
 
-export const exprToSuggestionExpr = (expr: data.Expr): data.SuggestionExpr => {
-  switch (expr._) {
-    case "Kernel":
-      return data.SuggestionExpr.Kernel(expr.kernelExpr);
-    case "Int32Literal":
-      return data.SuggestionExpr.Int32Literal(expr.int32);
-    case "PartReference":
-      return data.SuggestionExpr.PartReference(expr.partId);
-    case "LocalPartReference":
-      return data.SuggestionExpr.LocalPartReference(expr.localPartReference);
-    case "TagReference":
-      return data.SuggestionExpr.TagReference(expr.tagReference);
-    case "FunctionCall":
-      return data.SuggestionExpr.FunctionCall({
-        function: exprToSuggestionExpr(expr.functionCall.function),
-        parameter: exprToSuggestionExpr(expr.functionCall.parameter),
-      });
-    case "Lambda":
-      return data.SuggestionExpr.Lambda(
-        expr.lambdaBranchList.map(lambdaBranchToSuggestionLambdaBranch)
-      );
-  }
-};
-
-const lambdaBranchToSuggestionLambdaBranch = (
-  lambdaBranch: data.LambdaBranch
-): data.SuggestionLambdaBranch => ({
-  condition: lambdaBranch.condition,
-  description: lambdaBranch.description,
-  localPartList: lambdaBranch.localPartList.map(
-    branchPartDefinitionToSuggestion
-  ),
-  expr: exprToSuggestionExpr(lambdaBranch.expr),
-});
-
-const branchPartDefinitionToSuggestion = (
-  branchPartDefinition: data.BranchPartDefinition
-): data.SuggestionBranchPartDefinition => ({
-  localPartId: branchPartDefinition.localPartId,
-  name: branchPartDefinition.name,
-  description: branchPartDefinition.description,
-  type: typeToSuggestion(branchPartDefinition.type),
-  expr: exprToSuggestionExpr(branchPartDefinition.expr),
-});
-
-const typeToSuggestion = (type: data.Type): data.SuggestionType => {
-  return data.SuggestionType.TypePartWithParameter({
-    parameter: type.parameter.map(typeToSuggestion),
-    typePartId: type.typePartId,
-  });
-};
+export type EvaluationResult = data.Result<
+  data.EvaluatedExpr,
+  ReadonlyArray<data.EvaluateExprError>
+>;
 
 type SourceAndCache = {
   /** 型パーツ */
   typePartMap: ReadonlyMap<data.TypePartId, data.TypePart>;
   /** パーツ */
   partMap: ReadonlyMap<data.PartId, data.Part>;
-  /** Suggestion内で作ったパーツ */
-  suggestionPartMap: ReadonlyMap<number, data.SuggestionExpr>;
   /** 評価されたパーツ (キャッシュ) */
   evaluatedPartMap: Map<data.PartId, data.EvaluatedExpr>;
   /** 評価されたSuggestion内での作ったパーツ (キャッシュ) */
   evaluatedSuggestionPartMap: Map<number, data.EvaluatedExpr>;
 };
 
-export type EvaluationResult = data.Result<
-  data.EvaluatedExpr,
-  ReadonlyArray<data.EvaluateExprError>
->;
+type EvalParameter = {
+  typePartList: ReadonlyArray<data.IdAndData<data.TypePartId, data.TypePart>>;
+  partList: ReadonlyArray<data.IdAndData<data.PartId, data.Part>>;
+  expr: data.Expr;
+};
 
 /**
  * Elmから送られてきたデータを元にして式を評価する
  */
-export const evalExpr = (evalParameter: data.EvalParameter): EvaluationResult =>
+export const evalExpr = (evalParameter: EvalParameter): EvaluationResult =>
   evaluateSuggestionExpr(
     {
       partMap: new Map(
@@ -314,80 +266,31 @@ export const evalExpr = (evalParameter: data.EvalParameter): EvaluationResult =>
           typeAndId.data,
         ])
       ),
-      suggestionPartMap: changeListToSuggestionPartMap(
-        evalParameter.changeList
-      ),
       evaluatedPartMap: new Map(),
       evaluatedSuggestionPartMap: new Map(),
     },
     evalParameter.expr
   );
 
-const changeListToSuggestionPartMap = (
-  changeList: ReadonlyArray<data.Change>
-): ReadonlyMap<number, data.SuggestionExpr> => {
-  const map: Map<number, data.SuggestionExpr> = new Map();
-  for (const change of changeList) {
-    switch (change._) {
-      case "AddPart":
-        map.set(change.addPart.id, change.addPart.expr);
-        break;
-      case "ProjectName":
-        break;
-    }
-  }
-  return map;
-};
-
 export const evaluateSuggestionExpr = (
   sourceAndCache: SourceAndCache,
-  suggestionExpr: data.SuggestionExpr
+  expr: data.Expr
 ): EvaluationResult => {
-  switch (suggestionExpr._) {
+  switch (expr._) {
     case "Kernel":
-      return data.Result.Ok(
-        data.EvaluatedExpr.Kernel(suggestionExpr.kernelExpr)
-      );
+      return data.Result.Ok(data.EvaluatedExpr.Kernel(expr.kernelExpr));
     case "Int32Literal":
-      return data.Result.Ok(data.EvaluatedExpr.Int32(suggestionExpr.int32));
+      return data.Result.Ok(data.EvaluatedExpr.Int32(expr.int32));
     case "PartReference":
-      return evaluatePartReference(sourceAndCache, suggestionExpr.partId);
-    case "SuggestionPartReference":
-      return evaluateSuggestionPartReference(
-        sourceAndCache,
-        suggestionExpr.int32
-      );
-    case "LocalPartReference":
-      return evaluateLocalPartReference(
-        sourceAndCache,
-        suggestionExpr.localPartReference
-      );
+      return evaluatePartReference(sourceAndCache, expr.partId);
     case "TagReference":
-      return data.Result.Ok(
-        data.EvaluatedExpr.TagReference(suggestionExpr.tagReference)
-      );
-    case "SuggestionTagReference":
-      return data.Result.Error([data.EvaluateExprError.NotSupported]);
-    case "FunctionCall":
-      return evaluateSuggestionFunctionCall(
-        sourceAndCache,
-        suggestionExpr.suggestionFunctionCall
-      );
+      return data.Result.Ok(data.EvaluatedExpr.TagReference(expr.tagReference));
     case "Lambda":
       return data.Result.Error([data.EvaluateExprError.NotSupported]);
-    case "Blank":
-      return data.Result.Error([data.EvaluateExprError.Blank]);
+    case "FunctionCall":
+      return evaluateSuggestionFunctionCall(sourceAndCache, expr.functionCall);
   }
 };
-
-const localPartReferenceAndEvaluatedExpr = (
-  localPartReference: data.LocalPartReference,
-  evaluateExpr: data.EvaluatedExpr
-): [string, data.EvaluatedExpr] => [
-  (localPartReference.partId as string) +
-    (localPartReference.localPartId as string),
-  evaluateExpr,
-];
 
 const evaluatePartReference = (
   sourceAndCache: SourceAndCache,
@@ -403,93 +306,16 @@ const evaluatePartReference = (
       data.EvaluateExprError.NeedPartDefinition(partId),
     ]);
   }
-  const result = evaluateSuggestionExpr(
-    sourceAndCache,
-    exprToSuggestionExpr(part.expr)
-  );
+  const result = evaluateSuggestionExpr(sourceAndCache, part.expr);
   if (result._ === "Ok") {
     sourceAndCache.evaluatedPartMap.set(partId, result.ok);
   }
   return result;
 };
 
-const evaluateSuggestionPartReference = (
-  sourceAndCache: SourceAndCache,
-  addPartId: number
-): EvaluationResult => {
-  const evaluatedSuggestionPart = sourceAndCache.evaluatedSuggestionPartMap.get(
-    addPartId
-  );
-  if (evaluatedSuggestionPart !== undefined) {
-    return data.Result.Ok(evaluatedSuggestionPart);
-  }
-  const suggestionPart = sourceAndCache.suggestionPartMap.get(addPartId);
-  if (suggestionPart === undefined) {
-    return data.Result.Error([
-      data.EvaluateExprError.NeedSuggestionPart(addPartId),
-    ]);
-  }
-  const result = evaluateSuggestionExpr(sourceAndCache, suggestionPart);
-  if (result._ === "Ok") {
-    sourceAndCache.evaluatedSuggestionPartMap.set(addPartId, result.ok);
-  }
-  return result;
-};
-
-const evaluateLocalPartReference = (
-  sourceAndCache: SourceAndCache,
-  localPartReference: data.LocalPartReference
-): EvaluationResult => {
-  return data.Result.Error([data.EvaluateExprError.NotSupported]);
-};
-
-const localEvaluatedPartMapGetLocalPartExpr = (
-  evaluatedLocalPartMap: ReadonlyMap<string, data.EvaluatedExpr>,
-  localPartReference: data.LocalPartReference
-): data.EvaluatedExpr | undefined => {
-  return evaluatedLocalPartMap.get(
-    (localPartReference.partId as string) +
-      (localPartReference.localPartId as string)
-  );
-};
-
-const localPartMapGetLocalPartExpr = (
-  localPartMap: ReadonlyMap<string, data.Expr>,
-  localPartReference: data.LocalPartReference
-): data.Expr | undefined => {
-  return localPartMap.get(
-    (localPartReference.partId as string) +
-      (localPartReference.localPartId as string)
-  );
-};
-
-const localEvaluatedPartMapSetLocalPartExpr = (
-  optimizedLocalPart: ReadonlyMap<string, data.EvaluatedExpr>,
-  localPartReference: data.LocalPartReference,
-  evaluatedExpr: data.EvaluatedExpr
-): ReadonlyMap<string, data.EvaluatedExpr> => {
-  return new Map(optimizedLocalPart).set(
-    (localPartReference.partId as string) +
-      (localPartReference.localPartId as string),
-    evaluatedExpr
-  );
-};
-
-const localPartMapSetLocalPartExpr = (
-  localPartMap: ReadonlyMap<string, data.Expr>,
-  localPartReference: data.LocalPartReference,
-  expr: data.Expr
-): ReadonlyMap<string, data.Expr> => {
-  return new Map(localPartMap).set(
-    (localPartReference.partId as string) +
-      (localPartReference.localPartId as string),
-    expr
-  );
-};
-
 const evaluateSuggestionFunctionCall = (
   sourceAndCache: SourceAndCache,
-  functionCall: data.SuggestionFunctionCall
+  functionCall: data.FunctionCall
 ): EvaluationResult => {
   const functionResult = evaluateSuggestionExpr(
     sourceAndCache,
@@ -628,8 +454,6 @@ export const exprToDebugString = (expr: data.Expr): string => {
       return kernelToString(expr.kernelExpr);
     case "Int32Literal":
       return expr.int32.toString();
-    case "LocalPartReference":
-      return "[local " + JSON.stringify(expr.localPartReference) + "]";
     case "PartReference":
       return "[part " + (expr.partId as string) + "]";
     case "TagReference":
@@ -689,7 +513,7 @@ const conditionToString = (condition: data.Condition): string => {
       return (
         capturePartName +
         "(" +
-        (condition.conditionCapture.localPartId as string) +
+        (condition.conditionCapture.partId as string) +
         ")"
       );
     }
