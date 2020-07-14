@@ -91,21 +91,20 @@ describe("test", () => {
       {
         typePartMap: new Map(),
         partMap: new Map(),
-        suggestionPartMap: new Map(),
         evaluatedPartMap: new Map(),
         evaluatedSuggestionPartMap: new Map(),
       },
-      data.SuggestionExpr.FunctionCall({
-        function: data.SuggestionExpr.FunctionCall({
-          function: data.SuggestionExpr.Kernel("Int32Add"),
-          parameter: data.SuggestionExpr.Int32Literal(50),
+      data.Expr.FunctionCall({
+        function: data.Expr.FunctionCall({
+          function: data.Expr.Kernel("Int32Add"),
+          parameter: data.Expr.Int32Literal(50),
         }),
-        parameter: data.SuggestionExpr.FunctionCall({
-          function: data.SuggestionExpr.FunctionCall({
-            function: data.SuggestionExpr.Kernel("Int32Add"),
-            parameter: data.SuggestionExpr.Int32Literal(32),
+        parameter: data.Expr.FunctionCall({
+          function: data.Expr.FunctionCall({
+            function: data.Expr.Kernel("Int32Add"),
+            parameter: data.Expr.Int32Literal(32),
           }),
-          parameter: data.SuggestionExpr.Int32Literal(100),
+          parameter: data.Expr.Int32Literal(100),
         }),
       })
     );
@@ -171,19 +170,18 @@ describe("test", () => {
             },
           ],
         ]),
-        suggestionPartMap: new Map(),
         evaluatedSuggestionPartMap: new Map(),
         evaluatedPartMap: new Map(),
       },
-      data.SuggestionExpr.FunctionCall({
-        function: data.SuggestionExpr.FunctionCall({
-          function: data.SuggestionExpr.Kernel("Int32Add"),
-          parameter: data.SuggestionExpr.FunctionCall({
-            function: data.SuggestionExpr.PartReference(addOneHundredName),
-            parameter: data.SuggestionExpr.PartReference(oneName),
+      data.Expr.FunctionCall({
+        function: data.Expr.FunctionCall({
+          function: data.Expr.Kernel("Int32Add"),
+          parameter: data.Expr.FunctionCall({
+            function: data.Expr.PartReference(addOneHundredName),
+            parameter: data.Expr.PartReference(oneName),
           }),
         }),
-        parameter: data.SuggestionExpr.PartReference(oneName),
+        parameter: data.Expr.PartReference(oneName),
       })
     );
     expect(result).toEqual<
