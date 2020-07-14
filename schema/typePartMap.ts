@@ -15,6 +15,9 @@ const maybeValueTypePartId = "7340e6b552af43695335a64e057f4250" as TypePartId;
 const resultOkTypePartId = "2163b3c97b382de8085973eff850c919" as TypePartId;
 const resultErrorTypePartId = "bd8be8409130f30f15c5c86c01de6dc5" as TypePartId;
 
+const idAndDataIdTypePartId = "fc6ea18b02d5cfa07c79182be262ad72" as TypePartId;
+const idAndDataDataTypePartId = "5ca542b76f5199346931fb46caec2a85" as TypePartId;
+
 export const typePartMap: ReadonlyMap<TypePartId, TypePart> = new Map<
   TypePartId,
   TypePart
@@ -458,6 +461,34 @@ export const typePartMap: ReadonlyMap<TypePartId, TypePart> = new Map<
           name: "getTime",
           description: "取得日時",
           type: type.Time,
+        },
+      ]),
+    },
+  ],
+  [
+    id.IdAndData,
+    {
+      name: "IdAndData",
+      migrationPartId: Maybe.Nothing(),
+      description: "データを識別するIdとデータ",
+      projectId: util.definyCodeProjectId,
+      createSuggestionId: util.codeSuggestionId,
+      getTime: { day: 0, millisecond: 0 },
+      attribute: Maybe.Nothing(),
+      typeParameterList: [
+        { name: "id", typePartId: idAndDataIdTypePartId },
+        { name: "data", typePartId: idAndDataDataTypePartId },
+      ],
+      body: TypePartBody.Product([
+        {
+          name: "id",
+          description: "ID",
+          type: { typePartId: idAndDataIdTypePartId, parameter: [] },
+        },
+        {
+          name: "data",
+          description: "データ",
+          type: { typePartId: idAndDataDataTypePartId, parameter: [] },
         },
       ]),
     },

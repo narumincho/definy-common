@@ -55,6 +55,11 @@ export const User: Type = {
   parameter: [],
 };
 
+export const IdAndData = (idType: Type, dataType: Type): Type => ({
+  typePartId: id.IdAndData,
+  parameter: [idType, dataType],
+});
+
 export const ProjectId: Type = {
   typePartId: id.ProjectId,
   parameter: [],

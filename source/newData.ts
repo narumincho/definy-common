@@ -233,6 +233,21 @@ export type User = {
 };
 
 /**
+ * データを識別するIdとデータ
+ *  @typePartId 12a442ac046b1757e8684652c2669450
+ */
+export type IdAndData<id extends unknown, data extends unknown> = {
+  /**
+   * ID
+   */
+  readonly id: id;
+  /**
+   * データ
+   */
+  readonly data: data;
+};
+
+/**
  * プロジェクトを区別するためのID
  *  @typePartId 4e3ab0f9499404a5fa100c4b57835906
  */
@@ -1084,6 +1099,42 @@ export const User: { readonly codec: Codec<User> } = {
       };
     },
   },
+};
+
+/**
+ * データを識別するIdとデータ
+ * @typePartId 12a442ac046b1757e8684652c2669450
+ */
+export const IdAndData: {
+  readonly codec: <id extends unknown, data extends unknown>(
+    a: Codec<id>,
+    b: Codec<data>
+  ) => Codec<IdAndData<id, data>>;
+} = {
+  codec: <id extends unknown, data extends unknown>(
+    idCodec: Codec<id>,
+    dataCodec: Codec<data>
+  ): Codec<IdAndData<id, data>> => ({
+    encode: (value: IdAndData<id, data>): ReadonlyArray<number> =>
+      idCodec.encode(value.id).concat(dataCodec.encode(value.data)),
+    decode: (
+      index: number,
+      binary: Uint8Array
+    ): { readonly result: IdAndData<id, data>; readonly nextIndex: number } => {
+      const idAndNextIndex: {
+        readonly result: id;
+        readonly nextIndex: number;
+      } = idCodec.decode(index, binary);
+      const dataAndNextIndex: {
+        readonly result: data;
+        readonly nextIndex: number;
+      } = dataCodec.decode(idAndNextIndex.nextIndex, binary);
+      return {
+        result: { id: idAndNextIndex.result, data: dataAndNextIndex.result },
+        nextIndex: dataAndNextIndex.nextIndex,
+      };
+    },
+  }),
 };
 
 /**
