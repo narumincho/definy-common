@@ -799,6 +799,282 @@ export const typePartMap: ReadonlyMap<TypePartId, TypePart> = new Map<
     },
   ],
   [
+    id.TypePartId,
+    {
+      name: "TypePart",
+      description: "型パーツ",
+      migrationPartId: Maybe.Nothing(),
+      projectId: util.definyCodeProjectId,
+      createSuggestionId: util.codeSuggestionId,
+      getTime: { day: 0, millisecond: 0 },
+      attribute: Maybe.Nothing(),
+      typeParameterList: [],
+      body: TypePartBody.Product([
+        {
+          name: "name",
+          description: "型パーツの名前",
+          type: type.String,
+        },
+        {
+          name: "migrationPartId",
+          description:
+            "Justのときは型パーツは非推奨になっていて移行プログラムのパーツIDが含まれる",
+          type: type.Maybe(type.PartId),
+        },
+        {
+          name: "description",
+          description: "型パーツの説明",
+          type: type.String,
+        },
+        {
+          name: "projectId",
+          description: "所属しているプロジェクトのID",
+          type: type.ProjectId,
+        },
+        {
+          name: "createSuggestionId",
+          description: "この型パーツが作成された提案",
+          type: type.SuggestionId,
+        },
+        {
+          name: "getTime",
+          description: "取得日時",
+          type: type.Time,
+        },
+        {
+          name: "attribute",
+          description:
+            "コンパイラに与える,この型を表現するのにどういう特殊な状態にするかという情報",
+          type: type.Maybe(type.TypeAttribute),
+        },
+        {
+          name: "typeParameterList",
+          description: "型パラメーター",
+          type: type.List(type.TypeParameter),
+        },
+        {
+          name: "body",
+          description: "定義本体",
+          type: type.TypePartBody,
+        },
+      ]),
+    },
+  ],
+  [
+    id.TypeAttribute,
+    {
+      name: "TypeAttribute",
+      description: "コンパイラに向けた, 型のデータ形式をどうするかの情報",
+      migrationPartId: Maybe.Nothing(),
+      projectId: util.definyCodeProjectId,
+      createSuggestionId: util.codeSuggestionId,
+      getTime: { day: 0, millisecond: 0 },
+      attribute: Maybe.Nothing(),
+      typeParameterList: [],
+      body: TypePartBody.Sum([
+        {
+          name: "AsBoolean",
+          description:
+            "JavaScriptのbooleanとしれ扱うように指示する. 定義が True | Falseのような形のみをサポートする",
+          parameter: Maybe.Nothing(),
+        },
+      ]),
+    },
+  ],
+  [
+    id.TypeParameter,
+    {
+      name: "TypeParameter",
+      description: "型パラメーター",
+      migrationPartId: Maybe.Nothing(),
+      projectId: util.definyCodeProjectId,
+      createSuggestionId: util.codeSuggestionId,
+      getTime: { day: 0, millisecond: 0 },
+      attribute: Maybe.Nothing(),
+      typeParameterList: [],
+      body: TypePartBody.Product([
+        {
+          name: "name",
+          description: "型パラメーターの名前",
+          type: type.String,
+        },
+        {
+          name: "typePartId",
+          description: "型パラメーターの型ID",
+          type: type.TypePartId,
+        },
+      ]),
+    },
+  ],
+  [
+    id.TypePartBody,
+    {
+      name: "TypePartBody",
+      description: "型の定義本体",
+      migrationPartId: Maybe.Nothing(),
+      projectId: util.definyCodeProjectId,
+      createSuggestionId: util.codeSuggestionId,
+      getTime: { day: 0, millisecond: 0 },
+      attribute: Maybe.Nothing(),
+      typeParameterList: [],
+      body: TypePartBody.Sum([
+        {
+          name: "Product",
+          description: "直積型",
+          parameter: Maybe.Just(type.List(type.Member)),
+        },
+        {
+          name: "Sum",
+          description: "直和型",
+          parameter: Maybe.Just(type.List(type.Pattern)),
+        },
+        {
+          name: "Kernel",
+          description: "Definyだけでは表現できないデータ型",
+          parameter: Maybe.Just(type.TypePartBodyKernel),
+        },
+      ]),
+    },
+  ],
+  [
+    id.Member,
+    {
+      name: "Member",
+      description: "直積型のメンバー",
+      migrationPartId: Maybe.Nothing(),
+      projectId: util.definyCodeProjectId,
+      createSuggestionId: util.codeSuggestionId,
+      getTime: { day: 0, millisecond: 0 },
+      attribute: Maybe.Nothing(),
+      typeParameterList: [],
+      body: TypePartBody.Product([
+        {
+          name: "name",
+          description: "メンバー名",
+          type: type.String,
+        },
+        {
+          name: "description",
+          description: "メンバーの説明",
+          type: type.String,
+        },
+        {
+          name: "type",
+          description: "メンバー値の型",
+          type: type.Type,
+        },
+      ]),
+    },
+  ],
+  [
+    id.Pattern,
+    {
+      name: "Pattern",
+      description: "直積型のパターン",
+      migrationPartId: Maybe.Nothing(),
+      projectId: util.definyCodeProjectId,
+      createSuggestionId: util.codeSuggestionId,
+      getTime: { day: 0, millisecond: 0 },
+      attribute: Maybe.Nothing(),
+      typeParameterList: [],
+      body: TypePartBody.Product([
+        {
+          name: "name",
+          description: "タグ名",
+          type: type.String,
+        },
+        {
+          name: "description",
+          description: "パターンの説明",
+          type: type.String,
+        },
+        {
+          name: "parameter",
+          description: "そのパターンにつけるデータの型",
+          type: type.Maybe(type.Type),
+        },
+      ]),
+    },
+  ],
+  [
+    id.TypePartBodyKernel,
+    {
+      name: "TypePartBodyKernel",
+      description: "Definyだけでは表現できないデータ型",
+      migrationPartId: Maybe.Nothing(),
+      projectId: util.definyCodeProjectId,
+      createSuggestionId: util.codeSuggestionId,
+      getTime: { day: 0, millisecond: 0 },
+      attribute: Maybe.Nothing(),
+      typeParameterList: [],
+      body: TypePartBody.Sum([
+        {
+          name: "Function",
+          description: "関数",
+          parameter: Maybe.Nothing(),
+        },
+        {
+          name: "Int32",
+          description: "32bit整数",
+          parameter: Maybe.Nothing(),
+        },
+        {
+          name: "String",
+          description:
+            "文字列. Definyだけで表現できるが, TypeScriptでstringとして扱うために必要",
+          parameter: Maybe.Nothing(),
+        },
+        {
+          name: "Binary",
+          description: "バイナリ型. TypeScriptではUint8Arrayとして扱う",
+          parameter: Maybe.Nothing(),
+        },
+        {
+          name: "Id",
+          description:
+            "UUID (16byte) を表現する. 内部表現はとりあえず0-f長さ32の文字列",
+          parameter: Maybe.Nothing(),
+        },
+        {
+          name: "Token",
+          description:
+            "sha256などでハッシュ化したもの (32byte) を表現する. 内部表現はとりあえず0-f長さ64の文字列",
+          parameter: Maybe.Nothing(),
+        },
+        {
+          name: "List",
+          description: "配列型. TypeScriptではReadonlyArrayとして扱う",
+          parameter: Maybe.Nothing(),
+        },
+      ]),
+    },
+  ],
+  [
+    id.Type,
+    {
+      name: "Type",
+      description: "型",
+      migrationPartId: Maybe.Nothing(),
+      projectId: util.definyCodeProjectId,
+      createSuggestionId: util.codeSuggestionId,
+      getTime: { day: 0, millisecond: 0 },
+      attribute: Maybe.Nothing(),
+      typeParameterList: [],
+      body: TypePartBody.Product([
+        {
+          name: "typePartId",
+          description: "型の参照",
+          type: type.TypePartId,
+        },
+        {
+          name: "parameter",
+          description: "型のパラメーター",
+          type: type.List(type.Type),
+        },
+      ]),
+    },
+  ],
+  [
     id.ProjectId,
     {
       name: "ProjectId",

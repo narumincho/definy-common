@@ -426,6 +426,108 @@ export type SuggestionState =
 export type Change = { readonly _: "ProjectName"; readonly string: String };
 
 /**
+ * 型パーツの識別子
+ *  @typePartId 2562ffbc386c801f5132e10b945786e0
+ */
+export type TypePartId = string & { readonly _typePartId: never };
+
+/**
+ * コンパイラに向けた, 型のデータ形式をどうするかの情報
+ *  @typePartId 225e93ce3e35aa0bd76d07ea6f6b89cf
+ */
+export type TypeAttribute = "AsBoolean";
+
+/**
+ * 型パラメーター
+ *  @typePartId e1333f2af01621585b96e47aea9bfee1
+ */
+export type TypeParameter = {
+  /**
+   * 型パラメーターの名前
+   */
+  readonly name: String;
+  /**
+   * 型パラメーターの型ID
+   */
+  readonly typePartId: TypePartId;
+};
+
+/**
+ * 型の定義本体
+ *  @typePartId 27c027f90fb0fed86c8205cbd90cd08e
+ */
+export type TypePartBody =
+  | { readonly _: "Product"; readonly memberList: List<Member> }
+  | { readonly _: "Sum"; readonly patternList: List<Pattern> }
+  | { readonly _: "Kernel"; readonly typePartBodyKernel: TypePartBodyKernel };
+
+/**
+ * 直積型のメンバー
+ *  @typePartId 73b8e53686ac76acb085cb096f658d58
+ */
+export type Member = {
+  /**
+   * メンバー名
+   */
+  readonly name: String;
+  /**
+   * メンバーの説明
+   */
+  readonly description: String;
+  /**
+   * メンバー値の型
+   */
+  readonly type: Type;
+};
+
+/**
+ * 直積型のパターン
+ *  @typePartId 512c55527a1ce9822e1e51b2f6063789
+ */
+export type Pattern = {
+  /**
+   * タグ名
+   */
+  readonly name: String;
+  /**
+   * パターンの説明
+   */
+  readonly description: String;
+  /**
+   * そのパターンにつけるデータの型
+   */
+  readonly parameter: Maybe<Type>;
+};
+
+/**
+ * Definyだけでは表現できないデータ型
+ *  @typePartId 739fb46c7b45d8c51865fc91d5d2ebb1
+ */
+export type TypePartBodyKernel =
+  | "Function"
+  | "Int32"
+  | "String"
+  | "Binary"
+  | "Id"
+  | "Token"
+  | "List";
+
+/**
+ * 型
+ *  @typePartId 0e16754e227d7287a01596ee10e1244f
+ */
+export type Type = {
+  /**
+   * 型の参照
+   */
+  readonly typePartId: TypePartId;
+  /**
+   * 型のパラメーター
+   */
+  readonly parameter: List<Type>;
+};
+
+/**
  * プロジェクトの識別子
  *  @typePartId 4e3ab0f9499404a5fa100c4b57835906
  */
@@ -460,12 +562,6 @@ export type ImageToken = string & { readonly _imageToken: never };
  *  @typePartId d2c65983f602ee7e0a7be06e6af61acf
  */
 export type PartId = string & { readonly _partId: never };
-
-/**
- * 型パーツの識別子
- *  @typePartId 2562ffbc386c801f5132e10b945786e0
- */
-export type TypePartId = string & { readonly _typePartId: never };
 
 /**
  * -2 147 483 648 ～ 2 147 483 647. 32bit 符号付き整数. JavaScriptのnumberとして扱える. numberの32bit符号あり整数をSigned Leb128のバイナリに変換する
@@ -1887,6 +1983,428 @@ export const Change: {
 };
 
 /**
+ * 型パーツの識別子
+ * @typePartId 2562ffbc386c801f5132e10b945786e0
+ */
+export const TypePartId: { readonly codec: Codec<TypePartId> } = {
+  codec: {
+    encode: (value: TypePartId): ReadonlyArray<number> => encodeId(value),
+    decode: (
+      index: number,
+      binary: Uint8Array
+    ): { readonly result: TypePartId; readonly nextIndex: number } =>
+      decodeId(index, binary) as {
+        readonly result: TypePartId;
+        readonly nextIndex: number;
+      },
+  },
+};
+
+/**
+ * コンパイラに向けた, 型のデータ形式をどうするかの情報
+ * @typePartId 225e93ce3e35aa0bd76d07ea6f6b89cf
+ */
+export const TypeAttribute: {
+  /**
+   * JavaScriptのbooleanとしれ扱うように指示する. 定義が True | Falseのような形のみをサポートする
+   */
+  readonly AsBoolean: TypeAttribute;
+  readonly codec: Codec<TypeAttribute>;
+} = {
+  AsBoolean: "AsBoolean",
+  codec: {
+    encode: (value: TypeAttribute): ReadonlyArray<number> => {
+      switch (value) {
+        case "AsBoolean": {
+          return [0];
+        }
+      }
+    },
+    decode: (
+      index: number,
+      binary: Uint8Array
+    ): { readonly result: TypeAttribute; readonly nextIndex: number } => {
+      const patternIndex: {
+        readonly result: number;
+        readonly nextIndex: number;
+      } = Int32.codec.decode(index, binary);
+      if (patternIndex.result === 0) {
+        return {
+          result: TypeAttribute.AsBoolean,
+          nextIndex: patternIndex.nextIndex,
+        };
+      }
+      throw new Error("存在しないパターンを指定された 型を更新してください");
+    },
+  },
+};
+
+/**
+ * 型パラメーター
+ * @typePartId e1333f2af01621585b96e47aea9bfee1
+ */
+export const TypeParameter: { readonly codec: Codec<TypeParameter> } = {
+  codec: {
+    encode: (value: TypeParameter): ReadonlyArray<number> =>
+      String.codec
+        .encode(value.name)
+        .concat(TypePartId.codec.encode(value.typePartId)),
+    decode: (
+      index: number,
+      binary: Uint8Array
+    ): { readonly result: TypeParameter; readonly nextIndex: number } => {
+      const nameAndNextIndex: {
+        readonly result: String;
+        readonly nextIndex: number;
+      } = String.codec.decode(index, binary);
+      const typePartIdAndNextIndex: {
+        readonly result: TypePartId;
+        readonly nextIndex: number;
+      } = TypePartId.codec.decode(nameAndNextIndex.nextIndex, binary);
+      return {
+        result: {
+          name: nameAndNextIndex.result,
+          typePartId: typePartIdAndNextIndex.result,
+        },
+        nextIndex: typePartIdAndNextIndex.nextIndex,
+      };
+    },
+  },
+};
+
+/**
+ * 型の定義本体
+ * @typePartId 27c027f90fb0fed86c8205cbd90cd08e
+ */
+export const TypePartBody: {
+  /**
+   * 直積型
+   */
+  readonly Product: (a: List<Member>) => TypePartBody;
+  /**
+   * 直和型
+   */
+  readonly Sum: (a: List<Pattern>) => TypePartBody;
+  /**
+   * Definyだけでは表現できないデータ型
+   */
+  readonly Kernel: (a: TypePartBodyKernel) => TypePartBody;
+  readonly codec: Codec<TypePartBody>;
+} = {
+  Product: (memberList: List<Member>): TypePartBody => ({
+    _: "Product",
+    memberList,
+  }),
+  Sum: (patternList: List<Pattern>): TypePartBody => ({
+    _: "Sum",
+    patternList,
+  }),
+  Kernel: (typePartBodyKernel: TypePartBodyKernel): TypePartBody => ({
+    _: "Kernel",
+    typePartBodyKernel,
+  }),
+  codec: {
+    encode: (value: TypePartBody): ReadonlyArray<number> => {
+      switch (value._) {
+        case "Product": {
+          return [0].concat(List.codec(Member.codec).encode(value.memberList));
+        }
+        case "Sum": {
+          return [1].concat(
+            List.codec(Pattern.codec).encode(value.patternList)
+          );
+        }
+        case "Kernel": {
+          return [2].concat(
+            TypePartBodyKernel.codec.encode(value.typePartBodyKernel)
+          );
+        }
+      }
+    },
+    decode: (
+      index: number,
+      binary: Uint8Array
+    ): { readonly result: TypePartBody; readonly nextIndex: number } => {
+      const patternIndex: {
+        readonly result: number;
+        readonly nextIndex: number;
+      } = Int32.codec.decode(index, binary);
+      if (patternIndex.result === 0) {
+        const result: {
+          readonly result: List<Member>;
+          readonly nextIndex: number;
+        } = List.codec(Member.codec).decode(patternIndex.nextIndex, binary);
+        return {
+          result: TypePartBody.Product(result.result),
+          nextIndex: result.nextIndex,
+        };
+      }
+      if (patternIndex.result === 1) {
+        const result: {
+          readonly result: List<Pattern>;
+          readonly nextIndex: number;
+        } = List.codec(Pattern.codec).decode(patternIndex.nextIndex, binary);
+        return {
+          result: TypePartBody.Sum(result.result),
+          nextIndex: result.nextIndex,
+        };
+      }
+      if (patternIndex.result === 2) {
+        const result: {
+          readonly result: TypePartBodyKernel;
+          readonly nextIndex: number;
+        } = TypePartBodyKernel.codec.decode(patternIndex.nextIndex, binary);
+        return {
+          result: TypePartBody.Kernel(result.result),
+          nextIndex: result.nextIndex,
+        };
+      }
+      throw new Error("存在しないパターンを指定された 型を更新してください");
+    },
+  },
+};
+
+/**
+ * 直積型のメンバー
+ * @typePartId 73b8e53686ac76acb085cb096f658d58
+ */
+export const Member: { readonly codec: Codec<Member> } = {
+  codec: {
+    encode: (value: Member): ReadonlyArray<number> =>
+      String.codec
+        .encode(value.name)
+        .concat(String.codec.encode(value.description))
+        .concat(Type.codec.encode(value.type)),
+    decode: (
+      index: number,
+      binary: Uint8Array
+    ): { readonly result: Member; readonly nextIndex: number } => {
+      const nameAndNextIndex: {
+        readonly result: String;
+        readonly nextIndex: number;
+      } = String.codec.decode(index, binary);
+      const descriptionAndNextIndex: {
+        readonly result: String;
+        readonly nextIndex: number;
+      } = String.codec.decode(nameAndNextIndex.nextIndex, binary);
+      const typeAndNextIndex: {
+        readonly result: Type;
+        readonly nextIndex: number;
+      } = Type.codec.decode(descriptionAndNextIndex.nextIndex, binary);
+      return {
+        result: {
+          name: nameAndNextIndex.result,
+          description: descriptionAndNextIndex.result,
+          type: typeAndNextIndex.result,
+        },
+        nextIndex: typeAndNextIndex.nextIndex,
+      };
+    },
+  },
+};
+
+/**
+ * 直積型のパターン
+ * @typePartId 512c55527a1ce9822e1e51b2f6063789
+ */
+export const Pattern: { readonly codec: Codec<Pattern> } = {
+  codec: {
+    encode: (value: Pattern): ReadonlyArray<number> =>
+      String.codec
+        .encode(value.name)
+        .concat(String.codec.encode(value.description))
+        .concat(Maybe.codec(Type.codec).encode(value.parameter)),
+    decode: (
+      index: number,
+      binary: Uint8Array
+    ): { readonly result: Pattern; readonly nextIndex: number } => {
+      const nameAndNextIndex: {
+        readonly result: String;
+        readonly nextIndex: number;
+      } = String.codec.decode(index, binary);
+      const descriptionAndNextIndex: {
+        readonly result: String;
+        readonly nextIndex: number;
+      } = String.codec.decode(nameAndNextIndex.nextIndex, binary);
+      const parameterAndNextIndex: {
+        readonly result: Maybe<Type>;
+        readonly nextIndex: number;
+      } = Maybe.codec(Type.codec).decode(
+        descriptionAndNextIndex.nextIndex,
+        binary
+      );
+      return {
+        result: {
+          name: nameAndNextIndex.result,
+          description: descriptionAndNextIndex.result,
+          parameter: parameterAndNextIndex.result,
+        },
+        nextIndex: parameterAndNextIndex.nextIndex,
+      };
+    },
+  },
+};
+
+/**
+ * Definyだけでは表現できないデータ型
+ * @typePartId 739fb46c7b45d8c51865fc91d5d2ebb1
+ */
+export const TypePartBodyKernel: {
+  /**
+   * 関数
+   */
+  readonly Function: TypePartBodyKernel;
+  /**
+   * 32bit整数
+   */
+  readonly Int32: TypePartBodyKernel;
+  /**
+   * 文字列. Definyだけで表現できるが, TypeScriptでstringとして扱うために必要
+   */
+  readonly String: TypePartBodyKernel;
+  /**
+   * バイナリ型. TypeScriptではUint8Arrayとして扱う
+   */
+  readonly Binary: TypePartBodyKernel;
+  /**
+   * UUID (16byte) を表現する. 内部表現はとりあえず0-f長さ32の文字列
+   */
+  readonly Id: TypePartBodyKernel;
+  /**
+   * sha256などでハッシュ化したもの (32byte) を表現する. 内部表現はとりあえず0-f長さ64の文字列
+   */
+  readonly Token: TypePartBodyKernel;
+  /**
+   * 配列型. TypeScriptではReadonlyArrayとして扱う
+   */
+  readonly List: TypePartBodyKernel;
+  readonly codec: Codec<TypePartBodyKernel>;
+} = {
+  Function: "Function",
+  Int32: "Int32",
+  String: "String",
+  Binary: "Binary",
+  Id: "Id",
+  Token: "Token",
+  List: "List",
+  codec: {
+    encode: (value: TypePartBodyKernel): ReadonlyArray<number> => {
+      switch (value) {
+        case "Function": {
+          return [0];
+        }
+        case "Int32": {
+          return [1];
+        }
+        case "String": {
+          return [2];
+        }
+        case "Binary": {
+          return [3];
+        }
+        case "Id": {
+          return [4];
+        }
+        case "Token": {
+          return [5];
+        }
+        case "List": {
+          return [6];
+        }
+      }
+    },
+    decode: (
+      index: number,
+      binary: Uint8Array
+    ): { readonly result: TypePartBodyKernel; readonly nextIndex: number } => {
+      const patternIndex: {
+        readonly result: number;
+        readonly nextIndex: number;
+      } = Int32.codec.decode(index, binary);
+      if (patternIndex.result === 0) {
+        return {
+          result: TypePartBodyKernel.Function,
+          nextIndex: patternIndex.nextIndex,
+        };
+      }
+      if (patternIndex.result === 1) {
+        return {
+          result: TypePartBodyKernel.Int32,
+          nextIndex: patternIndex.nextIndex,
+        };
+      }
+      if (patternIndex.result === 2) {
+        return {
+          result: TypePartBodyKernel.String,
+          nextIndex: patternIndex.nextIndex,
+        };
+      }
+      if (patternIndex.result === 3) {
+        return {
+          result: TypePartBodyKernel.Binary,
+          nextIndex: patternIndex.nextIndex,
+        };
+      }
+      if (patternIndex.result === 4) {
+        return {
+          result: TypePartBodyKernel.Id,
+          nextIndex: patternIndex.nextIndex,
+        };
+      }
+      if (patternIndex.result === 5) {
+        return {
+          result: TypePartBodyKernel.Token,
+          nextIndex: patternIndex.nextIndex,
+        };
+      }
+      if (patternIndex.result === 6) {
+        return {
+          result: TypePartBodyKernel.List,
+          nextIndex: patternIndex.nextIndex,
+        };
+      }
+      throw new Error("存在しないパターンを指定された 型を更新してください");
+    },
+  },
+};
+
+/**
+ * 型
+ * @typePartId 0e16754e227d7287a01596ee10e1244f
+ */
+export const Type: { readonly codec: Codec<Type> } = {
+  codec: {
+    encode: (value: Type): ReadonlyArray<number> =>
+      TypePartId.codec
+        .encode(value.typePartId)
+        .concat(List.codec(Type.codec).encode(value.parameter)),
+    decode: (
+      index: number,
+      binary: Uint8Array
+    ): { readonly result: Type; readonly nextIndex: number } => {
+      const typePartIdAndNextIndex: {
+        readonly result: TypePartId;
+        readonly nextIndex: number;
+      } = TypePartId.codec.decode(index, binary);
+      const parameterAndNextIndex: {
+        readonly result: List<Type>;
+        readonly nextIndex: number;
+      } = List.codec(Type.codec).decode(
+        typePartIdAndNextIndex.nextIndex,
+        binary
+      );
+      return {
+        result: {
+          typePartId: typePartIdAndNextIndex.result,
+          parameter: parameterAndNextIndex.result,
+        },
+        nextIndex: parameterAndNextIndex.nextIndex,
+      };
+    },
+  },
+};
+
+/**
  * プロジェクトの識別子
  * @typePartId 4e3ab0f9499404a5fa100c4b57835906
  */
@@ -1989,24 +2507,6 @@ export const PartId: { readonly codec: Codec<PartId> } = {
     ): { readonly result: PartId; readonly nextIndex: number } =>
       decodeId(index, binary) as {
         readonly result: PartId;
-        readonly nextIndex: number;
-      },
-  },
-};
-
-/**
- * 型パーツの識別子
- * @typePartId 2562ffbc386c801f5132e10b945786e0
- */
-export const TypePartId: { readonly codec: Codec<TypePartId> } = {
-  codec: {
-    encode: (value: TypePartId): ReadonlyArray<number> => encodeId(value),
-    decode: (
-      index: number,
-      binary: Uint8Array
-    ): { readonly result: TypePartId; readonly nextIndex: number } =>
-      decodeId(index, binary) as {
-        readonly result: TypePartId;
         readonly nextIndex: number;
       },
   },

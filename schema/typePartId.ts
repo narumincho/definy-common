@@ -24,6 +24,14 @@ export const IdeaItemBody = "b88e52e998ab62764aa81c9940205668" as T;
 export const Suggestion = "f16c59a2158d9642481085d2492007f8" as T;
 export const SuggestionState = "9b97c1996665f1009a2f5a0f334d6bff" as T;
 export const Change = "e8a87ce7b719c048b40fa2c33263ff99" as T;
+export const TypePart = "95932121474f7db6f7a1256734be7746" as T;
+export const TypeAttribute = "225e93ce3e35aa0bd76d07ea6f6b89cf" as T;
+export const TypeParameter = "e1333f2af01621585b96e47aea9bfee1" as T;
+export const TypePartBody = "27c027f90fb0fed86c8205cbd90cd08e" as T;
+export const Member = "73b8e53686ac76acb085cb096f658d58" as T;
+export const Pattern = "512c55527a1ce9822e1e51b2f6063789" as T;
+export const TypePartBodyKernel = "739fb46c7b45d8c51865fc91d5d2ebb1" as T;
+export const Type = "0e16754e227d7287a01596ee10e1244f" as T;
 
 export const ProjectId = "4e3ab0f9499404a5fa100c4b57835906" as T;
 export const UserId = "5a71cddc0b95298cb57ec66089190e9b" as T;
