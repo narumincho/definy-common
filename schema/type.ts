@@ -65,6 +65,21 @@ export const Project: Type = {
   parameter: [],
 };
 
+export const Idea: Type = {
+  typePartId: id.Idea,
+  parameter: [],
+};
+
+export const IdeaItem: Type = {
+  typePartId: id.IdeaItem,
+  parameter: [],
+};
+
+export const IdeaItemBody: Type = {
+  typePartId: id.IdeaItemBody,
+  parameter: [],
+};
+
 export const ProjectId: Type = {
   typePartId: id.ProjectId,
   parameter: [],

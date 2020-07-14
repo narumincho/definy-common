@@ -554,6 +554,136 @@ export const typePartMap: ReadonlyMap<TypePartId, TypePart> = new Map<
     },
   ],
   [
+    id.Idea,
+    {
+      name: "Idea",
+      description: "アイデア",
+      migrationPartId: Maybe.Nothing(),
+      projectId: util.definyCodeProjectId,
+      createSuggestionId: util.codeSuggestionId,
+      getTime: { day: 0, millisecond: 0 },
+      attribute: Maybe.Nothing(),
+      typeParameterList: [],
+      body: TypePartBody.Product([
+        {
+          name: "name",
+          description: "アイデア名",
+          type: type.String,
+        },
+        {
+          name: "createUserId",
+          description: "言い出しっぺ",
+          type: type.UserId,
+        },
+        {
+          name: "createTime",
+          description: "作成日時",
+          type: type.Time,
+        },
+        {
+          name: "projectId",
+          description: "対象のプロジェクト",
+          type: type.ProjectId,
+        },
+        {
+          name: "itemList",
+          description: "アイデアの要素",
+          type: type.List(type.IdeaItem),
+        },
+        {
+          name: "updateTime",
+          description: "更新日時",
+          type: type.Time,
+        },
+        {
+          name: "getTime",
+          description: "取得日時",
+          type: type.Time,
+        },
+      ]),
+    },
+  ],
+  [
+    id.IdeaItem,
+    {
+      name: "IdeaItem",
+      description: "アイデアのコメント",
+      migrationPartId: Maybe.Nothing(),
+      projectId: util.definyCodeProjectId,
+      createSuggestionId: util.codeSuggestionId,
+      getTime: { day: 0, millisecond: 0 },
+      attribute: Maybe.Nothing(),
+      typeParameterList: [],
+      body: TypePartBody.Product([
+        {
+          name: "createUserId",
+          description: "作成者",
+          type: type.UserId,
+        },
+        {
+          name: "createTime",
+          description: "作成日時",
+          type: type.Time,
+        },
+        {
+          name: "body",
+          description: "本文",
+          type: type.IdeaItemBody,
+        },
+      ]),
+    },
+  ],
+  [
+    id.IdeaItemBody,
+    {
+      name: "IdeaItemBody",
+      description: "アイデアのアイテム",
+      migrationPartId: Maybe.Nothing(),
+      projectId: util.definyCodeProjectId,
+      createSuggestionId: util.codeSuggestionId,
+      getTime: { day: 0, millisecond: 0 },
+      attribute: Maybe.Nothing(),
+      typeParameterList: [],
+      body: TypePartBody.Sum([
+        {
+          name: "Comment",
+          description: "文章でのコメントをした",
+          parameter: Maybe.Just(type.String),
+        },
+        {
+          name: "SuggestionCreate",
+          description: "提案を作成した",
+          parameter: Maybe.Just(type.SuggestionId),
+        },
+        {
+          name: "SuggestionToApprovalPending",
+          description: "提案を承認待ちにした",
+          parameter: Maybe.Just(type.SuggestionId),
+        },
+        {
+          name: "SuggestionCancelToApprovalPending",
+          description: "承認待ちをキャンセルした",
+          parameter: Maybe.Just(type.SuggestionId),
+        },
+        {
+          name: "SuggestionApprove",
+          description: "提案を承認した",
+          parameter: Maybe.Just(type.SuggestionId),
+        },
+        {
+          name: "SuggestionReject",
+          description: "提案を拒否した",
+          parameter: Maybe.Just(type.SuggestionId),
+        },
+        {
+          name: "SuggestionCancelRejection",
+          description: "提案の拒否をキャンセルした",
+          parameter: Maybe.Just(type.SuggestionId),
+        },
+      ]),
+    },
+  ],
+  [
     id.ProjectId,
     {
       name: "ProjectId",

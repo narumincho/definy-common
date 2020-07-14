@@ -18,6 +18,9 @@ export const Language = "a7c52f1164c69f56625e8febd5f44bf3" as T;
 export const User = "655cea387d1aca74e54df4fc2888bcbb" as T;
 export const IdAndData = "12a442ac046b1757e8684652c2669450" as T;
 export const Project = "3fb93c7e94724891d2a224c6f945acbd" as T;
+export const Idea = "98d993c8105a292781e3d3291fb477b6" as T;
+export const IdeaItem = "ce630fa90ed090bd14c941915abd3293" as T;
+export const IdeaItemBody = "b88e52e998ab62764aa81c9940205668" as T;
 
 export const ProjectId = "4e3ab0f9499404a5fa100c4b57835906" as T;
 export const UserId = "5a71cddc0b95298cb57ec66089190e9b" as T;

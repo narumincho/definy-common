@@ -291,6 +291,82 @@ export type Project = {
 };
 
 /**
+ * アイデア
+ *  @typePartId 98d993c8105a292781e3d3291fb477b6
+ */
+export type Idea = {
+  /**
+   * アイデア名
+   */
+  readonly name: String;
+  /**
+   * 言い出しっぺ
+   */
+  readonly createUserId: UserId;
+  /**
+   * 作成日時
+   */
+  readonly createTime: Time;
+  /**
+   * 対象のプロジェクト
+   */
+  readonly projectId: ProjectId;
+  /**
+   * アイデアの要素
+   */
+  readonly itemList: List<IdeaItem>;
+  /**
+   * 更新日時
+   */
+  readonly updateTime: Time;
+  /**
+   * 取得日時
+   */
+  readonly getTime: Time;
+};
+
+/**
+ * アイデアのコメント
+ *  @typePartId ce630fa90ed090bd14c941915abd3293
+ */
+export type IdeaItem = {
+  /**
+   * 作成者
+   */
+  readonly createUserId: UserId;
+  /**
+   * 作成日時
+   */
+  readonly createTime: Time;
+  /**
+   * 本文
+   */
+  readonly body: IdeaItemBody;
+};
+
+/**
+ * アイデアのアイテム
+ *  @typePartId b88e52e998ab62764aa81c9940205668
+ */
+export type IdeaItemBody =
+  | { readonly _: "Comment"; readonly string: String }
+  | { readonly _: "SuggestionCreate"; readonly suggestionId: SuggestionId }
+  | {
+      readonly _: "SuggestionToApprovalPending";
+      readonly suggestionId: SuggestionId;
+    }
+  | {
+      readonly _: "SuggestionCancelToApprovalPending";
+      readonly suggestionId: SuggestionId;
+    }
+  | { readonly _: "SuggestionApprove"; readonly suggestionId: SuggestionId }
+  | { readonly _: "SuggestionReject"; readonly suggestionId: SuggestionId }
+  | {
+      readonly _: "SuggestionCancelRejection";
+      readonly suggestionId: SuggestionId;
+    };
+
+/**
  * プロジェクトの識別子
  *  @typePartId 4e3ab0f9499404a5fa100c4b57835906
  */
@@ -1269,6 +1345,282 @@ export const Project: { readonly codec: Codec<Project> } = {
         },
         nextIndex: typePartIdListAndNextIndex.nextIndex,
       };
+    },
+  },
+};
+
+/**
+ * アイデア
+ * @typePartId 98d993c8105a292781e3d3291fb477b6
+ */
+export const Idea: { readonly codec: Codec<Idea> } = {
+  codec: {
+    encode: (value: Idea): ReadonlyArray<number> =>
+      String.codec
+        .encode(value.name)
+        .concat(UserId.codec.encode(value.createUserId))
+        .concat(Time.codec.encode(value.createTime))
+        .concat(ProjectId.codec.encode(value.projectId))
+        .concat(List.codec(IdeaItem.codec).encode(value.itemList))
+        .concat(Time.codec.encode(value.updateTime))
+        .concat(Time.codec.encode(value.getTime)),
+    decode: (
+      index: number,
+      binary: Uint8Array
+    ): { readonly result: Idea; readonly nextIndex: number } => {
+      const nameAndNextIndex: {
+        readonly result: String;
+        readonly nextIndex: number;
+      } = String.codec.decode(index, binary);
+      const createUserIdAndNextIndex: {
+        readonly result: UserId;
+        readonly nextIndex: number;
+      } = UserId.codec.decode(nameAndNextIndex.nextIndex, binary);
+      const createTimeAndNextIndex: {
+        readonly result: Time;
+        readonly nextIndex: number;
+      } = Time.codec.decode(createUserIdAndNextIndex.nextIndex, binary);
+      const projectIdAndNextIndex: {
+        readonly result: ProjectId;
+        readonly nextIndex: number;
+      } = ProjectId.codec.decode(createTimeAndNextIndex.nextIndex, binary);
+      const itemListAndNextIndex: {
+        readonly result: List<IdeaItem>;
+        readonly nextIndex: number;
+      } = List.codec(IdeaItem.codec).decode(
+        projectIdAndNextIndex.nextIndex,
+        binary
+      );
+      const updateTimeAndNextIndex: {
+        readonly result: Time;
+        readonly nextIndex: number;
+      } = Time.codec.decode(itemListAndNextIndex.nextIndex, binary);
+      const getTimeAndNextIndex: {
+        readonly result: Time;
+        readonly nextIndex: number;
+      } = Time.codec.decode(updateTimeAndNextIndex.nextIndex, binary);
+      return {
+        result: {
+          name: nameAndNextIndex.result,
+          createUserId: createUserIdAndNextIndex.result,
+          createTime: createTimeAndNextIndex.result,
+          projectId: projectIdAndNextIndex.result,
+          itemList: itemListAndNextIndex.result,
+          updateTime: updateTimeAndNextIndex.result,
+          getTime: getTimeAndNextIndex.result,
+        },
+        nextIndex: getTimeAndNextIndex.nextIndex,
+      };
+    },
+  },
+};
+
+/**
+ * アイデアのコメント
+ * @typePartId ce630fa90ed090bd14c941915abd3293
+ */
+export const IdeaItem: { readonly codec: Codec<IdeaItem> } = {
+  codec: {
+    encode: (value: IdeaItem): ReadonlyArray<number> =>
+      UserId.codec
+        .encode(value.createUserId)
+        .concat(Time.codec.encode(value.createTime))
+        .concat(IdeaItemBody.codec.encode(value.body)),
+    decode: (
+      index: number,
+      binary: Uint8Array
+    ): { readonly result: IdeaItem; readonly nextIndex: number } => {
+      const createUserIdAndNextIndex: {
+        readonly result: UserId;
+        readonly nextIndex: number;
+      } = UserId.codec.decode(index, binary);
+      const createTimeAndNextIndex: {
+        readonly result: Time;
+        readonly nextIndex: number;
+      } = Time.codec.decode(createUserIdAndNextIndex.nextIndex, binary);
+      const bodyAndNextIndex: {
+        readonly result: IdeaItemBody;
+        readonly nextIndex: number;
+      } = IdeaItemBody.codec.decode(createTimeAndNextIndex.nextIndex, binary);
+      return {
+        result: {
+          createUserId: createUserIdAndNextIndex.result,
+          createTime: createTimeAndNextIndex.result,
+          body: bodyAndNextIndex.result,
+        },
+        nextIndex: bodyAndNextIndex.nextIndex,
+      };
+    },
+  },
+};
+
+/**
+ * アイデアのアイテム
+ * @typePartId b88e52e998ab62764aa81c9940205668
+ */
+export const IdeaItemBody: {
+  /**
+   * 文章でのコメントをした
+   */
+  readonly Comment: (a: String) => IdeaItemBody;
+  /**
+   * 提案を作成した
+   */
+  readonly SuggestionCreate: (a: SuggestionId) => IdeaItemBody;
+  /**
+   * 提案を承認待ちにした
+   */
+  readonly SuggestionToApprovalPending: (a: SuggestionId) => IdeaItemBody;
+  /**
+   * 承認待ちをキャンセルした
+   */
+  readonly SuggestionCancelToApprovalPending: (a: SuggestionId) => IdeaItemBody;
+  /**
+   * 提案を承認した
+   */
+  readonly SuggestionApprove: (a: SuggestionId) => IdeaItemBody;
+  /**
+   * 提案を拒否した
+   */
+  readonly SuggestionReject: (a: SuggestionId) => IdeaItemBody;
+  /**
+   * 提案の拒否をキャンセルした
+   */
+  readonly SuggestionCancelRejection: (a: SuggestionId) => IdeaItemBody;
+  readonly codec: Codec<IdeaItemBody>;
+} = {
+  Comment: (string_: String): IdeaItemBody => ({
+    _: "Comment",
+    string: string_,
+  }),
+  SuggestionCreate: (suggestionId: SuggestionId): IdeaItemBody => ({
+    _: "SuggestionCreate",
+    suggestionId,
+  }),
+  SuggestionToApprovalPending: (suggestionId: SuggestionId): IdeaItemBody => ({
+    _: "SuggestionToApprovalPending",
+    suggestionId,
+  }),
+  SuggestionCancelToApprovalPending: (
+    suggestionId: SuggestionId
+  ): IdeaItemBody => ({ _: "SuggestionCancelToApprovalPending", suggestionId }),
+  SuggestionApprove: (suggestionId: SuggestionId): IdeaItemBody => ({
+    _: "SuggestionApprove",
+    suggestionId,
+  }),
+  SuggestionReject: (suggestionId: SuggestionId): IdeaItemBody => ({
+    _: "SuggestionReject",
+    suggestionId,
+  }),
+  SuggestionCancelRejection: (suggestionId: SuggestionId): IdeaItemBody => ({
+    _: "SuggestionCancelRejection",
+    suggestionId,
+  }),
+  codec: {
+    encode: (value: IdeaItemBody): ReadonlyArray<number> => {
+      switch (value._) {
+        case "Comment": {
+          return [0].concat(String.codec.encode(value.string));
+        }
+        case "SuggestionCreate": {
+          return [1].concat(SuggestionId.codec.encode(value.suggestionId));
+        }
+        case "SuggestionToApprovalPending": {
+          return [2].concat(SuggestionId.codec.encode(value.suggestionId));
+        }
+        case "SuggestionCancelToApprovalPending": {
+          return [3].concat(SuggestionId.codec.encode(value.suggestionId));
+        }
+        case "SuggestionApprove": {
+          return [4].concat(SuggestionId.codec.encode(value.suggestionId));
+        }
+        case "SuggestionReject": {
+          return [5].concat(SuggestionId.codec.encode(value.suggestionId));
+        }
+        case "SuggestionCancelRejection": {
+          return [6].concat(SuggestionId.codec.encode(value.suggestionId));
+        }
+      }
+    },
+    decode: (
+      index: number,
+      binary: Uint8Array
+    ): { readonly result: IdeaItemBody; readonly nextIndex: number } => {
+      const patternIndex: {
+        readonly result: number;
+        readonly nextIndex: number;
+      } = Int32.codec.decode(index, binary);
+      if (patternIndex.result === 0) {
+        const result: {
+          readonly result: String;
+          readonly nextIndex: number;
+        } = String.codec.decode(patternIndex.nextIndex, binary);
+        return {
+          result: IdeaItemBody.Comment(result.result),
+          nextIndex: result.nextIndex,
+        };
+      }
+      if (patternIndex.result === 1) {
+        const result: {
+          readonly result: SuggestionId;
+          readonly nextIndex: number;
+        } = SuggestionId.codec.decode(patternIndex.nextIndex, binary);
+        return {
+          result: IdeaItemBody.SuggestionCreate(result.result),
+          nextIndex: result.nextIndex,
+        };
+      }
+      if (patternIndex.result === 2) {
+        const result: {
+          readonly result: SuggestionId;
+          readonly nextIndex: number;
+        } = SuggestionId.codec.decode(patternIndex.nextIndex, binary);
+        return {
+          result: IdeaItemBody.SuggestionToApprovalPending(result.result),
+          nextIndex: result.nextIndex,
+        };
+      }
+      if (patternIndex.result === 3) {
+        const result: {
+          readonly result: SuggestionId;
+          readonly nextIndex: number;
+        } = SuggestionId.codec.decode(patternIndex.nextIndex, binary);
+        return {
+          result: IdeaItemBody.SuggestionCancelToApprovalPending(result.result),
+          nextIndex: result.nextIndex,
+        };
+      }
+      if (patternIndex.result === 4) {
+        const result: {
+          readonly result: SuggestionId;
+          readonly nextIndex: number;
+        } = SuggestionId.codec.decode(patternIndex.nextIndex, binary);
+        return {
+          result: IdeaItemBody.SuggestionApprove(result.result),
+          nextIndex: result.nextIndex,
+        };
+      }
+      if (patternIndex.result === 5) {
+        const result: {
+          readonly result: SuggestionId;
+          readonly nextIndex: number;
+        } = SuggestionId.codec.decode(patternIndex.nextIndex, binary);
+        return {
+          result: IdeaItemBody.SuggestionReject(result.result),
+          nextIndex: result.nextIndex,
+        };
+      }
+      if (patternIndex.result === 6) {
+        const result: {
+          readonly result: SuggestionId;
+          readonly nextIndex: number;
+        } = SuggestionId.codec.decode(patternIndex.nextIndex, binary);
+        return {
+          result: IdeaItemBody.SuggestionCancelRejection(result.result),
+          nextIndex: result.nextIndex,
+        };
+      }
+      throw new Error("存在しないパターンを指定された 型を更新してください");
     },
   },
 };
