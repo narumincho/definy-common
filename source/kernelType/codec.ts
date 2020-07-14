@@ -221,5 +221,4 @@ export const getNextIndex = (resultAndNextIndexExpr: ts.Expr): ts.Expr =>
   tsUtil.get(resultAndNextIndexExpr, util.nextIndexProperty);
 
 export const codecParameterName = (name: string): ts.Identifer =>
-  // TODO fix TypeParameter codec name. identifer.fromString(name + "Codec");
-  identifer.fromString(name);
+  identifer.fromString(name + "Codec");

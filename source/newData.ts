@@ -330,13 +330,13 @@ export const Bool: {
 export const List: {
   readonly codec: <e extends unknown>(a: Codec<e>) => Codec<List<e>>;
 } = {
-  codec: <e extends unknown>(e: Codec<e>): Codec<List<e>> => ({
+  codec: <e extends unknown>(eCodec: Codec<e>): Codec<List<e>> => ({
     encode: (value: List<e>): ReadonlyArray<number> => {
       let result: Array<number> = Int32.codec.encode(value.length) as Array<
         number
       >;
       for (const element of value) {
-        result = result.concat(e.encode(element));
+        result = result.concat(eCodec.encode(element));
       }
       return result;
     },
@@ -354,7 +354,7 @@ export const List: {
         const resultAndNextIndex: {
           readonly result: e;
           readonly nextIndex: number;
-        } = e.decode(nextIndex, binary);
+        } = eCodec.decode(nextIndex, binary);
         result.push(resultAndNextIndex.result);
         nextIndex = resultAndNextIndex.nextIndex;
       }
@@ -385,11 +385,13 @@ export const Maybe: {
     value,
   }),
   Nothing: <value extends unknown>(): Maybe<value> => ({ _: "Nothing" }),
-  codec: <value extends unknown>(value: Codec<value>): Codec<Maybe<value>> => ({
+  codec: <value extends unknown>(
+    valueCodec: Codec<value>
+  ): Codec<Maybe<value>> => ({
     encode: (value: Maybe<value>): ReadonlyArray<number> => {
       switch (value._) {
         case "Just": {
-          return [0].concat(value.codec.encode(value.value));
+          return [0].concat(valueCodec.encode(value.value));
         }
         case "Nothing": {
           return [1];
@@ -408,7 +410,7 @@ export const Maybe: {
         const result: {
           readonly result: value;
           readonly nextIndex: number;
-        } = value.codec.decode(patternIndex.nextIndex, binary);
+        } = valueCodec.decode(patternIndex.nextIndex, binary);
         return {
           result: Maybe.Just(result.result),
           nextIndex: result.nextIndex,
@@ -451,16 +453,16 @@ export const Result: {
     error: error
   ): Result<ok, error> => ({ _: "Error", error }),
   codec: <ok extends unknown, error extends unknown>(
-    ok: Codec<ok>,
-    error: Codec<error>
+    okCodec: Codec<ok>,
+    errorCodec: Codec<error>
   ): Codec<Result<ok, error>> => ({
     encode: (value: Result<ok, error>): ReadonlyArray<number> => {
       switch (value._) {
         case "Ok": {
-          return [0].concat(ok.codec.encode(value.ok));
+          return [0].concat(okCodec.encode(value.ok));
         }
         case "Error": {
-          return [1].concat(error.codec.encode(value.error));
+          return [1].concat(errorCodec.encode(value.error));
         }
       }
     },
@@ -476,7 +478,7 @@ export const Result: {
         const result: {
           readonly result: ok;
           readonly nextIndex: number;
-        } = ok.codec.decode(patternIndex.nextIndex, binary);
+        } = okCodec.decode(patternIndex.nextIndex, binary);
         return {
           result: Result.Ok(result.result),
           nextIndex: result.nextIndex,
@@ -486,7 +488,7 @@ export const Result: {
         const result: {
           readonly result: error;
           readonly nextIndex: number;
-        } = error.codec.decode(patternIndex.nextIndex, binary);
+        } = errorCodec.decode(patternIndex.nextIndex, binary);
         return {
           result: Result.Error(result.result),
           nextIndex: result.nextIndex,

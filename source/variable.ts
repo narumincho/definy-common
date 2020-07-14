@@ -818,9 +818,9 @@ const codecExprUse = (
 };
 
 const typePartNameToCodecExpr = (typePartName: string): ts.Expr => {
-  // TODO 型パラメーターの判定を名前でしてしまっている
+  // TODO 型パラメーターかどうかの判定を名前でしてしまっている
   if (util.isFirstLowerCaseName(typePartName)) {
-    ts.Expr.Variable(codec.codecParameterName(typePartName));
+    return ts.Expr.Variable(codec.codecParameterName(typePartName));
   }
   return tsUtil.get(
     ts.Expr.Variable(identifer.fromString(typePartName)),
