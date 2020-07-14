@@ -1,13 +1,6 @@
 import * as c from "./codec";
 import * as ts from "js-ts-code-generator/distribution/newData";
-import * as util from "../../util";
-import {
-  Maybe,
-  TypePart,
-  TypePartBody,
-  TypePartBodyKernel,
-  TypePartId,
-} from "../../data";
+import * as util from "../util";
 import { identifer, data as tsUtil } from "js-ts-code-generator";
 
 const codec = (): ts.Expr =>
@@ -27,21 +20,6 @@ export const decode = (index: ts.Expr, binary: ts.Expr): ts.Expr =>
     expr: tsUtil.get(codec(), util.decodePropertyName),
     parameterList: [index, binary],
   });
-
-export const typePartId = "ccf22e92cea3639683c0271d65d00673" as TypePartId;
-
-export const typePart: TypePart = {
-  name: "Int32",
-  migrationPartId: Maybe.Nothing(),
-  description:
-    "-2 147 483 648 ～ 2 147 483 647. 32bit 符号付き整数. JavaScriptのnumberとして扱える. numberの32bit符号あり整数をSigned Leb128のバイナリに変換する",
-  projectId: util.definyCodeProjectId,
-  createSuggestionId: util.codeSuggestionId,
-  getTime: { day: 0, millisecond: 0 },
-  attribute: Maybe.Nothing(),
-  typeParameterList: [],
-  body: TypePartBody.Kernel(TypePartBodyKernel.Int32),
-};
 
 /**
  * numberの32bit符号あり整数をSigned Leb128のバイナリに変換するコード

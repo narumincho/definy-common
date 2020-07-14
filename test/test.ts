@@ -71,11 +71,11 @@ describe("test", () => {
     expect(languageAndLocation).toEqual(decodedLanguageAndLocation);
   });
   it("dateTime and js Date conversion", () => {
-    const sampleDateTime: data.Time = main.util.timeFromDate(
+    const sampleDateTime: data.Time = util.timeFromDate(
       new Date(2015, 3, 21, 14, 46, 3, 1234)
     );
     expect(sampleDateTime).toEqual(
-      main.util.timeFromDate(main.util.timeToDate(sampleDateTime))
+      util.timeFromDate(util.timeToDate(sampleDateTime))
     );
   });
   it("stringToTypePartName", () => {
@@ -110,10 +110,7 @@ describe("test", () => {
       })
     );
     expect(result).toEqual<
-      main.data.Result<
-        main.data.EvaluatedExpr,
-        ReadonlyArray<main.data.EvaluateExprError>
-      >
+      data.Result<data.EvaluatedExpr, ReadonlyArray<data.EvaluateExprError>>
     >(data.Result.Ok(data.EvaluatedExpr.Int32(182)));
   });
 
@@ -192,5 +189,9 @@ describe("test", () => {
     expect(result).toEqual<
       data.Result<data.EvaluatedExpr, ReadonlyArray<data.EvaluateExprError>>
     >(data.Result.Ok(data.EvaluatedExpr.Int32(102)));
+  });
+
+  it("util lower case", () => {
+    expect(util.isFirstLowerCaseName("value")).toEqual(true);
   });
 });

@@ -1,5 +1,5 @@
 import * as ts from "js-ts-code-generator/distribution/newData";
-import * as util from "../../util";
+import * as util from "../util";
 import { identifer, data as tsUtil } from "js-ts-code-generator";
 
 export const codecTypeWithTypeParameter = (
@@ -121,7 +121,7 @@ export const encodeLambda = (
   });
 };
 
-const encodeReturnType = tsUtil.readonlyArrayType(ts.Type.Number);
+export const encodeReturnType = tsUtil.readonlyArrayType(ts.Type.Number);
 /**
  * ```ts
  * (a: number, b: Uint8Array) => { readonly result: type_, readonly nextIndex: number }
@@ -150,13 +150,13 @@ export const decodeReturnType = (type_: ts.Type): ts.Type =>
     },
   ]);
 
-const indexIdentifer = identifer.fromString("index");
-const binaryIdentifer = identifer.fromString("binary");
+export const indexIdentifer = identifer.fromString("index");
+export const binaryIdentifer = identifer.fromString("binary");
 
 /**
  * ( index: number, binary: Uint8Array )
  */
-const decodeParameterList: ReadonlyArray<ts.ParameterWithDocument> = [
+export const decodeParameterList: ReadonlyArray<ts.ParameterWithDocument> = [
   {
     name: indexIdentifer,
     type: ts.Type.Number,
@@ -219,3 +219,6 @@ export const getResult = (resultAndNextIndexExpr: ts.Expr): ts.Expr =>
  */
 export const getNextIndex = (resultAndNextIndexExpr: ts.Expr): ts.Expr =>
   tsUtil.get(resultAndNextIndexExpr, util.nextIndexProperty);
+
+export const codecParameterName = (name: string): ts.Identifer =>
+  identifer.fromString(name + "Codec");

@@ -1,8 +1,8 @@
-import * as codec from "./kernel/codec";
-import * as data from "../data";
+import * as codec from "./kernelType/codec";
+import * as data from "./data";
 import * as ts from "js-ts-code-generator/distribution/newData";
 import * as tsUtil from "js-ts-code-generator/distribution/data";
-import * as util from "../util";
+import * as util from "./util";
 import { identifer } from "js-ts-code-generator";
 
 export const typePartMapToTypeAlias = (
@@ -35,7 +35,7 @@ const typePartToTsType = (
   allTypePartIdTypePartNameMap: ReadonlyMap<data.TypePartId, string>
 ): ts.Type => {
   if (typePart.attribute._ === "Just") {
-    typePartWIthAttributeToTsType(typePart, typePart.attribute.value);
+    return typePartWIthAttributeToTsType(typePart, typePart.attribute.value);
   }
   switch (typePart.body._) {
     case "Sum":
@@ -141,12 +141,7 @@ const typePartBodyKernelToTsType = (
         typeParameterList: [],
       });
     case "Int32":
-      return ts.Type.Intersection({
-        left: ts.Type.Number,
-        right: ts.Type.Object([
-          { name: "_int32", required: true, type: ts.Type.Never, document: "" },
-        ]),
-      });
+      return ts.Type.Number;
     case "String":
       return ts.Type.String;
     case "Binary":

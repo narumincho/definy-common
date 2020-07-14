@@ -17,4 +17,4 @@ ts.createProgram({
   },
 }).emit();
 
-require("../schemaJs/main.js");
+require("../schemaJs/schema/main.js");
