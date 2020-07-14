@@ -1,6 +1,7 @@
-import * as ts from "js-ts-code-generator/distribution/newData";
+import * as identifer from "js-ts-code-generator/source/identifer";
+import * as ts from "js-ts-code-generator/source/data";
+import * as tsUtil from "js-ts-code-generator/source/util";
 import * as util from "../util";
-import { identifer, data as tsUtil } from "js-ts-code-generator";
 
 export const codecTypeWithTypeParameter = (
   type_: ts.Type,

@@ -2,12 +2,13 @@ import * as binary from "./kernelType/binary";
 import * as codec from "./kernelType/codec";
 import * as data from "./data";
 import * as hexString from "./kernelType/hexString";
+import * as identifer from "js-ts-code-generator/source/identifer";
 import * as int32 from "./kernelType/int32";
 import * as kernelString from "./kernelType/string";
 import * as list from "./kernelType/list";
-import * as ts from "js-ts-code-generator/distribution/newData";
+import * as ts from "js-ts-code-generator/source/data";
+import * as tsUtil from "js-ts-code-generator/source/util";
 import * as util from "./util";
-import { identifer, data as tsUtil } from "js-ts-code-generator";
 
 export const typePartMapToVariable = (
   typePartMap: ReadonlyMap<data.TypePartId, data.TypePart>,

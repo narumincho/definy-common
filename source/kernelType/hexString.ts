@@ -1,7 +1,7 @@
 import * as codec from "./codec";
-import * as ts from "js-ts-code-generator/distribution/newData";
-import * as util from "../util";
-import { identifer, data as tsUtil } from "js-ts-code-generator";
+import * as identifer from "js-ts-code-generator/source/identifer";
+import * as ts from "js-ts-code-generator/source/data";
+import * as tsUtil from "js-ts-code-generator/source/util";
 
 const encodeDefinition = (
   byteSize: number,

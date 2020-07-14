@@ -1,6 +1,6 @@
 import * as data from "./data";
 import * as hexString from "./kernelType/hexString";
-import * as ts from "js-ts-code-generator/distribution/newData";
+import * as ts from "js-ts-code-generator/source/data";
 import * as typeAlias from "./typeAlias";
 import * as util from "./util";
 import * as variable from "./variable";
