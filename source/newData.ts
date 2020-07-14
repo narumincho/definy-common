@@ -739,6 +739,28 @@ export type BranchPartDefinition = {
 };
 
 /**
+ * 評価したときに失敗した原因を表すもの
+ *  @typePartId 6519a080b86da2627bef4032319ac621
+ */
+export type EvaluateExprError =
+  | { readonly _: "NeedPartDefinition"; readonly partId: PartId }
+  | { readonly _: "NeedSuggestionPart"; readonly int32: Int32 }
+  | { readonly _: "Blank" }
+  | { readonly _: "TypeError"; readonly typeError: TypeError }
+  | { readonly _: "NotSupported" };
+
+/**
+ * 型エラー
+ *  @typePartId 466fbfeeb2d6ead0f6bd0833b5ea3d71
+ */
+export type TypeError = {
+  /**
+   * 型エラーの説明
+   */
+  readonly message: String;
+};
+
+/**
  * プロジェクトの識別子
  *  @typePartId 4e3ab0f9499404a5fa100c4b57835906
  */
@@ -3308,6 +3330,146 @@ export const BranchPartDefinition: {
           expr: exprAndNextIndex.result,
         },
         nextIndex: exprAndNextIndex.nextIndex,
+      };
+    },
+  },
+};
+
+/**
+ * 評価したときに失敗した原因を表すもの
+ * @typePartId 6519a080b86da2627bef4032319ac621
+ */
+export const EvaluateExprError: {
+  /**
+   * 式を評価するには,このパーツの定義が必要だと言っている
+   */
+  readonly NeedPartDefinition: (a: PartId) => EvaluateExprError;
+  /**
+   * 式を評価するために必要なSuggestionPartが見つからない
+   */
+  readonly NeedSuggestionPart: (a: Int32) => EvaluateExprError;
+  /**
+   * 計算結果にblankが含まれている
+   */
+  readonly Blank: EvaluateExprError;
+  /**
+   * 型が合わない
+   */
+  readonly TypeError: (a: TypeError) => EvaluateExprError;
+  /**
+   * まだサポートしていないものが含まれている
+   */
+  readonly NotSupported: EvaluateExprError;
+  readonly codec: Codec<EvaluateExprError>;
+} = {
+  NeedPartDefinition: (partId: PartId): EvaluateExprError => ({
+    _: "NeedPartDefinition",
+    partId,
+  }),
+  NeedSuggestionPart: (int32: Int32): EvaluateExprError => ({
+    _: "NeedSuggestionPart",
+    int32,
+  }),
+  Blank: { _: "Blank" },
+  TypeError: (typeError: TypeError): EvaluateExprError => ({
+    _: "TypeError",
+    typeError,
+  }),
+  NotSupported: { _: "NotSupported" },
+  codec: {
+    encode: (value: EvaluateExprError): ReadonlyArray<number> => {
+      switch (value._) {
+        case "NeedPartDefinition": {
+          return [0].concat(PartId.codec.encode(value.partId));
+        }
+        case "NeedSuggestionPart": {
+          return [1].concat(Int32.codec.encode(value.int32));
+        }
+        case "Blank": {
+          return [2];
+        }
+        case "TypeError": {
+          return [3].concat(TypeError.codec.encode(value.typeError));
+        }
+        case "NotSupported": {
+          return [4];
+        }
+      }
+    },
+    decode: (
+      index: number,
+      binary: Uint8Array
+    ): { readonly result: EvaluateExprError; readonly nextIndex: number } => {
+      const patternIndex: {
+        readonly result: number;
+        readonly nextIndex: number;
+      } = Int32.codec.decode(index, binary);
+      if (patternIndex.result === 0) {
+        const result: {
+          readonly result: PartId;
+          readonly nextIndex: number;
+        } = PartId.codec.decode(patternIndex.nextIndex, binary);
+        return {
+          result: EvaluateExprError.NeedPartDefinition(result.result),
+          nextIndex: result.nextIndex,
+        };
+      }
+      if (patternIndex.result === 1) {
+        const result: {
+          readonly result: Int32;
+          readonly nextIndex: number;
+        } = Int32.codec.decode(patternIndex.nextIndex, binary);
+        return {
+          result: EvaluateExprError.NeedSuggestionPart(result.result),
+          nextIndex: result.nextIndex,
+        };
+      }
+      if (patternIndex.result === 2) {
+        return {
+          result: EvaluateExprError.Blank,
+          nextIndex: patternIndex.nextIndex,
+        };
+      }
+      if (patternIndex.result === 3) {
+        const result: {
+          readonly result: TypeError;
+          readonly nextIndex: number;
+        } = TypeError.codec.decode(patternIndex.nextIndex, binary);
+        return {
+          result: EvaluateExprError.TypeError(result.result),
+          nextIndex: result.nextIndex,
+        };
+      }
+      if (patternIndex.result === 4) {
+        return {
+          result: EvaluateExprError.NotSupported,
+          nextIndex: patternIndex.nextIndex,
+        };
+      }
+      throw new Error("存在しないパターンを指定された 型を更新してください");
+    },
+  },
+};
+
+/**
+ * 型エラー
+ * @typePartId 466fbfeeb2d6ead0f6bd0833b5ea3d71
+ */
+export const TypeError: { readonly codec: Codec<TypeError> } = {
+  codec: {
+    encode: (value: TypeError): ReadonlyArray<number> =>
+      String.codec.encode(value.message),
+    decode: (
+      index: number,
+      binary: Uint8Array
+    ): { readonly result: TypeError; readonly nextIndex: number } => {
+      const messageAndNextIndex: {
+        readonly result: String;
+        readonly nextIndex: number;
+      } = String.codec.decode(index, binary);
+      return {
+        result: { message: messageAndNextIndex.result },
+        nextIndex: messageAndNextIndex.nextIndex,
       };
     },
   },

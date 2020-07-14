@@ -1416,6 +1416,66 @@ export const typePartMap: ReadonlyMap<TypePartId, TypePart> = new Map<
     },
   ],
   [
+    id.EvaluateExprError,
+    {
+      name: "EvaluateExprError",
+      description: "評価したときに失敗した原因を表すもの",
+      migrationPartId: Maybe.Nothing(),
+      projectId: util.definyCodeProjectId,
+      createSuggestionId: util.codeSuggestionId,
+      getTime: { day: 0, millisecond: 0 },
+      attribute: Maybe.Nothing(),
+      typeParameterList: [],
+      body: TypePartBody.Sum([
+        {
+          name: "NeedPartDefinition",
+          description: "式を評価するには,このパーツの定義が必要だと言っている",
+          parameter: Maybe.Just(type.PartId),
+        },
+        {
+          name: "NeedSuggestionPart",
+          description: "式を評価するために必要なSuggestionPartが見つからない",
+          parameter: Maybe.Just(type.Int32),
+        },
+        {
+          name: "Blank",
+          description: "計算結果にblankが含まれている",
+          parameter: Maybe.Nothing(),
+        },
+        {
+          name: "TypeError",
+          description: "型が合わない",
+          parameter: Maybe.Just(type.TypeError),
+        },
+        {
+          name: "NotSupported",
+          description: "まだサポートしていないものが含まれている",
+          parameter: Maybe.Nothing(),
+        },
+      ]),
+    },
+  ],
+  [
+    id.TypeError,
+    {
+      name: "TypeError",
+      description: "型エラー",
+      migrationPartId: Maybe.Nothing(),
+      projectId: util.definyCodeProjectId,
+      createSuggestionId: util.codeSuggestionId,
+      getTime: { day: 0, millisecond: 0 },
+      attribute: Maybe.Nothing(),
+      typeParameterList: [],
+      body: TypePartBody.Product([
+        {
+          name: "message",
+          description: "型エラーの説明",
+          type: type.String,
+        },
+      ]),
+    },
+  ],
+  [
     id.ProjectId,
     {
       name: "ProjectId",

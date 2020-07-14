@@ -42,6 +42,8 @@ export const Condition = "a27c39d96ff09d8bafa4b37d386995d9" as T;
 export const ConditionTag = "46ec720c126a7093a527d29c176c5b59" as T;
 export const ConditionCapture = "1e0084ab494ca046f98cd6334ecf0944" as T;
 export const BranchPartDefinition = "7591b507c8c0477470c0eadca88b86c3" as T;
+export const EvaluateExprError = "6519a080b86da2627bef4032319ac621" as T;
+export const TypeError = "466fbfeeb2d6ead0f6bd0833b5ea3d71" as T;
 
 export const ProjectId = "4e3ab0f9499404a5fa100c4b57835906" as T;
 export const UserId = "5a71cddc0b95298cb57ec66089190e9b" as T;

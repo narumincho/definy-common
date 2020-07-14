@@ -99,6 +99,10 @@ export const ConditionCapture = noParameterType(id.ConditionCapture);
 
 export const BranchPartDefinition = noParameterType(id.BranchPartDefinition);
 
+export const EvaluateExprError = noParameterType(id.EvaluateExprError);
+
+export const TypeError = noParameterType(id.TypeError);
+
 export const ProjectId = noParameterType(id.ProjectId);
 
 export const UserId = noParameterType(id.UserId);
