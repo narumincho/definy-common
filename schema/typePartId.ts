@@ -24,6 +24,7 @@ export const IdeaItemBody = "b88e52e998ab62764aa81c9940205668" as T;
 export const Suggestion = "f16c59a2158d9642481085d2492007f8" as T;
 export const SuggestionState = "9b97c1996665f1009a2f5a0f334d6bff" as T;
 export const Change = "e8a87ce7b719c048b40fa2c33263ff99" as T;
+export const Part = "68599f9f5f2405a4f83d4dc4a8d4dfd7" as T;
 export const TypePart = "95932121474f7db6f7a1256734be7746" as T;
 export const TypeAttribute = "225e93ce3e35aa0bd76d07ea6f6b89cf" as T;
 export const TypeParameter = "e1333f2af01621585b96e47aea9bfee1" as T;

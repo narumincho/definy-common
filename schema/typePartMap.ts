@@ -799,7 +799,63 @@ export const typePartMap: ReadonlyMap<TypePartId, TypePart> = new Map<
     },
   ],
   [
-    id.TypePartId,
+    id.Part,
+    {
+      name: "Part",
+      description: "パーツの定義",
+      migrationPartId: Maybe.Nothing(),
+      projectId: util.definyCodeProjectId,
+      createSuggestionId: util.codeSuggestionId,
+      getTime: { day: 0, millisecond: 0 },
+      attribute: Maybe.Nothing(),
+      typeParameterList: [],
+      body: TypePartBody.Product([
+        {
+          name: "name",
+          description: "パーツの名前",
+          type: type.String,
+        },
+        {
+          name: "migrationPartId",
+          description:
+            "Justのときはパーツは非推奨になっていて移行プログラムのパーツIDが含まれる",
+          type: type.Maybe(type.PartId),
+        },
+        {
+          name: "description",
+          description: "パーツの説明",
+          type: type.String,
+        },
+        {
+          name: "type",
+          description: "パーツの型",
+          type: type.Type,
+        },
+        {
+          name: "expr",
+          description: "パーツの式",
+          type: type.Expr,
+        },
+        {
+          name: "projectId",
+          description: "所属しているプロジェクトのID",
+          type: type.ProjectId,
+        },
+        {
+          name: "createSuggestionId",
+          description: "このパーツが作成された提案",
+          type: type.SuggestionId,
+        },
+        {
+          name: "getTime",
+          description: "取得日時",
+          type: type.Time,
+        },
+      ]),
+    },
+  ],
+  [
+    id.TypePart,
     {
       name: "TypePart",
       description: "型パーツ",

@@ -63,6 +63,8 @@ export const SuggestionState = noParameterType(id.SuggestionId);
 
 export const Change = noParameterType(id.Change);
 
+export const Part = noParameterType(id.Part);
+
 export const TypePart = noParameterType(id.TypePart);
 
 export const TypeAttribute = noParameterType(id.TypeAttribute);

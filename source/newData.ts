@@ -426,10 +426,86 @@ export type SuggestionState =
 export type Change = { readonly _: "ProjectName"; readonly string: String };
 
 /**
- * 型パーツの識別子
- *  @typePartId 2562ffbc386c801f5132e10b945786e0
+ * パーツの定義
+ *  @typePartId 68599f9f5f2405a4f83d4dc4a8d4dfd7
  */
-export type TypePartId = string & { readonly _typePartId: never };
+export type Part = {
+  /**
+   * パーツの名前
+   */
+  readonly name: String;
+  /**
+   * Justのときはパーツは非推奨になっていて移行プログラムのパーツIDが含まれる
+   */
+  readonly migrationPartId: Maybe<PartId>;
+  /**
+   * パーツの説明
+   */
+  readonly description: String;
+  /**
+   * パーツの型
+   */
+  readonly type: Type;
+  /**
+   * パーツの式
+   */
+  readonly expr: Expr;
+  /**
+   * 所属しているプロジェクトのID
+   */
+  readonly projectId: ProjectId;
+  /**
+   * このパーツが作成された提案
+   */
+  readonly createSuggestionId: SuggestionId;
+  /**
+   * 取得日時
+   */
+  readonly getTime: Time;
+};
+
+/**
+ * 型パーツ
+ *  @typePartId 95932121474f7db6f7a1256734be7746
+ */
+export type TypePart = {
+  /**
+   * 型パーツの名前
+   */
+  readonly name: String;
+  /**
+   * Justのときは型パーツは非推奨になっていて移行プログラムのパーツIDが含まれる
+   */
+  readonly migrationPartId: Maybe<PartId>;
+  /**
+   * 型パーツの説明
+   */
+  readonly description: String;
+  /**
+   * 所属しているプロジェクトのID
+   */
+  readonly projectId: ProjectId;
+  /**
+   * この型パーツが作成された提案
+   */
+  readonly createSuggestionId: SuggestionId;
+  /**
+   * 取得日時
+   */
+  readonly getTime: Time;
+  /**
+   * コンパイラに与える,この型を表現するのにどういう特殊な状態にするかという情報
+   */
+  readonly attribute: Maybe<TypeAttribute>;
+  /**
+   * 型パラメーター
+   */
+  readonly typeParameterList: List<TypeParameter>;
+  /**
+   * 定義本体
+   */
+  readonly body: TypePartBody;
+};
 
 /**
  * コンパイラに向けた, 型のデータ形式をどうするかの情報
@@ -697,6 +773,12 @@ export type ImageToken = string & { readonly _imageToken: never };
  *  @typePartId d2c65983f602ee7e0a7be06e6af61acf
  */
 export type PartId = string & { readonly _partId: never };
+
+/**
+ * 型パーツの識別子
+ *  @typePartId 2562ffbc386c801f5132e10b945786e0
+ */
+export type TypePartId = string & { readonly _typePartId: never };
 
 /**
  * タグの識別子
@@ -2124,20 +2206,155 @@ export const Change: {
 };
 
 /**
- * 型パーツの識別子
- * @typePartId 2562ffbc386c801f5132e10b945786e0
+ * パーツの定義
+ * @typePartId 68599f9f5f2405a4f83d4dc4a8d4dfd7
  */
-export const TypePartId: { readonly codec: Codec<TypePartId> } = {
+export const Part: { readonly codec: Codec<Part> } = {
   codec: {
-    encode: (value: TypePartId): ReadonlyArray<number> => encodeId(value),
+    encode: (value: Part): ReadonlyArray<number> =>
+      String.codec
+        .encode(value.name)
+        .concat(Maybe.codec(PartId.codec).encode(value.migrationPartId))
+        .concat(String.codec.encode(value.description))
+        .concat(Type.codec.encode(value.type))
+        .concat(Expr.codec.encode(value.expr))
+        .concat(ProjectId.codec.encode(value.projectId))
+        .concat(SuggestionId.codec.encode(value.createSuggestionId))
+        .concat(Time.codec.encode(value.getTime)),
     decode: (
       index: number,
       binary: Uint8Array
-    ): { readonly result: TypePartId; readonly nextIndex: number } =>
-      decodeId(index, binary) as {
-        readonly result: TypePartId;
+    ): { readonly result: Part; readonly nextIndex: number } => {
+      const nameAndNextIndex: {
+        readonly result: String;
         readonly nextIndex: number;
-      },
+      } = String.codec.decode(index, binary);
+      const migrationPartIdAndNextIndex: {
+        readonly result: Maybe<PartId>;
+        readonly nextIndex: number;
+      } = Maybe.codec(PartId.codec).decode(nameAndNextIndex.nextIndex, binary);
+      const descriptionAndNextIndex: {
+        readonly result: String;
+        readonly nextIndex: number;
+      } = String.codec.decode(migrationPartIdAndNextIndex.nextIndex, binary);
+      const typeAndNextIndex: {
+        readonly result: Type;
+        readonly nextIndex: number;
+      } = Type.codec.decode(descriptionAndNextIndex.nextIndex, binary);
+      const exprAndNextIndex: {
+        readonly result: Expr;
+        readonly nextIndex: number;
+      } = Expr.codec.decode(typeAndNextIndex.nextIndex, binary);
+      const projectIdAndNextIndex: {
+        readonly result: ProjectId;
+        readonly nextIndex: number;
+      } = ProjectId.codec.decode(exprAndNextIndex.nextIndex, binary);
+      const createSuggestionIdAndNextIndex: {
+        readonly result: SuggestionId;
+        readonly nextIndex: number;
+      } = SuggestionId.codec.decode(projectIdAndNextIndex.nextIndex, binary);
+      const getTimeAndNextIndex: {
+        readonly result: Time;
+        readonly nextIndex: number;
+      } = Time.codec.decode(createSuggestionIdAndNextIndex.nextIndex, binary);
+      return {
+        result: {
+          name: nameAndNextIndex.result,
+          migrationPartId: migrationPartIdAndNextIndex.result,
+          description: descriptionAndNextIndex.result,
+          type: typeAndNextIndex.result,
+          expr: exprAndNextIndex.result,
+          projectId: projectIdAndNextIndex.result,
+          createSuggestionId: createSuggestionIdAndNextIndex.result,
+          getTime: getTimeAndNextIndex.result,
+        },
+        nextIndex: getTimeAndNextIndex.nextIndex,
+      };
+    },
+  },
+};
+
+/**
+ * 型パーツ
+ * @typePartId 95932121474f7db6f7a1256734be7746
+ */
+export const TypePart: { readonly codec: Codec<TypePart> } = {
+  codec: {
+    encode: (value: TypePart): ReadonlyArray<number> =>
+      String.codec
+        .encode(value.name)
+        .concat(Maybe.codec(PartId.codec).encode(value.migrationPartId))
+        .concat(String.codec.encode(value.description))
+        .concat(ProjectId.codec.encode(value.projectId))
+        .concat(SuggestionId.codec.encode(value.createSuggestionId))
+        .concat(Time.codec.encode(value.getTime))
+        .concat(Maybe.codec(TypeAttribute.codec).encode(value.attribute))
+        .concat(List.codec(TypeParameter.codec).encode(value.typeParameterList))
+        .concat(TypePartBody.codec.encode(value.body)),
+    decode: (
+      index: number,
+      binary: Uint8Array
+    ): { readonly result: TypePart; readonly nextIndex: number } => {
+      const nameAndNextIndex: {
+        readonly result: String;
+        readonly nextIndex: number;
+      } = String.codec.decode(index, binary);
+      const migrationPartIdAndNextIndex: {
+        readonly result: Maybe<PartId>;
+        readonly nextIndex: number;
+      } = Maybe.codec(PartId.codec).decode(nameAndNextIndex.nextIndex, binary);
+      const descriptionAndNextIndex: {
+        readonly result: String;
+        readonly nextIndex: number;
+      } = String.codec.decode(migrationPartIdAndNextIndex.nextIndex, binary);
+      const projectIdAndNextIndex: {
+        readonly result: ProjectId;
+        readonly nextIndex: number;
+      } = ProjectId.codec.decode(descriptionAndNextIndex.nextIndex, binary);
+      const createSuggestionIdAndNextIndex: {
+        readonly result: SuggestionId;
+        readonly nextIndex: number;
+      } = SuggestionId.codec.decode(projectIdAndNextIndex.nextIndex, binary);
+      const getTimeAndNextIndex: {
+        readonly result: Time;
+        readonly nextIndex: number;
+      } = Time.codec.decode(createSuggestionIdAndNextIndex.nextIndex, binary);
+      const attributeAndNextIndex: {
+        readonly result: Maybe<TypeAttribute>;
+        readonly nextIndex: number;
+      } = Maybe.codec(TypeAttribute.codec).decode(
+        getTimeAndNextIndex.nextIndex,
+        binary
+      );
+      const typeParameterListAndNextIndex: {
+        readonly result: List<TypeParameter>;
+        readonly nextIndex: number;
+      } = List.codec(TypeParameter.codec).decode(
+        attributeAndNextIndex.nextIndex,
+        binary
+      );
+      const bodyAndNextIndex: {
+        readonly result: TypePartBody;
+        readonly nextIndex: number;
+      } = TypePartBody.codec.decode(
+        typeParameterListAndNextIndex.nextIndex,
+        binary
+      );
+      return {
+        result: {
+          name: nameAndNextIndex.result,
+          migrationPartId: migrationPartIdAndNextIndex.result,
+          description: descriptionAndNextIndex.result,
+          projectId: projectIdAndNextIndex.result,
+          createSuggestionId: createSuggestionIdAndNextIndex.result,
+          getTime: getTimeAndNextIndex.result,
+          attribute: attributeAndNextIndex.result,
+          typeParameterList: typeParameterListAndNextIndex.result,
+          body: bodyAndNextIndex.result,
+        },
+        nextIndex: bodyAndNextIndex.nextIndex,
+      };
+    },
   },
 };
 
@@ -3199,6 +3416,24 @@ export const PartId: { readonly codec: Codec<PartId> } = {
     ): { readonly result: PartId; readonly nextIndex: number } =>
       decodeId(index, binary) as {
         readonly result: PartId;
+        readonly nextIndex: number;
+      },
+  },
+};
+
+/**
+ * 型パーツの識別子
+ * @typePartId 2562ffbc386c801f5132e10b945786e0
+ */
+export const TypePartId: { readonly codec: Codec<TypePartId> } = {
+  codec: {
+    encode: (value: TypePartId): ReadonlyArray<number> => encodeId(value),
+    decode: (
+      index: number,
+      binary: Uint8Array
+    ): { readonly result: TypePartId; readonly nextIndex: number } =>
+      decodeId(index, binary) as {
+        readonly result: TypePartId;
         readonly nextIndex: number;
       },
   },
