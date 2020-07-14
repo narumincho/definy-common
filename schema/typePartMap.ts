@@ -1075,6 +1075,291 @@ export const typePartMap: ReadonlyMap<TypePartId, TypePart> = new Map<
     },
   ],
   [
+    id.Expr,
+    {
+      name: "Expr",
+      description: "式",
+      migrationPartId: Maybe.Nothing(),
+      projectId: util.definyCodeProjectId,
+      createSuggestionId: util.codeSuggestionId,
+      getTime: { day: 0, millisecond: 0 },
+      attribute: Maybe.Nothing(),
+      typeParameterList: [],
+      body: TypePartBody.Sum([
+        {
+          name: "Kernel",
+          description: "Definyだけでは表現できない式",
+          parameter: Maybe.Just(type.KernelExpr),
+        },
+        {
+          name: "Int32Literal",
+          description: "32bit整数",
+          parameter: Maybe.Just(type.Int32),
+        },
+        {
+          name: "PartReference",
+          description: "パーツの値を参照",
+          parameter: Maybe.Just(type.PartId),
+        },
+        {
+          name: "TagReference",
+          description: "タグを参照",
+          parameter: Maybe.Just(type.TagReference),
+        },
+        {
+          name: "FunctionCall",
+          description: "関数呼び出し",
+          parameter: Maybe.Just(type.FunctionCall),
+        },
+        {
+          name: "Lambda",
+          description: "ラムダ",
+          parameter: Maybe.Just(type.List(type.LambdaBranch)),
+        },
+      ]),
+    },
+  ],
+  [
+    id.KernelExpr,
+    {
+      name: "KernelExpr",
+      description: "Definyだけでは表現できない式",
+      migrationPartId: Maybe.Nothing(),
+      projectId: util.definyCodeProjectId,
+      createSuggestionId: util.codeSuggestionId,
+      getTime: { day: 0, millisecond: 0 },
+      attribute: Maybe.Nothing(),
+      typeParameterList: [],
+      body: TypePartBody.Sum([
+        {
+          name: "Int32Add",
+          description: "32bit整数を足す関数",
+          parameter: Maybe.Nothing(),
+        },
+        {
+          name: "Int32Sub",
+          description: "32bit整数を引く関数",
+          parameter: Maybe.Nothing(),
+        },
+        {
+          name: "Int32Mul",
+          description: "32bit整数をかける関数",
+          parameter: Maybe.Nothing(),
+        },
+      ]),
+    },
+  ],
+  [
+    id.TagReference,
+    {
+      name: "TagReference",
+      description: "タグの参照を表す",
+      migrationPartId: Maybe.Nothing(),
+      projectId: util.definyCodeProjectId,
+      createSuggestionId: util.codeSuggestionId,
+      getTime: { day: 0, millisecond: 0 },
+      attribute: Maybe.Nothing(),
+      typeParameterList: [],
+      body: TypePartBody.Product([
+        {
+          name: "typePartId",
+          description: "型ID",
+          type: type.TypePartId,
+        },
+        {
+          name: "tagId",
+          description: "タグID",
+          type: type.TagId,
+        },
+      ]),
+    },
+  ],
+  [
+    id.FunctionCall,
+    {
+      name: "FunctionCall",
+      description: "関数呼び出し",
+      migrationPartId: Maybe.Nothing(),
+      projectId: util.definyCodeProjectId,
+      createSuggestionId: util.codeSuggestionId,
+      getTime: { day: 0, millisecond: 0 },
+      attribute: Maybe.Nothing(),
+      typeParameterList: [],
+      body: TypePartBody.Product([
+        {
+          name: "function",
+          description: "関数",
+          type: type.Expr,
+        },
+        {
+          name: "parameter",
+          description: "パラメーター",
+          type: type.Expr,
+        },
+      ]),
+    },
+  ],
+  [
+    id.LambdaBranch,
+    {
+      name: "LambdaBranch",
+      description: "ラムダのブランチ. Just x -> data x のようなところ",
+      migrationPartId: Maybe.Nothing(),
+      projectId: util.definyCodeProjectId,
+      createSuggestionId: util.codeSuggestionId,
+      getTime: { day: 0, millisecond: 0 },
+      attribute: Maybe.Nothing(),
+      typeParameterList: [],
+      body: TypePartBody.Product([
+        {
+          name: "condition",
+          description: "入力値の条件を書くところ. Just x",
+          type: type.Condition,
+        },
+        {
+          name: "description",
+          description: "ブランチの説明",
+          type: type.String,
+        },
+        {
+          name: "localPartList",
+          description: "",
+          type: type.List(type.BranchPartDefinition),
+        },
+        {
+          name: "expr",
+          description: "式",
+          type: type.Expr,
+        },
+      ]),
+    },
+  ],
+  [
+    id.Condition,
+    {
+      name: "Condition",
+      description: "ブランチの式を使う条件",
+      migrationPartId: Maybe.Nothing(),
+      projectId: util.definyCodeProjectId,
+      createSuggestionId: util.codeSuggestionId,
+      getTime: { day: 0, millisecond: 0 },
+      attribute: Maybe.Nothing(),
+      typeParameterList: [],
+      body: TypePartBody.Sum([
+        {
+          name: "ByTag",
+          description: "タグ",
+          parameter: Maybe.Just(type.ConditionTag),
+        },
+        {
+          name: "ByCapture",
+          description: "キャプチャパーツへのキャプチャ",
+          parameter: Maybe.Just(type.ConditionCapture),
+        },
+        {
+          name: "Any",
+          description: "_ すべてのパターンを通すもの",
+          parameter: Maybe.Nothing(),
+        },
+        {
+          name: "Int32",
+          description: "32bit整数の完全一致",
+          parameter: Maybe.Just(type.Int32),
+        },
+      ]),
+    },
+  ],
+  [
+    id.ConditionTag,
+    {
+      name: "ConditionTag",
+      description: "タグによる条件",
+      migrationPartId: Maybe.Nothing(),
+      projectId: util.definyCodeProjectId,
+      createSuggestionId: util.codeSuggestionId,
+      getTime: { day: 0, millisecond: 0 },
+      attribute: Maybe.Nothing(),
+      typeParameterList: [],
+      body: TypePartBody.Product([
+        {
+          name: "tag",
+          description: "タグ",
+          type: type.TagId,
+        },
+        {
+          name: "parameter",
+          description: "パラメーター",
+          type: type.Maybe(type.Condition),
+        },
+      ]),
+    },
+  ],
+  [
+    id.ConditionCapture,
+    {
+      name: "ConditionCapture",
+      description: "キャプチャパーツへのキャプチャ",
+      migrationPartId: Maybe.Nothing(),
+      projectId: util.definyCodeProjectId,
+      createSuggestionId: util.codeSuggestionId,
+      getTime: { day: 0, millisecond: 0 },
+      attribute: Maybe.Nothing(),
+      typeParameterList: [],
+      body: TypePartBody.Product([
+        {
+          name: "name",
+          description: "キャプチャパーツの名前",
+          type: type.String,
+        },
+        {
+          name: "partId",
+          description: "ローカルパーツのパーツId",
+          type: type.PartId,
+        },
+      ]),
+    },
+  ],
+  [
+    id.BranchPartDefinition,
+    {
+      name: "BranchPartDefinition",
+      description: "ラムダのブランチで使えるパーツを定義する部分",
+      migrationPartId: Maybe.Nothing(),
+      projectId: util.definyCodeProjectId,
+      createSuggestionId: util.codeSuggestionId,
+      getTime: { day: 0, millisecond: 0 },
+      attribute: Maybe.Nothing(),
+      typeParameterList: [],
+      body: TypePartBody.Product([
+        {
+          name: "partId",
+          description: "ローカルパーツのPartId",
+          type: type.PartId,
+        },
+        {
+          name: "name",
+          description: "ブランチパーツの名前",
+          type: type.String,
+        },
+        {
+          name: "description",
+          description: "ブランチパーツの説明",
+          type: type.String,
+        },
+        {
+          name: "type",
+          description: "ローカルパーツの型",
+          type: type.Type,
+        },
+        {
+          name: "expr",
+          description: "ローカルパーツの式",
+          type: type.Expr,
+        },
+      ]),
+    },
+  ],
+  [
     id.ProjectId,
     {
       name: "ProjectId",
@@ -1165,6 +1450,20 @@ export const typePartMap: ReadonlyMap<TypePartId, TypePart> = new Map<
       name: "TypePartId",
       migrationPartId: Maybe.Nothing(),
       description: "型パーツの識別子",
+      projectId: util.definyCodeProjectId,
+      createSuggestionId: util.codeSuggestionId,
+      getTime: { day: 0, millisecond: 0 },
+      attribute: Maybe.Nothing(),
+      typeParameterList: [],
+      body: TypePartBody.Kernel(TypePartBodyKernel.Id),
+    },
+  ],
+  [
+    id.TagId,
+    {
+      name: "TagId",
+      migrationPartId: Maybe.Nothing(),
+      description: "タグの識別子",
       projectId: util.definyCodeProjectId,
       createSuggestionId: util.codeSuggestionId,
       getTime: { day: 0, millisecond: 0 },

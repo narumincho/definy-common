@@ -528,6 +528,141 @@ export type Type = {
 };
 
 /**
+ * 式
+ *  @typePartId 6e0366a4344ee3f670bd5238aa86cb9e
+ */
+export type Expr =
+  | { readonly _: "Kernel"; readonly kernelExpr: KernelExpr }
+  | { readonly _: "Int32Literal"; readonly int32: Int32 }
+  | { readonly _: "PartReference"; readonly partId: PartId }
+  | { readonly _: "TagReference"; readonly tagReference: TagReference }
+  | { readonly _: "FunctionCall"; readonly functionCall: FunctionCall }
+  | { readonly _: "Lambda"; readonly lambdaBranchList: List<LambdaBranch> };
+
+/**
+ * Definyだけでは表現できない式
+ *  @typePartId dfd22b704f16a4033ad6a07b6ce7fb5b
+ */
+export type KernelExpr = "Int32Add" | "Int32Sub" | "Int32Mul";
+
+/**
+ * タグの参照を表す
+ *  @typePartId 9e622b94f66cccedeb7cd9eb10232867
+ */
+export type TagReference = {
+  /**
+   * 型ID
+   */
+  readonly typePartId: TypePartId;
+  /**
+   * タグID
+   */
+  readonly tagId: TagId;
+};
+
+/**
+ * 関数呼び出し
+ *  @typePartId eb48ccda184401de37cee133ee046e94
+ */
+export type FunctionCall = {
+  /**
+   * 関数
+   */
+  readonly function: Expr;
+  /**
+   * パラメーター
+   */
+  readonly parameter: Expr;
+};
+
+/**
+ * ラムダのブランチ. Just x -> data x のようなところ
+ *  @typePartId e1c39a207e4c950b326f1294550f40ac
+ */
+export type LambdaBranch = {
+  /**
+   * 入力値の条件を書くところ. Just x
+   */
+  readonly condition: Condition;
+  /**
+   * ブランチの説明
+   */
+  readonly description: String;
+  readonly localPartList: List<BranchPartDefinition>;
+  /**
+   * 式
+   */
+  readonly expr: Expr;
+};
+
+/**
+ * ブランチの式を使う条件
+ *  @typePartId a27c39d96ff09d8bafa4b37d386995d9
+ */
+export type Condition =
+  | { readonly _: "ByTag"; readonly conditionTag: ConditionTag }
+  | { readonly _: "ByCapture"; readonly conditionCapture: ConditionCapture }
+  | { readonly _: "Any" }
+  | { readonly _: "Int32"; readonly int32: Int32 };
+
+/**
+ * タグによる条件
+ *  @typePartId 46ec720c126a7093a527d29c176c5b59
+ */
+export type ConditionTag = {
+  /**
+   * タグ
+   */
+  readonly tag: TagId;
+  /**
+   * パラメーター
+   */
+  readonly parameter: Maybe<Condition>;
+};
+
+/**
+ * キャプチャパーツへのキャプチャ
+ *  @typePartId 1e0084ab494ca046f98cd6334ecf0944
+ */
+export type ConditionCapture = {
+  /**
+   * キャプチャパーツの名前
+   */
+  readonly name: String;
+  /**
+   * ローカルパーツのパーツId
+   */
+  readonly partId: PartId;
+};
+
+/**
+ * ラムダのブランチで使えるパーツを定義する部分
+ *  @typePartId 7591b507c8c0477470c0eadca88b86c3
+ */
+export type BranchPartDefinition = {
+  /**
+   * ローカルパーツのPartId
+   */
+  readonly partId: PartId;
+  /**
+   * ブランチパーツの名前
+   */
+  readonly name: String;
+  /**
+   * ブランチパーツの説明
+   */
+  readonly description: String;
+  /**
+   * ローカルパーツの型
+   */
+  readonly type: Type;
+  /**
+   * ローカルパーツの式
+   */
+  readonly expr: Expr;
+};
+
+/**
  * プロジェクトの識別子
  *  @typePartId 4e3ab0f9499404a5fa100c4b57835906
  */
@@ -562,6 +697,12 @@ export type ImageToken = string & { readonly _imageToken: never };
  *  @typePartId d2c65983f602ee7e0a7be06e6af61acf
  */
 export type PartId = string & { readonly _partId: never };
+
+/**
+ * タグの識別子
+ *  @typePartId 3133b45b0078dd3b79b067c3ce0c4a67
+ */
+export type TagId = string & { readonly _tagId: never };
 
 /**
  * -2 147 483 648 ～ 2 147 483 647. 32bit 符号付き整数. JavaScriptのnumberとして扱える. numberの32bit符号あり整数をSigned Leb128のバイナリに変換する
@@ -2405,6 +2546,557 @@ export const Type: { readonly codec: Codec<Type> } = {
 };
 
 /**
+ * 式
+ * @typePartId 6e0366a4344ee3f670bd5238aa86cb9e
+ */
+export const Expr: {
+  /**
+   * Definyだけでは表現できない式
+   */
+  readonly Kernel: (a: KernelExpr) => Expr;
+  /**
+   * 32bit整数
+   */
+  readonly Int32Literal: (a: Int32) => Expr;
+  /**
+   * パーツの値を参照
+   */
+  readonly PartReference: (a: PartId) => Expr;
+  /**
+   * タグを参照
+   */
+  readonly TagReference: (a: TagReference) => Expr;
+  /**
+   * 関数呼び出し
+   */
+  readonly FunctionCall: (a: FunctionCall) => Expr;
+  /**
+   * ラムダ
+   */
+  readonly Lambda: (a: List<LambdaBranch>) => Expr;
+  readonly codec: Codec<Expr>;
+} = {
+  Kernel: (kernelExpr: KernelExpr): Expr => ({ _: "Kernel", kernelExpr }),
+  Int32Literal: (int32: Int32): Expr => ({ _: "Int32Literal", int32 }),
+  PartReference: (partId: PartId): Expr => ({ _: "PartReference", partId }),
+  TagReference: (tagReference: TagReference): Expr => ({
+    _: "TagReference",
+    tagReference,
+  }),
+  FunctionCall: (functionCall: FunctionCall): Expr => ({
+    _: "FunctionCall",
+    functionCall,
+  }),
+  Lambda: (lambdaBranchList: List<LambdaBranch>): Expr => ({
+    _: "Lambda",
+    lambdaBranchList,
+  }),
+  codec: {
+    encode: (value: Expr): ReadonlyArray<number> => {
+      switch (value._) {
+        case "Kernel": {
+          return [0].concat(KernelExpr.codec.encode(value.kernelExpr));
+        }
+        case "Int32Literal": {
+          return [1].concat(Int32.codec.encode(value.int32));
+        }
+        case "PartReference": {
+          return [2].concat(PartId.codec.encode(value.partId));
+        }
+        case "TagReference": {
+          return [3].concat(TagReference.codec.encode(value.tagReference));
+        }
+        case "FunctionCall": {
+          return [4].concat(FunctionCall.codec.encode(value.functionCall));
+        }
+        case "Lambda": {
+          return [5].concat(
+            List.codec(LambdaBranch.codec).encode(value.lambdaBranchList)
+          );
+        }
+      }
+    },
+    decode: (
+      index: number,
+      binary: Uint8Array
+    ): { readonly result: Expr; readonly nextIndex: number } => {
+      const patternIndex: {
+        readonly result: number;
+        readonly nextIndex: number;
+      } = Int32.codec.decode(index, binary);
+      if (patternIndex.result === 0) {
+        const result: {
+          readonly result: KernelExpr;
+          readonly nextIndex: number;
+        } = KernelExpr.codec.decode(patternIndex.nextIndex, binary);
+        return {
+          result: Expr.Kernel(result.result),
+          nextIndex: result.nextIndex,
+        };
+      }
+      if (patternIndex.result === 1) {
+        const result: {
+          readonly result: Int32;
+          readonly nextIndex: number;
+        } = Int32.codec.decode(patternIndex.nextIndex, binary);
+        return {
+          result: Expr.Int32Literal(result.result),
+          nextIndex: result.nextIndex,
+        };
+      }
+      if (patternIndex.result === 2) {
+        const result: {
+          readonly result: PartId;
+          readonly nextIndex: number;
+        } = PartId.codec.decode(patternIndex.nextIndex, binary);
+        return {
+          result: Expr.PartReference(result.result),
+          nextIndex: result.nextIndex,
+        };
+      }
+      if (patternIndex.result === 3) {
+        const result: {
+          readonly result: TagReference;
+          readonly nextIndex: number;
+        } = TagReference.codec.decode(patternIndex.nextIndex, binary);
+        return {
+          result: Expr.TagReference(result.result),
+          nextIndex: result.nextIndex,
+        };
+      }
+      if (patternIndex.result === 4) {
+        const result: {
+          readonly result: FunctionCall;
+          readonly nextIndex: number;
+        } = FunctionCall.codec.decode(patternIndex.nextIndex, binary);
+        return {
+          result: Expr.FunctionCall(result.result),
+          nextIndex: result.nextIndex,
+        };
+      }
+      if (patternIndex.result === 5) {
+        const result: {
+          readonly result: List<LambdaBranch>;
+          readonly nextIndex: number;
+        } = List.codec(LambdaBranch.codec).decode(
+          patternIndex.nextIndex,
+          binary
+        );
+        return {
+          result: Expr.Lambda(result.result),
+          nextIndex: result.nextIndex,
+        };
+      }
+      throw new Error("存在しないパターンを指定された 型を更新してください");
+    },
+  },
+};
+
+/**
+ * Definyだけでは表現できない式
+ * @typePartId dfd22b704f16a4033ad6a07b6ce7fb5b
+ */
+export const KernelExpr: {
+  /**
+   * 32bit整数を足す関数
+   */
+  readonly Int32Add: KernelExpr;
+  /**
+   * 32bit整数を引く関数
+   */
+  readonly Int32Sub: KernelExpr;
+  /**
+   * 32bit整数をかける関数
+   */
+  readonly Int32Mul: KernelExpr;
+  readonly codec: Codec<KernelExpr>;
+} = {
+  Int32Add: "Int32Add",
+  Int32Sub: "Int32Sub",
+  Int32Mul: "Int32Mul",
+  codec: {
+    encode: (value: KernelExpr): ReadonlyArray<number> => {
+      switch (value) {
+        case "Int32Add": {
+          return [0];
+        }
+        case "Int32Sub": {
+          return [1];
+        }
+        case "Int32Mul": {
+          return [2];
+        }
+      }
+    },
+    decode: (
+      index: number,
+      binary: Uint8Array
+    ): { readonly result: KernelExpr; readonly nextIndex: number } => {
+      const patternIndex: {
+        readonly result: number;
+        readonly nextIndex: number;
+      } = Int32.codec.decode(index, binary);
+      if (patternIndex.result === 0) {
+        return {
+          result: KernelExpr.Int32Add,
+          nextIndex: patternIndex.nextIndex,
+        };
+      }
+      if (patternIndex.result === 1) {
+        return {
+          result: KernelExpr.Int32Sub,
+          nextIndex: patternIndex.nextIndex,
+        };
+      }
+      if (patternIndex.result === 2) {
+        return {
+          result: KernelExpr.Int32Mul,
+          nextIndex: patternIndex.nextIndex,
+        };
+      }
+      throw new Error("存在しないパターンを指定された 型を更新してください");
+    },
+  },
+};
+
+/**
+ * タグの参照を表す
+ * @typePartId 9e622b94f66cccedeb7cd9eb10232867
+ */
+export const TagReference: { readonly codec: Codec<TagReference> } = {
+  codec: {
+    encode: (value: TagReference): ReadonlyArray<number> =>
+      TypePartId.codec
+        .encode(value.typePartId)
+        .concat(TagId.codec.encode(value.tagId)),
+    decode: (
+      index: number,
+      binary: Uint8Array
+    ): { readonly result: TagReference; readonly nextIndex: number } => {
+      const typePartIdAndNextIndex: {
+        readonly result: TypePartId;
+        readonly nextIndex: number;
+      } = TypePartId.codec.decode(index, binary);
+      const tagIdAndNextIndex: {
+        readonly result: TagId;
+        readonly nextIndex: number;
+      } = TagId.codec.decode(typePartIdAndNextIndex.nextIndex, binary);
+      return {
+        result: {
+          typePartId: typePartIdAndNextIndex.result,
+          tagId: tagIdAndNextIndex.result,
+        },
+        nextIndex: tagIdAndNextIndex.nextIndex,
+      };
+    },
+  },
+};
+
+/**
+ * 関数呼び出し
+ * @typePartId eb48ccda184401de37cee133ee046e94
+ */
+export const FunctionCall: { readonly codec: Codec<FunctionCall> } = {
+  codec: {
+    encode: (value: FunctionCall): ReadonlyArray<number> =>
+      Expr.codec
+        .encode(value.function)
+        .concat(Expr.codec.encode(value.parameter)),
+    decode: (
+      index: number,
+      binary: Uint8Array
+    ): { readonly result: FunctionCall; readonly nextIndex: number } => {
+      const functionAndNextIndex: {
+        readonly result: Expr;
+        readonly nextIndex: number;
+      } = Expr.codec.decode(index, binary);
+      const parameterAndNextIndex: {
+        readonly result: Expr;
+        readonly nextIndex: number;
+      } = Expr.codec.decode(functionAndNextIndex.nextIndex, binary);
+      return {
+        result: {
+          function: functionAndNextIndex.result,
+          parameter: parameterAndNextIndex.result,
+        },
+        nextIndex: parameterAndNextIndex.nextIndex,
+      };
+    },
+  },
+};
+
+/**
+ * ラムダのブランチ. Just x -> data x のようなところ
+ * @typePartId e1c39a207e4c950b326f1294550f40ac
+ */
+export const LambdaBranch: { readonly codec: Codec<LambdaBranch> } = {
+  codec: {
+    encode: (value: LambdaBranch): ReadonlyArray<number> =>
+      Condition.codec
+        .encode(value.condition)
+        .concat(String.codec.encode(value.description))
+        .concat(
+          List.codec(BranchPartDefinition.codec).encode(value.localPartList)
+        )
+        .concat(Expr.codec.encode(value.expr)),
+    decode: (
+      index: number,
+      binary: Uint8Array
+    ): { readonly result: LambdaBranch; readonly nextIndex: number } => {
+      const conditionAndNextIndex: {
+        readonly result: Condition;
+        readonly nextIndex: number;
+      } = Condition.codec.decode(index, binary);
+      const descriptionAndNextIndex: {
+        readonly result: String;
+        readonly nextIndex: number;
+      } = String.codec.decode(conditionAndNextIndex.nextIndex, binary);
+      const localPartListAndNextIndex: {
+        readonly result: List<BranchPartDefinition>;
+        readonly nextIndex: number;
+      } = List.codec(BranchPartDefinition.codec).decode(
+        descriptionAndNextIndex.nextIndex,
+        binary
+      );
+      const exprAndNextIndex: {
+        readonly result: Expr;
+        readonly nextIndex: number;
+      } = Expr.codec.decode(localPartListAndNextIndex.nextIndex, binary);
+      return {
+        result: {
+          condition: conditionAndNextIndex.result,
+          description: descriptionAndNextIndex.result,
+          localPartList: localPartListAndNextIndex.result,
+          expr: exprAndNextIndex.result,
+        },
+        nextIndex: exprAndNextIndex.nextIndex,
+      };
+    },
+  },
+};
+
+/**
+ * ブランチの式を使う条件
+ * @typePartId a27c39d96ff09d8bafa4b37d386995d9
+ */
+export const Condition: {
+  /**
+   * タグ
+   */
+  readonly ByTag: (a: ConditionTag) => Condition;
+  /**
+   * キャプチャパーツへのキャプチャ
+   */
+  readonly ByCapture: (a: ConditionCapture) => Condition;
+  /**
+   * _ すべてのパターンを通すもの
+   */
+  readonly Any: Condition;
+  /**
+   * 32bit整数の完全一致
+   */
+  readonly Int32: (a: Int32) => Condition;
+  readonly codec: Codec<Condition>;
+} = {
+  ByTag: (conditionTag: ConditionTag): Condition => ({
+    _: "ByTag",
+    conditionTag,
+  }),
+  ByCapture: (conditionCapture: ConditionCapture): Condition => ({
+    _: "ByCapture",
+    conditionCapture,
+  }),
+  Any: { _: "Any" },
+  Int32: (int32: Int32): Condition => ({ _: "Int32", int32 }),
+  codec: {
+    encode: (value: Condition): ReadonlyArray<number> => {
+      switch (value._) {
+        case "ByTag": {
+          return [0].concat(ConditionTag.codec.encode(value.conditionTag));
+        }
+        case "ByCapture": {
+          return [1].concat(
+            ConditionCapture.codec.encode(value.conditionCapture)
+          );
+        }
+        case "Any": {
+          return [2];
+        }
+        case "Int32": {
+          return [3].concat(Int32.codec.encode(value.int32));
+        }
+      }
+    },
+    decode: (
+      index: number,
+      binary: Uint8Array
+    ): { readonly result: Condition; readonly nextIndex: number } => {
+      const patternIndex: {
+        readonly result: number;
+        readonly nextIndex: number;
+      } = Int32.codec.decode(index, binary);
+      if (patternIndex.result === 0) {
+        const result: {
+          readonly result: ConditionTag;
+          readonly nextIndex: number;
+        } = ConditionTag.codec.decode(patternIndex.nextIndex, binary);
+        return {
+          result: Condition.ByTag(result.result),
+          nextIndex: result.nextIndex,
+        };
+      }
+      if (patternIndex.result === 1) {
+        const result: {
+          readonly result: ConditionCapture;
+          readonly nextIndex: number;
+        } = ConditionCapture.codec.decode(patternIndex.nextIndex, binary);
+        return {
+          result: Condition.ByCapture(result.result),
+          nextIndex: result.nextIndex,
+        };
+      }
+      if (patternIndex.result === 2) {
+        return { result: Condition.Any, nextIndex: patternIndex.nextIndex };
+      }
+      if (patternIndex.result === 3) {
+        const result: {
+          readonly result: Int32;
+          readonly nextIndex: number;
+        } = Int32.codec.decode(patternIndex.nextIndex, binary);
+        return {
+          result: Condition.Int32(result.result),
+          nextIndex: result.nextIndex,
+        };
+      }
+      throw new Error("存在しないパターンを指定された 型を更新してください");
+    },
+  },
+};
+
+/**
+ * タグによる条件
+ * @typePartId 46ec720c126a7093a527d29c176c5b59
+ */
+export const ConditionTag: { readonly codec: Codec<ConditionTag> } = {
+  codec: {
+    encode: (value: ConditionTag): ReadonlyArray<number> =>
+      TagId.codec
+        .encode(value.tag)
+        .concat(Maybe.codec(Condition.codec).encode(value.parameter)),
+    decode: (
+      index: number,
+      binary: Uint8Array
+    ): { readonly result: ConditionTag; readonly nextIndex: number } => {
+      const tagAndNextIndex: {
+        readonly result: TagId;
+        readonly nextIndex: number;
+      } = TagId.codec.decode(index, binary);
+      const parameterAndNextIndex: {
+        readonly result: Maybe<Condition>;
+        readonly nextIndex: number;
+      } = Maybe.codec(Condition.codec).decode(
+        tagAndNextIndex.nextIndex,
+        binary
+      );
+      return {
+        result: {
+          tag: tagAndNextIndex.result,
+          parameter: parameterAndNextIndex.result,
+        },
+        nextIndex: parameterAndNextIndex.nextIndex,
+      };
+    },
+  },
+};
+
+/**
+ * キャプチャパーツへのキャプチャ
+ * @typePartId 1e0084ab494ca046f98cd6334ecf0944
+ */
+export const ConditionCapture: { readonly codec: Codec<ConditionCapture> } = {
+  codec: {
+    encode: (value: ConditionCapture): ReadonlyArray<number> =>
+      String.codec.encode(value.name).concat(PartId.codec.encode(value.partId)),
+    decode: (
+      index: number,
+      binary: Uint8Array
+    ): { readonly result: ConditionCapture; readonly nextIndex: number } => {
+      const nameAndNextIndex: {
+        readonly result: String;
+        readonly nextIndex: number;
+      } = String.codec.decode(index, binary);
+      const partIdAndNextIndex: {
+        readonly result: PartId;
+        readonly nextIndex: number;
+      } = PartId.codec.decode(nameAndNextIndex.nextIndex, binary);
+      return {
+        result: {
+          name: nameAndNextIndex.result,
+          partId: partIdAndNextIndex.result,
+        },
+        nextIndex: partIdAndNextIndex.nextIndex,
+      };
+    },
+  },
+};
+
+/**
+ * ラムダのブランチで使えるパーツを定義する部分
+ * @typePartId 7591b507c8c0477470c0eadca88b86c3
+ */
+export const BranchPartDefinition: {
+  readonly codec: Codec<BranchPartDefinition>;
+} = {
+  codec: {
+    encode: (value: BranchPartDefinition): ReadonlyArray<number> =>
+      PartId.codec
+        .encode(value.partId)
+        .concat(String.codec.encode(value.name))
+        .concat(String.codec.encode(value.description))
+        .concat(Type.codec.encode(value.type))
+        .concat(Expr.codec.encode(value.expr)),
+    decode: (
+      index: number,
+      binary: Uint8Array
+    ): {
+      readonly result: BranchPartDefinition;
+      readonly nextIndex: number;
+    } => {
+      const partIdAndNextIndex: {
+        readonly result: PartId;
+        readonly nextIndex: number;
+      } = PartId.codec.decode(index, binary);
+      const nameAndNextIndex: {
+        readonly result: String;
+        readonly nextIndex: number;
+      } = String.codec.decode(partIdAndNextIndex.nextIndex, binary);
+      const descriptionAndNextIndex: {
+        readonly result: String;
+        readonly nextIndex: number;
+      } = String.codec.decode(nameAndNextIndex.nextIndex, binary);
+      const typeAndNextIndex: {
+        readonly result: Type;
+        readonly nextIndex: number;
+      } = Type.codec.decode(descriptionAndNextIndex.nextIndex, binary);
+      const exprAndNextIndex: {
+        readonly result: Expr;
+        readonly nextIndex: number;
+      } = Expr.codec.decode(typeAndNextIndex.nextIndex, binary);
+      return {
+        result: {
+          partId: partIdAndNextIndex.result,
+          name: nameAndNextIndex.result,
+          description: descriptionAndNextIndex.result,
+          type: typeAndNextIndex.result,
+          expr: exprAndNextIndex.result,
+        },
+        nextIndex: exprAndNextIndex.nextIndex,
+      };
+    },
+  },
+};
+
+/**
  * プロジェクトの識別子
  * @typePartId 4e3ab0f9499404a5fa100c4b57835906
  */
@@ -2507,6 +3199,24 @@ export const PartId: { readonly codec: Codec<PartId> } = {
     ): { readonly result: PartId; readonly nextIndex: number } =>
       decodeId(index, binary) as {
         readonly result: PartId;
+        readonly nextIndex: number;
+      },
+  },
+};
+
+/**
+ * タグの識別子
+ * @typePartId 3133b45b0078dd3b79b067c3ce0c4a67
+ */
+export const TagId: { readonly codec: Codec<TagId> } = {
+  codec: {
+    encode: (value: TagId): ReadonlyArray<number> => encodeId(value),
+    decode: (
+      index: number,
+      binary: Uint8Array
+    ): { readonly result: TagId; readonly nextIndex: number } =>
+      decodeId(index, binary) as {
+        readonly result: TagId;
         readonly nextIndex: number;
       },
   },

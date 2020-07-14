@@ -6,9 +6,9 @@ const noParameterType = (typePartId: data.TypePartId): data.Type => ({
   parameter: [],
 });
 
-export const Int32: data.Type = noParameterType(id.Int32);
-export const Binary: data.Type = noParameterType(id.Binary);
-export const Bool: data.Type = noParameterType(id.Bool);
+export const Int32 = noParameterType(id.Int32);
+export const Binary = noParameterType(id.Binary);
+export const Bool = noParameterType(id.Bool);
 export const List = (element: data.Type): data.Type => ({
   typePartId: id.List,
   parameter: [element],
@@ -21,27 +21,25 @@ export const Result = (ok: data.Type, error: data.Type): data.Type => ({
   typePartId: id.Result,
   parameter: [ok, error],
 });
-export const String: data.Type = noParameterType(id.String);
+export const String = noParameterType(id.String);
 
-export const Time: data.Type = noParameterType(id.Time);
+export const Time = noParameterType(id.Time);
 
-export const RequestLogInUrlRequestData: data.Type = noParameterType(
+export const RequestLogInUrlRequestData = noParameterType(
   id.RequestLogInUrlRequestData
 );
 
-export const OpenIdConnectProvider: data.Type = noParameterType(
-  id.OpenIdConnectProvider
-);
+export const OpenIdConnectProvider = noParameterType(id.OpenIdConnectProvider);
 
-export const UrlData: data.Type = noParameterType(id.UrlData);
+export const UrlData = noParameterType(id.UrlData);
 
-export const ClientMode: data.Type = noParameterType(id.ClientMode);
+export const ClientMode = noParameterType(id.ClientMode);
 
-export const Location: data.Type = noParameterType(id.Location);
+export const Location = noParameterType(id.Location);
 
-export const Language: data.Type = noParameterType(id.Language);
+export const Language = noParameterType(id.Language);
 
-export const User: data.Type = noParameterType(id.User);
+export const User = noParameterType(id.User);
 
 export const IdAndData = (
   idType: data.Type,
@@ -51,48 +49,66 @@ export const IdAndData = (
   parameter: [idType, dataType],
 });
 
-export const Project: data.Type = noParameterType(id.Project);
+export const Project = noParameterType(id.Project);
 
-export const Idea: data.Type = noParameterType(id.Idea);
+export const Idea = noParameterType(id.Idea);
 
-export const IdeaItem: data.Type = noParameterType(id.IdeaItem);
+export const IdeaItem = noParameterType(id.IdeaItem);
 
-export const IdeaItemBody: data.Type = noParameterType(id.IdeaItemBody);
+export const IdeaItemBody = noParameterType(id.IdeaItemBody);
 
-export const Suggestion: data.Type = noParameterType(id.Suggestion);
+export const Suggestion = noParameterType(id.Suggestion);
 
-export const SuggestionState: data.Type = noParameterType(id.SuggestionId);
+export const SuggestionState = noParameterType(id.SuggestionId);
 
-export const Change: data.Type = noParameterType(id.Change);
+export const Change = noParameterType(id.Change);
 
-export const TypePart: data.Type = noParameterType(id.TypePart);
+export const TypePart = noParameterType(id.TypePart);
 
-export const TypeAttribute: data.Type = noParameterType(id.TypeAttribute);
+export const TypeAttribute = noParameterType(id.TypeAttribute);
 
-export const TypeParameter: data.Type = noParameterType(id.TypeParameter);
+export const TypeParameter = noParameterType(id.TypeParameter);
 
-export const TypePartBody: data.Type = noParameterType(id.TypePartBody);
+export const TypePartBody = noParameterType(id.TypePartBody);
 
-export const Member: data.Type = noParameterType(id.Member);
+export const Member = noParameterType(id.Member);
 
-export const Pattern: data.Type = noParameterType(id.Pattern);
+export const Pattern = noParameterType(id.Pattern);
 
-export const TypePartBodyKernel: data.Type = noParameterType(
-  id.TypePartBodyKernel
-);
+export const TypePartBodyKernel = noParameterType(id.TypePartBodyKernel);
 
-export const Type: data.Type = noParameterType(id.Type);
+export const Type = noParameterType(id.Type);
 
-export const ProjectId: data.Type = noParameterType(id.ProjectId);
+export const Expr = noParameterType(id.Expr);
 
-export const UserId: data.Type = noParameterType(id.UserId);
+export const KernelExpr = noParameterType(id.KernelExpr);
 
-export const IdeaId: data.Type = noParameterType(id.IdeaId);
+export const TagReference = noParameterType(id.TagReference);
 
-export const SuggestionId: data.Type = noParameterType(id.SuggestionId);
+export const FunctionCall = noParameterType(id.FunctionCall);
 
-export const ImageToken: data.Type = noParameterType(id.ImageToken);
+export const LambdaBranch = noParameterType(id.LambdaBranch);
 
-export const PartId: data.Type = noParameterType(id.PartId);
+export const Condition = noParameterType(id.Condition);
 
-export const TypePartId: data.Type = noParameterType(id.TypePartId);
+export const ConditionTag = noParameterType(id.ConditionTag);
+
+export const ConditionCapture = noParameterType(id.ConditionCapture);
+
+export const BranchPartDefinition = noParameterType(id.BranchPartDefinition);
+
+export const ProjectId = noParameterType(id.ProjectId);
+
+export const UserId = noParameterType(id.UserId);
+
+export const IdeaId = noParameterType(id.IdeaId);
+
+export const SuggestionId = noParameterType(id.SuggestionId);
+
+export const ImageToken = noParameterType(id.ImageToken);
+
+export const PartId = noParameterType(id.PartId);
+
+export const TypePartId = noParameterType(id.TypePartId);
+
+export const TagId = noParameterType(id.TagId);
