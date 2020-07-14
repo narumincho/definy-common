@@ -739,6 +739,32 @@ export type BranchPartDefinition = {
 };
 
 /**
+ * 評価しきった式
+ *  @typePartId 76b94bf171eb1dd4cbfb7835938b76b2
+ */
+export type EvaluatedExpr =
+  | { readonly _: "Kernel"; readonly kernelExpr: KernelExpr }
+  | { readonly _: "Int32"; readonly int32: Int32 }
+  | { readonly _: "TagReference"; readonly tagReference: TagReference }
+  | { readonly _: "Lambda"; readonly lambdaBranchList: List<LambdaBranch> }
+  | { readonly _: "KernelCall"; readonly kernelCall: KernelCall };
+
+/**
+ * 複数の引数が必要な内部関数の部分呼び出し
+ *  @typePartId 1db3d6bfb8b0b396a3f94f062d37a630
+ */
+export type KernelCall = {
+  /**
+   * 関数
+   */
+  readonly kernel: KernelExpr;
+  /**
+   * 呼び出すパラメーター
+   */
+  readonly expr: EvaluatedExpr;
+};
+
+/**
  * 評価したときに失敗した原因を表すもの
  *  @typePartId 6519a080b86da2627bef4032319ac621
  */
@@ -3416,6 +3442,171 @@ export const BranchPartDefinition: {
           name: nameAndNextIndex.result,
           description: descriptionAndNextIndex.result,
           type: typeAndNextIndex.result,
+          expr: exprAndNextIndex.result,
+        },
+        nextIndex: exprAndNextIndex.nextIndex,
+      };
+    },
+  },
+};
+
+/**
+ * 評価しきった式
+ * @typePartId 76b94bf171eb1dd4cbfb7835938b76b2
+ */
+export const EvaluatedExpr: {
+  /**
+   * Definyだけでは表現できない式
+   */
+  readonly Kernel: (a: KernelExpr) => EvaluatedExpr;
+  /**
+   * 32bit整数
+   */
+  readonly Int32: (a: Int32) => EvaluatedExpr;
+  /**
+   * タグを参照
+   */
+  readonly TagReference: (a: TagReference) => EvaluatedExpr;
+  /**
+   * ラムダ
+   */
+  readonly Lambda: (a: List<LambdaBranch>) => EvaluatedExpr;
+  /**
+   * 内部関数呼び出し
+   */
+  readonly KernelCall: (a: KernelCall) => EvaluatedExpr;
+  readonly codec: Codec<EvaluatedExpr>;
+} = {
+  Kernel: (kernelExpr: KernelExpr): EvaluatedExpr => ({
+    _: "Kernel",
+    kernelExpr,
+  }),
+  Int32: (int32: Int32): EvaluatedExpr => ({ _: "Int32", int32 }),
+  TagReference: (tagReference: TagReference): EvaluatedExpr => ({
+    _: "TagReference",
+    tagReference,
+  }),
+  Lambda: (lambdaBranchList: List<LambdaBranch>): EvaluatedExpr => ({
+    _: "Lambda",
+    lambdaBranchList,
+  }),
+  KernelCall: (kernelCall: KernelCall): EvaluatedExpr => ({
+    _: "KernelCall",
+    kernelCall,
+  }),
+  codec: {
+    encode: (value: EvaluatedExpr): ReadonlyArray<number> => {
+      switch (value._) {
+        case "Kernel": {
+          return [0].concat(KernelExpr.codec.encode(value.kernelExpr));
+        }
+        case "Int32": {
+          return [1].concat(Int32.codec.encode(value.int32));
+        }
+        case "TagReference": {
+          return [2].concat(TagReference.codec.encode(value.tagReference));
+        }
+        case "Lambda": {
+          return [3].concat(
+            List.codec(LambdaBranch.codec).encode(value.lambdaBranchList)
+          );
+        }
+        case "KernelCall": {
+          return [4].concat(KernelCall.codec.encode(value.kernelCall));
+        }
+      }
+    },
+    decode: (
+      index: number,
+      binary: Uint8Array
+    ): { readonly result: EvaluatedExpr; readonly nextIndex: number } => {
+      const patternIndex: {
+        readonly result: number;
+        readonly nextIndex: number;
+      } = Int32.codec.decode(index, binary);
+      if (patternIndex.result === 0) {
+        const result: {
+          readonly result: KernelExpr;
+          readonly nextIndex: number;
+        } = KernelExpr.codec.decode(patternIndex.nextIndex, binary);
+        return {
+          result: EvaluatedExpr.Kernel(result.result),
+          nextIndex: result.nextIndex,
+        };
+      }
+      if (patternIndex.result === 1) {
+        const result: {
+          readonly result: Int32;
+          readonly nextIndex: number;
+        } = Int32.codec.decode(patternIndex.nextIndex, binary);
+        return {
+          result: EvaluatedExpr.Int32(result.result),
+          nextIndex: result.nextIndex,
+        };
+      }
+      if (patternIndex.result === 2) {
+        const result: {
+          readonly result: TagReference;
+          readonly nextIndex: number;
+        } = TagReference.codec.decode(patternIndex.nextIndex, binary);
+        return {
+          result: EvaluatedExpr.TagReference(result.result),
+          nextIndex: result.nextIndex,
+        };
+      }
+      if (patternIndex.result === 3) {
+        const result: {
+          readonly result: List<LambdaBranch>;
+          readonly nextIndex: number;
+        } = List.codec(LambdaBranch.codec).decode(
+          patternIndex.nextIndex,
+          binary
+        );
+        return {
+          result: EvaluatedExpr.Lambda(result.result),
+          nextIndex: result.nextIndex,
+        };
+      }
+      if (patternIndex.result === 4) {
+        const result: {
+          readonly result: KernelCall;
+          readonly nextIndex: number;
+        } = KernelCall.codec.decode(patternIndex.nextIndex, binary);
+        return {
+          result: EvaluatedExpr.KernelCall(result.result),
+          nextIndex: result.nextIndex,
+        };
+      }
+      throw new Error("存在しないパターンを指定された 型を更新してください");
+    },
+  },
+};
+
+/**
+ * 複数の引数が必要な内部関数の部分呼び出し
+ * @typePartId 1db3d6bfb8b0b396a3f94f062d37a630
+ */
+export const KernelCall: { readonly codec: Codec<KernelCall> } = {
+  codec: {
+    encode: (value: KernelCall): ReadonlyArray<number> =>
+      KernelExpr.codec
+        .encode(value.kernel)
+        .concat(EvaluatedExpr.codec.encode(value.expr)),
+    decode: (
+      index: number,
+      binary: Uint8Array
+    ): { readonly result: KernelCall; readonly nextIndex: number } => {
+      const kernelAndNextIndex: {
+        readonly result: KernelExpr;
+        readonly nextIndex: number;
+      } = KernelExpr.codec.decode(index, binary);
+      const exprAndNextIndex: {
+        readonly result: EvaluatedExpr;
+        readonly nextIndex: number;
+      } = EvaluatedExpr.codec.decode(kernelAndNextIndex.nextIndex, binary);
+      return {
+        result: {
+          kernel: kernelAndNextIndex.result,
           expr: exprAndNextIndex.result,
         },
         nextIndex: exprAndNextIndex.nextIndex,
