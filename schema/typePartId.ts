@@ -21,6 +21,9 @@ export const Project = "3fb93c7e94724891d2a224c6f945acbd" as T;
 export const Idea = "98d993c8105a292781e3d3291fb477b6" as T;
 export const IdeaItem = "ce630fa90ed090bd14c941915abd3293" as T;
 export const IdeaItemBody = "b88e52e998ab62764aa81c9940205668" as T;
+export const Suggestion = "f16c59a2158d9642481085d2492007f8" as T;
+export const SuggestionState = "9b97c1996665f1009a2f5a0f334d6bff" as T;
+export const Change = "e8a87ce7b719c048b40fa2c33263ff99" as T;
 
 export const ProjectId = "4e3ab0f9499404a5fa100c4b57835906" as T;
 export const UserId = "5a71cddc0b95298cb57ec66089190e9b" as T;

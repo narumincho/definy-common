@@ -684,6 +684,121 @@ export const typePartMap: ReadonlyMap<TypePartId, TypePart> = new Map<
     },
   ],
   [
+    id.Suggestion,
+    {
+      name: "Suggestion",
+      description: "提案",
+      migrationPartId: Maybe.Nothing(),
+      projectId: util.definyCodeProjectId,
+      createSuggestionId: util.codeSuggestionId,
+      getTime: { day: 0, millisecond: 0 },
+      attribute: Maybe.Nothing(),
+      typeParameterList: [],
+      body: TypePartBody.Product([
+        {
+          name: "name",
+          description: "変更概要",
+          type: type.String,
+        },
+        {
+          name: "createUserId",
+          description: "作成者",
+          type: type.UserId,
+        },
+        {
+          name: "reason",
+          description: "変更理由",
+          type: type.String,
+        },
+        {
+          name: "state",
+          description: "承認状態",
+          type: type.SuggestionState,
+        },
+        {
+          name: "changeList",
+          description: "変更",
+          type: type.List(type.Change),
+        },
+        {
+          name: "projectId",
+          description: "変更をするプロジェクト",
+          type: type.ProjectId,
+        },
+        {
+          name: "ideaId",
+          description: "投稿したアイデアID",
+          type: type.IdeaId,
+        },
+        {
+          name: "updateTime",
+          description: "更新日時",
+          type: type.Time,
+        },
+        {
+          name: "getTime",
+          description: "取得日時",
+          type: type.Time,
+        },
+      ]),
+    },
+  ],
+  [
+    id.SuggestionState,
+    {
+      name: "SuggestionState",
+      description: "提案の状況",
+      migrationPartId: Maybe.Nothing(),
+      projectId: util.definyCodeProjectId,
+      createSuggestionId: util.codeSuggestionId,
+      getTime: { day: 0, millisecond: 0 },
+      attribute: Maybe.Nothing(),
+      typeParameterList: [],
+      body: TypePartBody.Sum([
+        {
+          name: "Creating",
+          description: "作成中",
+          parameter: Maybe.Nothing(),
+        },
+        {
+          name: "ApprovalPending",
+          description: "承認待ち",
+          parameter: Maybe.Nothing(),
+        },
+        {
+          name: "Approved",
+          description: "承認済み",
+          parameter: Maybe.Nothing(),
+        },
+        {
+          name: "Rejected",
+          description: "拒否された",
+          parameter: Maybe.Nothing(),
+        },
+      ]),
+    },
+  ],
+  [
+    id.Change,
+    {
+      name: "Change",
+      description: "変更点",
+      migrationPartId: Maybe.Nothing(),
+      projectId: util.definyCodeProjectId,
+      createSuggestionId: util.codeSuggestionId,
+      getTime: { day: 0, millisecond: 0 },
+      attribute: Maybe.Nothing(),
+      typeParameterList: [],
+      body: TypePartBody.Sum([
+        {
+          name: "ProjectName",
+          description: "プロジェクト名の変更",
+          parameter: Maybe.Just(type.String),
+        },
+      ]),
+    },
+  ],
+  [
     id.ProjectId,
     {
       name: "ProjectId",

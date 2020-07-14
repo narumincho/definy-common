@@ -1,5 +1,6 @@
 import * as id from "./typePartId";
 import { Type } from "../source/data";
+import { idea } from "./name";
 
 export const Int32: Type = { typePartId: id.Int32, parameter: [] };
 export const Binary: Type = { typePartId: id.Binary, parameter: [] };
@@ -77,6 +78,21 @@ export const IdeaItem: Type = {
 
 export const IdeaItemBody: Type = {
   typePartId: id.IdeaItemBody,
+  parameter: [],
+};
+
+export const Suggestion: Type = {
+  typePartId: id.Suggestion,
+  parameter: [],
+};
+
+export const SuggestionState: Type = {
+  typePartId: id.SuggestionId,
+  parameter: [],
+};
+
+export const Change: Type = {
+  typePartId: id.Change,
   parameter: [],
 };
 

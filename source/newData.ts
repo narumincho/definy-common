@@ -367,6 +367,65 @@ export type IdeaItemBody =
     };
 
 /**
+ * 提案
+ *  @typePartId f16c59a2158d9642481085d2492007f8
+ */
+export type Suggestion = {
+  /**
+   * 変更概要
+   */
+  readonly name: String;
+  /**
+   * 作成者
+   */
+  readonly createUserId: UserId;
+  /**
+   * 変更理由
+   */
+  readonly reason: String;
+  /**
+   * 承認状態
+   */
+  readonly state: SuggestionId;
+  /**
+   * 変更
+   */
+  readonly changeList: List<Change>;
+  /**
+   * 変更をするプロジェクト
+   */
+  readonly projectId: ProjectId;
+  /**
+   * 投稿したアイデアID
+   */
+  readonly ideaId: IdeaId;
+  /**
+   * 更新日時
+   */
+  readonly updateTime: Time;
+  /**
+   * 取得日時
+   */
+  readonly getTime: Time;
+};
+
+/**
+ * 提案の状況
+ *  @typePartId 9b97c1996665f1009a2f5a0f334d6bff
+ */
+export type SuggestionState =
+  | "Creating"
+  | "ApprovalPending"
+  | "Approved"
+  | "Rejected";
+
+/**
+ * 変更点
+ *  @typePartId e8a87ce7b719c048b40fa2c33263ff99
+ */
+export type Change = { readonly _: "ProjectName"; readonly string: String };
+
+/**
  * プロジェクトの識別子
  *  @typePartId 4e3ab0f9499404a5fa100c4b57835906
  */
@@ -1617,6 +1676,208 @@ export const IdeaItemBody: {
         } = SuggestionId.codec.decode(patternIndex.nextIndex, binary);
         return {
           result: IdeaItemBody.SuggestionCancelRejection(result.result),
+          nextIndex: result.nextIndex,
+        };
+      }
+      throw new Error("存在しないパターンを指定された 型を更新してください");
+    },
+  },
+};
+
+/**
+ * 提案
+ * @typePartId f16c59a2158d9642481085d2492007f8
+ */
+export const Suggestion: { readonly codec: Codec<Suggestion> } = {
+  codec: {
+    encode: (value: Suggestion): ReadonlyArray<number> =>
+      String.codec
+        .encode(value.name)
+        .concat(UserId.codec.encode(value.createUserId))
+        .concat(String.codec.encode(value.reason))
+        .concat(SuggestionId.codec.encode(value.state))
+        .concat(List.codec(Change.codec).encode(value.changeList))
+        .concat(ProjectId.codec.encode(value.projectId))
+        .concat(IdeaId.codec.encode(value.ideaId))
+        .concat(Time.codec.encode(value.updateTime))
+        .concat(Time.codec.encode(value.getTime)),
+    decode: (
+      index: number,
+      binary: Uint8Array
+    ): { readonly result: Suggestion; readonly nextIndex: number } => {
+      const nameAndNextIndex: {
+        readonly result: String;
+        readonly nextIndex: number;
+      } = String.codec.decode(index, binary);
+      const createUserIdAndNextIndex: {
+        readonly result: UserId;
+        readonly nextIndex: number;
+      } = UserId.codec.decode(nameAndNextIndex.nextIndex, binary);
+      const reasonAndNextIndex: {
+        readonly result: String;
+        readonly nextIndex: number;
+      } = String.codec.decode(createUserIdAndNextIndex.nextIndex, binary);
+      const stateAndNextIndex: {
+        readonly result: SuggestionId;
+        readonly nextIndex: number;
+      } = SuggestionId.codec.decode(reasonAndNextIndex.nextIndex, binary);
+      const changeListAndNextIndex: {
+        readonly result: List<Change>;
+        readonly nextIndex: number;
+      } = List.codec(Change.codec).decode(stateAndNextIndex.nextIndex, binary);
+      const projectIdAndNextIndex: {
+        readonly result: ProjectId;
+        readonly nextIndex: number;
+      } = ProjectId.codec.decode(changeListAndNextIndex.nextIndex, binary);
+      const ideaIdAndNextIndex: {
+        readonly result: IdeaId;
+        readonly nextIndex: number;
+      } = IdeaId.codec.decode(projectIdAndNextIndex.nextIndex, binary);
+      const updateTimeAndNextIndex: {
+        readonly result: Time;
+        readonly nextIndex: number;
+      } = Time.codec.decode(ideaIdAndNextIndex.nextIndex, binary);
+      const getTimeAndNextIndex: {
+        readonly result: Time;
+        readonly nextIndex: number;
+      } = Time.codec.decode(updateTimeAndNextIndex.nextIndex, binary);
+      return {
+        result: {
+          name: nameAndNextIndex.result,
+          createUserId: createUserIdAndNextIndex.result,
+          reason: reasonAndNextIndex.result,
+          state: stateAndNextIndex.result,
+          changeList: changeListAndNextIndex.result,
+          projectId: projectIdAndNextIndex.result,
+          ideaId: ideaIdAndNextIndex.result,
+          updateTime: updateTimeAndNextIndex.result,
+          getTime: getTimeAndNextIndex.result,
+        },
+        nextIndex: getTimeAndNextIndex.nextIndex,
+      };
+    },
+  },
+};
+
+/**
+ * 提案の状況
+ * @typePartId 9b97c1996665f1009a2f5a0f334d6bff
+ */
+export const SuggestionState: {
+  /**
+   * 作成中
+   */
+  readonly Creating: SuggestionState;
+  /**
+   * 承認待ち
+   */
+  readonly ApprovalPending: SuggestionState;
+  /**
+   * 承認済み
+   */
+  readonly Approved: SuggestionState;
+  /**
+   * 拒否された
+   */
+  readonly Rejected: SuggestionState;
+  readonly codec: Codec<SuggestionState>;
+} = {
+  Creating: "Creating",
+  ApprovalPending: "ApprovalPending",
+  Approved: "Approved",
+  Rejected: "Rejected",
+  codec: {
+    encode: (value: SuggestionState): ReadonlyArray<number> => {
+      switch (value) {
+        case "Creating": {
+          return [0];
+        }
+        case "ApprovalPending": {
+          return [1];
+        }
+        case "Approved": {
+          return [2];
+        }
+        case "Rejected": {
+          return [3];
+        }
+      }
+    },
+    decode: (
+      index: number,
+      binary: Uint8Array
+    ): { readonly result: SuggestionState; readonly nextIndex: number } => {
+      const patternIndex: {
+        readonly result: number;
+        readonly nextIndex: number;
+      } = Int32.codec.decode(index, binary);
+      if (patternIndex.result === 0) {
+        return {
+          result: SuggestionState.Creating,
+          nextIndex: patternIndex.nextIndex,
+        };
+      }
+      if (patternIndex.result === 1) {
+        return {
+          result: SuggestionState.ApprovalPending,
+          nextIndex: patternIndex.nextIndex,
+        };
+      }
+      if (patternIndex.result === 2) {
+        return {
+          result: SuggestionState.Approved,
+          nextIndex: patternIndex.nextIndex,
+        };
+      }
+      if (patternIndex.result === 3) {
+        return {
+          result: SuggestionState.Rejected,
+          nextIndex: patternIndex.nextIndex,
+        };
+      }
+      throw new Error("存在しないパターンを指定された 型を更新してください");
+    },
+  },
+};
+
+/**
+ * 変更点
+ * @typePartId e8a87ce7b719c048b40fa2c33263ff99
+ */
+export const Change: {
+  /**
+   * プロジェクト名の変更
+   */
+  readonly ProjectName: (a: String) => Change;
+  readonly codec: Codec<Change>;
+} = {
+  ProjectName: (string_: String): Change => ({
+    _: "ProjectName",
+    string: string_,
+  }),
+  codec: {
+    encode: (value: Change): ReadonlyArray<number> => {
+      switch (value._) {
+        case "ProjectName": {
+          return [0].concat(String.codec.encode(value.string));
+        }
+      }
+    },
+    decode: (
+      index: number,
+      binary: Uint8Array
+    ): { readonly result: Change; readonly nextIndex: number } => {
+      const patternIndex: {
+        readonly result: number;
+        readonly nextIndex: number;
+      } = Int32.codec.decode(index, binary);
+      if (patternIndex.result === 0) {
+        const result: {
+          readonly result: String;
+          readonly nextIndex: number;
+        } = String.codec.decode(patternIndex.nextIndex, binary);
+        return {
+          result: Change.ProjectName(result.result),
           nextIndex: result.nextIndex,
         };
       }
