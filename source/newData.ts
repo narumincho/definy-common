@@ -68,31 +68,31 @@ export type Codec<T extends unknown> = {
 
 /**
  * -2 147 483 648 ～ 2 147 483 647. 32bit 符号付き整数. JavaScriptのnumberとして扱える. numberの32bit符号あり整数をSigned Leb128のバイナリに変換する
- *  @typePartIdccf22e92cea3639683c0271d65d00673
+ *  @typePartId ccf22e92cea3639683c0271d65d00673
  */
 export type Int32 = number;
 
 /**
  * バイナリ. JavaScriptのUint8Arrayで扱える. 最初にLED128でバイト数, その次にバイナリそのまま
- *  @typePartId743d625544767e750c453fa344194599
+ *  @typePartId 743d625544767e750c453fa344194599
  */
 export type Binary = Uint8Array;
 
 /**
  * Bool. 真か偽. JavaScriptのbooleanで扱える. true: 1, false: 0. (1byte)としてバイナリに変換する
- *  @typePartId93e91ed730b5e7689250a76096ae60a4
+ *  @typePartId 93e91ed730b5e7689250a76096ae60a4
  */
 export type Bool = boolean;
 
 /**
  * リスト. JavaScriptのArrayで扱う
- *  @typePartIdd7a1efe440138793962eed5625de8196
+ *  @typePartId d7a1efe440138793962eed5625de8196
  */
 export type List<e extends unknown> = ReadonlyArray<e>;
 
 /**
  * Maybe. nullableのようなもの. 今後はRustのstd::Optionに出力するために属性をつける?
- *  @typePartIdcdd7dd74dd0f2036b44dcae6aaac46f5
+ *  @typePartId cdd7dd74dd0f2036b44dcae6aaac46f5
  */
 export type Maybe<value extends unknown> =
   | { readonly _: "Just"; readonly value: value }
@@ -100,7 +100,7 @@ export type Maybe<value extends unknown> =
 
 /**
  * 成功と失敗を表す型. 今後はRustのstd::Resultに出力するために属性をつける?
- *  @typePartId943ef399d0891f897f26bc02fa24af70
+ *  @typePartId 943ef399d0891f897f26bc02fa24af70
  */
 export type Result<ok extends unknown, error extends unknown> =
   | { readonly _: "Ok"; readonly ok: ok }
@@ -108,13 +108,13 @@ export type Result<ok extends unknown, error extends unknown> =
 
 /**
  * 文字列. JavaScriptのstringで扱う. バイナリ形式はUTF-8. 不正な文字が入っている可能性がある
- *  @typePartIdf1f830d23ffab8cec4d0191d157b9fc4
+ *  @typePartId f1f830d23ffab8cec4d0191d157b9fc4
  */
 export type String = string;
 
 /**
  * 日時. 0001-01-01T00:00:00.000Z to 9999-12-31T23:59:59.999Z 最小単位はミリ秒. ミリ秒の求め方は day*1000*60*60*24 + millisecond
- *  @typePartIdfa64c1721a3285f112a4118b66b43712
+ *  @typePartId fa64c1721a3285f112a4118b66b43712
  */
 export type Time = {
   /**
@@ -129,7 +129,7 @@ export type Time = {
 
 /**
  * ログインのURLを発行するために必要なデータ
- *  @typePartIddb245392b9296a48a195e4bd8824dd2b
+ *  @typePartId db245392b9296a48a195e4bd8824dd2b
  */
 export type RequestLogInUrlRequestData = {
   /**
@@ -144,13 +144,13 @@ export type RequestLogInUrlRequestData = {
 
 /**
  * ソーシャルログインを提供するプロバイダー (例: Google, GitHub)
- *  @typePartId0264130f1d9473f670907755cbee50d9
+ *  @typePartId 0264130f1d9473f670907755cbee50d9
  */
 export type OpenIdConnectProvider = "Google" | "GitHub";
 
 /**
  * デバッグモードかどうか,言語とページの場所. URLとして表現されるデータ. Googleなどの検索エンジンの都合( https://support.google.com/webmasters/answer/182192?hl=ja )で,URLにページの言語を入れて,言語ごとに別のURLである必要がある. デバッグ時のホスト名は http://localhost になる
- *  @typePartIddc3b3cd3f125b344fb60a91c0b184f3e
+ *  @typePartId dc3b3cd3f125b344fb60a91c0b184f3e
  */
 export type UrlData = {
   /**
@@ -169,13 +169,13 @@ export type UrlData = {
 
 /**
  * デバッグモードか, リリースモード
- *  @typePartId261b20a84f5b94b93559aaf98ffc6d33
+ *  @typePartId 261b20a84f5b94b93559aaf98ffc6d33
  */
 export type ClientMode = "DebugMode" | "Release";
 
 /**
  * DefinyWebアプリ内での場所を示すもの. URLから求められる. URLに変換できる
- *  @typePartIde830168583e34ff0750716aa6b253c5f
+ *  @typePartId e830168583e34ff0750716aa6b253c5f
  */
 export type Location =
   | { readonly _: "Home" }
@@ -189,37 +189,82 @@ export type Location =
 
 /**
  * 英語,日本語,エスペラント語などの言語
- *  @typePartIda7c52f1164c69f56625e8febd5f44bf3
+ *  @typePartId a7c52f1164c69f56625e8febd5f44bf3
  */
 export type Language = "Japanese" | "English" | "Esperanto";
 
 /**
+ * ユーザーのデータのスナップショット
+ *  @typePartId 655cea387d1aca74e54df4fc2888bcbb
+ */
+export type User = {
+  /**
+   * ユーザー名. 表示される名前. 他のユーザーとかぶっても良い. 絵文字も使える. 全角英数は半角英数,半角カタカナは全角カタカナ, (株)の合字を分解するなどのNFKCの正規化がされる. U+0000-U+0019 と U+007F-U+00A0 の範囲の文字は入らない. 前後に空白を含められない. 間の空白は2文字以上連続しない. 文字数のカウント方法は正規化されたあとのCodePoint単位. Twitterと同じ, 1文字以上50文字以下
+   */
+  readonly name: String;
+  /**
+   * プロフィール画像
+   */
+  readonly imageHash: ImageToken;
+  /**
+   * 自己紹介文. 改行文字を含めることができる. Twitterと同じ 0～160文字
+   */
+  readonly introduction: String;
+  /**
+   * Definyでユーザーが作成された日時
+   */
+  readonly createTime: Time;
+  /**
+   * プロジェクトに対する いいね
+   */
+  readonly likeProjectIdList: List<ProjectId>;
+  /**
+   * 開発に参加した (書いたコードが使われた) プロジェクト
+   */
+  readonly developProjectIdList: List<ProjectId>;
+  /**
+   * コメントをしたアイデア
+   */
+  readonly commentIdeaIdList: List<IdeaId>;
+  /**
+   * 取得日時
+   */
+  readonly getTime: Time;
+};
+
+/**
  * プロジェクトを区別するためのID
- *  @typePartId4e3ab0f9499404a5fa100c4b57835906
+ *  @typePartId 4e3ab0f9499404a5fa100c4b57835906
  */
 export type ProjectId = string & { readonly _projectId: never };
 
 /**
  * ユーザーを区別するためのID
- *  @typePartId5a71cddc0b95298cb57ec66089190e9b
+ *  @typePartId 5a71cddc0b95298cb57ec66089190e9b
  */
 export type UserId = string & { readonly _userId: never };
 
 /**
  * アイデアを区別するためのID
- *  @typePartId719fa4020ae23a96d301d9fa31d8fcaf
+ *  @typePartId 719fa4020ae23a96d301d9fa31d8fcaf
  */
 export type IdeaId = string & { readonly _ideaId: never };
 
 /**
  * 提案を区別するためのID
- *  @typePartId72cc637f6803ef5ca7536889a7fff52e
+ *  @typePartId 72cc637f6803ef5ca7536889a7fff52e
  */
 export type SuggestionId = string & { readonly _suggestionId: never };
 
 /**
+ * 画像から求められるトークン.キャッシュのキーとして使われる.1つのトークンに対して永久に1つの画像データしか表さない. キャッシュを更新する必要はない
+ *  @typePartId b193be207840b5b489517eb5d7b492b2
+ */
+export type ImageToken = string & { readonly _imageToken: never };
+
+/**
  * -2 147 483 648 ～ 2 147 483 647. 32bit 符号付き整数. JavaScriptのnumberとして扱える. numberの32bit符号あり整数をSigned Leb128のバイナリに変換する
- * @typePartIdccf22e92cea3639683c0271d65d00673
+ * @typePartId ccf22e92cea3639683c0271d65d00673
  */
 export const Int32: { readonly codec: Codec<Int32> } = {
   codec: {
@@ -265,7 +310,7 @@ export const Int32: { readonly codec: Codec<Int32> } = {
 
 /**
  * バイナリ. JavaScriptのUint8Arrayで扱える. 最初にLED128でバイト数, その次にバイナリそのまま
- * @typePartId743d625544767e750c453fa344194599
+ * @typePartId 743d625544767e750c453fa344194599
  */
 export const Binary: { readonly codec: Codec<Binary> } = {
   codec: {
@@ -287,7 +332,7 @@ export const Binary: { readonly codec: Codec<Binary> } = {
 
 /**
  * Bool. 真か偽. JavaScriptのbooleanで扱える. true: 1, false: 0. (1byte)としてバイナリに変換する
- * @typePartId93e91ed730b5e7689250a76096ae60a4
+ * @typePartId 93e91ed730b5e7689250a76096ae60a4
  */
 export const Bool: {
   /**
@@ -325,7 +370,7 @@ export const Bool: {
 
 /**
  * リスト. JavaScriptのArrayで扱う
- * @typePartIdd7a1efe440138793962eed5625de8196
+ * @typePartId d7a1efe440138793962eed5625de8196
  */
 export const List: {
   readonly codec: <e extends unknown>(a: Codec<e>) => Codec<List<e>>;
@@ -365,7 +410,7 @@ export const List: {
 
 /**
  * Maybe. nullableのようなもの. 今後はRustのstd::Optionに出力するために属性をつける?
- * @typePartIdcdd7dd74dd0f2036b44dcae6aaac46f5
+ * @typePartId cdd7dd74dd0f2036b44dcae6aaac46f5
  */
 export const Maybe: {
   /**
@@ -426,7 +471,7 @@ export const Maybe: {
 
 /**
  * 成功と失敗を表す型. 今後はRustのstd::Resultに出力するために属性をつける?
- * @typePartId943ef399d0891f897f26bc02fa24af70
+ * @typePartId 943ef399d0891f897f26bc02fa24af70
  */
 export const Result: {
   /**
@@ -501,7 +546,7 @@ export const Result: {
 
 /**
  * 文字列. JavaScriptのstringで扱う. バイナリ形式はUTF-8. 不正な文字が入っている可能性がある
- * @typePartIdf1f830d23ffab8cec4d0191d157b9fc4
+ * @typePartId f1f830d23ffab8cec4d0191d157b9fc4
  */
 export const String: { readonly codec: Codec<String> } = {
   codec: {
@@ -535,7 +580,7 @@ export const String: { readonly codec: Codec<String> } = {
 
 /**
  * 日時. 0001-01-01T00:00:00.000Z to 9999-12-31T23:59:59.999Z 最小単位はミリ秒. ミリ秒の求め方は day*1000*60*60*24 + millisecond
- * @typePartIdfa64c1721a3285f112a4118b66b43712
+ * @typePartId fa64c1721a3285f112a4118b66b43712
  */
 export const Time: { readonly codec: Codec<Time> } = {
   codec: {
@@ -568,7 +613,7 @@ export const Time: { readonly codec: Codec<Time> } = {
 
 /**
  * ログインのURLを発行するために必要なデータ
- * @typePartIddb245392b9296a48a195e4bd8824dd2b
+ * @typePartId db245392b9296a48a195e4bd8824dd2b
  */
 export const RequestLogInUrlRequestData: {
   readonly codec: Codec<RequestLogInUrlRequestData>;
@@ -609,7 +654,7 @@ export const RequestLogInUrlRequestData: {
 
 /**
  * ソーシャルログインを提供するプロバイダー (例: Google, GitHub)
- * @typePartId0264130f1d9473f670907755cbee50d9
+ * @typePartId 0264130f1d9473f670907755cbee50d9
  */
 export const OpenIdConnectProvider: {
   /**
@@ -665,7 +710,7 @@ export const OpenIdConnectProvider: {
 
 /**
  * デバッグモードかどうか,言語とページの場所. URLとして表現されるデータ. Googleなどの検索エンジンの都合( https://support.google.com/webmasters/answer/182192?hl=ja )で,URLにページの言語を入れて,言語ごとに別のURLである必要がある. デバッグ時のホスト名は http://localhost になる
- * @typePartIddc3b3cd3f125b344fb60a91c0b184f3e
+ * @typePartId dc3b3cd3f125b344fb60a91c0b184f3e
  */
 export const UrlData: { readonly codec: Codec<UrlData> } = {
   codec: {
@@ -704,7 +749,7 @@ export const UrlData: { readonly codec: Codec<UrlData> } = {
 
 /**
  * デバッグモードか, リリースモード
- * @typePartId261b20a84f5b94b93559aaf98ffc6d33
+ * @typePartId 261b20a84f5b94b93559aaf98ffc6d33
  */
 export const ClientMode: {
   /**
@@ -757,7 +802,7 @@ export const ClientMode: {
 
 /**
  * DefinyWebアプリ内での場所を示すもの. URLから求められる. URLに変換できる
- * @typePartIde830168583e34ff0750716aa6b253c5f
+ * @typePartId e830168583e34ff0750716aa6b253c5f
  */
 export const Location: {
   /**
@@ -904,7 +949,7 @@ export const Location: {
 
 /**
  * 英語,日本語,エスペラント語などの言語
- * @typePartIda7c52f1164c69f56625e8febd5f44bf3
+ * @typePartId a7c52f1164c69f56625e8febd5f44bf3
  */
 export const Language: {
   /**
@@ -964,8 +1009,86 @@ export const Language: {
 };
 
 /**
+ * ユーザーのデータのスナップショット
+ * @typePartId 655cea387d1aca74e54df4fc2888bcbb
+ */
+export const User: { readonly codec: Codec<User> } = {
+  codec: {
+    encode: (value: User): ReadonlyArray<number> =>
+      String.codec
+        .encode(value.name)
+        .concat(ImageToken.codec.encode(value.imageHash))
+        .concat(String.codec.encode(value.introduction))
+        .concat(Time.codec.encode(value.createTime))
+        .concat(List.codec(ProjectId.codec).encode(value.likeProjectIdList))
+        .concat(List.codec(ProjectId.codec).encode(value.developProjectIdList))
+        .concat(List.codec(IdeaId.codec).encode(value.commentIdeaIdList))
+        .concat(Time.codec.encode(value.getTime)),
+    decode: (
+      index: number,
+      binary: Uint8Array
+    ): { readonly result: User; readonly nextIndex: number } => {
+      const nameAndNextIndex: {
+        readonly result: String;
+        readonly nextIndex: number;
+      } = String.codec.decode(index, binary);
+      const imageHashAndNextIndex: {
+        readonly result: ImageToken;
+        readonly nextIndex: number;
+      } = ImageToken.codec.decode(nameAndNextIndex.nextIndex, binary);
+      const introductionAndNextIndex: {
+        readonly result: String;
+        readonly nextIndex: number;
+      } = String.codec.decode(imageHashAndNextIndex.nextIndex, binary);
+      const createTimeAndNextIndex: {
+        readonly result: Time;
+        readonly nextIndex: number;
+      } = Time.codec.decode(introductionAndNextIndex.nextIndex, binary);
+      const likeProjectIdListAndNextIndex: {
+        readonly result: List<ProjectId>;
+        readonly nextIndex: number;
+      } = List.codec(ProjectId.codec).decode(
+        createTimeAndNextIndex.nextIndex,
+        binary
+      );
+      const developProjectIdListAndNextIndex: {
+        readonly result: List<ProjectId>;
+        readonly nextIndex: number;
+      } = List.codec(ProjectId.codec).decode(
+        likeProjectIdListAndNextIndex.nextIndex,
+        binary
+      );
+      const commentIdeaIdListAndNextIndex: {
+        readonly result: List<IdeaId>;
+        readonly nextIndex: number;
+      } = List.codec(IdeaId.codec).decode(
+        developProjectIdListAndNextIndex.nextIndex,
+        binary
+      );
+      const getTimeAndNextIndex: {
+        readonly result: Time;
+        readonly nextIndex: number;
+      } = Time.codec.decode(commentIdeaIdListAndNextIndex.nextIndex, binary);
+      return {
+        result: {
+          name: nameAndNextIndex.result,
+          imageHash: imageHashAndNextIndex.result,
+          introduction: introductionAndNextIndex.result,
+          createTime: createTimeAndNextIndex.result,
+          likeProjectIdList: likeProjectIdListAndNextIndex.result,
+          developProjectIdList: developProjectIdListAndNextIndex.result,
+          commentIdeaIdList: commentIdeaIdListAndNextIndex.result,
+          getTime: getTimeAndNextIndex.result,
+        },
+        nextIndex: getTimeAndNextIndex.nextIndex,
+      };
+    },
+  },
+};
+
+/**
  * プロジェクトを区別するためのID
- * @typePartId4e3ab0f9499404a5fa100c4b57835906
+ * @typePartId 4e3ab0f9499404a5fa100c4b57835906
  */
 export const ProjectId: { readonly codec: Codec<ProjectId> } = {
   codec: {
@@ -983,7 +1106,7 @@ export const ProjectId: { readonly codec: Codec<ProjectId> } = {
 
 /**
  * ユーザーを区別するためのID
- * @typePartId5a71cddc0b95298cb57ec66089190e9b
+ * @typePartId 5a71cddc0b95298cb57ec66089190e9b
  */
 export const UserId: { readonly codec: Codec<UserId> } = {
   codec: {
@@ -1001,7 +1124,7 @@ export const UserId: { readonly codec: Codec<UserId> } = {
 
 /**
  * アイデアを区別するためのID
- * @typePartId719fa4020ae23a96d301d9fa31d8fcaf
+ * @typePartId 719fa4020ae23a96d301d9fa31d8fcaf
  */
 export const IdeaId: { readonly codec: Codec<IdeaId> } = {
   codec: {
@@ -1019,7 +1142,7 @@ export const IdeaId: { readonly codec: Codec<IdeaId> } = {
 
 /**
  * 提案を区別するためのID
- * @typePartId72cc637f6803ef5ca7536889a7fff52e
+ * @typePartId 72cc637f6803ef5ca7536889a7fff52e
  */
 export const SuggestionId: { readonly codec: Codec<SuggestionId> } = {
   codec: {
@@ -1030,6 +1153,24 @@ export const SuggestionId: { readonly codec: Codec<SuggestionId> } = {
     ): { readonly result: SuggestionId; readonly nextIndex: number } =>
       decodeId(index, binary) as {
         readonly result: SuggestionId;
+        readonly nextIndex: number;
+      },
+  },
+};
+
+/**
+ * 画像から求められるトークン.キャッシュのキーとして使われる.1つのトークンに対して永久に1つの画像データしか表さない. キャッシュを更新する必要はない
+ * @typePartId b193be207840b5b489517eb5d7b492b2
+ */
+export const ImageToken: { readonly codec: Codec<ImageToken> } = {
+  codec: {
+    encode: (value: ImageToken): ReadonlyArray<number> => encodeId(value),
+    decode: (
+      index: number,
+      binary: Uint8Array
+    ): { readonly result: ImageToken; readonly nextIndex: number } =>
+      decodeId(index, binary) as {
+        readonly result: ImageToken;
         readonly nextIndex: number;
       },
   },

@@ -406,6 +406,63 @@ export const typePartMap: ReadonlyMap<TypePartId, TypePart> = new Map<
     },
   ],
   [
+    id.User,
+    {
+      name: "User",
+      migrationPartId: Maybe.Nothing(),
+      description: "ユーザーのデータのスナップショット",
+      projectId: util.definyCodeProjectId,
+      createSuggestionId: util.codeSuggestionId,
+      getTime: { day: 0, millisecond: 0 },
+      attribute: Maybe.Nothing(),
+      typeParameterList: [],
+      body: TypePartBody.Product([
+        {
+          name: "name",
+          description:
+            "ユーザー名. 表示される名前. 他のユーザーとかぶっても良い. 絵文字も使える. 全角英数は半角英数,半角カタカナは全角カタカナ, (株)の合字を分解するなどのNFKCの正規化がされる. U+0000-U+0019 と U+007F-U+00A0 の範囲の文字は入らない. 前後に空白を含められない. 間の空白は2文字以上連続しない. 文字数のカウント方法は正規化されたあとのCodePoint単位. Twitterと同じ, 1文字以上50文字以下",
+          type: type.String,
+        },
+        {
+          name: "imageHash",
+          description: "プロフィール画像",
+          type: type.ImageToken,
+        },
+        {
+          name: "introduction",
+          description:
+            "自己紹介文. 改行文字を含めることができる. Twitterと同じ 0～160文字",
+          type: type.String,
+        },
+        {
+          name: "createTime",
+          description: "Definyでユーザーが作成された日時",
+          type: type.Time,
+        },
+        {
+          name: "likeProjectIdList",
+          description: "プロジェクトに対する いいね",
+          type: type.List(type.ProjectId),
+        },
+        {
+          name: "developProjectIdList",
+          description: "開発に参加した (書いたコードが使われた) プロジェクト",
+          type: type.List(type.ProjectId),
+        },
+        {
+          name: "commentIdeaIdList",
+          description: "コメントをしたアイデア",
+          type: type.List(type.IdeaId),
+        },
+        {
+          name: "getTime",
+          description: "取得日時",
+          type: type.Time,
+        },
+      ]),
+    },
+  ],
+  [
     id.ProjectId,
     {
       name: "ProjectId",
@@ -453,6 +510,21 @@ export const typePartMap: ReadonlyMap<TypePartId, TypePart> = new Map<
       name: "SuggestionId",
       migrationPartId: Maybe.Nothing(),
       description: "提案を区別するためのID",
+      projectId: util.definyCodeProjectId,
+      createSuggestionId: util.codeSuggestionId,
+      getTime: { day: 0, millisecond: 0 },
+      attribute: Maybe.Nothing(),
+      typeParameterList: [],
+      body: TypePartBody.Kernel(TypePartBodyKernel.Id),
+    },
+  ],
+  [
+    id.ImageToken,
+    {
+      name: "ImageToken",
+      migrationPartId: Maybe.Nothing(),
+      description:
+        "画像から求められるトークン.キャッシュのキーとして使われる.1つのトークンに対して永久に1つの画像データしか表さない. キャッシュを更新する必要はない",
       projectId: util.definyCodeProjectId,
       createSuggestionId: util.codeSuggestionId,
       getTime: { day: 0, millisecond: 0 },

@@ -50,6 +50,11 @@ export const Language: Type = {
   parameter: [],
 };
 
+export const User: Type = {
+  typePartId: id.User,
+  parameter: [],
+};
+
 export const ProjectId: Type = {
   typePartId: id.ProjectId,
   parameter: [],
@@ -67,5 +72,10 @@ export const IdeaId: Type = {
 
 export const SuggestionId: Type = {
   typePartId: id.SuggestionId,
+  parameter: [],
+};
+
+export const ImageToken: Type = {
+  typePartId: id.ImageToken,
   parameter: [],
 };

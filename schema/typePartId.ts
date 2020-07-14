@@ -1,4 +1,4 @@
-import { TypePartId } from "../source/data";
+import { TypePart, TypePartId } from "../source/data";
 
 export const Int32 = "ccf22e92cea3639683c0271d65d00673" as TypePartId;
 export const Binary = "743d625544767e750c453fa344194599" as TypePartId;
@@ -15,8 +15,10 @@ export const UrlData = "dc3b3cd3f125b344fb60a91c0b184f3e" as TypePartId;
 export const ClientMode = "261b20a84f5b94b93559aaf98ffc6d33" as TypePartId;
 export const Location = "e830168583e34ff0750716aa6b253c5f" as TypePartId;
 export const Language = "a7c52f1164c69f56625e8febd5f44bf3" as TypePartId;
+export const User = "655cea387d1aca74e54df4fc2888bcbb" as TypePartId;
 
 export const ProjectId = "4e3ab0f9499404a5fa100c4b57835906" as TypePartId;
 export const UserId = "5a71cddc0b95298cb57ec66089190e9b" as TypePartId;
 export const IdeaId = "719fa4020ae23a96d301d9fa31d8fcaf" as TypePartId;
 export const SuggestionId = "72cc637f6803ef5ca7536889a7fff52e" as TypePartId;
+export const ImageToken = "b193be207840b5b489517eb5d7b492b2" as TypePartId;
