@@ -25,7 +25,7 @@ const typePartToVariable = (
 ): ts.Variable => {
   return {
     name: identifer.fromString(typePart.name),
-    document: typePart.description + "\n@typePartId" + (typePartId as string),
+    document: typePart.description + "\n@typePartId " + (typePartId as string),
     type: typePartToVariableType(typePart, allTypePartIdTypePartNameMap),
     expr: typePartToVariableExpr(typePart, allTypePartIdTypePartNameMap),
   };
