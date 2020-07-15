@@ -1743,7 +1743,7 @@ export const typePartMap: ReadonlyMap<TypePartId, TypePart> = new Map<
       getTime: { day: 0, millisecond: 0 },
       attribute: Maybe.Nothing(),
       typeParameterList: [],
-      body: TypePartBody.Kernel(TypePartBodyKernel.Id),
+      body: TypePartBody.Kernel(TypePartBodyKernel.Token),
     },
   ],
   [
@@ -1800,7 +1800,7 @@ export const typePartMap: ReadonlyMap<TypePartId, TypePart> = new Map<
       getTime: { day: 0, millisecond: 0 },
       attribute: Maybe.Nothing(),
       typeParameterList: [],
-      body: TypePartBody.Kernel(TypePartBodyKernel.Id),
+      body: TypePartBody.Kernel(TypePartBodyKernel.Token),
     },
   ],
 ]);

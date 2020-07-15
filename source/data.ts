@@ -4029,12 +4029,12 @@ export const SuggestionId: { readonly codec: Codec<SuggestionId> } = {
  */
 export const ImageToken: { readonly codec: Codec<ImageToken> } = {
   codec: {
-    encode: (value: ImageToken): ReadonlyArray<number> => encodeId(value),
+    encode: (value: ImageToken): ReadonlyArray<number> => encodeToken(value),
     decode: (
       index: number,
       binary: Uint8Array
     ): { readonly result: ImageToken; readonly nextIndex: number } =>
-      decodeId(index, binary) as {
+      decodeToken(index, binary) as {
         readonly result: ImageToken;
         readonly nextIndex: number;
       },
@@ -4101,12 +4101,12 @@ export const TagId: { readonly codec: Codec<TagId> } = {
  */
 export const AccessToken: { readonly codec: Codec<AccessToken> } = {
   codec: {
-    encode: (value: AccessToken): ReadonlyArray<number> => encodeId(value),
+    encode: (value: AccessToken): ReadonlyArray<number> => encodeToken(value),
     decode: (
       index: number,
       binary: Uint8Array
     ): { readonly result: AccessToken; readonly nextIndex: number } =>
-      decodeId(index, binary) as {
+      decodeToken(index, binary) as {
         readonly result: AccessToken;
         readonly nextIndex: number;
       },

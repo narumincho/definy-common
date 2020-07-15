@@ -195,10 +195,7 @@ export const tokenEncodeDefinitionStatementList = (
 ): ReadonlyArray<ts.Statement> => [
   ts.Statement.Return(
     ts.Expr.Call({
-      expr: ts.Expr.Call({
-        expr: encodeTokenVariable,
-        parameterList: [valueVar],
-      }),
+      expr: encodeTokenVariable,
       parameterList: [valueVar],
     })
   ),
@@ -217,7 +214,7 @@ export const tokenDecodeDefinitionStatementList = (
           expr: decodeTokenVariable,
           parameterList: [parameterIndex, parameterBinary],
         }),
-        type: codec.decodeFunctionType(targetType),
+        type: codec.decodeReturnType(targetType),
       })
     ),
   ];

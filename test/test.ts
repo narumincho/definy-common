@@ -2,6 +2,12 @@ import * as data from "../source/data";
 import * as main from "../source/main";
 import * as util from "../source/util";
 
+const codecEqual = <T>(value: T, codec: data.Codec<T>): void => {
+  expect(value).toEqual<T>(
+    codec.decode(0, new Uint8Array(codec.encode(value))).result
+  );
+};
+
 describe("test", () => {
   it("https://definy.app/ is Home in English", () => {
     expect(
@@ -191,5 +197,65 @@ describe("test", () => {
 
   it("util lower case", () => {
     expect(util.isFirstLowerCaseName("value")).toEqual(true);
+  });
+
+  it("int32 codec", () => {
+    codecEqual(123, data.Int32.codec);
+  });
+
+  it("int32 min codec", () => {
+    codecEqual(-(2 ** 31), data.Int32.codec);
+  });
+
+  it("string ascii codec", () => {
+    codecEqual("sample text", data.String.codec);
+  });
+
+  it("strong japanese emoji codec", () => {
+    codecEqual("やったぜ😀👨‍👩‍👧‍👦", data.String.codec);
+  });
+
+  it("maybe string codec", () => {
+    codecEqual(data.Maybe.Just("それな"), data.Maybe.codec(data.String.codec));
+  });
+
+  it("list number codec", () => {
+    codecEqual(
+      [1, 43, 6423, 334, 663, 0, 74, -1, -29031, 2 ** 31 - 1],
+      data.List.codec(data.Int32.codec)
+    );
+  });
+
+  it("token codec", () => {
+    codecEqual(
+      "24b6b3789d903e841490ac04ffc2b6f9848ea529b2d9db380d190583b09995e6" as data.AccessToken,
+      data.AccessToken.codec
+    );
+  });
+
+  it("id codec", () => {
+    codecEqual(
+      "756200c85a0ff28f08daa2d201d616a9" as data.UserId,
+      data.UserId.codec
+    );
+  });
+
+  it("user codec", () => {
+    codecEqual(
+      {
+        name: "ナルミンチョ",
+        getTime: { day: 18458, millisecond: 25968 },
+        commentIdeaIdList: [],
+        createTime: { day: 18440, millisecond: 12000 },
+        developProjectIdList: [],
+        imageHash: "0a8eed336ca61252c13da0ff0b82ce37e81b84622a4052ab33693c434b4f6434" as data.ImageToken,
+        introduction: "ナルミンチョはDefinyを作っている人です.",
+        likeProjectIdList: [
+          "be9a40a32e2ddb7c8b09aa458fe206a1" as data.ProjectId,
+          "dc2c318f1cab573562497ea1e4b96c0e" as data.ProjectId,
+        ],
+      },
+      data.User.codec
+    );
   });
 });
