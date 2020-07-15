@@ -386,7 +386,7 @@ export type Suggestion = {
   /**
    * 承認状態
    */
-  readonly state: SuggestionId;
+  readonly state: SuggestionState;
   /**
    * 変更
    */
@@ -2151,7 +2151,7 @@ export const Suggestion: { readonly codec: Codec<Suggestion> } = {
         .encode(value.name)
         .concat(UserId.codec.encode(value.createUserId))
         .concat(String.codec.encode(value.reason))
-        .concat(SuggestionId.codec.encode(value.state))
+        .concat(SuggestionState.codec.encode(value.state))
         .concat(List.codec(Change.codec).encode(value.changeList))
         .concat(ProjectId.codec.encode(value.projectId))
         .concat(IdeaId.codec.encode(value.ideaId))
@@ -2174,9 +2174,9 @@ export const Suggestion: { readonly codec: Codec<Suggestion> } = {
         readonly nextIndex: number;
       } = String.codec.decode(createUserIdAndNextIndex.nextIndex, binary);
       const stateAndNextIndex: {
-        readonly result: SuggestionId;
+        readonly result: SuggestionState;
         readonly nextIndex: number;
-      } = SuggestionId.codec.decode(reasonAndNextIndex.nextIndex, binary);
+      } = SuggestionState.codec.decode(reasonAndNextIndex.nextIndex, binary);
       const changeListAndNextIndex: {
         readonly result: List<Change>;
         readonly nextIndex: number;

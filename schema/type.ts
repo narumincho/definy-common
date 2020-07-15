@@ -59,7 +59,7 @@ export const IdeaItemBody = noParameterType(id.IdeaItemBody);
 
 export const Suggestion = noParameterType(id.Suggestion);
 
-export const SuggestionState = noParameterType(id.SuggestionId);
+export const SuggestionState = noParameterType(id.SuggestionState);
 
 export const Change = noParameterType(id.Change);
 
