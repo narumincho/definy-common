@@ -280,10 +280,6 @@ export type User = {
    * コメントをしたアイデア
    */
   readonly commentIdeaIdList: List<IdeaId>;
-  /**
-   * 取得日時
-   */
-  readonly getTime: Time;
 };
 
 /**
@@ -331,10 +327,6 @@ export type Project = {
    */
   readonly updateTime: Time;
   /**
-   * 取得日時
-   */
-  readonly getTime: Time;
-  /**
    * 所属しているのパーツのIDのリスト
    */
   readonly partIdList: List<PartId>;
@@ -373,10 +365,6 @@ export type Idea = {
    * 更新日時
    */
   readonly updateTime: Time;
-  /**
-   * 取得日時
-   */
-  readonly getTime: Time;
 };
 
 /**
@@ -457,10 +445,6 @@ export type Suggestion = {
    * 更新日時
    */
   readonly updateTime: Time;
-  /**
-   * 取得日時
-   */
-  readonly getTime: Time;
 };
 
 /**
@@ -512,10 +496,6 @@ export type Part = {
    * このパーツが作成された提案
    */
   readonly createSuggestionId: SuggestionId;
-  /**
-   * 取得日時
-   */
-  readonly getTime: Time;
 };
 
 /**
@@ -543,10 +523,6 @@ export type TypePart = {
    * この型パーツが作成された提案
    */
   readonly createSuggestionId: SuggestionId;
-  /**
-   * 取得日時
-   */
-  readonly getTime: Time;
   /**
    * コンパイラに与える,この型を表現するのにどういう特殊な状態にするかという情報
    */
@@ -1912,8 +1888,7 @@ export const User: { readonly codec: Codec<User> } = {
         .concat(Time.codec.encode(value.createTime))
         .concat(List.codec(ProjectId.codec).encode(value.likeProjectIdList))
         .concat(List.codec(ProjectId.codec).encode(value.developProjectIdList))
-        .concat(List.codec(IdeaId.codec).encode(value.commentIdeaIdList))
-        .concat(Time.codec.encode(value.getTime)),
+        .concat(List.codec(IdeaId.codec).encode(value.commentIdeaIdList)),
     decode: (
       index: number,
       binary: Uint8Array
@@ -1955,10 +1930,6 @@ export const User: { readonly codec: Codec<User> } = {
         developProjectIdListAndNextIndex.nextIndex,
         binary
       );
-      const getTimeAndNextIndex: {
-        readonly result: Time;
-        readonly nextIndex: number;
-      } = Time.codec.decode(commentIdeaIdListAndNextIndex.nextIndex, binary);
       return {
         result: {
           name: nameAndNextIndex.result,
@@ -1968,9 +1939,8 @@ export const User: { readonly codec: Codec<User> } = {
           likeProjectIdList: likeProjectIdListAndNextIndex.result,
           developProjectIdList: developProjectIdListAndNextIndex.result,
           commentIdeaIdList: commentIdeaIdListAndNextIndex.result,
-          getTime: getTimeAndNextIndex.result,
         },
-        nextIndex: getTimeAndNextIndex.nextIndex,
+        nextIndex: commentIdeaIdListAndNextIndex.nextIndex,
       };
     },
   },
@@ -2026,7 +1996,6 @@ export const Project: { readonly codec: Codec<Project> } = {
         .concat(Time.codec.encode(value.createTime))
         .concat(UserId.codec.encode(value.createUserId))
         .concat(Time.codec.encode(value.updateTime))
-        .concat(Time.codec.encode(value.getTime))
         .concat(List.codec(PartId.codec).encode(value.partIdList))
         .concat(List.codec(TypePartId.codec).encode(value.typePartIdList)),
     decode: (
@@ -2057,15 +2026,11 @@ export const Project: { readonly codec: Codec<Project> } = {
         readonly result: Time;
         readonly nextIndex: number;
       } = Time.codec.decode(createUserIdAndNextIndex.nextIndex, binary);
-      const getTimeAndNextIndex: {
-        readonly result: Time;
-        readonly nextIndex: number;
-      } = Time.codec.decode(updateTimeAndNextIndex.nextIndex, binary);
       const partIdListAndNextIndex: {
         readonly result: List<PartId>;
         readonly nextIndex: number;
       } = List.codec(PartId.codec).decode(
-        getTimeAndNextIndex.nextIndex,
+        updateTimeAndNextIndex.nextIndex,
         binary
       );
       const typePartIdListAndNextIndex: {
@@ -2083,7 +2048,6 @@ export const Project: { readonly codec: Codec<Project> } = {
           createTime: createTimeAndNextIndex.result,
           createUserId: createUserIdAndNextIndex.result,
           updateTime: updateTimeAndNextIndex.result,
-          getTime: getTimeAndNextIndex.result,
           partIdList: partIdListAndNextIndex.result,
           typePartIdList: typePartIdListAndNextIndex.result,
         },
@@ -2106,8 +2070,7 @@ export const Idea: { readonly codec: Codec<Idea> } = {
         .concat(Time.codec.encode(value.createTime))
         .concat(ProjectId.codec.encode(value.projectId))
         .concat(List.codec(IdeaItem.codec).encode(value.itemList))
-        .concat(Time.codec.encode(value.updateTime))
-        .concat(Time.codec.encode(value.getTime)),
+        .concat(Time.codec.encode(value.updateTime)),
     decode: (
       index: number,
       binary: Uint8Array
@@ -2139,10 +2102,6 @@ export const Idea: { readonly codec: Codec<Idea> } = {
         readonly result: Time;
         readonly nextIndex: number;
       } = Time.codec.decode(itemListAndNextIndex.nextIndex, binary);
-      const getTimeAndNextIndex: {
-        readonly result: Time;
-        readonly nextIndex: number;
-      } = Time.codec.decode(updateTimeAndNextIndex.nextIndex, binary);
       return {
         result: {
           name: nameAndNextIndex.result,
@@ -2151,9 +2110,8 @@ export const Idea: { readonly codec: Codec<Idea> } = {
           projectId: projectIdAndNextIndex.result,
           itemList: itemListAndNextIndex.result,
           updateTime: updateTimeAndNextIndex.result,
-          getTime: getTimeAndNextIndex.result,
         },
-        nextIndex: getTimeAndNextIndex.nextIndex,
+        nextIndex: updateTimeAndNextIndex.nextIndex,
       };
     },
   },
@@ -2384,8 +2342,7 @@ export const Suggestion: { readonly codec: Codec<Suggestion> } = {
         .concat(List.codec(Change.codec).encode(value.changeList))
         .concat(ProjectId.codec.encode(value.projectId))
         .concat(IdeaId.codec.encode(value.ideaId))
-        .concat(Time.codec.encode(value.updateTime))
-        .concat(Time.codec.encode(value.getTime)),
+        .concat(Time.codec.encode(value.updateTime)),
     decode: (
       index: number,
       binary: Uint8Array
@@ -2422,10 +2379,6 @@ export const Suggestion: { readonly codec: Codec<Suggestion> } = {
         readonly result: Time;
         readonly nextIndex: number;
       } = Time.codec.decode(ideaIdAndNextIndex.nextIndex, binary);
-      const getTimeAndNextIndex: {
-        readonly result: Time;
-        readonly nextIndex: number;
-      } = Time.codec.decode(updateTimeAndNextIndex.nextIndex, binary);
       return {
         result: {
           name: nameAndNextIndex.result,
@@ -2436,9 +2389,8 @@ export const Suggestion: { readonly codec: Codec<Suggestion> } = {
           projectId: projectIdAndNextIndex.result,
           ideaId: ideaIdAndNextIndex.result,
           updateTime: updateTimeAndNextIndex.result,
-          getTime: getTimeAndNextIndex.result,
         },
-        nextIndex: getTimeAndNextIndex.nextIndex,
+        nextIndex: updateTimeAndNextIndex.nextIndex,
       };
     },
   },
@@ -2585,8 +2537,7 @@ export const Part: { readonly codec: Codec<Part> } = {
         .concat(Type.codec.encode(value.type))
         .concat(Expr.codec.encode(value.expr))
         .concat(ProjectId.codec.encode(value.projectId))
-        .concat(SuggestionId.codec.encode(value.createSuggestionId))
-        .concat(Time.codec.encode(value.getTime)),
+        .concat(SuggestionId.codec.encode(value.createSuggestionId)),
     decode: (
       index: number,
       binary: Uint8Array
@@ -2619,10 +2570,6 @@ export const Part: { readonly codec: Codec<Part> } = {
         readonly result: SuggestionId;
         readonly nextIndex: number;
       } = SuggestionId.codec.decode(projectIdAndNextIndex.nextIndex, binary);
-      const getTimeAndNextIndex: {
-        readonly result: Time;
-        readonly nextIndex: number;
-      } = Time.codec.decode(createSuggestionIdAndNextIndex.nextIndex, binary);
       return {
         result: {
           name: nameAndNextIndex.result,
@@ -2632,9 +2579,8 @@ export const Part: { readonly codec: Codec<Part> } = {
           expr: exprAndNextIndex.result,
           projectId: projectIdAndNextIndex.result,
           createSuggestionId: createSuggestionIdAndNextIndex.result,
-          getTime: getTimeAndNextIndex.result,
         },
-        nextIndex: getTimeAndNextIndex.nextIndex,
+        nextIndex: createSuggestionIdAndNextIndex.nextIndex,
       };
     },
   },
@@ -2653,7 +2599,6 @@ export const TypePart: { readonly codec: Codec<TypePart> } = {
         .concat(String.codec.encode(value.description))
         .concat(ProjectId.codec.encode(value.projectId))
         .concat(SuggestionId.codec.encode(value.createSuggestionId))
-        .concat(Time.codec.encode(value.getTime))
         .concat(Maybe.codec(TypeAttribute.codec).encode(value.attribute))
         .concat(List.codec(TypeParameter.codec).encode(value.typeParameterList))
         .concat(TypePartBody.codec.encode(value.body)),
@@ -2681,15 +2626,11 @@ export const TypePart: { readonly codec: Codec<TypePart> } = {
         readonly result: SuggestionId;
         readonly nextIndex: number;
       } = SuggestionId.codec.decode(projectIdAndNextIndex.nextIndex, binary);
-      const getTimeAndNextIndex: {
-        readonly result: Time;
-        readonly nextIndex: number;
-      } = Time.codec.decode(createSuggestionIdAndNextIndex.nextIndex, binary);
       const attributeAndNextIndex: {
         readonly result: Maybe<TypeAttribute>;
         readonly nextIndex: number;
       } = Maybe.codec(TypeAttribute.codec).decode(
-        getTimeAndNextIndex.nextIndex,
+        createSuggestionIdAndNextIndex.nextIndex,
         binary
       );
       const typeParameterListAndNextIndex: {
@@ -2713,7 +2654,6 @@ export const TypePart: { readonly codec: Codec<TypePart> } = {
           description: descriptionAndNextIndex.result,
           projectId: projectIdAndNextIndex.result,
           createSuggestionId: createSuggestionIdAndNextIndex.result,
-          getTime: getTimeAndNextIndex.result,
           attribute: attributeAndNextIndex.result,
           typeParameterList: typeParameterListAndNextIndex.result,
           body: bodyAndNextIndex.result,

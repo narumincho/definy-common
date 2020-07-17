@@ -37,7 +37,6 @@ export const typePartMap: ReadonlyMap<TypePartId, TypePart> = new Map<
         "-2 147 483 648 ～ 2 147 483 647. 32bit 符号付き整数. JavaScriptのnumberとして扱える. numberの32bit符号あり整数をSigned Leb128のバイナリに変換する",
       projectId: util.definyCodeProjectId,
       createSuggestionId: util.codeSuggestionId,
-      getTime: { day: 0, millisecond: 0 },
       attribute: Maybe.Nothing(),
       typeParameterList: [],
       body: TypePartBody.Kernel(TypePartBodyKernel.Int32),
@@ -52,7 +51,6 @@ export const typePartMap: ReadonlyMap<TypePartId, TypePart> = new Map<
         "バイナリ. JavaScriptのUint8Arrayで扱える. 最初にLED128でバイト数, その次にバイナリそのまま",
       projectId: util.definyCodeProjectId,
       createSuggestionId: util.codeSuggestionId,
-      getTime: { day: 0, millisecond: 0 },
       attribute: Maybe.Nothing(),
       typeParameterList: [],
       body: TypePartBody.Kernel(TypePartBodyKernel.Binary),
@@ -67,7 +65,6 @@ export const typePartMap: ReadonlyMap<TypePartId, TypePart> = new Map<
         "Bool. 真か偽. JavaScriptのbooleanで扱える. true: 1, false: 0. (1byte)としてバイナリに変換する",
       projectId: util.definyCodeProjectId,
       createSuggestionId: util.codeSuggestionId,
-      getTime: { day: 0, millisecond: 0 },
       attribute: Maybe.Just(TypeAttribute.AsBoolean),
       typeParameterList: [],
       body: TypePartBody.Sum([
@@ -92,7 +89,6 @@ export const typePartMap: ReadonlyMap<TypePartId, TypePart> = new Map<
       description: "リスト. JavaScriptのArrayで扱う",
       projectId: util.definyCodeProjectId,
       createSuggestionId: util.codeSuggestionId,
-      getTime: { day: 0, millisecond: 0 },
       attribute: Maybe.Nothing(),
       typeParameterList: [
         {
@@ -112,7 +108,6 @@ export const typePartMap: ReadonlyMap<TypePartId, TypePart> = new Map<
         "Maybe. nullableのようなもの. 今後はRustのstd::Optionに出力するために属性をつける?",
       projectId: util.definyCodeProjectId,
       createSuggestionId: util.codeSuggestionId,
-      getTime: { day: 0, millisecond: 0 },
       attribute: Maybe.Nothing(),
       typeParameterList: [
         {
@@ -146,7 +141,6 @@ export const typePartMap: ReadonlyMap<TypePartId, TypePart> = new Map<
         "成功と失敗を表す型. 今後はRustのstd::Resultに出力するために属性をつける?",
       projectId: util.definyCodeProjectId,
       createSuggestionId: util.codeSuggestionId,
-      getTime: { day: 0, millisecond: 0 },
       attribute: Maybe.Nothing(),
       typeParameterList: [
         {
@@ -187,7 +181,6 @@ export const typePartMap: ReadonlyMap<TypePartId, TypePart> = new Map<
         "文字列. JavaScriptのstringで扱う. バイナリ形式はUTF-8. 不正な文字が入っている可能性がある",
       projectId: util.definyCodeProjectId,
       createSuggestionId: util.codeSuggestionId,
-      getTime: { day: 0, millisecond: 0 },
       attribute: Maybe.Nothing(),
       typeParameterList: [],
       body: TypePartBody.Kernel(TypePartBodyKernel.String),
@@ -201,7 +194,6 @@ export const typePartMap: ReadonlyMap<TypePartId, TypePart> = new Map<
       description: "プロジェクトの識別子",
       projectId: util.definyCodeProjectId,
       createSuggestionId: util.codeSuggestionId,
-      getTime: { day: 0, millisecond: 0 },
       attribute: Maybe.Nothing(),
       typeParameterList: [],
       body: TypePartBody.Kernel(TypePartBodyKernel.Id),
@@ -215,7 +207,6 @@ export const typePartMap: ReadonlyMap<TypePartId, TypePart> = new Map<
       description: "ユーザーの識別子",
       projectId: util.definyCodeProjectId,
       createSuggestionId: util.codeSuggestionId,
-      getTime: { day: 0, millisecond: 0 },
       attribute: Maybe.Nothing(),
       typeParameterList: [],
       body: TypePartBody.Kernel(TypePartBodyKernel.Id),
@@ -229,7 +220,6 @@ export const typePartMap: ReadonlyMap<TypePartId, TypePart> = new Map<
       description: "アイデアの識別子",
       projectId: util.definyCodeProjectId,
       createSuggestionId: util.codeSuggestionId,
-      getTime: { day: 0, millisecond: 0 },
       attribute: Maybe.Nothing(),
       typeParameterList: [],
       body: TypePartBody.Kernel(TypePartBodyKernel.Id),
@@ -243,7 +233,6 @@ export const typePartMap: ReadonlyMap<TypePartId, TypePart> = new Map<
       description: "提案の識別子",
       projectId: util.definyCodeProjectId,
       createSuggestionId: util.codeSuggestionId,
-      getTime: { day: 0, millisecond: 0 },
       attribute: Maybe.Nothing(),
       typeParameterList: [],
       body: TypePartBody.Kernel(TypePartBodyKernel.Id),
@@ -258,7 +247,6 @@ export const typePartMap: ReadonlyMap<TypePartId, TypePart> = new Map<
         "画像から求められるトークン.キャッシュのキーとして使われる.1つのトークンに対して永久に1つの画像データしか表さない. キャッシュを更新する必要はない",
       projectId: util.definyCodeProjectId,
       createSuggestionId: util.codeSuggestionId,
-      getTime: { day: 0, millisecond: 0 },
       attribute: Maybe.Nothing(),
       typeParameterList: [],
       body: TypePartBody.Kernel(TypePartBodyKernel.Token),
@@ -272,7 +260,6 @@ export const typePartMap: ReadonlyMap<TypePartId, TypePart> = new Map<
       description: "パーツの識別子",
       projectId: util.definyCodeProjectId,
       createSuggestionId: util.codeSuggestionId,
-      getTime: { day: 0, millisecond: 0 },
       attribute: Maybe.Nothing(),
       typeParameterList: [],
       body: TypePartBody.Kernel(TypePartBodyKernel.Id),
@@ -286,7 +273,6 @@ export const typePartMap: ReadonlyMap<TypePartId, TypePart> = new Map<
       description: "型パーツの識別子",
       projectId: util.definyCodeProjectId,
       createSuggestionId: util.codeSuggestionId,
-      getTime: { day: 0, millisecond: 0 },
       attribute: Maybe.Nothing(),
       typeParameterList: [],
       body: TypePartBody.Kernel(TypePartBodyKernel.Id),
@@ -300,7 +286,6 @@ export const typePartMap: ReadonlyMap<TypePartId, TypePart> = new Map<
       description: "タグの識別子",
       projectId: util.definyCodeProjectId,
       createSuggestionId: util.codeSuggestionId,
-      getTime: { day: 0, millisecond: 0 },
       attribute: Maybe.Nothing(),
       typeParameterList: [],
       body: TypePartBody.Kernel(TypePartBodyKernel.Id),
@@ -315,7 +300,6 @@ export const typePartMap: ReadonlyMap<TypePartId, TypePart> = new Map<
         "アクセストークン. アクセストークンを持っていれば特定のユーザーであるが証明される. これが盗まれた場合,不正に得た相手はそのユーザーになりすますことができる",
       projectId: util.definyCodeProjectId,
       createSuggestionId: util.codeSuggestionId,
-      getTime: { day: 0, millisecond: 0 },
       attribute: Maybe.Nothing(),
       typeParameterList: [],
       body: TypePartBody.Kernel(TypePartBodyKernel.Token),
@@ -330,7 +314,6 @@ export const typePartMap: ReadonlyMap<TypePartId, TypePart> = new Map<
         "日時. 0001-01-01T00:00:00.000Z to 9999-12-31T23:59:59.999Z 最小単位はミリ秒. ミリ秒の求め方は day*1000*60*60*24 + millisecond",
       projectId: util.definyCodeProjectId,
       createSuggestionId: util.codeSuggestionId,
-      getTime: { day: 0, millisecond: 0 },
       typeParameterList: [],
       attribute: Maybe.Nothing(),
       body: TypePartBody.Product([
@@ -355,7 +338,6 @@ export const typePartMap: ReadonlyMap<TypePartId, TypePart> = new Map<
       description: "ログインのURLを発行するために必要なデータ",
       projectId: util.definyCodeProjectId,
       createSuggestionId: util.codeSuggestionId,
-      getTime: { day: 0, millisecond: 0 },
       typeParameterList: [],
       attribute: Maybe.Nothing(),
       body: TypePartBody.Product([
@@ -381,7 +363,6 @@ export const typePartMap: ReadonlyMap<TypePartId, TypePart> = new Map<
         "ソーシャルログインを提供するプロバイダー (例: Google, GitHub)",
       projectId: util.definyCodeProjectId,
       createSuggestionId: util.codeSuggestionId,
-      getTime: { day: 0, millisecond: 0 },
       typeParameterList: [],
       attribute: Maybe.Nothing(),
       body: TypePartBody.Sum([
@@ -409,7 +390,6 @@ export const typePartMap: ReadonlyMap<TypePartId, TypePart> = new Map<
         "デバッグモードかどうか,言語とページの場所. URLとして表現されるデータ. Googleなどの検索エンジンの都合( https://support.google.com/webmasters/answer/182192?hl=ja )で,URLにページの言語を入れて,言語ごとに別のURLである必要がある. デバッグ時のホスト名は http://localhost になる",
       projectId: util.definyCodeProjectId,
       createSuggestionId: util.codeSuggestionId,
-      getTime: { day: 0, millisecond: 0 },
       attribute: Maybe.Nothing(),
       typeParameterList: [],
       body: TypePartBody.Product([
@@ -439,7 +419,6 @@ export const typePartMap: ReadonlyMap<TypePartId, TypePart> = new Map<
       description: "デバッグモードか, リリースモード",
       projectId: util.definyCodeProjectId,
       createSuggestionId: util.codeSuggestionId,
-      getTime: { day: 0, millisecond: 0 },
       attribute: Maybe.Nothing(),
       typeParameterList: [],
       body: TypePartBody.Sum([
@@ -465,7 +444,6 @@ export const typePartMap: ReadonlyMap<TypePartId, TypePart> = new Map<
         "DefinyWebアプリ内での場所を示すもの. URLから求められる. URLに変換できる",
       projectId: util.definyCodeProjectId,
       createSuggestionId: util.codeSuggestionId,
-      getTime: { day: 0, millisecond: 0 },
       attribute: Maybe.Nothing(),
       typeParameterList: [],
       body: TypePartBody.Sum([
@@ -520,7 +498,6 @@ export const typePartMap: ReadonlyMap<TypePartId, TypePart> = new Map<
       description: "英語,日本語,エスペラント語などの言語",
       projectId: util.definyCodeProjectId,
       createSuggestionId: util.codeSuggestionId,
-      getTime: { day: 0, millisecond: 0 },
       attribute: Maybe.Nothing(),
       typeParameterList: [],
       body: TypePartBody.Sum([
@@ -550,7 +527,6 @@ export const typePartMap: ReadonlyMap<TypePartId, TypePart> = new Map<
       description: "ユーザーのデータのスナップショット",
       projectId: util.definyCodeProjectId,
       createSuggestionId: util.codeSuggestionId,
-      getTime: { day: 0, millisecond: 0 },
       attribute: Maybe.Nothing(),
       typeParameterList: [],
       body: TypePartBody.Product([
@@ -591,11 +567,6 @@ export const typePartMap: ReadonlyMap<TypePartId, TypePart> = new Map<
           description: "コメントをしたアイデア",
           type: type.List(type.IdeaId),
         },
-        {
-          name: "getTime",
-          description: "取得日時",
-          type: type.Time,
-        },
       ]),
     },
   ],
@@ -607,7 +578,6 @@ export const typePartMap: ReadonlyMap<TypePartId, TypePart> = new Map<
       description: "データを識別するIdとデータ",
       projectId: util.definyCodeProjectId,
       createSuggestionId: util.codeSuggestionId,
-      getTime: { day: 0, millisecond: 0 },
       attribute: Maybe.Nothing(),
       typeParameterList: [
         { name: "id", typePartId: idAndDataIdTypePartId },
@@ -635,7 +605,6 @@ export const typePartMap: ReadonlyMap<TypePartId, TypePart> = new Map<
       migrationPartId: Maybe.Nothing(),
       projectId: util.definyCodeProjectId,
       createSuggestionId: util.codeSuggestionId,
-      getTime: { day: 0, millisecond: 0 },
       attribute: Maybe.Nothing(),
       typeParameterList: [],
       body: TypePartBody.Product([
@@ -670,11 +639,6 @@ export const typePartMap: ReadonlyMap<TypePartId, TypePart> = new Map<
           type: type.Time,
         },
         {
-          name: "getTime",
-          description: "取得日時",
-          type: type.Time,
-        },
-        {
           name: "partIdList",
           description: "所属しているのパーツのIDのリスト",
           type: type.List(type.PartId),
@@ -695,7 +659,6 @@ export const typePartMap: ReadonlyMap<TypePartId, TypePart> = new Map<
       migrationPartId: Maybe.Nothing(),
       projectId: util.definyCodeProjectId,
       createSuggestionId: util.codeSuggestionId,
-      getTime: { day: 0, millisecond: 0 },
       attribute: Maybe.Nothing(),
       typeParameterList: [],
       body: TypePartBody.Product([
@@ -729,11 +692,6 @@ export const typePartMap: ReadonlyMap<TypePartId, TypePart> = new Map<
           description: "更新日時",
           type: type.Time,
         },
-        {
-          name: "getTime",
-          description: "取得日時",
-          type: type.Time,
-        },
       ]),
     },
   ],
@@ -745,7 +703,6 @@ export const typePartMap: ReadonlyMap<TypePartId, TypePart> = new Map<
       migrationPartId: Maybe.Nothing(),
       projectId: util.definyCodeProjectId,
       createSuggestionId: util.codeSuggestionId,
-      getTime: { day: 0, millisecond: 0 },
       attribute: Maybe.Nothing(),
       typeParameterList: [],
       body: TypePartBody.Product([
@@ -775,7 +732,6 @@ export const typePartMap: ReadonlyMap<TypePartId, TypePart> = new Map<
       migrationPartId: Maybe.Nothing(),
       projectId: util.definyCodeProjectId,
       createSuggestionId: util.codeSuggestionId,
-      getTime: { day: 0, millisecond: 0 },
       attribute: Maybe.Nothing(),
       typeParameterList: [],
       body: TypePartBody.Sum([
@@ -825,7 +781,6 @@ export const typePartMap: ReadonlyMap<TypePartId, TypePart> = new Map<
       migrationPartId: Maybe.Nothing(),
       projectId: util.definyCodeProjectId,
       createSuggestionId: util.codeSuggestionId,
-      getTime: { day: 0, millisecond: 0 },
       attribute: Maybe.Nothing(),
       typeParameterList: [],
       body: TypePartBody.Product([
@@ -869,11 +824,6 @@ export const typePartMap: ReadonlyMap<TypePartId, TypePart> = new Map<
           description: "更新日時",
           type: type.Time,
         },
-        {
-          name: "getTime",
-          description: "取得日時",
-          type: type.Time,
-        },
       ]),
     },
   ],
@@ -885,7 +835,6 @@ export const typePartMap: ReadonlyMap<TypePartId, TypePart> = new Map<
       migrationPartId: Maybe.Nothing(),
       projectId: util.definyCodeProjectId,
       createSuggestionId: util.codeSuggestionId,
-      getTime: { day: 0, millisecond: 0 },
       attribute: Maybe.Nothing(),
       typeParameterList: [],
       body: TypePartBody.Sum([
@@ -920,7 +869,6 @@ export const typePartMap: ReadonlyMap<TypePartId, TypePart> = new Map<
       migrationPartId: Maybe.Nothing(),
       projectId: util.definyCodeProjectId,
       createSuggestionId: util.codeSuggestionId,
-      getTime: { day: 0, millisecond: 0 },
       attribute: Maybe.Nothing(),
       typeParameterList: [],
       body: TypePartBody.Sum([
@@ -940,7 +888,6 @@ export const typePartMap: ReadonlyMap<TypePartId, TypePart> = new Map<
       migrationPartId: Maybe.Nothing(),
       projectId: util.definyCodeProjectId,
       createSuggestionId: util.codeSuggestionId,
-      getTime: { day: 0, millisecond: 0 },
       attribute: Maybe.Nothing(),
       typeParameterList: [],
       body: TypePartBody.Product([
@@ -980,11 +927,6 @@ export const typePartMap: ReadonlyMap<TypePartId, TypePart> = new Map<
           description: "このパーツが作成された提案",
           type: type.SuggestionId,
         },
-        {
-          name: "getTime",
-          description: "取得日時",
-          type: type.Time,
-        },
       ]),
     },
   ],
@@ -996,7 +938,6 @@ export const typePartMap: ReadonlyMap<TypePartId, TypePart> = new Map<
       migrationPartId: Maybe.Nothing(),
       projectId: util.definyCodeProjectId,
       createSuggestionId: util.codeSuggestionId,
-      getTime: { day: 0, millisecond: 0 },
       attribute: Maybe.Nothing(),
       typeParameterList: [],
       body: TypePartBody.Product([
@@ -1027,11 +968,6 @@ export const typePartMap: ReadonlyMap<TypePartId, TypePart> = new Map<
           type: type.SuggestionId,
         },
         {
-          name: "getTime",
-          description: "取得日時",
-          type: type.Time,
-        },
-        {
           name: "attribute",
           description:
             "コンパイラに与える,この型を表現するのにどういう特殊な状態にするかという情報",
@@ -1058,7 +994,6 @@ export const typePartMap: ReadonlyMap<TypePartId, TypePart> = new Map<
       migrationPartId: Maybe.Nothing(),
       projectId: util.definyCodeProjectId,
       createSuggestionId: util.codeSuggestionId,
-      getTime: { day: 0, millisecond: 0 },
       attribute: Maybe.Nothing(),
       typeParameterList: [],
       body: TypePartBody.Sum([
@@ -1079,7 +1014,6 @@ export const typePartMap: ReadonlyMap<TypePartId, TypePart> = new Map<
       migrationPartId: Maybe.Nothing(),
       projectId: util.definyCodeProjectId,
       createSuggestionId: util.codeSuggestionId,
-      getTime: { day: 0, millisecond: 0 },
       attribute: Maybe.Nothing(),
       typeParameterList: [],
       body: TypePartBody.Product([
@@ -1104,7 +1038,6 @@ export const typePartMap: ReadonlyMap<TypePartId, TypePart> = new Map<
       migrationPartId: Maybe.Nothing(),
       projectId: util.definyCodeProjectId,
       createSuggestionId: util.codeSuggestionId,
-      getTime: { day: 0, millisecond: 0 },
       attribute: Maybe.Nothing(),
       typeParameterList: [],
       body: TypePartBody.Sum([
@@ -1134,7 +1067,6 @@ export const typePartMap: ReadonlyMap<TypePartId, TypePart> = new Map<
       migrationPartId: Maybe.Nothing(),
       projectId: util.definyCodeProjectId,
       createSuggestionId: util.codeSuggestionId,
-      getTime: { day: 0, millisecond: 0 },
       attribute: Maybe.Nothing(),
       typeParameterList: [],
       body: TypePartBody.Product([
@@ -1164,7 +1096,6 @@ export const typePartMap: ReadonlyMap<TypePartId, TypePart> = new Map<
       migrationPartId: Maybe.Nothing(),
       projectId: util.definyCodeProjectId,
       createSuggestionId: util.codeSuggestionId,
-      getTime: { day: 0, millisecond: 0 },
       attribute: Maybe.Nothing(),
       typeParameterList: [],
       body: TypePartBody.Product([
@@ -1194,7 +1125,6 @@ export const typePartMap: ReadonlyMap<TypePartId, TypePart> = new Map<
       migrationPartId: Maybe.Nothing(),
       projectId: util.definyCodeProjectId,
       createSuggestionId: util.codeSuggestionId,
-      getTime: { day: 0, millisecond: 0 },
       attribute: Maybe.Nothing(),
       typeParameterList: [],
       body: TypePartBody.Sum([
@@ -1247,7 +1177,6 @@ export const typePartMap: ReadonlyMap<TypePartId, TypePart> = new Map<
       migrationPartId: Maybe.Nothing(),
       projectId: util.definyCodeProjectId,
       createSuggestionId: util.codeSuggestionId,
-      getTime: { day: 0, millisecond: 0 },
       attribute: Maybe.Nothing(),
       typeParameterList: [],
       body: TypePartBody.Product([
@@ -1272,7 +1201,6 @@ export const typePartMap: ReadonlyMap<TypePartId, TypePart> = new Map<
       migrationPartId: Maybe.Nothing(),
       projectId: util.definyCodeProjectId,
       createSuggestionId: util.codeSuggestionId,
-      getTime: { day: 0, millisecond: 0 },
       attribute: Maybe.Nothing(),
       typeParameterList: [],
       body: TypePartBody.Sum([
@@ -1317,7 +1245,6 @@ export const typePartMap: ReadonlyMap<TypePartId, TypePart> = new Map<
       migrationPartId: Maybe.Nothing(),
       projectId: util.definyCodeProjectId,
       createSuggestionId: util.codeSuggestionId,
-      getTime: { day: 0, millisecond: 0 },
       attribute: Maybe.Nothing(),
       typeParameterList: [],
       body: TypePartBody.Sum([
@@ -1347,7 +1274,6 @@ export const typePartMap: ReadonlyMap<TypePartId, TypePart> = new Map<
       migrationPartId: Maybe.Nothing(),
       projectId: util.definyCodeProjectId,
       createSuggestionId: util.codeSuggestionId,
-      getTime: { day: 0, millisecond: 0 },
       attribute: Maybe.Nothing(),
       typeParameterList: [],
       body: TypePartBody.Product([
@@ -1372,7 +1298,6 @@ export const typePartMap: ReadonlyMap<TypePartId, TypePart> = new Map<
       migrationPartId: Maybe.Nothing(),
       projectId: util.definyCodeProjectId,
       createSuggestionId: util.codeSuggestionId,
-      getTime: { day: 0, millisecond: 0 },
       attribute: Maybe.Nothing(),
       typeParameterList: [],
       body: TypePartBody.Product([
@@ -1397,7 +1322,6 @@ export const typePartMap: ReadonlyMap<TypePartId, TypePart> = new Map<
       migrationPartId: Maybe.Nothing(),
       projectId: util.definyCodeProjectId,
       createSuggestionId: util.codeSuggestionId,
-      getTime: { day: 0, millisecond: 0 },
       attribute: Maybe.Nothing(),
       typeParameterList: [],
       body: TypePartBody.Product([
@@ -1432,7 +1356,6 @@ export const typePartMap: ReadonlyMap<TypePartId, TypePart> = new Map<
       migrationPartId: Maybe.Nothing(),
       projectId: util.definyCodeProjectId,
       createSuggestionId: util.codeSuggestionId,
-      getTime: { day: 0, millisecond: 0 },
       attribute: Maybe.Nothing(),
       typeParameterList: [],
       body: TypePartBody.Sum([
@@ -1467,7 +1390,6 @@ export const typePartMap: ReadonlyMap<TypePartId, TypePart> = new Map<
       migrationPartId: Maybe.Nothing(),
       projectId: util.definyCodeProjectId,
       createSuggestionId: util.codeSuggestionId,
-      getTime: { day: 0, millisecond: 0 },
       attribute: Maybe.Nothing(),
       typeParameterList: [],
       body: TypePartBody.Product([
@@ -1492,7 +1414,6 @@ export const typePartMap: ReadonlyMap<TypePartId, TypePart> = new Map<
       migrationPartId: Maybe.Nothing(),
       projectId: util.definyCodeProjectId,
       createSuggestionId: util.codeSuggestionId,
-      getTime: { day: 0, millisecond: 0 },
       attribute: Maybe.Nothing(),
       typeParameterList: [],
       body: TypePartBody.Product([
@@ -1517,7 +1438,6 @@ export const typePartMap: ReadonlyMap<TypePartId, TypePart> = new Map<
       migrationPartId: Maybe.Nothing(),
       projectId: util.definyCodeProjectId,
       createSuggestionId: util.codeSuggestionId,
-      getTime: { day: 0, millisecond: 0 },
       attribute: Maybe.Nothing(),
       typeParameterList: [],
       body: TypePartBody.Product([
@@ -1557,7 +1477,6 @@ export const typePartMap: ReadonlyMap<TypePartId, TypePart> = new Map<
       migrationPartId: Maybe.Nothing(),
       projectId: util.definyCodeProjectId,
       createSuggestionId: util.codeSuggestionId,
-      getTime: { day: 0, millisecond: 0 },
       attribute: Maybe.Nothing(),
       typeParameterList: [],
       body: TypePartBody.Sum([
@@ -1597,7 +1516,6 @@ export const typePartMap: ReadonlyMap<TypePartId, TypePart> = new Map<
       migrationPartId: Maybe.Nothing(),
       projectId: util.definyCodeProjectId,
       createSuggestionId: util.codeSuggestionId,
-      getTime: { day: 0, millisecond: 0 },
       attribute: Maybe.Nothing(),
       typeParameterList: [],
       body: TypePartBody.Product([
@@ -1622,7 +1540,6 @@ export const typePartMap: ReadonlyMap<TypePartId, TypePart> = new Map<
       migrationPartId: Maybe.Nothing(),
       projectId: util.definyCodeProjectId,
       createSuggestionId: util.codeSuggestionId,
-      getTime: { day: 0, millisecond: 0 },
       attribute: Maybe.Nothing(),
       typeParameterList: [],
       body: TypePartBody.Sum([
@@ -1662,7 +1579,6 @@ export const typePartMap: ReadonlyMap<TypePartId, TypePart> = new Map<
       migrationPartId: Maybe.Nothing(),
       projectId: util.definyCodeProjectId,
       createSuggestionId: util.codeSuggestionId,
-      getTime: { day: 0, millisecond: 0 },
       attribute: Maybe.Nothing(),
       typeParameterList: [],
       body: TypePartBody.Product([
@@ -1682,7 +1598,6 @@ export const typePartMap: ReadonlyMap<TypePartId, TypePart> = new Map<
       migrationPartId: Maybe.Nothing(),
       projectId: util.definyCodeProjectId,
       createSuggestionId: util.codeSuggestionId,
-      getTime: { day: 0, millisecond: 0 },
       attribute: Maybe.Nothing(),
       typeParameterList: [],
       body: TypePartBody.Product([
@@ -1707,7 +1622,6 @@ export const typePartMap: ReadonlyMap<TypePartId, TypePart> = new Map<
       migrationPartId: Maybe.Nothing(),
       projectId: util.definyCodeProjectId,
       createSuggestionId: util.codeSuggestionId,
-      getTime: { day: 0, millisecond: 0 },
       attribute: Maybe.Nothing(),
       typeParameterList: [],
       body: TypePartBody.Product([
@@ -1737,7 +1651,6 @@ export const typePartMap: ReadonlyMap<TypePartId, TypePart> = new Map<
       migrationPartId: Maybe.Nothing(),
       projectId: util.definyCodeProjectId,
       createSuggestionId: util.codeSuggestionId,
-      getTime: { day: 0, millisecond: 0 },
       attribute: Maybe.Nothing(),
       typeParameterList: [],
       body: TypePartBody.Product([
@@ -1767,7 +1680,6 @@ export const typePartMap: ReadonlyMap<TypePartId, TypePart> = new Map<
       migrationPartId: Maybe.Nothing(),
       projectId: util.definyCodeProjectId,
       createSuggestionId: util.codeSuggestionId,
-      getTime: { day: 0, millisecond: 0 },
       attribute: Maybe.Nothing(),
       typeParameterList: [],
       body: TypePartBody.Product([
@@ -1792,7 +1704,6 @@ export const typePartMap: ReadonlyMap<TypePartId, TypePart> = new Map<
       migrationPartId: Maybe.Nothing(),
       projectId: util.definyCodeProjectId,
       createSuggestionId: util.codeSuggestionId,
-      getTime: { day: 0, millisecond: 0 },
       attribute: Maybe.Nothing(),
       typeParameterList: [],
       body: TypePartBody.Product([
@@ -1817,7 +1728,6 @@ export const typePartMap: ReadonlyMap<TypePartId, TypePart> = new Map<
       migrationPartId: Maybe.Nothing(),
       projectId: util.definyCodeProjectId,
       createSuggestionId: util.codeSuggestionId,
-      getTime: { day: 0, millisecond: 0 },
       attribute: Maybe.Nothing(),
       typeParameterList: [],
       body: TypePartBody.Sum([
@@ -1869,7 +1779,6 @@ export const typePartMap: ReadonlyMap<TypePartId, TypePart> = new Map<
       migrationPartId: Maybe.Nothing(),
       projectId: util.definyCodeProjectId,
       createSuggestionId: util.codeSuggestionId,
-      getTime: { day: 0, millisecond: 0 },
       attribute: Maybe.Nothing(),
       typeParameterList: [{ name: "data", typePartId: resourceDataTypePartId }],
       body: TypePartBody.Product([
@@ -1898,7 +1807,6 @@ export const typePartMap: ReadonlyMap<TypePartId, TypePart> = new Map<
       migrationPartId: Maybe.Nothing(),
       projectId: util.definyCodeProjectId,
       createSuggestionId: util.codeSuggestionId,
-      getTime: { day: 0, millisecond: 0 },
       attribute: Maybe.Nothing(),
       typeParameterList: [
         { name: "data", typePartId: resourceStateDataTypePartId },
@@ -1981,7 +1889,6 @@ export const typePartMap: ReadonlyMap<TypePartId, TypePart> = new Map<
       migrationPartId: Maybe.Nothing(),
       projectId: util.definyCodeProjectId,
       createSuggestionId: util.codeSuggestionId,
-      getTime: { day: 0, millisecond: 0 },
       attribute: Maybe.Nothing(),
       typeParameterList: [
         { name: "data", typePartId: staticResourceStateDataTypePartId },
