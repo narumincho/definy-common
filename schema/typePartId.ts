@@ -8,6 +8,16 @@ export const Maybe = "cdd7dd74dd0f2036b44dcae6aaac46f5" as T;
 export const Result = "943ef399d0891f897f26bc02fa24af70" as T;
 export const String = "f1f830d23ffab8cec4d0191d157b9fc4" as T;
 
+export const ProjectId = "4e3ab0f9499404a5fa100c4b57835906" as T;
+export const UserId = "5a71cddc0b95298cb57ec66089190e9b" as T;
+export const IdeaId = "719fa4020ae23a96d301d9fa31d8fcaf" as T;
+export const SuggestionId = "72cc637f6803ef5ca7536889a7fff52e" as T;
+export const ImageToken = "b193be207840b5b489517eb5d7b492b2" as T;
+export const PartId = "d2c65983f602ee7e0a7be06e6af61acf" as T;
+export const TypePartId = "2562ffbc386c801f5132e10b945786e0" as T;
+export const TagId = "3133b45b0078dd3b79b067c3ce0c4a67" as T;
+export const AccessToken = "be993929300452364c8bb658609f682d" as T;
+
 export const Time = "fa64c1721a3285f112a4118b66b43712" as T;
 export const RequestLogInUrlRequestData = "db245392b9296a48a195e4bd8824dd2b" as T;
 export const OpenIdConnectProvider = "0264130f1d9473f670907755cbee50d9" as T;
@@ -51,13 +61,7 @@ export const CreateIdeaParameter = "036e55068c26060c3632062801b0216b" as T;
 export const AddCommentParameter = "ad7a6a667a36a79c3bbc81f8f0789fe8" as T;
 export const AddSuggestionParameter = "8b40f4351fe048ff78f14c523b6f76f1" as T;
 export const AccessTokenAndSuggestionId = "74280d6a5db1d48b6815a73a819756c3" as T;
-
-export const ProjectId = "4e3ab0f9499404a5fa100c4b57835906" as T;
-export const UserId = "5a71cddc0b95298cb57ec66089190e9b" as T;
-export const IdeaId = "719fa4020ae23a96d301d9fa31d8fcaf" as T;
-export const SuggestionId = "72cc637f6803ef5ca7536889a7fff52e" as T;
-export const ImageToken = "b193be207840b5b489517eb5d7b492b2" as T;
-export const PartId = "d2c65983f602ee7e0a7be06e6af61acf" as T;
-export const TypePartId = "2562ffbc386c801f5132e10b945786e0" as T;
-export const TagId = "3133b45b0078dd3b79b067c3ce0c4a67" as T;
-export const AccessToken = "be993929300452364c8bb658609f682d" as T;
+export const LogInState = "d562fe803c7e40c32269e24c1435e4d1" as T;
+export const Resource = "f7590073f3ed06452193dddbb91e82e0" as T;
+export const ResourceState = "833fbf3dcab7e9365f334f8b00c24d55" as T;
+export const StaticResourceState = "134205335ce83693fd83994e907acabd" as T;

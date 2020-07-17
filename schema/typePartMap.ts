@@ -18,6 +18,12 @@ const resultErrorTypePartId = "bd8be8409130f30f15c5c86c01de6dc5" as TypePartId;
 const idAndDataIdTypePartId = "fc6ea18b02d5cfa07c79182be262ad72" as TypePartId;
 const idAndDataDataTypePartId = "5ca542b76f5199346931fb46caec2a85" as TypePartId;
 
+const resourceDataTypePartId = "79be6a507196441f8c317c8a7415a9d0" as TypePartId;
+
+const resourceStateDataTypePartId = "5089ac70cf7b31947a7ba2c244212578" as TypePartId;
+
+const staticResourceStateDataTypePartId = "c99b0600c7aca05a1716e4a4c3519cec" as TypePartId;
+
 export const typePartMap: ReadonlyMap<TypePartId, TypePart> = new Map<
   TypePartId,
   TypePart
@@ -185,6 +191,134 @@ export const typePartMap: ReadonlyMap<TypePartId, TypePart> = new Map<
       attribute: Maybe.Nothing(),
       typeParameterList: [],
       body: TypePartBody.Kernel(TypePartBodyKernel.String),
+    },
+  ],
+  [
+    id.ProjectId,
+    {
+      name: "ProjectId",
+      migrationPartId: Maybe.Nothing(),
+      description: "プロジェクトの識別子",
+      projectId: util.definyCodeProjectId,
+      createSuggestionId: util.codeSuggestionId,
+      getTime: { day: 0, millisecond: 0 },
+      attribute: Maybe.Nothing(),
+      typeParameterList: [],
+      body: TypePartBody.Kernel(TypePartBodyKernel.Id),
+    },
+  ],
+  [
+    id.UserId,
+    {
+      name: "UserId",
+      migrationPartId: Maybe.Nothing(),
+      description: "ユーザーの識別子",
+      projectId: util.definyCodeProjectId,
+      createSuggestionId: util.codeSuggestionId,
+      getTime: { day: 0, millisecond: 0 },
+      attribute: Maybe.Nothing(),
+      typeParameterList: [],
+      body: TypePartBody.Kernel(TypePartBodyKernel.Id),
+    },
+  ],
+  [
+    id.IdeaId,
+    {
+      name: "IdeaId",
+      migrationPartId: Maybe.Nothing(),
+      description: "アイデアの識別子",
+      projectId: util.definyCodeProjectId,
+      createSuggestionId: util.codeSuggestionId,
+      getTime: { day: 0, millisecond: 0 },
+      attribute: Maybe.Nothing(),
+      typeParameterList: [],
+      body: TypePartBody.Kernel(TypePartBodyKernel.Id),
+    },
+  ],
+  [
+    id.SuggestionId,
+    {
+      name: "SuggestionId",
+      migrationPartId: Maybe.Nothing(),
+      description: "提案の識別子",
+      projectId: util.definyCodeProjectId,
+      createSuggestionId: util.codeSuggestionId,
+      getTime: { day: 0, millisecond: 0 },
+      attribute: Maybe.Nothing(),
+      typeParameterList: [],
+      body: TypePartBody.Kernel(TypePartBodyKernel.Id),
+    },
+  ],
+  [
+    id.ImageToken,
+    {
+      name: "ImageToken",
+      migrationPartId: Maybe.Nothing(),
+      description:
+        "画像から求められるトークン.キャッシュのキーとして使われる.1つのトークンに対して永久に1つの画像データしか表さない. キャッシュを更新する必要はない",
+      projectId: util.definyCodeProjectId,
+      createSuggestionId: util.codeSuggestionId,
+      getTime: { day: 0, millisecond: 0 },
+      attribute: Maybe.Nothing(),
+      typeParameterList: [],
+      body: TypePartBody.Kernel(TypePartBodyKernel.Token),
+    },
+  ],
+  [
+    id.PartId,
+    {
+      name: "PartId",
+      migrationPartId: Maybe.Nothing(),
+      description: "パーツの識別子",
+      projectId: util.definyCodeProjectId,
+      createSuggestionId: util.codeSuggestionId,
+      getTime: { day: 0, millisecond: 0 },
+      attribute: Maybe.Nothing(),
+      typeParameterList: [],
+      body: TypePartBody.Kernel(TypePartBodyKernel.Id),
+    },
+  ],
+  [
+    id.TypePartId,
+    {
+      name: "TypePartId",
+      migrationPartId: Maybe.Nothing(),
+      description: "型パーツの識別子",
+      projectId: util.definyCodeProjectId,
+      createSuggestionId: util.codeSuggestionId,
+      getTime: { day: 0, millisecond: 0 },
+      attribute: Maybe.Nothing(),
+      typeParameterList: [],
+      body: TypePartBody.Kernel(TypePartBodyKernel.Id),
+    },
+  ],
+  [
+    id.TagId,
+    {
+      name: "TagId",
+      migrationPartId: Maybe.Nothing(),
+      description: "タグの識別子",
+      projectId: util.definyCodeProjectId,
+      createSuggestionId: util.codeSuggestionId,
+      getTime: { day: 0, millisecond: 0 },
+      attribute: Maybe.Nothing(),
+      typeParameterList: [],
+      body: TypePartBody.Kernel(TypePartBodyKernel.Id),
+    },
+  ],
+  [
+    id.AccessToken,
+    {
+      name: "AccessToken",
+      migrationPartId: Maybe.Nothing(),
+      description:
+        "アクセストークン. アクセストークンを持っていれば特定のユーザーであるが証明される. これが盗まれた場合,不正に得た相手はそのユーザーになりすますことができる",
+      projectId: util.definyCodeProjectId,
+      createSuggestionId: util.codeSuggestionId,
+      getTime: { day: 0, millisecond: 0 },
+      attribute: Maybe.Nothing(),
+      typeParameterList: [],
+      body: TypePartBody.Kernel(TypePartBodyKernel.Token),
     },
   ],
   [
@@ -1676,131 +1810,227 @@ export const typePartMap: ReadonlyMap<TypePartId, TypePart> = new Map<
     },
   ],
   [
-    id.ProjectId,
+    id.LogInState,
     {
-      name: "ProjectId",
+      name: "LogInState",
+      description: "ログイン状態",
       migrationPartId: Maybe.Nothing(),
-      description: "プロジェクトの識別子",
       projectId: util.definyCodeProjectId,
       createSuggestionId: util.codeSuggestionId,
       getTime: { day: 0, millisecond: 0 },
       attribute: Maybe.Nothing(),
       typeParameterList: [],
-      body: TypePartBody.Kernel(TypePartBodyKernel.Id),
+      body: TypePartBody.Sum([
+        {
+          name: "Guest",
+          description: "ログインしていない状態",
+          parameter: Maybe.Nothing(),
+        },
+        {
+          name: "WaitRequestingLogInUrl",
+          description: "ログインボタンを押したあとの状態",
+          parameter: Maybe.Just(type.OpenIdConnectProvider),
+        },
+        {
+          name: "RequestingLogInUrl",
+          description: "ログインへの画面URLをリクエストした状態",
+          parameter: Maybe.Just(type.OpenIdConnectProvider),
+        },
+        {
+          name: "JumpingToLogInPage",
+          description: "ログインURLを受け取り,ログイン画面へ移行中",
+          parameter: Maybe.Just(type.String),
+        },
+        {
+          name: "WaitVerifyingAccessToken",
+          description:
+            "indexedDBに保存されていたアクセストークンをしだす前の状態",
+          parameter: Maybe.Just(type.AccessToken),
+        },
+        {
+          name: "VerifyingAccessToken",
+          description: "indexedDBに保存されていたアクセストークン検証中",
+          parameter: Maybe.Just(type.AccessToken),
+        },
+        {
+          name: "LoggedIn",
+          description: "ログインしている状態",
+          parameter: Maybe.Just(type.AccessToken),
+        },
+      ]),
     },
   ],
   [
-    id.UserId,
+    id.Resource,
     {
-      name: "UserId",
-      migrationPartId: Maybe.Nothing(),
-      description: "ユーザーの識別子",
-      projectId: util.definyCodeProjectId,
-      createSuggestionId: util.codeSuggestionId,
-      getTime: { day: 0, millisecond: 0 },
-      attribute: Maybe.Nothing(),
-      typeParameterList: [],
-      body: TypePartBody.Kernel(TypePartBodyKernel.Id),
-    },
-  ],
-  [
-    id.IdeaId,
-    {
-      name: "IdeaId",
-      migrationPartId: Maybe.Nothing(),
-      description: "アイデアの識別子",
-      projectId: util.definyCodeProjectId,
-      createSuggestionId: util.codeSuggestionId,
-      getTime: { day: 0, millisecond: 0 },
-      attribute: Maybe.Nothing(),
-      typeParameterList: [],
-      body: TypePartBody.Kernel(TypePartBodyKernel.Id),
-    },
-  ],
-  [
-    id.SuggestionId,
-    {
-      name: "SuggestionId",
-      migrationPartId: Maybe.Nothing(),
-      description: "提案の識別子",
-      projectId: util.definyCodeProjectId,
-      createSuggestionId: util.codeSuggestionId,
-      getTime: { day: 0, millisecond: 0 },
-      attribute: Maybe.Nothing(),
-      typeParameterList: [],
-      body: TypePartBody.Kernel(TypePartBodyKernel.Id),
-    },
-  ],
-  [
-    id.ImageToken,
-    {
-      name: "ImageToken",
-      migrationPartId: Maybe.Nothing(),
+      name: "Resource",
       description:
-        "画像から求められるトークン.キャッシュのキーとして使われる.1つのトークンに対して永久に1つの画像データしか表さない. キャッシュを更新する必要はない",
+        "取得日時とデータ本体. データ本体がない場合も含まれているのでMaybe",
+      migrationPartId: Maybe.Nothing(),
       projectId: util.definyCodeProjectId,
       createSuggestionId: util.codeSuggestionId,
       getTime: { day: 0, millisecond: 0 },
       attribute: Maybe.Nothing(),
-      typeParameterList: [],
-      body: TypePartBody.Kernel(TypePartBodyKernel.Token),
+      typeParameterList: [{ name: "data", typePartId: resourceDataTypePartId }],
+      body: TypePartBody.Product([
+        {
+          name: "getTime",
+          description: "データベースから取得した日時",
+          type: type.Time,
+        },
+        {
+          name: "dataMaybe",
+          description: "データ本体",
+          type: type.Maybe({
+            typePartId: resourceDataTypePartId,
+            parameter: [],
+          }),
+        },
+      ]),
     },
   ],
   [
-    id.PartId,
+    id.ResourceState,
     {
-      name: "PartId",
-      migrationPartId: Maybe.Nothing(),
-      description: "パーツの識別子",
-      projectId: util.definyCodeProjectId,
-      createSuggestionId: util.codeSuggestionId,
-      getTime: { day: 0, millisecond: 0 },
-      attribute: Maybe.Nothing(),
-      typeParameterList: [],
-      body: TypePartBody.Kernel(TypePartBodyKernel.Id),
-    },
-  ],
-  [
-    id.TypePartId,
-    {
-      name: "TypePartId",
-      migrationPartId: Maybe.Nothing(),
-      description: "型パーツの識別子",
-      projectId: util.definyCodeProjectId,
-      createSuggestionId: util.codeSuggestionId,
-      getTime: { day: 0, millisecond: 0 },
-      attribute: Maybe.Nothing(),
-      typeParameterList: [],
-      body: TypePartBody.Kernel(TypePartBodyKernel.Id),
-    },
-  ],
-  [
-    id.TagId,
-    {
-      name: "TagId",
-      migrationPartId: Maybe.Nothing(),
-      description: "タグの識別子",
-      projectId: util.definyCodeProjectId,
-      createSuggestionId: util.codeSuggestionId,
-      getTime: { day: 0, millisecond: 0 },
-      attribute: Maybe.Nothing(),
-      typeParameterList: [],
-      body: TypePartBody.Kernel(TypePartBodyKernel.Id),
-    },
-  ],
-  [
-    id.AccessToken,
-    {
-      name: "AccessToken",
-      migrationPartId: Maybe.Nothing(),
+      name: "ResourceState",
       description:
-        "アクセストークン. アクセストークンを持っていれば特定のユーザーであるが証明される. これが盗まれた場合,不正に得た相手はそのユーザーになりすますことができる",
+        "ProjectやUserなどのリソースの状態とデータ. 読み込み中だとか",
+      migrationPartId: Maybe.Nothing(),
       projectId: util.definyCodeProjectId,
       createSuggestionId: util.codeSuggestionId,
       getTime: { day: 0, millisecond: 0 },
       attribute: Maybe.Nothing(),
-      typeParameterList: [],
-      body: TypePartBody.Kernel(TypePartBodyKernel.Token),
+      typeParameterList: [
+        { name: "data", typePartId: resourceStateDataTypePartId },
+      ],
+      body: TypePartBody.Sum([
+        {
+          name: "Loaded",
+          description: "読み込み済み",
+          parameter: Maybe.Just(
+            type.Resource({
+              typePartId: resourceStateDataTypePartId,
+              parameter: [],
+            })
+          ),
+        },
+        {
+          name: "Unknown",
+          description: "データを取得できなかった (サーバーの障害, オフライン)",
+          parameter: Maybe.Nothing(),
+        },
+        {
+          name: "WaitLoading",
+          description: "indexedDBにアクセス待ち",
+          parameter: Maybe.Nothing(),
+        },
+        {
+          name: "Loading",
+          description: "indexedDBにアクセス中",
+          parameter: Maybe.Nothing(),
+        },
+        {
+          name: "WaitRequesting",
+          description: "サーバに問い合わせ待ち",
+          parameter: Maybe.Nothing(),
+        },
+        {
+          name: "Requesting",
+          description: "サーバに問い合わせ中",
+          parameter: Maybe.Nothing(),
+        },
+        {
+          name: "WaitUpdating",
+          description: "更新待ち",
+          parameter: Maybe.Just(
+            type.Resource({
+              typePartId: resourceStateDataTypePartId,
+              parameter: [],
+            })
+          ),
+        },
+        {
+          name: "Updating",
+          description: "サーバーに問い合わせてリソースを更新中",
+          parameter: Maybe.Just(
+            type.Resource({
+              typePartId: resourceStateDataTypePartId,
+              parameter: [],
+            })
+          ),
+        },
+        {
+          name: "WaitRetrying",
+          description: "Unknownだったリソースをサーバーに問い合わせ待ち",
+          parameter: Maybe.Nothing(),
+        },
+        {
+          name: "Retrying",
+          description: "Unknownだったリソースをサーバーに問い合わせ中",
+          parameter: Maybe.Nothing(),
+        },
+      ]),
+    },
+  ],
+  [
+    id.StaticResourceState,
+    {
+      name: "StaticResourceState",
+      description:
+        "キーであるTokenによってデータが必ず1つに決まるもの. 絶対に更新されない",
+      migrationPartId: Maybe.Nothing(),
+      projectId: util.definyCodeProjectId,
+      createSuggestionId: util.codeSuggestionId,
+      getTime: { day: 0, millisecond: 0 },
+      attribute: Maybe.Nothing(),
+      typeParameterList: [
+        { name: "data", typePartId: staticResourceStateDataTypePartId },
+      ],
+      body: TypePartBody.Sum([
+        {
+          name: "Loaded",
+          description: "取得済み",
+          parameter: Maybe.Just({
+            typePartId: staticResourceStateDataTypePartId,
+            parameter: [],
+          }),
+        },
+        {
+          name: "Unknown",
+          description: "データを取得できなかった (サーバーの障害, オフライン)",
+          parameter: Maybe.Nothing(),
+        },
+        {
+          name: "WaitLoading",
+          description: "indexedDBにアクセス待ち",
+          parameter: Maybe.Nothing(),
+        },
+        {
+          name: "Loading",
+          description: "indexedDBにアクセス中",
+          parameter: Maybe.Nothing(),
+        },
+        {
+          name: "WaitRequesting",
+          description: "サーバに問い合わせ待ち",
+          parameter: Maybe.Nothing(),
+        },
+        {
+          name: "Requesting",
+          description: "サーバに問い合わせ中",
+          parameter: Maybe.Nothing(),
+        },
+        {
+          name: "WaitRetrying",
+          description: "Unknownだったリソースをサーバーに問い合わせ待ち",
+          parameter: Maybe.Nothing(),
+        },
+        {
+          name: "Retrying",
+          description: "Unknownだったリソースをサーバーに問い合わせ中",
+          parameter: Maybe.Nothing(),
+        },
+      ]),
     },
   ],
 ]);

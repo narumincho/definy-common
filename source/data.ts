@@ -113,6 +113,60 @@ export type Result<ok extends unknown, error extends unknown> =
 export type String = string;
 
 /**
+ * プロジェクトの識別子
+ *  @typePartId 4e3ab0f9499404a5fa100c4b57835906
+ */
+export type ProjectId = string & { readonly _projectId: never };
+
+/**
+ * ユーザーの識別子
+ *  @typePartId 5a71cddc0b95298cb57ec66089190e9b
+ */
+export type UserId = string & { readonly _userId: never };
+
+/**
+ * アイデアの識別子
+ *  @typePartId 719fa4020ae23a96d301d9fa31d8fcaf
+ */
+export type IdeaId = string & { readonly _ideaId: never };
+
+/**
+ * 提案の識別子
+ *  @typePartId 72cc637f6803ef5ca7536889a7fff52e
+ */
+export type SuggestionId = string & { readonly _suggestionId: never };
+
+/**
+ * 画像から求められるトークン.キャッシュのキーとして使われる.1つのトークンに対して永久に1つの画像データしか表さない. キャッシュを更新する必要はない
+ *  @typePartId b193be207840b5b489517eb5d7b492b2
+ */
+export type ImageToken = string & { readonly _imageToken: never };
+
+/**
+ * パーツの識別子
+ *  @typePartId d2c65983f602ee7e0a7be06e6af61acf
+ */
+export type PartId = string & { readonly _partId: never };
+
+/**
+ * 型パーツの識別子
+ *  @typePartId 2562ffbc386c801f5132e10b945786e0
+ */
+export type TypePartId = string & { readonly _typePartId: never };
+
+/**
+ * タグの識別子
+ *  @typePartId 3133b45b0078dd3b79b067c3ce0c4a67
+ */
+export type TagId = string & { readonly _tagId: never };
+
+/**
+ * アクセストークン. アクセストークンを持っていれば特定のユーザーであるが証明される. これが盗まれた場合,不正に得た相手はそのユーザーになりすますことができる
+ *  @typePartId be993929300452364c8bb658609f682d
+ */
+export type AccessToken = string & { readonly _accessToken: never };
+
+/**
  * 日時. 0001-01-01T00:00:00.000Z to 9999-12-31T23:59:59.999Z 最小単位はミリ秒. ミリ秒の求め方は day*1000*60*60*24 + millisecond
  *  @typePartId fa64c1721a3285f112a4118b66b43712
  */
@@ -870,58 +924,71 @@ export type AccessTokenAndSuggestionId = {
 };
 
 /**
- * プロジェクトの識別子
- *  @typePartId 4e3ab0f9499404a5fa100c4b57835906
+ * ログイン状態
+ *  @typePartId d562fe803c7e40c32269e24c1435e4d1
  */
-export type ProjectId = string & { readonly _projectId: never };
+export type LogInState =
+  | { readonly _: "Guest" }
+  | {
+      readonly _: "WaitRequestingLogInUrl";
+      readonly openIdConnectProvider: OpenIdConnectProvider;
+    }
+  | {
+      readonly _: "RequestingLogInUrl";
+      readonly openIdConnectProvider: OpenIdConnectProvider;
+    }
+  | { readonly _: "JumpingToLogInPage"; readonly string: String }
+  | {
+      readonly _: "WaitVerifyingAccessToken";
+      readonly accessToken: AccessToken;
+    }
+  | { readonly _: "VerifyingAccessToken"; readonly accessToken: AccessToken }
+  | { readonly _: "LoggedIn"; readonly accessToken: AccessToken };
 
 /**
- * ユーザーの識別子
- *  @typePartId 5a71cddc0b95298cb57ec66089190e9b
+ * 取得日時とデータ本体. データ本体がない場合も含まれているのでMaybe
+ *  @typePartId f7590073f3ed06452193dddbb91e82e0
  */
-export type UserId = string & { readonly _userId: never };
+export type Resource<data extends unknown> = {
+  /**
+   * データベースから取得した日時
+   */
+  readonly getTime: Time;
+  /**
+   * データ本体
+   */
+  readonly dataMaybe: Maybe<data>;
+};
 
 /**
- * アイデアの識別子
- *  @typePartId 719fa4020ae23a96d301d9fa31d8fcaf
+ * ProjectやUserなどのリソースの状態とデータ. 読み込み中だとか
+ *  @typePartId 833fbf3dcab7e9365f334f8b00c24d55
  */
-export type IdeaId = string & { readonly _ideaId: never };
+export type ResourceState<data extends unknown> =
+  | { readonly _: "Loaded"; readonly dataResource: Resource<data> }
+  | { readonly _: "Unknown" }
+  | { readonly _: "WaitLoading" }
+  | { readonly _: "Loading" }
+  | { readonly _: "WaitRequesting" }
+  | { readonly _: "Requesting" }
+  | { readonly _: "WaitUpdating"; readonly dataResource: Resource<data> }
+  | { readonly _: "Updating"; readonly dataResource: Resource<data> }
+  | { readonly _: "WaitRetrying" }
+  | { readonly _: "Retrying" };
 
 /**
- * 提案の識別子
- *  @typePartId 72cc637f6803ef5ca7536889a7fff52e
+ * キーであるTokenによってデータが必ず1つに決まるもの. 絶対に更新されない
+ *  @typePartId 134205335ce83693fd83994e907acabd
  */
-export type SuggestionId = string & { readonly _suggestionId: never };
-
-/**
- * 画像から求められるトークン.キャッシュのキーとして使われる.1つのトークンに対して永久に1つの画像データしか表さない. キャッシュを更新する必要はない
- *  @typePartId b193be207840b5b489517eb5d7b492b2
- */
-export type ImageToken = string & { readonly _imageToken: never };
-
-/**
- * パーツの識別子
- *  @typePartId d2c65983f602ee7e0a7be06e6af61acf
- */
-export type PartId = string & { readonly _partId: never };
-
-/**
- * 型パーツの識別子
- *  @typePartId 2562ffbc386c801f5132e10b945786e0
- */
-export type TypePartId = string & { readonly _typePartId: never };
-
-/**
- * タグの識別子
- *  @typePartId 3133b45b0078dd3b79b067c3ce0c4a67
- */
-export type TagId = string & { readonly _tagId: never };
-
-/**
- * アクセストークン. アクセストークンを持っていれば特定のユーザーであるが証明される. これが盗まれた場合,不正に得た相手はそのユーザーになりすますことができる
- *  @typePartId be993929300452364c8bb658609f682d
- */
-export type AccessToken = string & { readonly _accessToken: never };
+export type StaticResourceState<data extends unknown> =
+  | { readonly _: "Loaded"; readonly data: data }
+  | { readonly _: "Unknown" }
+  | { readonly _: "WaitLoading" }
+  | { readonly _: "Loading" }
+  | { readonly _: "WaitRequesting" }
+  | { readonly _: "Requesting" }
+  | { readonly _: "WaitRetrying" }
+  | { readonly _: "Retrying" };
 
 /**
  * -2 147 483 648 ～ 2 147 483 647. 32bit 符号付き整数. JavaScriptのnumberとして扱える. numberの32bit符号あり整数をSigned Leb128のバイナリに変換する
@@ -1236,6 +1303,168 @@ export const String: { readonly codec: Codec<String> } = {
       }
       return { result: new a.TextDecoder().decode(textBinary), nextIndex };
     },
+  },
+};
+
+/**
+ * プロジェクトの識別子
+ * @typePartId 4e3ab0f9499404a5fa100c4b57835906
+ */
+export const ProjectId: { readonly codec: Codec<ProjectId> } = {
+  codec: {
+    encode: (value: ProjectId): ReadonlyArray<number> => encodeId(value),
+    decode: (
+      index: number,
+      binary: Uint8Array
+    ): { readonly result: ProjectId; readonly nextIndex: number } =>
+      decodeId(index, binary) as {
+        readonly result: ProjectId;
+        readonly nextIndex: number;
+      },
+  },
+};
+
+/**
+ * ユーザーの識別子
+ * @typePartId 5a71cddc0b95298cb57ec66089190e9b
+ */
+export const UserId: { readonly codec: Codec<UserId> } = {
+  codec: {
+    encode: (value: UserId): ReadonlyArray<number> => encodeId(value),
+    decode: (
+      index: number,
+      binary: Uint8Array
+    ): { readonly result: UserId; readonly nextIndex: number } =>
+      decodeId(index, binary) as {
+        readonly result: UserId;
+        readonly nextIndex: number;
+      },
+  },
+};
+
+/**
+ * アイデアの識別子
+ * @typePartId 719fa4020ae23a96d301d9fa31d8fcaf
+ */
+export const IdeaId: { readonly codec: Codec<IdeaId> } = {
+  codec: {
+    encode: (value: IdeaId): ReadonlyArray<number> => encodeId(value),
+    decode: (
+      index: number,
+      binary: Uint8Array
+    ): { readonly result: IdeaId; readonly nextIndex: number } =>
+      decodeId(index, binary) as {
+        readonly result: IdeaId;
+        readonly nextIndex: number;
+      },
+  },
+};
+
+/**
+ * 提案の識別子
+ * @typePartId 72cc637f6803ef5ca7536889a7fff52e
+ */
+export const SuggestionId: { readonly codec: Codec<SuggestionId> } = {
+  codec: {
+    encode: (value: SuggestionId): ReadonlyArray<number> => encodeId(value),
+    decode: (
+      index: number,
+      binary: Uint8Array
+    ): { readonly result: SuggestionId; readonly nextIndex: number } =>
+      decodeId(index, binary) as {
+        readonly result: SuggestionId;
+        readonly nextIndex: number;
+      },
+  },
+};
+
+/**
+ * 画像から求められるトークン.キャッシュのキーとして使われる.1つのトークンに対して永久に1つの画像データしか表さない. キャッシュを更新する必要はない
+ * @typePartId b193be207840b5b489517eb5d7b492b2
+ */
+export const ImageToken: { readonly codec: Codec<ImageToken> } = {
+  codec: {
+    encode: (value: ImageToken): ReadonlyArray<number> => encodeToken(value),
+    decode: (
+      index: number,
+      binary: Uint8Array
+    ): { readonly result: ImageToken; readonly nextIndex: number } =>
+      decodeToken(index, binary) as {
+        readonly result: ImageToken;
+        readonly nextIndex: number;
+      },
+  },
+};
+
+/**
+ * パーツの識別子
+ * @typePartId d2c65983f602ee7e0a7be06e6af61acf
+ */
+export const PartId: { readonly codec: Codec<PartId> } = {
+  codec: {
+    encode: (value: PartId): ReadonlyArray<number> => encodeId(value),
+    decode: (
+      index: number,
+      binary: Uint8Array
+    ): { readonly result: PartId; readonly nextIndex: number } =>
+      decodeId(index, binary) as {
+        readonly result: PartId;
+        readonly nextIndex: number;
+      },
+  },
+};
+
+/**
+ * 型パーツの識別子
+ * @typePartId 2562ffbc386c801f5132e10b945786e0
+ */
+export const TypePartId: { readonly codec: Codec<TypePartId> } = {
+  codec: {
+    encode: (value: TypePartId): ReadonlyArray<number> => encodeId(value),
+    decode: (
+      index: number,
+      binary: Uint8Array
+    ): { readonly result: TypePartId; readonly nextIndex: number } =>
+      decodeId(index, binary) as {
+        readonly result: TypePartId;
+        readonly nextIndex: number;
+      },
+  },
+};
+
+/**
+ * タグの識別子
+ * @typePartId 3133b45b0078dd3b79b067c3ce0c4a67
+ */
+export const TagId: { readonly codec: Codec<TagId> } = {
+  codec: {
+    encode: (value: TagId): ReadonlyArray<number> => encodeId(value),
+    decode: (
+      index: number,
+      binary: Uint8Array
+    ): { readonly result: TagId; readonly nextIndex: number } =>
+      decodeId(index, binary) as {
+        readonly result: TagId;
+        readonly nextIndex: number;
+      },
+  },
+};
+
+/**
+ * アクセストークン. アクセストークンを持っていれば特定のユーザーであるが証明される. これが盗まれた場合,不正に得た相手はそのユーザーになりすますことができる
+ * @typePartId be993929300452364c8bb658609f682d
+ */
+export const AccessToken: { readonly codec: Codec<AccessToken> } = {
+  codec: {
+    encode: (value: AccessToken): ReadonlyArray<number> => encodeToken(value),
+    decode: (
+      index: number,
+      binary: Uint8Array
+    ): { readonly result: AccessToken; readonly nextIndex: number } =>
+      decodeToken(index, binary) as {
+        readonly result: AccessToken;
+        readonly nextIndex: number;
+      },
   },
 };
 
@@ -3952,163 +4181,580 @@ export const AccessTokenAndSuggestionId: {
 };
 
 /**
- * プロジェクトの識別子
- * @typePartId 4e3ab0f9499404a5fa100c4b57835906
+ * ログイン状態
+ * @typePartId d562fe803c7e40c32269e24c1435e4d1
  */
-export const ProjectId: { readonly codec: Codec<ProjectId> } = {
+export const LogInState: {
+  /**
+   * ログインしていない状態
+   */
+  readonly Guest: LogInState;
+  /**
+   * ログインボタンを押したあとの状態
+   */
+  readonly WaitRequestingLogInUrl: (a: OpenIdConnectProvider) => LogInState;
+  /**
+   * ログインへの画面URLをリクエストした状態
+   */
+  readonly RequestingLogInUrl: (a: OpenIdConnectProvider) => LogInState;
+  /**
+   * ログインURLを受け取り,ログイン画面へ移行中
+   */
+  readonly JumpingToLogInPage: (a: String) => LogInState;
+  /**
+   * indexedDBに保存されていたアクセストークンをしだす前の状態
+   */
+  readonly WaitVerifyingAccessToken: (a: AccessToken) => LogInState;
+  /**
+   * indexedDBに保存されていたアクセストークン検証中
+   */
+  readonly VerifyingAccessToken: (a: AccessToken) => LogInState;
+  /**
+   * ログインしている状態
+   */
+  readonly LoggedIn: (a: AccessToken) => LogInState;
+  readonly codec: Codec<LogInState>;
+} = {
+  Guest: { _: "Guest" },
+  WaitRequestingLogInUrl: (
+    openIdConnectProvider: OpenIdConnectProvider
+  ): LogInState => ({ _: "WaitRequestingLogInUrl", openIdConnectProvider }),
+  RequestingLogInUrl: (
+    openIdConnectProvider: OpenIdConnectProvider
+  ): LogInState => ({ _: "RequestingLogInUrl", openIdConnectProvider }),
+  JumpingToLogInPage: (string_: String): LogInState => ({
+    _: "JumpingToLogInPage",
+    string: string_,
+  }),
+  WaitVerifyingAccessToken: (accessToken: AccessToken): LogInState => ({
+    _: "WaitVerifyingAccessToken",
+    accessToken,
+  }),
+  VerifyingAccessToken: (accessToken: AccessToken): LogInState => ({
+    _: "VerifyingAccessToken",
+    accessToken,
+  }),
+  LoggedIn: (accessToken: AccessToken): LogInState => ({
+    _: "LoggedIn",
+    accessToken,
+  }),
   codec: {
-    encode: (value: ProjectId): ReadonlyArray<number> => encodeId(value),
+    encode: (value: LogInState): ReadonlyArray<number> => {
+      switch (value._) {
+        case "Guest": {
+          return [0];
+        }
+        case "WaitRequestingLogInUrl": {
+          return [1].concat(
+            OpenIdConnectProvider.codec.encode(value.openIdConnectProvider)
+          );
+        }
+        case "RequestingLogInUrl": {
+          return [2].concat(
+            OpenIdConnectProvider.codec.encode(value.openIdConnectProvider)
+          );
+        }
+        case "JumpingToLogInPage": {
+          return [3].concat(String.codec.encode(value.string));
+        }
+        case "WaitVerifyingAccessToken": {
+          return [4].concat(AccessToken.codec.encode(value.accessToken));
+        }
+        case "VerifyingAccessToken": {
+          return [5].concat(AccessToken.codec.encode(value.accessToken));
+        }
+        case "LoggedIn": {
+          return [6].concat(AccessToken.codec.encode(value.accessToken));
+        }
+      }
+    },
     decode: (
       index: number,
       binary: Uint8Array
-    ): { readonly result: ProjectId; readonly nextIndex: number } =>
-      decodeId(index, binary) as {
-        readonly result: ProjectId;
+    ): { readonly result: LogInState; readonly nextIndex: number } => {
+      const patternIndex: {
+        readonly result: number;
         readonly nextIndex: number;
-      },
+      } = Int32.codec.decode(index, binary);
+      if (patternIndex.result === 0) {
+        return { result: LogInState.Guest, nextIndex: patternIndex.nextIndex };
+      }
+      if (patternIndex.result === 1) {
+        const result: {
+          readonly result: OpenIdConnectProvider;
+          readonly nextIndex: number;
+        } = OpenIdConnectProvider.codec.decode(patternIndex.nextIndex, binary);
+        return {
+          result: LogInState.WaitRequestingLogInUrl(result.result),
+          nextIndex: result.nextIndex,
+        };
+      }
+      if (patternIndex.result === 2) {
+        const result: {
+          readonly result: OpenIdConnectProvider;
+          readonly nextIndex: number;
+        } = OpenIdConnectProvider.codec.decode(patternIndex.nextIndex, binary);
+        return {
+          result: LogInState.RequestingLogInUrl(result.result),
+          nextIndex: result.nextIndex,
+        };
+      }
+      if (patternIndex.result === 3) {
+        const result: {
+          readonly result: String;
+          readonly nextIndex: number;
+        } = String.codec.decode(patternIndex.nextIndex, binary);
+        return {
+          result: LogInState.JumpingToLogInPage(result.result),
+          nextIndex: result.nextIndex,
+        };
+      }
+      if (patternIndex.result === 4) {
+        const result: {
+          readonly result: AccessToken;
+          readonly nextIndex: number;
+        } = AccessToken.codec.decode(patternIndex.nextIndex, binary);
+        return {
+          result: LogInState.WaitVerifyingAccessToken(result.result),
+          nextIndex: result.nextIndex,
+        };
+      }
+      if (patternIndex.result === 5) {
+        const result: {
+          readonly result: AccessToken;
+          readonly nextIndex: number;
+        } = AccessToken.codec.decode(patternIndex.nextIndex, binary);
+        return {
+          result: LogInState.VerifyingAccessToken(result.result),
+          nextIndex: result.nextIndex,
+        };
+      }
+      if (patternIndex.result === 6) {
+        const result: {
+          readonly result: AccessToken;
+          readonly nextIndex: number;
+        } = AccessToken.codec.decode(patternIndex.nextIndex, binary);
+        return {
+          result: LogInState.LoggedIn(result.result),
+          nextIndex: result.nextIndex,
+        };
+      }
+      throw new Error("存在しないパターンを指定された 型を更新してください");
+    },
   },
 };
 
 /**
- * ユーザーの識別子
- * @typePartId 5a71cddc0b95298cb57ec66089190e9b
+ * 取得日時とデータ本体. データ本体がない場合も含まれているのでMaybe
+ * @typePartId f7590073f3ed06452193dddbb91e82e0
  */
-export const UserId: { readonly codec: Codec<UserId> } = {
-  codec: {
-    encode: (value: UserId): ReadonlyArray<number> => encodeId(value),
+export const Resource: {
+  readonly codec: <data extends unknown>(
+    a: Codec<data>
+  ) => Codec<Resource<data>>;
+} = {
+  codec: <data extends unknown>(
+    dataCodec: Codec<data>
+  ): Codec<Resource<data>> => ({
+    encode: (value: Resource<data>): ReadonlyArray<number> =>
+      Time.codec
+        .encode(value.getTime)
+        .concat(Maybe.codec(dataCodec).encode(value.dataMaybe)),
     decode: (
       index: number,
       binary: Uint8Array
-    ): { readonly result: UserId; readonly nextIndex: number } =>
-      decodeId(index, binary) as {
-        readonly result: UserId;
+    ): { readonly result: Resource<data>; readonly nextIndex: number } => {
+      const getTimeAndNextIndex: {
+        readonly result: Time;
         readonly nextIndex: number;
-      },
-  },
+      } = Time.codec.decode(index, binary);
+      const dataMaybeAndNextIndex: {
+        readonly result: Maybe<data>;
+        readonly nextIndex: number;
+      } = Maybe.codec(dataCodec).decode(getTimeAndNextIndex.nextIndex, binary);
+      return {
+        result: {
+          getTime: getTimeAndNextIndex.result,
+          dataMaybe: dataMaybeAndNextIndex.result,
+        },
+        nextIndex: dataMaybeAndNextIndex.nextIndex,
+      };
+    },
+  }),
 };
 
 /**
- * アイデアの識別子
- * @typePartId 719fa4020ae23a96d301d9fa31d8fcaf
+ * ProjectやUserなどのリソースの状態とデータ. 読み込み中だとか
+ * @typePartId 833fbf3dcab7e9365f334f8b00c24d55
  */
-export const IdeaId: { readonly codec: Codec<IdeaId> } = {
-  codec: {
-    encode: (value: IdeaId): ReadonlyArray<number> => encodeId(value),
+export const ResourceState: {
+  /**
+   * 読み込み済み
+   */
+  readonly Loaded: <data extends unknown>(
+    a: Resource<data>
+  ) => ResourceState<data>;
+  /**
+   * データを取得できなかった (サーバーの障害, オフライン)
+   */
+  readonly Unknown: <data extends unknown>() => ResourceState<data>;
+  /**
+   * indexedDBにアクセス待ち
+   */
+  readonly WaitLoading: <data extends unknown>() => ResourceState<data>;
+  /**
+   * indexedDBにアクセス中
+   */
+  readonly Loading: <data extends unknown>() => ResourceState<data>;
+  /**
+   * サーバに問い合わせ待ち
+   */
+  readonly WaitRequesting: <data extends unknown>() => ResourceState<data>;
+  /**
+   * サーバに問い合わせ中
+   */
+  readonly Requesting: <data extends unknown>() => ResourceState<data>;
+  /**
+   * 更新待ち
+   */
+  readonly WaitUpdating: <data extends unknown>(
+    a: Resource<data>
+  ) => ResourceState<data>;
+  /**
+   * サーバーに問い合わせてリソースを更新中
+   */
+  readonly Updating: <data extends unknown>(
+    a: Resource<data>
+  ) => ResourceState<data>;
+  /**
+   * Unknownだったリソースをサーバーに問い合わせ待ち
+   */
+  readonly WaitRetrying: <data extends unknown>() => ResourceState<data>;
+  /**
+   * Unknownだったリソースをサーバーに問い合わせ中
+   */
+  readonly Retrying: <data extends unknown>() => ResourceState<data>;
+  readonly codec: <data extends unknown>(
+    a: Codec<data>
+  ) => Codec<ResourceState<data>>;
+} = {
+  Loaded: <data extends unknown>(
+    dataResource: Resource<data>
+  ): ResourceState<data> => ({ _: "Loaded", dataResource }),
+  Unknown: <data extends unknown>(): ResourceState<data> => ({ _: "Unknown" }),
+  WaitLoading: <data extends unknown>(): ResourceState<data> => ({
+    _: "WaitLoading",
+  }),
+  Loading: <data extends unknown>(): ResourceState<data> => ({ _: "Loading" }),
+  WaitRequesting: <data extends unknown>(): ResourceState<data> => ({
+    _: "WaitRequesting",
+  }),
+  Requesting: <data extends unknown>(): ResourceState<data> => ({
+    _: "Requesting",
+  }),
+  WaitUpdating: <data extends unknown>(
+    dataResource: Resource<data>
+  ): ResourceState<data> => ({ _: "WaitUpdating", dataResource }),
+  Updating: <data extends unknown>(
+    dataResource: Resource<data>
+  ): ResourceState<data> => ({ _: "Updating", dataResource }),
+  WaitRetrying: <data extends unknown>(): ResourceState<data> => ({
+    _: "WaitRetrying",
+  }),
+  Retrying: <data extends unknown>(): ResourceState<data> => ({
+    _: "Retrying",
+  }),
+  codec: <data extends unknown>(
+    dataCodec: Codec<data>
+  ): Codec<ResourceState<data>> => ({
+    encode: (value: ResourceState<data>): ReadonlyArray<number> => {
+      switch (value._) {
+        case "Loaded": {
+          return [0].concat(
+            Resource.codec(dataCodec).encode(value.dataResource)
+          );
+        }
+        case "Unknown": {
+          return [1];
+        }
+        case "WaitLoading": {
+          return [2];
+        }
+        case "Loading": {
+          return [3];
+        }
+        case "WaitRequesting": {
+          return [4];
+        }
+        case "Requesting": {
+          return [5];
+        }
+        case "WaitUpdating": {
+          return [6].concat(
+            Resource.codec(dataCodec).encode(value.dataResource)
+          );
+        }
+        case "Updating": {
+          return [7].concat(
+            Resource.codec(dataCodec).encode(value.dataResource)
+          );
+        }
+        case "WaitRetrying": {
+          return [8];
+        }
+        case "Retrying": {
+          return [9];
+        }
+      }
+    },
     decode: (
       index: number,
       binary: Uint8Array
-    ): { readonly result: IdeaId; readonly nextIndex: number } =>
-      decodeId(index, binary) as {
-        readonly result: IdeaId;
+    ): { readonly result: ResourceState<data>; readonly nextIndex: number } => {
+      const patternIndex: {
+        readonly result: number;
         readonly nextIndex: number;
-      },
-  },
+      } = Int32.codec.decode(index, binary);
+      if (patternIndex.result === 0) {
+        const result: {
+          readonly result: Resource<data>;
+          readonly nextIndex: number;
+        } = Resource.codec(dataCodec).decode(patternIndex.nextIndex, binary);
+        return {
+          result: ResourceState.Loaded(result.result),
+          nextIndex: result.nextIndex,
+        };
+      }
+      if (patternIndex.result === 1) {
+        return {
+          result: ResourceState.Unknown(),
+          nextIndex: patternIndex.nextIndex,
+        };
+      }
+      if (patternIndex.result === 2) {
+        return {
+          result: ResourceState.WaitLoading(),
+          nextIndex: patternIndex.nextIndex,
+        };
+      }
+      if (patternIndex.result === 3) {
+        return {
+          result: ResourceState.Loading(),
+          nextIndex: patternIndex.nextIndex,
+        };
+      }
+      if (patternIndex.result === 4) {
+        return {
+          result: ResourceState.WaitRequesting(),
+          nextIndex: patternIndex.nextIndex,
+        };
+      }
+      if (patternIndex.result === 5) {
+        return {
+          result: ResourceState.Requesting(),
+          nextIndex: patternIndex.nextIndex,
+        };
+      }
+      if (patternIndex.result === 6) {
+        const result: {
+          readonly result: Resource<data>;
+          readonly nextIndex: number;
+        } = Resource.codec(dataCodec).decode(patternIndex.nextIndex, binary);
+        return {
+          result: ResourceState.WaitUpdating(result.result),
+          nextIndex: result.nextIndex,
+        };
+      }
+      if (patternIndex.result === 7) {
+        const result: {
+          readonly result: Resource<data>;
+          readonly nextIndex: number;
+        } = Resource.codec(dataCodec).decode(patternIndex.nextIndex, binary);
+        return {
+          result: ResourceState.Updating(result.result),
+          nextIndex: result.nextIndex,
+        };
+      }
+      if (patternIndex.result === 8) {
+        return {
+          result: ResourceState.WaitRetrying(),
+          nextIndex: patternIndex.nextIndex,
+        };
+      }
+      if (patternIndex.result === 9) {
+        return {
+          result: ResourceState.Retrying(),
+          nextIndex: patternIndex.nextIndex,
+        };
+      }
+      throw new Error("存在しないパターンを指定された 型を更新してください");
+    },
+  }),
 };
 
 /**
- * 提案の識別子
- * @typePartId 72cc637f6803ef5ca7536889a7fff52e
+ * キーであるTokenによってデータが必ず1つに決まるもの. 絶対に更新されない
+ * @typePartId 134205335ce83693fd83994e907acabd
  */
-export const SuggestionId: { readonly codec: Codec<SuggestionId> } = {
-  codec: {
-    encode: (value: SuggestionId): ReadonlyArray<number> => encodeId(value),
+export const StaticResourceState: {
+  /**
+   * 取得済み
+   */
+  readonly Loaded: <data extends unknown>(a: data) => StaticResourceState<data>;
+  /**
+   * データを取得できなかった (サーバーの障害, オフライン)
+   */
+  readonly Unknown: <data extends unknown>() => StaticResourceState<data>;
+  /**
+   * indexedDBにアクセス待ち
+   */
+  readonly WaitLoading: <data extends unknown>() => StaticResourceState<data>;
+  /**
+   * indexedDBにアクセス中
+   */
+  readonly Loading: <data extends unknown>() => StaticResourceState<data>;
+  /**
+   * サーバに問い合わせ待ち
+   */
+  readonly WaitRequesting: <data extends unknown>() => StaticResourceState<
+    data
+  >;
+  /**
+   * サーバに問い合わせ中
+   */
+  readonly Requesting: <data extends unknown>() => StaticResourceState<data>;
+  /**
+   * Unknownだったリソースをサーバーに問い合わせ待ち
+   */
+  readonly WaitRetrying: <data extends unknown>() => StaticResourceState<data>;
+  /**
+   * Unknownだったリソースをサーバーに問い合わせ中
+   */
+  readonly Retrying: <data extends unknown>() => StaticResourceState<data>;
+  readonly codec: <data extends unknown>(
+    a: Codec<data>
+  ) => Codec<StaticResourceState<data>>;
+} = {
+  Loaded: <data extends unknown>(data: data): StaticResourceState<data> => ({
+    _: "Loaded",
+    data,
+  }),
+  Unknown: <data extends unknown>(): StaticResourceState<data> => ({
+    _: "Unknown",
+  }),
+  WaitLoading: <data extends unknown>(): StaticResourceState<data> => ({
+    _: "WaitLoading",
+  }),
+  Loading: <data extends unknown>(): StaticResourceState<data> => ({
+    _: "Loading",
+  }),
+  WaitRequesting: <data extends unknown>(): StaticResourceState<data> => ({
+    _: "WaitRequesting",
+  }),
+  Requesting: <data extends unknown>(): StaticResourceState<data> => ({
+    _: "Requesting",
+  }),
+  WaitRetrying: <data extends unknown>(): StaticResourceState<data> => ({
+    _: "WaitRetrying",
+  }),
+  Retrying: <data extends unknown>(): StaticResourceState<data> => ({
+    _: "Retrying",
+  }),
+  codec: <data extends unknown>(
+    dataCodec: Codec<data>
+  ): Codec<StaticResourceState<data>> => ({
+    encode: (value: StaticResourceState<data>): ReadonlyArray<number> => {
+      switch (value._) {
+        case "Loaded": {
+          return [0].concat(dataCodec.encode(value.data));
+        }
+        case "Unknown": {
+          return [1];
+        }
+        case "WaitLoading": {
+          return [2];
+        }
+        case "Loading": {
+          return [3];
+        }
+        case "WaitRequesting": {
+          return [4];
+        }
+        case "Requesting": {
+          return [5];
+        }
+        case "WaitRetrying": {
+          return [6];
+        }
+        case "Retrying": {
+          return [7];
+        }
+      }
+    },
     decode: (
       index: number,
       binary: Uint8Array
-    ): { readonly result: SuggestionId; readonly nextIndex: number } =>
-      decodeId(index, binary) as {
-        readonly result: SuggestionId;
+    ): {
+      readonly result: StaticResourceState<data>;
+      readonly nextIndex: number;
+    } => {
+      const patternIndex: {
+        readonly result: number;
         readonly nextIndex: number;
-      },
-  },
-};
-
-/**
- * 画像から求められるトークン.キャッシュのキーとして使われる.1つのトークンに対して永久に1つの画像データしか表さない. キャッシュを更新する必要はない
- * @typePartId b193be207840b5b489517eb5d7b492b2
- */
-export const ImageToken: { readonly codec: Codec<ImageToken> } = {
-  codec: {
-    encode: (value: ImageToken): ReadonlyArray<number> => encodeToken(value),
-    decode: (
-      index: number,
-      binary: Uint8Array
-    ): { readonly result: ImageToken; readonly nextIndex: number } =>
-      decodeToken(index, binary) as {
-        readonly result: ImageToken;
-        readonly nextIndex: number;
-      },
-  },
-};
-
-/**
- * パーツの識別子
- * @typePartId d2c65983f602ee7e0a7be06e6af61acf
- */
-export const PartId: { readonly codec: Codec<PartId> } = {
-  codec: {
-    encode: (value: PartId): ReadonlyArray<number> => encodeId(value),
-    decode: (
-      index: number,
-      binary: Uint8Array
-    ): { readonly result: PartId; readonly nextIndex: number } =>
-      decodeId(index, binary) as {
-        readonly result: PartId;
-        readonly nextIndex: number;
-      },
-  },
-};
-
-/**
- * 型パーツの識別子
- * @typePartId 2562ffbc386c801f5132e10b945786e0
- */
-export const TypePartId: { readonly codec: Codec<TypePartId> } = {
-  codec: {
-    encode: (value: TypePartId): ReadonlyArray<number> => encodeId(value),
-    decode: (
-      index: number,
-      binary: Uint8Array
-    ): { readonly result: TypePartId; readonly nextIndex: number } =>
-      decodeId(index, binary) as {
-        readonly result: TypePartId;
-        readonly nextIndex: number;
-      },
-  },
-};
-
-/**
- * タグの識別子
- * @typePartId 3133b45b0078dd3b79b067c3ce0c4a67
- */
-export const TagId: { readonly codec: Codec<TagId> } = {
-  codec: {
-    encode: (value: TagId): ReadonlyArray<number> => encodeId(value),
-    decode: (
-      index: number,
-      binary: Uint8Array
-    ): { readonly result: TagId; readonly nextIndex: number } =>
-      decodeId(index, binary) as {
-        readonly result: TagId;
-        readonly nextIndex: number;
-      },
-  },
-};
-
-/**
- * アクセストークン. アクセストークンを持っていれば特定のユーザーであるが証明される. これが盗まれた場合,不正に得た相手はそのユーザーになりすますことができる
- * @typePartId be993929300452364c8bb658609f682d
- */
-export const AccessToken: { readonly codec: Codec<AccessToken> } = {
-  codec: {
-    encode: (value: AccessToken): ReadonlyArray<number> => encodeToken(value),
-    decode: (
-      index: number,
-      binary: Uint8Array
-    ): { readonly result: AccessToken; readonly nextIndex: number } =>
-      decodeToken(index, binary) as {
-        readonly result: AccessToken;
-        readonly nextIndex: number;
-      },
-  },
+      } = Int32.codec.decode(index, binary);
+      if (patternIndex.result === 0) {
+        const result: {
+          readonly result: data;
+          readonly nextIndex: number;
+        } = dataCodec.decode(patternIndex.nextIndex, binary);
+        return {
+          result: StaticResourceState.Loaded(result.result),
+          nextIndex: result.nextIndex,
+        };
+      }
+      if (patternIndex.result === 1) {
+        return {
+          result: StaticResourceState.Unknown(),
+          nextIndex: patternIndex.nextIndex,
+        };
+      }
+      if (patternIndex.result === 2) {
+        return {
+          result: StaticResourceState.WaitLoading(),
+          nextIndex: patternIndex.nextIndex,
+        };
+      }
+      if (patternIndex.result === 3) {
+        return {
+          result: StaticResourceState.Loading(),
+          nextIndex: patternIndex.nextIndex,
+        };
+      }
+      if (patternIndex.result === 4) {
+        return {
+          result: StaticResourceState.WaitRequesting(),
+          nextIndex: patternIndex.nextIndex,
+        };
+      }
+      if (patternIndex.result === 5) {
+        return {
+          result: StaticResourceState.Requesting(),
+          nextIndex: patternIndex.nextIndex,
+        };
+      }
+      if (patternIndex.result === 6) {
+        return {
+          result: StaticResourceState.WaitRetrying(),
+          nextIndex: patternIndex.nextIndex,
+        };
+      }
+      if (patternIndex.result === 7) {
+        return {
+          result: StaticResourceState.Retrying(),
+          nextIndex: patternIndex.nextIndex,
+        };
+      }
+      throw new Error("存在しないパターンを指定された 型を更新してください");
+    },
+  }),
 };

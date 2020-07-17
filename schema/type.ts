@@ -23,6 +23,24 @@ export const Result = (ok: data.Type, error: data.Type): data.Type => ({
 });
 export const String = noParameterType(id.String);
 
+export const ProjectId = noParameterType(id.ProjectId);
+
+export const UserId = noParameterType(id.UserId);
+
+export const IdeaId = noParameterType(id.IdeaId);
+
+export const SuggestionId = noParameterType(id.SuggestionId);
+
+export const ImageToken = noParameterType(id.ImageToken);
+
+export const PartId = noParameterType(id.PartId);
+
+export const TypePartId = noParameterType(id.TypePartId);
+
+export const TagId = noParameterType(id.TagId);
+
+export const AccessToken = noParameterType(id.AccessToken);
+
 export const Time = noParameterType(id.Time);
 
 export const RequestLogInUrlRequestData = noParameterType(
@@ -123,20 +141,19 @@ export const AccessTokenAndSuggestionId = noParameterType(
   id.AccessTokenAndSuggestionId
 );
 
-export const ProjectId = noParameterType(id.ProjectId);
+export const LogInState = noParameterType(id.LogInState);
 
-export const UserId = noParameterType(id.UserId);
+export const Resource = (dataType: data.Type): data.Type => ({
+  typePartId: id.Resource,
+  parameter: [dataType],
+});
 
-export const IdeaId = noParameterType(id.IdeaId);
+export const ResourceState = (dataType: data.Type): data.Type => ({
+  typePartId: id.ResourceState,
+  parameter: [dataType],
+});
 
-export const SuggestionId = noParameterType(id.SuggestionId);
-
-export const ImageToken = noParameterType(id.ImageToken);
-
-export const PartId = noParameterType(id.PartId);
-
-export const TypePartId = noParameterType(id.TypePartId);
-
-export const TagId = noParameterType(id.TagId);
-
-export const AccessToken = noParameterType(id.AccessToken);
+export const StaticResourceState = (dataType: data.Type): data.Type => ({
+  typePartId: id.StaticResourceState,
+  parameter: [dataType],
+});
