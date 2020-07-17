@@ -149,10 +149,6 @@ describe("test", () => {
               type: intType,
               expr: data.Expr.Int32Literal(1),
               createSuggestionId: "oneCreateSuggestionId" as data.SuggestionId,
-              getTime: {
-                day: 0,
-                millisecond: 0,
-              },
               projectId: "sampleProject" as data.ProjectId,
             },
           ],
@@ -168,10 +164,6 @@ describe("test", () => {
                 parameter: data.Expr.Int32Literal(100),
               }),
               createSuggestionId: "addOneHundredCreateSuggestionId" as data.SuggestionId,
-              getTime: {
-                day: 0,
-                millisecond: 0,
-              },
               projectId: "sampleProject" as data.ProjectId,
             },
           ],
@@ -244,7 +236,6 @@ describe("test", () => {
     codecEqual(
       {
         name: "ナルミンチョ",
-        getTime: { day: 18458, millisecond: 25968 },
         commentIdeaIdList: [],
         createTime: { day: 18440, millisecond: 12000 },
         developProjectIdList: [],
@@ -265,7 +256,6 @@ describe("test", () => {
         id: "933055412132d6aa46f8dde7159ecb38" as data.UserId,
         data: {
           name: "ナルミンチョ",
-          getTime: { day: 18458, millisecond: 25968 },
           commentIdeaIdList: [],
           createTime: { day: 18440, millisecond: 12000 },
           developProjectIdList: [],
