@@ -23,7 +23,7 @@ export const typePartToTypeAlias = (
   allTypePartIdTypePartNameMap: ReadonlyMap<data.TypePartId, string>
 ): ts.TypeAlias => ({
   name: identifer.fromString(typePart.name),
-  document: typePart.description + "\n @typePartId " + (typePartId as string),
+  document: typePart.description + "\n@typePartId " + (typePartId as string),
   typeParameterList: typePart.typeParameterList.map((typeParameter) =>
     identifer.fromString(typeParameter.name)
   ),

@@ -68,31 +68,31 @@ export type Codec<T extends unknown> = {
 
 /**
  * -2 147 483 648 ～ 2 147 483 647. 32bit 符号付き整数. JavaScriptのnumberとして扱える. numberの32bit符号あり整数をSigned Leb128のバイナリに変換する
- *  @typePartId ccf22e92cea3639683c0271d65d00673
+ * @typePartId ccf22e92cea3639683c0271d65d00673
  */
 export type Int32 = number;
 
 /**
  * バイナリ. JavaScriptのUint8Arrayで扱える. 最初にLED128でバイト数, その次にバイナリそのまま
- *  @typePartId 743d625544767e750c453fa344194599
+ * @typePartId 743d625544767e750c453fa344194599
  */
 export type Binary = Uint8Array;
 
 /**
  * Bool. 真か偽. JavaScriptのbooleanで扱える. true: 1, false: 0. (1byte)としてバイナリに変換する
- *  @typePartId 93e91ed730b5e7689250a76096ae60a4
+ * @typePartId 93e91ed730b5e7689250a76096ae60a4
  */
 export type Bool = boolean;
 
 /**
  * リスト. JavaScriptのArrayで扱う
- *  @typePartId d7a1efe440138793962eed5625de8196
+ * @typePartId d7a1efe440138793962eed5625de8196
  */
 export type List<e extends unknown> = ReadonlyArray<e>;
 
 /**
  * Maybe. nullableのようなもの. 今後はRustのstd::Optionに出力するために属性をつける?
- *  @typePartId cdd7dd74dd0f2036b44dcae6aaac46f5
+ * @typePartId cdd7dd74dd0f2036b44dcae6aaac46f5
  */
 export type Maybe<value extends unknown> =
   | { readonly _: "Just"; readonly value: value }
@@ -100,7 +100,7 @@ export type Maybe<value extends unknown> =
 
 /**
  * 成功と失敗を表す型. 今後はRustのstd::Resultに出力するために属性をつける?
- *  @typePartId 943ef399d0891f897f26bc02fa24af70
+ * @typePartId 943ef399d0891f897f26bc02fa24af70
  */
 export type Result<ok extends unknown, error extends unknown> =
   | { readonly _: "Ok"; readonly ok: ok }
@@ -108,67 +108,67 @@ export type Result<ok extends unknown, error extends unknown> =
 
 /**
  * 文字列. JavaScriptのstringで扱う. バイナリ形式はUTF-8. 不正な文字が入っている可能性がある
- *  @typePartId f1f830d23ffab8cec4d0191d157b9fc4
+ * @typePartId f1f830d23ffab8cec4d0191d157b9fc4
  */
 export type String = string;
 
 /**
  * プロジェクトの識別子
- *  @typePartId 4e3ab0f9499404a5fa100c4b57835906
+ * @typePartId 4e3ab0f9499404a5fa100c4b57835906
  */
 export type ProjectId = string & { readonly _projectId: never };
 
 /**
  * ユーザーの識別子
- *  @typePartId 5a71cddc0b95298cb57ec66089190e9b
+ * @typePartId 5a71cddc0b95298cb57ec66089190e9b
  */
 export type UserId = string & { readonly _userId: never };
 
 /**
  * アイデアの識別子
- *  @typePartId 719fa4020ae23a96d301d9fa31d8fcaf
+ * @typePartId 719fa4020ae23a96d301d9fa31d8fcaf
  */
 export type IdeaId = string & { readonly _ideaId: never };
 
 /**
  * 提案の識別子
- *  @typePartId 72cc637f6803ef5ca7536889a7fff52e
+ * @typePartId 72cc637f6803ef5ca7536889a7fff52e
  */
 export type SuggestionId = string & { readonly _suggestionId: never };
 
 /**
  * 画像から求められるトークン.キャッシュのキーとして使われる.1つのトークンに対して永久に1つの画像データしか表さない. キャッシュを更新する必要はない
- *  @typePartId b193be207840b5b489517eb5d7b492b2
+ * @typePartId b193be207840b5b489517eb5d7b492b2
  */
 export type ImageToken = string & { readonly _imageToken: never };
 
 /**
  * パーツの識別子
- *  @typePartId d2c65983f602ee7e0a7be06e6af61acf
+ * @typePartId d2c65983f602ee7e0a7be06e6af61acf
  */
 export type PartId = string & { readonly _partId: never };
 
 /**
  * 型パーツの識別子
- *  @typePartId 2562ffbc386c801f5132e10b945786e0
+ * @typePartId 2562ffbc386c801f5132e10b945786e0
  */
 export type TypePartId = string & { readonly _typePartId: never };
 
 /**
  * タグの識別子
- *  @typePartId 3133b45b0078dd3b79b067c3ce0c4a67
+ * @typePartId 3133b45b0078dd3b79b067c3ce0c4a67
  */
 export type TagId = string & { readonly _tagId: never };
 
 /**
  * アクセストークン. アクセストークンを持っていれば特定のユーザーであるが証明される. これが盗まれた場合,不正に得た相手はそのユーザーになりすますことができる
- *  @typePartId be993929300452364c8bb658609f682d
+ * @typePartId be993929300452364c8bb658609f682d
  */
 export type AccessToken = string & { readonly _accessToken: never };
 
 /**
  * 日時. 0001-01-01T00:00:00.000Z to 9999-12-31T23:59:59.999Z 最小単位はミリ秒. ミリ秒の求め方は day*1000*60*60*24 + millisecond
- *  @typePartId fa64c1721a3285f112a4118b66b43712
+ * @typePartId fa64c1721a3285f112a4118b66b43712
  */
 export type Time = {
   /**
@@ -183,7 +183,7 @@ export type Time = {
 
 /**
  * ログインのURLを発行するために必要なデータ
- *  @typePartId db245392b9296a48a195e4bd8824dd2b
+ * @typePartId db245392b9296a48a195e4bd8824dd2b
  */
 export type RequestLogInUrlRequestData = {
   /**
@@ -198,13 +198,13 @@ export type RequestLogInUrlRequestData = {
 
 /**
  * ソーシャルログインを提供するプロバイダー (例: Google, GitHub)
- *  @typePartId 0264130f1d9473f670907755cbee50d9
+ * @typePartId 0264130f1d9473f670907755cbee50d9
  */
 export type OpenIdConnectProvider = "Google" | "GitHub";
 
 /**
  * デバッグモードかどうか,言語とページの場所. URLとして表現されるデータ. Googleなどの検索エンジンの都合( https://support.google.com/webmasters/answer/182192?hl=ja )で,URLにページの言語を入れて,言語ごとに別のURLである必要がある. デバッグ時のホスト名は http://localhost になる
- *  @typePartId dc3b3cd3f125b344fb60a91c0b184f3e
+ * @typePartId dc3b3cd3f125b344fb60a91c0b184f3e
  */
 export type UrlData = {
   /**
@@ -223,13 +223,13 @@ export type UrlData = {
 
 /**
  * デバッグモードか, リリースモード
- *  @typePartId 261b20a84f5b94b93559aaf98ffc6d33
+ * @typePartId 261b20a84f5b94b93559aaf98ffc6d33
  */
 export type ClientMode = "DebugMode" | "Release";
 
 /**
  * DefinyWebアプリ内での場所を示すもの. URLから求められる. URLに変換できる
- *  @typePartId e830168583e34ff0750716aa6b253c5f
+ * @typePartId e830168583e34ff0750716aa6b253c5f
  */
 export type Location =
   | { readonly _: "Home" }
@@ -243,13 +243,13 @@ export type Location =
 
 /**
  * 英語,日本語,エスペラント語などの言語
- *  @typePartId a7c52f1164c69f56625e8febd5f44bf3
+ * @typePartId a7c52f1164c69f56625e8febd5f44bf3
  */
 export type Language = "Japanese" | "English" | "Esperanto";
 
 /**
  * ユーザーのデータのスナップショット
- *  @typePartId 655cea387d1aca74e54df4fc2888bcbb
+ * @typePartId 655cea387d1aca74e54df4fc2888bcbb
  */
 export type User = {
   /**
@@ -284,7 +284,7 @@ export type User = {
 
 /**
  * データを識別するIdとデータ
- *  @typePartId 12a442ac046b1757e8684652c2669450
+ * @typePartId 12a442ac046b1757e8684652c2669450
  */
 export type IdAndData<id extends unknown, data extends unknown> = {
   /**
@@ -299,7 +299,7 @@ export type IdAndData<id extends unknown, data extends unknown> = {
 
 /**
  * プロジェクト
- *  @typePartId 3fb93c7e94724891d2a224c6f945acbd
+ * @typePartId 3fb93c7e94724891d2a224c6f945acbd
  */
 export type Project = {
   /**
@@ -338,7 +338,7 @@ export type Project = {
 
 /**
  * アイデア
- *  @typePartId 98d993c8105a292781e3d3291fb477b6
+ * @typePartId 98d993c8105a292781e3d3291fb477b6
  */
 export type Idea = {
   /**
@@ -369,7 +369,7 @@ export type Idea = {
 
 /**
  * アイデアのコメント
- *  @typePartId ce630fa90ed090bd14c941915abd3293
+ * @typePartId ce630fa90ed090bd14c941915abd3293
  */
 export type IdeaItem = {
   /**
@@ -388,7 +388,7 @@ export type IdeaItem = {
 
 /**
  * アイデアのアイテム
- *  @typePartId b88e52e998ab62764aa81c9940205668
+ * @typePartId b88e52e998ab62764aa81c9940205668
  */
 export type IdeaItemBody =
   | { readonly _: "Comment"; readonly string: String }
@@ -410,7 +410,7 @@ export type IdeaItemBody =
 
 /**
  * 提案
- *  @typePartId f16c59a2158d9642481085d2492007f8
+ * @typePartId f16c59a2158d9642481085d2492007f8
  */
 export type Suggestion = {
   /**
@@ -449,7 +449,7 @@ export type Suggestion = {
 
 /**
  * 提案の状況
- *  @typePartId 9b97c1996665f1009a2f5a0f334d6bff
+ * @typePartId 9b97c1996665f1009a2f5a0f334d6bff
  */
 export type SuggestionState =
   | "Creating"
@@ -459,13 +459,13 @@ export type SuggestionState =
 
 /**
  * 変更点
- *  @typePartId e8a87ce7b719c048b40fa2c33263ff99
+ * @typePartId e8a87ce7b719c048b40fa2c33263ff99
  */
 export type Change = { readonly _: "ProjectName"; readonly string: String };
 
 /**
  * パーツの定義
- *  @typePartId 68599f9f5f2405a4f83d4dc4a8d4dfd7
+ * @typePartId 68599f9f5f2405a4f83d4dc4a8d4dfd7
  */
 export type Part = {
   /**
@@ -500,7 +500,7 @@ export type Part = {
 
 /**
  * 型パーツ
- *  @typePartId 95932121474f7db6f7a1256734be7746
+ * @typePartId 95932121474f7db6f7a1256734be7746
  */
 export type TypePart = {
   /**
@@ -539,13 +539,13 @@ export type TypePart = {
 
 /**
  * コンパイラに向けた, 型のデータ形式をどうするかの情報
- *  @typePartId 225e93ce3e35aa0bd76d07ea6f6b89cf
+ * @typePartId 225e93ce3e35aa0bd76d07ea6f6b89cf
  */
 export type TypeAttribute = "AsBoolean";
 
 /**
  * 型パラメーター
- *  @typePartId e1333f2af01621585b96e47aea9bfee1
+ * @typePartId e1333f2af01621585b96e47aea9bfee1
  */
 export type TypeParameter = {
   /**
@@ -560,7 +560,7 @@ export type TypeParameter = {
 
 /**
  * 型の定義本体
- *  @typePartId 27c027f90fb0fed86c8205cbd90cd08e
+ * @typePartId 27c027f90fb0fed86c8205cbd90cd08e
  */
 export type TypePartBody =
   | { readonly _: "Product"; readonly memberList: List<Member> }
@@ -569,7 +569,7 @@ export type TypePartBody =
 
 /**
  * 直積型のメンバー
- *  @typePartId 73b8e53686ac76acb085cb096f658d58
+ * @typePartId 73b8e53686ac76acb085cb096f658d58
  */
 export type Member = {
   /**
@@ -588,7 +588,7 @@ export type Member = {
 
 /**
  * 直積型のパターン
- *  @typePartId 512c55527a1ce9822e1e51b2f6063789
+ * @typePartId 512c55527a1ce9822e1e51b2f6063789
  */
 export type Pattern = {
   /**
@@ -607,7 +607,7 @@ export type Pattern = {
 
 /**
  * Definyだけでは表現できないデータ型
- *  @typePartId 739fb46c7b45d8c51865fc91d5d2ebb1
+ * @typePartId 739fb46c7b45d8c51865fc91d5d2ebb1
  */
 export type TypePartBodyKernel =
   | "Function"
@@ -620,7 +620,7 @@ export type TypePartBodyKernel =
 
 /**
  * 型
- *  @typePartId 0e16754e227d7287a01596ee10e1244f
+ * @typePartId 0e16754e227d7287a01596ee10e1244f
  */
 export type Type = {
   /**
@@ -635,7 +635,7 @@ export type Type = {
 
 /**
  * 式
- *  @typePartId 6e0366a4344ee3f670bd5238aa86cb9e
+ * @typePartId 6e0366a4344ee3f670bd5238aa86cb9e
  */
 export type Expr =
   | { readonly _: "Kernel"; readonly kernelExpr: KernelExpr }
@@ -647,13 +647,13 @@ export type Expr =
 
 /**
  * Definyだけでは表現できない式
- *  @typePartId dfd22b704f16a4033ad6a07b6ce7fb5b
+ * @typePartId dfd22b704f16a4033ad6a07b6ce7fb5b
  */
 export type KernelExpr = "Int32Add" | "Int32Sub" | "Int32Mul";
 
 /**
  * タグの参照を表す
- *  @typePartId 9e622b94f66cccedeb7cd9eb10232867
+ * @typePartId 9e622b94f66cccedeb7cd9eb10232867
  */
 export type TagReference = {
   /**
@@ -668,7 +668,7 @@ export type TagReference = {
 
 /**
  * 関数呼び出し
- *  @typePartId eb48ccda184401de37cee133ee046e94
+ * @typePartId eb48ccda184401de37cee133ee046e94
  */
 export type FunctionCall = {
   /**
@@ -683,7 +683,7 @@ export type FunctionCall = {
 
 /**
  * ラムダのブランチ. Just x -> data x のようなところ
- *  @typePartId e1c39a207e4c950b326f1294550f40ac
+ * @typePartId e1c39a207e4c950b326f1294550f40ac
  */
 export type LambdaBranch = {
   /**
@@ -703,7 +703,7 @@ export type LambdaBranch = {
 
 /**
  * ブランチの式を使う条件
- *  @typePartId a27c39d96ff09d8bafa4b37d386995d9
+ * @typePartId a27c39d96ff09d8bafa4b37d386995d9
  */
 export type Condition =
   | { readonly _: "ByTag"; readonly conditionTag: ConditionTag }
@@ -713,7 +713,7 @@ export type Condition =
 
 /**
  * タグによる条件
- *  @typePartId 46ec720c126a7093a527d29c176c5b59
+ * @typePartId 46ec720c126a7093a527d29c176c5b59
  */
 export type ConditionTag = {
   /**
@@ -728,7 +728,7 @@ export type ConditionTag = {
 
 /**
  * キャプチャパーツへのキャプチャ
- *  @typePartId 1e0084ab494ca046f98cd6334ecf0944
+ * @typePartId 1e0084ab494ca046f98cd6334ecf0944
  */
 export type ConditionCapture = {
   /**
@@ -743,7 +743,7 @@ export type ConditionCapture = {
 
 /**
  * ラムダのブランチで使えるパーツを定義する部分
- *  @typePartId 7591b507c8c0477470c0eadca88b86c3
+ * @typePartId 7591b507c8c0477470c0eadca88b86c3
  */
 export type BranchPartDefinition = {
   /**
@@ -770,7 +770,7 @@ export type BranchPartDefinition = {
 
 /**
  * 評価しきった式
- *  @typePartId 76b94bf171eb1dd4cbfb7835938b76b2
+ * @typePartId 76b94bf171eb1dd4cbfb7835938b76b2
  */
 export type EvaluatedExpr =
   | { readonly _: "Kernel"; readonly kernelExpr: KernelExpr }
@@ -781,7 +781,7 @@ export type EvaluatedExpr =
 
 /**
  * 複数の引数が必要な内部関数の部分呼び出し
- *  @typePartId 1db3d6bfb8b0b396a3f94f062d37a630
+ * @typePartId 1db3d6bfb8b0b396a3f94f062d37a630
  */
 export type KernelCall = {
   /**
@@ -796,7 +796,7 @@ export type KernelCall = {
 
 /**
  * 評価したときに失敗した原因を表すもの
- *  @typePartId 6519a080b86da2627bef4032319ac621
+ * @typePartId 6519a080b86da2627bef4032319ac621
  */
 export type EvaluateExprError =
   | { readonly _: "NeedPartDefinition"; readonly partId: PartId }
@@ -807,7 +807,7 @@ export type EvaluateExprError =
 
 /**
  * 型エラー
- *  @typePartId 466fbfeeb2d6ead0f6bd0833b5ea3d71
+ * @typePartId 466fbfeeb2d6ead0f6bd0833b5ea3d71
  */
 export type TypeError = {
   /**
@@ -818,7 +818,7 @@ export type TypeError = {
 
 /**
  * プロジェクト作成時に必要なパラメーター
- *  @typePartId 8ac0f1e4609a750afb9e068d9914a2db
+ * @typePartId 8ac0f1e4609a750afb9e068d9914a2db
  */
 export type CreateProjectParameter = {
   /**
@@ -833,7 +833,7 @@ export type CreateProjectParameter = {
 
 /**
  * アイデアを作成時に必要なパラメーター
- *  @typePartId 036e55068c26060c3632062801b0216b
+ * @typePartId 036e55068c26060c3632062801b0216b
  */
 export type CreateIdeaParameter = {
   /**
@@ -852,7 +852,7 @@ export type CreateIdeaParameter = {
 
 /**
  * アイデアにコメントを追加するときに必要なパラメーター
- *  @typePartId ad7a6a667a36a79c3bbc81f8f0789fe8
+ * @typePartId ad7a6a667a36a79c3bbc81f8f0789fe8
  */
 export type AddCommentParameter = {
   /**
@@ -871,7 +871,7 @@ export type AddCommentParameter = {
 
 /**
  * 提案を作成するときに必要なパラメーター
- *  @typePartId 8b40f4351fe048ff78f14c523b6f76f1
+ * @typePartId 8b40f4351fe048ff78f14c523b6f76f1
  */
 export type AddSuggestionParameter = {
   /**
@@ -886,7 +886,7 @@ export type AddSuggestionParameter = {
 
 /**
  * 提案を承認待ちにしたり許可したりするときなどに使う
- *  @typePartId 74280d6a5db1d48b6815a73a819756c3
+ * @typePartId 74280d6a5db1d48b6815a73a819756c3
  */
 export type AccessTokenAndSuggestionId = {
   /**
@@ -901,7 +901,7 @@ export type AccessTokenAndSuggestionId = {
 
 /**
  * ログイン状態
- *  @typePartId d562fe803c7e40c32269e24c1435e4d1
+ * @typePartId d562fe803c7e40c32269e24c1435e4d1
  */
 export type LogInState =
   | { readonly _: "WaitLoadingAccessTokenFromIndexedDB" }
@@ -925,7 +925,7 @@ export type LogInState =
 
 /**
  * 取得日時とデータ本体. データ本体がない場合も含まれているのでMaybe
- *  @typePartId f7590073f3ed06452193dddbb91e82e0
+ * @typePartId f7590073f3ed06452193dddbb91e82e0
  */
 export type Resource<data extends unknown> = {
   /**
@@ -940,7 +940,7 @@ export type Resource<data extends unknown> = {
 
 /**
  * ProjectやUserなどのリソースの状態とデータ. 読み込み中だとか
- *  @typePartId 833fbf3dcab7e9365f334f8b00c24d55
+ * @typePartId 833fbf3dcab7e9365f334f8b00c24d55
  */
 export type ResourceState<data extends unknown> =
   | { readonly _: "Loaded"; readonly dataResource: Resource<data> }
@@ -956,7 +956,7 @@ export type ResourceState<data extends unknown> =
 
 /**
  * キーであるTokenによってデータが必ず1つに決まるもの. 絶対に更新されない
- *  @typePartId 134205335ce83693fd83994e907acabd
+ * @typePartId 134205335ce83693fd83994e907acabd
  */
 export type StaticResourceState<data extends unknown> =
   | { readonly _: "Loaded"; readonly data: data }
