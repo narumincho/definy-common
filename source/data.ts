@@ -904,6 +904,8 @@ export type AccessTokenAndSuggestionId = {
  *  @typePartId d562fe803c7e40c32269e24c1435e4d1
  */
 export type LogInState =
+  | { readonly _: "WaitLoadingAccessTokenFromIndexedDB" }
+  | { readonly _: "LoadingAccessTokenFromIndexedDB" }
   | { readonly _: "Guest" }
   | {
       readonly _: "WaitRequestingLogInUrl";
@@ -4126,6 +4128,14 @@ export const AccessTokenAndSuggestionId: {
  */
 export const LogInState: {
   /**
+   * アクセストークンをindexedDBから読み取る状態
+   */
+  readonly WaitLoadingAccessTokenFromIndexedDB: LogInState;
+  /**
+   * アクセストークンをindexedDBから読み取っている状態
+   */
+  readonly LoadingAccessTokenFromIndexedDB: LogInState;
+  /**
    * ログインしていない状態
    */
   readonly Guest: LogInState;
@@ -4142,11 +4152,11 @@ export const LogInState: {
    */
   readonly JumpingToLogInPage: (a: String) => LogInState;
   /**
-   * indexedDBに保存されていたアクセストークンをしだす前の状態
+   * アクセストークンの検証とログインしているユーザーの情報を取得する状態
    */
   readonly WaitVerifyingAccessToken: (a: AccessToken) => LogInState;
   /**
-   * indexedDBに保存されていたアクセストークン検証中
+   * アクセストークンの検証とログインしているユーザーの情報を取得している状態
    */
   readonly VerifyingAccessToken: (a: AccessToken) => LogInState;
   /**
@@ -4155,6 +4165,10 @@ export const LogInState: {
   readonly LoggedIn: (a: AccessToken) => LogInState;
   readonly codec: Codec<LogInState>;
 } = {
+  WaitLoadingAccessTokenFromIndexedDB: {
+    _: "WaitLoadingAccessTokenFromIndexedDB",
+  },
+  LoadingAccessTokenFromIndexedDB: { _: "LoadingAccessTokenFromIndexedDB" },
   Guest: { _: "Guest" },
   WaitRequestingLogInUrl: (
     openIdConnectProvider: OpenIdConnectProvider
@@ -4181,30 +4195,36 @@ export const LogInState: {
   codec: {
     encode: (value: LogInState): ReadonlyArray<number> => {
       switch (value._) {
-        case "Guest": {
+        case "WaitLoadingAccessTokenFromIndexedDB": {
           return [0];
         }
+        case "LoadingAccessTokenFromIndexedDB": {
+          return [1];
+        }
+        case "Guest": {
+          return [2];
+        }
         case "WaitRequestingLogInUrl": {
-          return [1].concat(
+          return [3].concat(
             OpenIdConnectProvider.codec.encode(value.openIdConnectProvider)
           );
         }
         case "RequestingLogInUrl": {
-          return [2].concat(
+          return [4].concat(
             OpenIdConnectProvider.codec.encode(value.openIdConnectProvider)
           );
         }
         case "JumpingToLogInPage": {
-          return [3].concat(String.codec.encode(value.string));
+          return [5].concat(String.codec.encode(value.string));
         }
         case "WaitVerifyingAccessToken": {
-          return [4].concat(AccessToken.codec.encode(value.accessToken));
+          return [6].concat(AccessToken.codec.encode(value.accessToken));
         }
         case "VerifyingAccessToken": {
-          return [5].concat(AccessToken.codec.encode(value.accessToken));
+          return [7].concat(AccessToken.codec.encode(value.accessToken));
         }
         case "LoggedIn": {
-          return [6].concat(AccessToken.codec.encode(value.accessToken));
+          return [8].concat(AccessToken.codec.encode(value.accessToken));
         }
       }
     },
@@ -4217,9 +4237,21 @@ export const LogInState: {
         readonly nextIndex: number;
       } = Int32.codec.decode(index, binary);
       if (patternIndex.result === 0) {
-        return { result: LogInState.Guest, nextIndex: patternIndex.nextIndex };
+        return {
+          result: LogInState.WaitLoadingAccessTokenFromIndexedDB,
+          nextIndex: patternIndex.nextIndex,
+        };
       }
       if (patternIndex.result === 1) {
+        return {
+          result: LogInState.LoadingAccessTokenFromIndexedDB,
+          nextIndex: patternIndex.nextIndex,
+        };
+      }
+      if (patternIndex.result === 2) {
+        return { result: LogInState.Guest, nextIndex: patternIndex.nextIndex };
+      }
+      if (patternIndex.result === 3) {
         const result: {
           readonly result: OpenIdConnectProvider;
           readonly nextIndex: number;
@@ -4229,7 +4261,7 @@ export const LogInState: {
           nextIndex: result.nextIndex,
         };
       }
-      if (patternIndex.result === 2) {
+      if (patternIndex.result === 4) {
         const result: {
           readonly result: OpenIdConnectProvider;
           readonly nextIndex: number;
@@ -4239,7 +4271,7 @@ export const LogInState: {
           nextIndex: result.nextIndex,
         };
       }
-      if (patternIndex.result === 3) {
+      if (patternIndex.result === 5) {
         const result: {
           readonly result: String;
           readonly nextIndex: number;
@@ -4249,7 +4281,7 @@ export const LogInState: {
           nextIndex: result.nextIndex,
         };
       }
-      if (patternIndex.result === 4) {
+      if (patternIndex.result === 6) {
         const result: {
           readonly result: AccessToken;
           readonly nextIndex: number;
@@ -4259,7 +4291,7 @@ export const LogInState: {
           nextIndex: result.nextIndex,
         };
       }
-      if (patternIndex.result === 5) {
+      if (patternIndex.result === 7) {
         const result: {
           readonly result: AccessToken;
           readonly nextIndex: number;
@@ -4269,7 +4301,7 @@ export const LogInState: {
           nextIndex: result.nextIndex,
         };
       }
-      if (patternIndex.result === 6) {
+      if (patternIndex.result === 8) {
         const result: {
           readonly result: AccessToken;
           readonly nextIndex: number;

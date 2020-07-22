@@ -1732,6 +1732,16 @@ export const typePartMap: ReadonlyMap<TypePartId, TypePart> = new Map<
       typeParameterList: [],
       body: TypePartBody.Sum([
         {
+          name: "WaitLoadingAccessTokenFromIndexedDB",
+          description: "アクセストークンをindexedDBから読み取る状態",
+          parameter: Maybe.Nothing(),
+        },
+        {
+          name: "LoadingAccessTokenFromIndexedDB",
+          description: "アクセストークンをindexedDBから読み取っている状態",
+          parameter: Maybe.Nothing(),
+        },
+        {
           name: "Guest",
           description: "ログインしていない状態",
           parameter: Maybe.Nothing(),
@@ -1754,12 +1764,13 @@ export const typePartMap: ReadonlyMap<TypePartId, TypePart> = new Map<
         {
           name: "WaitVerifyingAccessToken",
           description:
-            "indexedDBに保存されていたアクセストークンをしだす前の状態",
+            "アクセストークンの検証とログインしているユーザーの情報を取得する状態",
           parameter: Maybe.Just(type.AccessToken),
         },
         {
           name: "VerifyingAccessToken",
-          description: "indexedDBに保存されていたアクセストークン検証中",
+          description:
+            "アクセストークンの検証とログインしているユーザーの情報を取得している状態",
           parameter: Maybe.Just(type.AccessToken),
         },
         {
