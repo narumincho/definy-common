@@ -65,3 +65,4 @@ export const LogInState = "d562fe803c7e40c32269e24c1435e4d1" as T;
 export const Resource = "f7590073f3ed06452193dddbb91e82e0" as T;
 export const ResourceState = "833fbf3dcab7e9365f334f8b00c24d55" as T;
 export const StaticResourceState = "134205335ce83693fd83994e907acabd" as T;
+export const AccessTokenAndUserId = "895fb0f083f1828da2c56b25ed77eb54" as T;

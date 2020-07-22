@@ -1776,7 +1776,31 @@ export const typePartMap: ReadonlyMap<TypePartId, TypePart> = new Map<
         {
           name: "LoggedIn",
           description: "ログインしている状態",
-          parameter: Maybe.Just(type.AccessToken),
+          parameter: Maybe.Just(type.AccessTokenAndUserId),
+        },
+      ]),
+    },
+  ],
+  [
+    id.AccessTokenAndUserId,
+    {
+      name: "AccessTokenAndUserId",
+      description: "AccessTokenとUserId",
+      migrationPartId: Maybe.Nothing(),
+      projectId: util.definyCodeProjectId,
+      createSuggestionId: util.codeSuggestionId,
+      attribute: Maybe.Nothing(),
+      typeParameterList: [],
+      body: TypePartBody.Product([
+        {
+          name: "accessToken",
+          description: "AccessToken",
+          type: type.AccessToken,
+        },
+        {
+          name: "userId",
+          description: "UserId",
+          type: type.UserId,
         },
       ]),
     },

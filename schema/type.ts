@@ -157,3 +157,5 @@ export const StaticResourceState = (dataType: data.Type): data.Type => ({
   typePartId: id.StaticResourceState,
   parameter: [dataType],
 });
+
+export const AccessTokenAndUserId = noParameterType(id.AccessTokenAndUserId);

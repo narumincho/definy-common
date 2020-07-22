@@ -921,7 +921,25 @@ export type LogInState =
       readonly accessToken: AccessToken;
     }
   | { readonly _: "VerifyingAccessToken"; readonly accessToken: AccessToken }
-  | { readonly _: "LoggedIn"; readonly accessToken: AccessToken };
+  | {
+      readonly _: "LoggedIn";
+      readonly accessTokenAndUserId: AccessTokenAndUserId;
+    };
+
+/**
+ * AccessTokenとUserId
+ * @typePartId 895fb0f083f1828da2c56b25ed77eb54
+ */
+export type AccessTokenAndUserId = {
+  /**
+   * AccessToken
+   */
+  readonly accessToken: AccessToken;
+  /**
+   * UserId
+   */
+  readonly userId: UserId;
+};
 
 /**
  * 取得日時とデータ本体. データ本体がない場合も含まれているのでMaybe
@@ -4162,7 +4180,7 @@ export const LogInState: {
   /**
    * ログインしている状態
    */
-  readonly LoggedIn: (a: AccessToken) => LogInState;
+  readonly LoggedIn: (a: AccessTokenAndUserId) => LogInState;
   readonly codec: Codec<LogInState>;
 } = {
   WaitLoadingAccessTokenFromIndexedDB: {
@@ -4188,9 +4206,9 @@ export const LogInState: {
     _: "VerifyingAccessToken",
     accessToken,
   }),
-  LoggedIn: (accessToken: AccessToken): LogInState => ({
+  LoggedIn: (accessTokenAndUserId: AccessTokenAndUserId): LogInState => ({
     _: "LoggedIn",
-    accessToken,
+    accessTokenAndUserId,
   }),
   codec: {
     encode: (value: LogInState): ReadonlyArray<number> => {
@@ -4224,7 +4242,9 @@ export const LogInState: {
           return [7].concat(AccessToken.codec.encode(value.accessToken));
         }
         case "LoggedIn": {
-          return [8].concat(AccessToken.codec.encode(value.accessToken));
+          return [8].concat(
+            AccessTokenAndUserId.codec.encode(value.accessTokenAndUserId)
+          );
         }
       }
     },
@@ -4303,15 +4323,53 @@ export const LogInState: {
       }
       if (patternIndex.result === 8) {
         const result: {
-          readonly result: AccessToken;
+          readonly result: AccessTokenAndUserId;
           readonly nextIndex: number;
-        } = AccessToken.codec.decode(patternIndex.nextIndex, binary);
+        } = AccessTokenAndUserId.codec.decode(patternIndex.nextIndex, binary);
         return {
           result: LogInState.LoggedIn(result.result),
           nextIndex: result.nextIndex,
         };
       }
       throw new Error("存在しないパターンを指定された 型を更新してください");
+    },
+  },
+};
+
+/**
+ * AccessTokenとUserId
+ * @typePartId 895fb0f083f1828da2c56b25ed77eb54
+ */
+export const AccessTokenAndUserId: {
+  readonly codec: Codec<AccessTokenAndUserId>;
+} = {
+  codec: {
+    encode: (value: AccessTokenAndUserId): ReadonlyArray<number> =>
+      AccessToken.codec
+        .encode(value.accessToken)
+        .concat(UserId.codec.encode(value.userId)),
+    decode: (
+      index: number,
+      binary: Uint8Array
+    ): {
+      readonly result: AccessTokenAndUserId;
+      readonly nextIndex: number;
+    } => {
+      const accessTokenAndNextIndex: {
+        readonly result: AccessToken;
+        readonly nextIndex: number;
+      } = AccessToken.codec.decode(index, binary);
+      const userIdAndNextIndex: {
+        readonly result: UserId;
+        readonly nextIndex: number;
+      } = UserId.codec.decode(accessTokenAndNextIndex.nextIndex, binary);
+      return {
+        result: {
+          accessToken: accessTokenAndNextIndex.result,
+          userId: userIdAndNextIndex.result,
+        },
+        nextIndex: userIdAndNextIndex.nextIndex,
+      };
     },
   },
 };
