@@ -250,6 +250,7 @@ export type Location =
   | { readonly _: "User"; readonly userId: UserId }
   | { readonly _: "Idea"; readonly ideaId: IdeaId }
   | { readonly _: "Commit"; readonly commitId: CommitId }
+  | { readonly _: "Setting" }
   | { readonly _: "About" }
   | { readonly _: "Debug" };
 
@@ -1753,9 +1754,13 @@ export const Location: {
    */
   readonly Idea: (a: IdeaId) => Location;
   /**
-   * コミットのページ
+   * コミットの詳細, 編集ページ
    */
   readonly Commit: (a: CommitId) => Location;
+  /**
+   * 設定ページ
+   */
+  readonly Setting: Location;
   /**
    * Definyについて説明したページ
    */
@@ -1772,6 +1777,7 @@ export const Location: {
   User: (userId: UserId): Location => ({ _: "User", userId }),
   Idea: (ideaId: IdeaId): Location => ({ _: "Idea", ideaId }),
   Commit: (commitId: CommitId): Location => ({ _: "Commit", commitId }),
+  Setting: { _: "Setting" },
   About: { _: "About" },
   Debug: { _: "Debug" },
   codec: {
@@ -1795,11 +1801,14 @@ export const Location: {
         case "Commit": {
           return [5].concat(CommitId.codec.encode(value.commitId));
         }
-        case "About": {
+        case "Setting": {
           return [6];
         }
-        case "Debug": {
+        case "About": {
           return [7];
+        }
+        case "Debug": {
+          return [8];
         }
       }
     },
@@ -1861,9 +1870,12 @@ export const Location: {
         };
       }
       if (patternIndex.result === 6) {
-        return { result: Location.About, nextIndex: patternIndex.nextIndex };
+        return { result: Location.Setting, nextIndex: patternIndex.nextIndex };
       }
       if (patternIndex.result === 7) {
+        return { result: Location.About, nextIndex: patternIndex.nextIndex };
+      }
+      if (patternIndex.result === 8) {
         return { result: Location.Debug, nextIndex: patternIndex.nextIndex };
       }
       throw new Error("存在しないパターンを指定された 型を更新してください");

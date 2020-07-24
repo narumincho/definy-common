@@ -502,8 +502,13 @@ export const typePartMap: ReadonlyMap<TypePartId, TypePart> = new Map<
         },
         {
           name: "Commit",
-          description: "コミットのページ",
+          description: "コミットの詳細, 編集ページ",
           parameter: Maybe.Just(type.CommitId),
+        },
+        {
+          name: "Setting",
+          description: "設定ページ",
+          parameter: Maybe.Nothing(),
         },
         {
           name: "About",

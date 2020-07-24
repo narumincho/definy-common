@@ -51,6 +51,8 @@ const locationToPath = (location: data.Location): string => {
       return "/idea/" + (location.ideaId as string);
     case "Commit":
       return "/commit/" + (location.commitId as string);
+    case "Setting":
+      return "/setting/";
     case "About":
       return "/about";
     case "Debug":
@@ -101,6 +103,9 @@ const locationFromUrl = (pathName: string): data.Location => {
   }
   if (pathName === "/debug") {
     return data.Location.Debug;
+  }
+  if (pathName === "/setting") {
+    return data.Location.Setting;
   }
   const projectResult = pathName.match(/^\/project\/(?<id>[0-9a-f]{32})$/u);
   if (projectResult !== null && projectResult.groups !== undefined) {
