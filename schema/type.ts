@@ -29,7 +29,7 @@ export const UserId = noParameterType(id.UserId);
 
 export const IdeaId = noParameterType(id.IdeaId);
 
-export const SuggestionId = noParameterType(id.SuggestionId);
+export const CommitId = noParameterType(id.CommitId);
 
 export const ImageToken = noParameterType(id.ImageToken);
 
@@ -40,6 +40,10 @@ export const TypePartId = noParameterType(id.TypePartId);
 export const TagId = noParameterType(id.TagId);
 
 export const AccessToken = noParameterType(id.AccessToken);
+
+export const PartHash = noParameterType(id.PartHash);
+
+export const TypePartHash = noParameterType(id.TypePartHash);
 
 export const Time = noParameterType(id.Time);
 
@@ -71,15 +75,11 @@ export const Project = noParameterType(id.Project);
 
 export const Idea = noParameterType(id.Idea);
 
-export const IdeaItem = noParameterType(id.IdeaItem);
+export const Comment = noParameterType(id.Comment);
 
-export const IdeaItemBody = noParameterType(id.IdeaItemBody);
+export const Code = noParameterType(id.Commit);
 
-export const Suggestion = noParameterType(id.Suggestion);
-
-export const SuggestionState = noParameterType(id.SuggestionState);
-
-export const Change = noParameterType(id.Change);
+export const IdeaState = noParameterType(id.IdeaState);
 
 export const Part = noParameterType(id.Part);
 
@@ -133,12 +133,10 @@ export const CreateIdeaParameter = noParameterType(id.CreateIdeaParameter);
 
 export const AddCommentParameter = noParameterType(id.AddCommentParameter);
 
-export const AddSuggestionParameter = noParameterType(
-  id.AddSuggestionParameter
-);
+export const AddCommitParameter = noParameterType(id.AddCommitParameter);
 
-export const AccessTokenAndSuggestionId = noParameterType(
-  id.AccessTokenAndSuggestionId
+export const AccessTokenAndCommitId = noParameterType(
+  id.AccessTokenAndCommitId
 );
 
 export const LogInState = noParameterType(id.LogInState);
