@@ -447,7 +447,7 @@ export type Commit = {
   /**
    * 型パーツ
    */
-  readonly typePartHashList: List<TypePartId>;
+  readonly typePartHashList: List<TypePartHash>;
   /**
    * 変更をするプロジェクト
    */
@@ -2265,7 +2265,7 @@ export const Commit: { readonly codec: Codec<Commit> } = {
         .concat(ImageToken.codec.encode(value.projectImage))
         .concat(ImageToken.codec.encode(value.projectIcon))
         .concat(List.codec(PartHash.codec).encode(value.partHashList))
-        .concat(List.codec(TypePartId.codec).encode(value.typePartHashList))
+        .concat(List.codec(TypePartHash.codec).encode(value.typePartHashList))
         .concat(ProjectId.codec.encode(value.projectId))
         .concat(IdeaId.codec.encode(value.ideaId))
         .concat(Time.codec.encode(value.updateTime)),
@@ -2305,9 +2305,9 @@ export const Commit: { readonly codec: Codec<Commit> } = {
         binary
       );
       const typePartHashListAndNextIndex: {
-        readonly result: List<TypePartId>;
+        readonly result: List<TypePartHash>;
         readonly nextIndex: number;
-      } = List.codec(TypePartId.codec).decode(
+      } = List.codec(TypePartHash.codec).decode(
         partHashListAndNextIndex.nextIndex,
         binary
       );
