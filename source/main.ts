@@ -1,5 +1,6 @@
 import * as data from "./data";
 import * as hexString from "./kernelType/hexString";
+import * as jsTsCodeGenerator from "js-ts-code-generator";
 import * as ts from "js-ts-code-generator/source/data";
 import * as typeAlias from "./typeAlias";
 import * as util from "./util";
@@ -523,6 +524,24 @@ const conditionToString = (condition: data.Condition): string => {
     case "Int32":
       return condition.int32.toString();
   }
+};
+
+export const generateTypeScriptCodeAsString = (
+  typePartMap: ReadonlyMap<data.TypePartId, data.TypePart>
+): string => {
+  return jsTsCodeGenerator.generateCodeAsString(
+    generateTypeScriptCode(typePartMap),
+    "TypeScript"
+  );
+};
+
+export const generateJavaScriptCodeAsString = (
+  typePartMap: ReadonlyMap<data.TypePartId, data.TypePart>
+): string => {
+  return jsTsCodeGenerator.generateCodeAsString(
+    generateTypeScriptCode(typePartMap),
+    "JavaScript"
+  );
 };
 
 export const generateTypeScriptCode = (
