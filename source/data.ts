@@ -332,7 +332,7 @@ export type Project = {
    */
   readonly createTime: Time;
   /**
-   * 作成アカウント
+   * プロジェクトを作成したユーザー
    */
   readonly createUserId: UserId;
   /**
@@ -340,13 +340,9 @@ export type Project = {
    */
   readonly updateTime: Time;
   /**
-   * 所属しているのパーツのIDのリスト
+   * リリースされたコミット
    */
-  readonly partIdList: List<PartId>;
-  /**
-   * 所属している型パーツのIDのリスト
-   */
-  readonly typePartIdList: List<TypePartId>;
+  readonly commitId: List<CommitId>;
 };
 
 /**
@@ -355,7 +351,7 @@ export type Project = {
  */
 export type Idea = {
   /**
-   * アイデア名
+   * アイデア名 最大240文字まで
    */
   readonly name: String;
   /**
@@ -375,13 +371,9 @@ export type Idea = {
    */
   readonly commentList: List<Comment>;
   /**
-   * 子のアイデア
+   * 親のアイデア
    */
-  readonly childIdeaList: List<IdeaId>;
-  /**
-   * アイデアを実現することができるかもしれないコミット
-   */
-  readonly commitIdList: List<CommitId>;
+  readonly parentIdeaId: Maybe<IdeaId>;
   /**
    * 更新日時
    */
@@ -406,7 +398,7 @@ export type Comment = {
    */
   readonly createTime: Time;
   /**
-   * 本文
+   * 本文 1～10000文字
    */
   readonly body: String;
 };
@@ -2066,8 +2058,7 @@ export const Project: { readonly codec: Codec<Project> } = {
         .concat(Time.codec.encode(value.createTime))
         .concat(UserId.codec.encode(value.createUserId))
         .concat(Time.codec.encode(value.updateTime))
-        .concat(List.codec(PartId.codec).encode(value.partIdList))
-        .concat(List.codec(TypePartId.codec).encode(value.typePartIdList)),
+        .concat(List.codec(CommitId.codec).encode(value.commitId)),
     decode: (
       index: number,
       binary: Uint8Array
@@ -2096,18 +2087,11 @@ export const Project: { readonly codec: Codec<Project> } = {
         readonly result: Time;
         readonly nextIndex: number;
       } = Time.codec.decode(createUserIdAndNextIndex.nextIndex, binary);
-      const partIdListAndNextIndex: {
-        readonly result: List<PartId>;
+      const commitIdAndNextIndex: {
+        readonly result: List<CommitId>;
         readonly nextIndex: number;
-      } = List.codec(PartId.codec).decode(
+      } = List.codec(CommitId.codec).decode(
         updateTimeAndNextIndex.nextIndex,
-        binary
-      );
-      const typePartIdListAndNextIndex: {
-        readonly result: List<TypePartId>;
-        readonly nextIndex: number;
-      } = List.codec(TypePartId.codec).decode(
-        partIdListAndNextIndex.nextIndex,
         binary
       );
       return {
@@ -2118,10 +2102,9 @@ export const Project: { readonly codec: Codec<Project> } = {
           createTime: createTimeAndNextIndex.result,
           createUserId: createUserIdAndNextIndex.result,
           updateTime: updateTimeAndNextIndex.result,
-          partIdList: partIdListAndNextIndex.result,
-          typePartIdList: typePartIdListAndNextIndex.result,
+          commitId: commitIdAndNextIndex.result,
         },
-        nextIndex: typePartIdListAndNextIndex.nextIndex,
+        nextIndex: commitIdAndNextIndex.nextIndex,
       };
     },
   },
@@ -2140,8 +2123,7 @@ export const Idea: { readonly codec: Codec<Idea> } = {
         .concat(Time.codec.encode(value.createTime))
         .concat(ProjectId.codec.encode(value.projectId))
         .concat(List.codec(Comment.codec).encode(value.commentList))
-        .concat(List.codec(IdeaId.codec).encode(value.childIdeaList))
-        .concat(List.codec(CommitId.codec).encode(value.commitIdList))
+        .concat(Maybe.codec(IdeaId.codec).encode(value.parentIdeaId))
         .concat(Time.codec.encode(value.updateTime))
         .concat(IdeaState.codec.encode(value.state)),
     decode: (
@@ -2171,24 +2153,17 @@ export const Idea: { readonly codec: Codec<Idea> } = {
         projectIdAndNextIndex.nextIndex,
         binary
       );
-      const childIdeaListAndNextIndex: {
-        readonly result: List<IdeaId>;
+      const parentIdeaIdAndNextIndex: {
+        readonly result: Maybe<IdeaId>;
         readonly nextIndex: number;
-      } = List.codec(IdeaId.codec).decode(
+      } = Maybe.codec(IdeaId.codec).decode(
         commentListAndNextIndex.nextIndex,
-        binary
-      );
-      const commitIdListAndNextIndex: {
-        readonly result: List<CommitId>;
-        readonly nextIndex: number;
-      } = List.codec(CommitId.codec).decode(
-        childIdeaListAndNextIndex.nextIndex,
         binary
       );
       const updateTimeAndNextIndex: {
         readonly result: Time;
         readonly nextIndex: number;
-      } = Time.codec.decode(commitIdListAndNextIndex.nextIndex, binary);
+      } = Time.codec.decode(parentIdeaIdAndNextIndex.nextIndex, binary);
       const stateAndNextIndex: {
         readonly result: IdeaState;
         readonly nextIndex: number;
@@ -2200,8 +2175,7 @@ export const Idea: { readonly codec: Codec<Idea> } = {
           createTime: createTimeAndNextIndex.result,
           projectId: projectIdAndNextIndex.result,
           commentList: commentListAndNextIndex.result,
-          childIdeaList: childIdeaListAndNextIndex.result,
-          commitIdList: commitIdListAndNextIndex.result,
+          parentIdeaId: parentIdeaIdAndNextIndex.result,
           updateTime: updateTimeAndNextIndex.result,
           state: stateAndNextIndex.result,
         },

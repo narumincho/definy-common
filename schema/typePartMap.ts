@@ -663,7 +663,7 @@ export const typePartMap: ReadonlyMap<TypePartId, TypePart> = new Map<
         },
         {
           name: "createUserId",
-          description: "作成アカウント",
+          description: "プロジェクトを作成したユーザー",
           type: type.UserId,
         },
         {
@@ -672,14 +672,9 @@ export const typePartMap: ReadonlyMap<TypePartId, TypePart> = new Map<
           type: type.Time,
         },
         {
-          name: "partIdList",
-          description: "所属しているのパーツのIDのリスト",
-          type: type.List(type.PartId),
-        },
-        {
-          name: "typePartIdList",
-          description: "所属している型パーツのIDのリスト",
-          type: type.List(type.TypePartId),
+          name: "commitId",
+          description: "リリースされたコミット",
+          type: type.List(type.CommitId),
         },
       ]),
     },
@@ -697,7 +692,7 @@ export const typePartMap: ReadonlyMap<TypePartId, TypePart> = new Map<
       body: TypePartBody.Product([
         {
           name: "name",
-          description: "アイデア名",
+          description: "アイデア名 最大240文字まで",
           type: type.String,
         },
         {
@@ -707,7 +702,7 @@ export const typePartMap: ReadonlyMap<TypePartId, TypePart> = new Map<
         },
         {
           name: "createTime",
-          description: "作成日時",
+          description: "作成日時 ",
           type: type.Time,
         },
         {
@@ -721,14 +716,9 @@ export const typePartMap: ReadonlyMap<TypePartId, TypePart> = new Map<
           type: type.List(type.Comment),
         },
         {
-          name: "childIdeaList",
-          description: "子のアイデア",
-          type: type.List(type.IdeaId),
-        },
-        {
-          name: "commitIdList",
-          description: "アイデアを実現することができるかもしれないコミット",
-          type: type.List(type.CommitId),
+          name: "parentIdeaId",
+          description: "親のアイデア",
+          type: type.Maybe(type.IdeaId),
         },
         {
           name: "updateTime",
@@ -766,7 +756,7 @@ export const typePartMap: ReadonlyMap<TypePartId, TypePart> = new Map<
         },
         {
           name: "body",
-          description: "本文",
+          description: "本文 1～10000文字",
           type: type.String,
         },
       ]),
