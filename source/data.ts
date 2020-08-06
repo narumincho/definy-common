@@ -342,7 +342,7 @@ export type Project = {
   /**
    * リリースされたコミット
    */
-  readonly commitId: List<CommitId>;
+  readonly commitId: CommitId;
 };
 
 /**
@@ -448,6 +448,10 @@ export type Commit = {
    * 投稿したアイデアID
    */
   readonly ideaId: IdeaId;
+  /**
+   * 作成日時
+   */
+  readonly createTime: Time;
   /**
    * 更新日時
    */
@@ -2058,7 +2062,7 @@ export const Project: { readonly codec: Codec<Project> } = {
         .concat(Time.codec.encode(value.createTime))
         .concat(UserId.codec.encode(value.createUserId))
         .concat(Time.codec.encode(value.updateTime))
-        .concat(List.codec(CommitId.codec).encode(value.commitId)),
+        .concat(CommitId.codec.encode(value.commitId)),
     decode: (
       index: number,
       binary: Uint8Array
@@ -2088,12 +2092,9 @@ export const Project: { readonly codec: Codec<Project> } = {
         readonly nextIndex: number;
       } = Time.codec.decode(createUserIdAndNextIndex.nextIndex, binary);
       const commitIdAndNextIndex: {
-        readonly result: List<CommitId>;
+        readonly result: CommitId;
         readonly nextIndex: number;
-      } = List.codec(CommitId.codec).decode(
-        updateTimeAndNextIndex.nextIndex,
-        binary
-      );
+      } = CommitId.codec.decode(updateTimeAndNextIndex.nextIndex, binary);
       return {
         result: {
           name: nameAndNextIndex.result,
@@ -2242,6 +2243,7 @@ export const Commit: { readonly codec: Codec<Commit> } = {
         .concat(List.codec(TypePartHash.codec).encode(value.typePartHashList))
         .concat(ProjectId.codec.encode(value.projectId))
         .concat(IdeaId.codec.encode(value.ideaId))
+        .concat(Time.codec.encode(value.createTime))
         .concat(Time.codec.encode(value.updateTime)),
     decode: (
       index: number,
@@ -2296,10 +2298,14 @@ export const Commit: { readonly codec: Codec<Commit> } = {
         readonly result: IdeaId;
         readonly nextIndex: number;
       } = IdeaId.codec.decode(projectIdAndNextIndex.nextIndex, binary);
-      const updateTimeAndNextIndex: {
+      const createTimeAndNextIndex: {
         readonly result: Time;
         readonly nextIndex: number;
       } = Time.codec.decode(ideaIdAndNextIndex.nextIndex, binary);
+      const updateTimeAndNextIndex: {
+        readonly result: Time;
+        readonly nextIndex: number;
+      } = Time.codec.decode(createTimeAndNextIndex.nextIndex, binary);
       return {
         result: {
           createUserId: createUserIdAndNextIndex.result,
@@ -2312,6 +2318,7 @@ export const Commit: { readonly codec: Codec<Commit> } = {
           typePartHashList: typePartHashListAndNextIndex.result,
           projectId: projectIdAndNextIndex.result,
           ideaId: ideaIdAndNextIndex.result,
+          createTime: createTimeAndNextIndex.result,
           updateTime: updateTimeAndNextIndex.result,
         },
         nextIndex: updateTimeAndNextIndex.nextIndex,

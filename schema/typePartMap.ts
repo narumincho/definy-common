@@ -674,7 +674,7 @@ export const typePartMap: ReadonlyMap<TypePartId, TypePart> = new Map<
         {
           name: "commitId",
           description: "リリースされたコミット",
-          type: type.List(type.CommitId),
+          type: type.CommitId,
         },
       ]),
     },
@@ -822,6 +822,11 @@ export const typePartMap: ReadonlyMap<TypePartId, TypePart> = new Map<
           name: "ideaId",
           description: "投稿したアイデアID",
           type: type.IdeaId,
+        },
+        {
+          name: "createTime",
+          description: "作成日時",
+          type: type.Time,
         },
         {
           name: "updateTime",
