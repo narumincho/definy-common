@@ -19,6 +19,8 @@ export const TagId = "3133b45b0078dd3b79b067c3ce0c4a67" as T;
 export const AccessToken = "be993929300452364c8bb658609f682d" as T;
 export const PartHash = "f0f801e3ab1f50d01e2521b63630d6c4" as T;
 export const TypePartHash = "9db6ff8756ff0a14768f55f9524f8fd8" as T;
+export const ReleasePartId = "f2f240718b8ac94d550c2dd3d96a322b" as T;
+export const ReleaseTypePartId = "11c5e4b4b797b001ce22b508a68f6c9e" as T;
 
 export const Time = "fa64c1721a3285f112a4118b66b43712" as T;
 export const RequestLogInUrlRequestData = "db245392b9296a48a195e4bd8824dd2b" as T;

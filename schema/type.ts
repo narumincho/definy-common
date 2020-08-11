@@ -45,6 +45,10 @@ export const PartHash = noParameterType(id.PartHash);
 
 export const TypePartHash = noParameterType(id.TypePartHash);
 
+export const ReleasePartId = noParameterType(id.ReleasePartId);
+
+export const ReleaseTypePartId = noParameterType(id.ReleaseTypePartId);
+
 export const Time = noParameterType(id.Time);
 
 export const RequestLogInUrlRequestData = noParameterType(

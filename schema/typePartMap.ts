@@ -316,6 +316,32 @@ export const typePartMap: ReadonlyMap<TypePartId, TypePart> = new Map<
     },
   ],
   [
+    id.ReleasePartId,
+    {
+      name: "ReleasePartId",
+      description:
+        "他のプロジェクトのパーツを使うときに使う. 互換性が維持される限り,IDが同じになる",
+      projectId: util.definyCodeProjectId,
+      createCommitId: util.codeCommitId,
+      attribute: Maybe.Nothing(),
+      typeParameterList: [],
+      body: TypePartBody.Kernel(TypePartBodyKernel.Id),
+    },
+  ],
+  [
+    id.ReleaseTypePartId,
+    {
+      name: "ReleaseTypePartId",
+      description:
+        "他のプロジェクトの型パーツを使うときに使う. 互換性が維持される限り,IDが同じになる",
+      projectId: util.definyCodeProjectId,
+      createCommitId: util.codeCommitId,
+      attribute: Maybe.Nothing(),
+      typeParameterList: [],
+      body: TypePartBody.Kernel(TypePartBodyKernel.Id),
+    },
+  ],
+  [
     id.Time,
     {
       name: "Time",

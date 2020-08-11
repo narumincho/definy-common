@@ -179,6 +179,18 @@ export type PartHash = string & { readonly _partHash: never };
 export type TypePartHash = string & { readonly _typePartHash: never };
 
 /**
+ * 他のプロジェクトのパーツを使うときに使う. 互換性が維持される限り,IDが同じになる
+ * @typePartId f2f240718b8ac94d550c2dd3d96a322b
+ */
+export type ReleasePartId = string & { readonly _releasePartId: never };
+
+/**
+ * 他のプロジェクトの型パーツを使うときに使う. 互換性が維持される限り,IDが同じになる
+ * @typePartId 11c5e4b4b797b001ce22b508a68f6c9e
+ */
+export type ReleaseTypePartId = string & { readonly _releaseTypePartId: never };
+
+/**
  * 日時. 0001-01-01T00:00:00.000Z to 9999-12-31T23:59:59.999Z 最小単位はミリ秒. ミリ秒の求め方は day*1000*60*60*24 + millisecond
  * @typePartId fa64c1721a3285f112a4118b66b43712
  */
@@ -1489,6 +1501,43 @@ export const TypePartHash: { readonly codec: Codec<TypePartHash> } = {
     ): { readonly result: TypePartHash; readonly nextIndex: number } =>
       decodeToken(index, binary) as {
         readonly result: TypePartHash;
+        readonly nextIndex: number;
+      },
+  },
+};
+
+/**
+ * 他のプロジェクトのパーツを使うときに使う. 互換性が維持される限り,IDが同じになる
+ * @typePartId f2f240718b8ac94d550c2dd3d96a322b
+ */
+export const ReleasePartId: { readonly codec: Codec<ReleasePartId> } = {
+  codec: {
+    encode: (value: ReleasePartId): ReadonlyArray<number> => encodeId(value),
+    decode: (
+      index: number,
+      binary: Uint8Array
+    ): { readonly result: ReleasePartId; readonly nextIndex: number } =>
+      decodeId(index, binary) as {
+        readonly result: ReleasePartId;
+        readonly nextIndex: number;
+      },
+  },
+};
+
+/**
+ * 他のプロジェクトの型パーツを使うときに使う. 互換性が維持される限り,IDが同じになる
+ * @typePartId 11c5e4b4b797b001ce22b508a68f6c9e
+ */
+export const ReleaseTypePartId: { readonly codec: Codec<ReleaseTypePartId> } = {
+  codec: {
+    encode: (value: ReleaseTypePartId): ReadonlyArray<number> =>
+      encodeId(value),
+    decode: (
+      index: number,
+      binary: Uint8Array
+    ): { readonly result: ReleaseTypePartId; readonly nextIndex: number } =>
+      decodeId(index, binary) as {
+        readonly result: ReleaseTypePartId;
         readonly nextIndex: number;
       },
   },
