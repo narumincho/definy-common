@@ -340,6 +340,10 @@ export type Project = {
    */
   readonly updateTime: Time;
   /**
+   * ルートのアイデア
+   */
+  readonly rootIdeaId: IdeaId;
+  /**
    * リリースされたコミット
    */
   readonly commitId: CommitId;
@@ -2064,6 +2068,7 @@ export const Project: { readonly codec: Codec<Project> } = {
         .concat(Time.codec.encode(value.createTime))
         .concat(UserId.codec.encode(value.createUserId))
         .concat(Time.codec.encode(value.updateTime))
+        .concat(IdeaId.codec.encode(value.rootIdeaId))
         .concat(CommitId.codec.encode(value.commitId)),
     decode: (
       index: number,
@@ -2093,10 +2098,14 @@ export const Project: { readonly codec: Codec<Project> } = {
         readonly result: Time;
         readonly nextIndex: number;
       } = Time.codec.decode(createUserIdAndNextIndex.nextIndex, binary);
+      const rootIdeaIdAndNextIndex: {
+        readonly result: IdeaId;
+        readonly nextIndex: number;
+      } = IdeaId.codec.decode(updateTimeAndNextIndex.nextIndex, binary);
       const commitIdAndNextIndex: {
         readonly result: CommitId;
         readonly nextIndex: number;
-      } = CommitId.codec.decode(updateTimeAndNextIndex.nextIndex, binary);
+      } = CommitId.codec.decode(rootIdeaIdAndNextIndex.nextIndex, binary);
       return {
         result: {
           name: nameAndNextIndex.result,
@@ -2105,6 +2114,7 @@ export const Project: { readonly codec: Codec<Project> } = {
           createTime: createTimeAndNextIndex.result,
           createUserId: createUserIdAndNextIndex.result,
           updateTime: updateTimeAndNextIndex.result,
+          rootIdeaId: rootIdeaIdAndNextIndex.result,
           commitId: commitIdAndNextIndex.result,
         },
         nextIndex: commitIdAndNextIndex.nextIndex,
@@ -2335,11 +2345,11 @@ export const Commit: { readonly codec: Codec<Commit> } = {
  */
 export const IdeaState: {
   /**
-   * コミットとコメントを受付中
+   * コミットと子アイデアとコメントを受付中
    */
   readonly Creating: IdeaState;
   /**
-   * 実現するコミットを作くられ, 承認された
+   * 実現するコミットが作られ, 承認された
    */
   readonly Approved: (a: CommitId) => IdeaState;
   readonly codec: Codec<IdeaState>;

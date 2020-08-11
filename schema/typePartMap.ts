@@ -655,6 +655,11 @@ export const typePartMap: ReadonlyMap<TypePartId, TypePart> = new Map<
           type: type.Time,
         },
         {
+          name: "rootIdeaId",
+          description: "ルートのアイデア",
+          type: type.IdeaId,
+        },
+        {
           name: "commitId",
           description: "リリースされたコミット",
           type: type.CommitId,
@@ -828,12 +833,12 @@ export const typePartMap: ReadonlyMap<TypePartId, TypePart> = new Map<
       body: TypePartBody.Sum([
         {
           name: "Creating",
-          description: "コミットとコメントを受付中",
+          description: "コミットと子アイデアとコメントを受付中",
           parameter: Maybe.Nothing(),
         },
         {
           name: "Approved",
-          description: "実現するコミットを作くられ, 承認された",
+          description: "実現するコミットが作られ, 承認された",
           parameter: Maybe.Just(type.CommitId),
         },
       ]),
