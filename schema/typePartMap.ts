@@ -1559,9 +1559,9 @@ export const typePartMap: ReadonlyMap<TypePartId, TypePart> = new Map<
           type: type.String,
         },
         {
-          name: "projectId",
-          description: "対象のプロジェクトID",
-          type: type.ProjectId,
+          name: "parentId",
+          description: "親アイデアID",
+          type: type.IdeaId,
         },
       ]),
     },

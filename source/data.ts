@@ -843,9 +843,9 @@ export type CreateIdeaParameter = {
    */
   readonly ideaName: String;
   /**
-   * 対象のプロジェクトID
+   * 親アイデアID
    */
-  readonly projectId: ProjectId;
+  readonly parentId: IdeaId;
 };
 
 /**
@@ -3814,7 +3814,7 @@ export const CreateIdeaParameter: {
       AccessToken.codec
         .encode(value.accessToken)
         .concat(String.codec.encode(value.ideaName))
-        .concat(ProjectId.codec.encode(value.projectId)),
+        .concat(IdeaId.codec.encode(value.parentId)),
     decode: (
       index: number,
       binary: Uint8Array
@@ -3827,17 +3827,17 @@ export const CreateIdeaParameter: {
         readonly result: String;
         readonly nextIndex: number;
       } = String.codec.decode(accessTokenAndNextIndex.nextIndex, binary);
-      const projectIdAndNextIndex: {
-        readonly result: ProjectId;
+      const parentIdAndNextIndex: {
+        readonly result: IdeaId;
         readonly nextIndex: number;
-      } = ProjectId.codec.decode(ideaNameAndNextIndex.nextIndex, binary);
+      } = IdeaId.codec.decode(ideaNameAndNextIndex.nextIndex, binary);
       return {
         result: {
           accessToken: accessTokenAndNextIndex.result,
           ideaName: ideaNameAndNextIndex.result,
-          projectId: projectIdAndNextIndex.result,
+          parentId: parentIdAndNextIndex.result,
         },
-        nextIndex: projectIdAndNextIndex.nextIndex,
+        nextIndex: parentIdAndNextIndex.nextIndex,
       };
     },
   },
