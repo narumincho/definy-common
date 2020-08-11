@@ -145,7 +145,6 @@ describe("test", () => {
             {
               name: "one",
               description: "1を表す",
-              migrationPartId: data.Maybe.Nothing(),
               type: intType,
               expr: data.Expr.Int32Literal(1),
               createCommitId: "oneCreateCommitId" as data.CommitId,
@@ -157,7 +156,6 @@ describe("test", () => {
             {
               name: "addOneHundred",
               description: "100を足す関数",
-              migrationPartId: data.Maybe.Nothing(),
               type: intType,
               expr: data.Expr.FunctionCall({
                 function: data.Expr.Kernel("Int32Add"),

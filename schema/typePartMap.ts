@@ -32,7 +32,6 @@ export const typePartMap: ReadonlyMap<TypePartId, TypePart> = new Map<
     id.Int32,
     {
       name: "Int32",
-      migrationPartId: Maybe.Nothing(),
       description:
         "-2 147 483 648 ～ 2 147 483 647. 32bit 符号付き整数. JavaScriptのnumberとして扱える. numberの32bit符号あり整数をSigned Leb128のバイナリに変換する",
       projectId: util.definyCodeProjectId,
@@ -46,7 +45,6 @@ export const typePartMap: ReadonlyMap<TypePartId, TypePart> = new Map<
     id.Binary,
     {
       name: "Binary",
-      migrationPartId: Maybe.Nothing(),
       description:
         "バイナリ. JavaScriptのUint8Arrayで扱える. 最初にLED128でバイト数, その次にバイナリそのまま",
       projectId: util.definyCodeProjectId,
@@ -60,7 +58,6 @@ export const typePartMap: ReadonlyMap<TypePartId, TypePart> = new Map<
     id.Bool,
     {
       name: "Bool",
-      migrationPartId: Maybe.Nothing(),
       description:
         "Bool. 真か偽. JavaScriptのbooleanで扱える. true: 1, false: 0. (1byte)としてバイナリに変換する",
       projectId: util.definyCodeProjectId,
@@ -85,7 +82,6 @@ export const typePartMap: ReadonlyMap<TypePartId, TypePart> = new Map<
     id.List,
     {
       name: "List",
-      migrationPartId: Maybe.Nothing(),
       description: "リスト. JavaScriptのArrayで扱う",
       projectId: util.definyCodeProjectId,
       createCommitId: util.codeCommitId,
@@ -103,7 +99,6 @@ export const typePartMap: ReadonlyMap<TypePartId, TypePart> = new Map<
     id.Maybe,
     {
       name: "Maybe",
-      migrationPartId: Maybe.Nothing(),
       description:
         "Maybe. nullableのようなもの. 今後はRustのstd::Optionに出力するために属性をつける?",
       projectId: util.definyCodeProjectId,
@@ -136,7 +131,6 @@ export const typePartMap: ReadonlyMap<TypePartId, TypePart> = new Map<
     id.Result,
     {
       name: "Result",
-      migrationPartId: Maybe.Nothing(),
       description:
         "成功と失敗を表す型. 今後はRustのstd::Resultに出力するために属性をつける?",
       projectId: util.definyCodeProjectId,
@@ -176,7 +170,6 @@ export const typePartMap: ReadonlyMap<TypePartId, TypePart> = new Map<
     id.String,
     {
       name: "String",
-      migrationPartId: Maybe.Nothing(),
       description:
         "文字列. JavaScriptのstringで扱う. バイナリ形式はUTF-8. 不正な文字が入っている可能性がある",
       projectId: util.definyCodeProjectId,
@@ -190,7 +183,6 @@ export const typePartMap: ReadonlyMap<TypePartId, TypePart> = new Map<
     id.ProjectId,
     {
       name: "ProjectId",
-      migrationPartId: Maybe.Nothing(),
       description: "プロジェクトの識別子",
       projectId: util.definyCodeProjectId,
       createCommitId: util.codeCommitId,
@@ -203,7 +195,6 @@ export const typePartMap: ReadonlyMap<TypePartId, TypePart> = new Map<
     id.UserId,
     {
       name: "UserId",
-      migrationPartId: Maybe.Nothing(),
       description: "ユーザーの識別子",
       projectId: util.definyCodeProjectId,
       createCommitId: util.codeCommitId,
@@ -216,7 +207,6 @@ export const typePartMap: ReadonlyMap<TypePartId, TypePart> = new Map<
     id.IdeaId,
     {
       name: "IdeaId",
-      migrationPartId: Maybe.Nothing(),
       description: "アイデアの識別子",
       projectId: util.definyCodeProjectId,
       createCommitId: util.codeCommitId,
@@ -229,7 +219,6 @@ export const typePartMap: ReadonlyMap<TypePartId, TypePart> = new Map<
     id.CommitId,
     {
       name: "CommitId",
-      migrationPartId: Maybe.Nothing(),
       description: "提案の識別子",
       projectId: util.definyCodeProjectId,
       createCommitId: util.codeCommitId,
@@ -242,7 +231,6 @@ export const typePartMap: ReadonlyMap<TypePartId, TypePart> = new Map<
     id.ImageToken,
     {
       name: "ImageToken",
-      migrationPartId: Maybe.Nothing(),
       description:
         "画像から求められるトークン.キャッシュのキーとして使われる.1つのトークンに対して永久に1つの画像データしか表さない. キャッシュを更新する必要はない",
       projectId: util.definyCodeProjectId,
@@ -256,7 +244,6 @@ export const typePartMap: ReadonlyMap<TypePartId, TypePart> = new Map<
     id.PartId,
     {
       name: "PartId",
-      migrationPartId: Maybe.Nothing(),
       description: "パーツの識別子",
       projectId: util.definyCodeProjectId,
       createCommitId: util.codeCommitId,
@@ -269,7 +256,6 @@ export const typePartMap: ReadonlyMap<TypePartId, TypePart> = new Map<
     id.TypePartId,
     {
       name: "TypePartId",
-      migrationPartId: Maybe.Nothing(),
       description: "型パーツの識別子",
       projectId: util.definyCodeProjectId,
       createCommitId: util.codeCommitId,
@@ -282,7 +268,6 @@ export const typePartMap: ReadonlyMap<TypePartId, TypePart> = new Map<
     id.TagId,
     {
       name: "TagId",
-      migrationPartId: Maybe.Nothing(),
       description: "タグの識別子",
       projectId: util.definyCodeProjectId,
       createCommitId: util.codeCommitId,
@@ -295,7 +280,6 @@ export const typePartMap: ReadonlyMap<TypePartId, TypePart> = new Map<
     id.AccessToken,
     {
       name: "AccessToken",
-      migrationPartId: Maybe.Nothing(),
       description:
         "アクセストークン. アクセストークンを持っていれば特定のユーザーであるが証明される. これが盗まれた場合,不正に得た相手はそのユーザーになりすますことができる",
       projectId: util.definyCodeProjectId,
@@ -309,7 +293,6 @@ export const typePartMap: ReadonlyMap<TypePartId, TypePart> = new Map<
     id.PartHash,
     {
       name: "PartHash",
-      migrationPartId: Maybe.Nothing(),
       description:
         "コミット内に入る. パーツのハッシュ化したもの. ハッシュ化にはパーツ名やドキュメントも含める",
       projectId: util.definyCodeProjectId,
@@ -323,7 +306,6 @@ export const typePartMap: ReadonlyMap<TypePartId, TypePart> = new Map<
     id.TypePartHash,
     {
       name: "TypePartHash",
-      migrationPartId: Maybe.Nothing(),
       description:
         "コミット内に入る. 型パーツのハッシュ化したもの. ハッシュ化には型パーツ名やドキュメントも含める",
       projectId: util.definyCodeProjectId,
@@ -337,7 +319,6 @@ export const typePartMap: ReadonlyMap<TypePartId, TypePart> = new Map<
     id.Time,
     {
       name: "Time",
-      migrationPartId: Maybe.Nothing(),
       description:
         "日時. 0001-01-01T00:00:00.000Z to 9999-12-31T23:59:59.999Z 最小単位はミリ秒. ミリ秒の求め方は day*1000*60*60*24 + millisecond",
       projectId: util.definyCodeProjectId,
@@ -362,7 +343,6 @@ export const typePartMap: ReadonlyMap<TypePartId, TypePart> = new Map<
     id.RequestLogInUrlRequestData,
     {
       name: "RequestLogInUrlRequestData",
-      migrationPartId: Maybe.Nothing(),
       description: "ログインのURLを発行するために必要なデータ",
       projectId: util.definyCodeProjectId,
       createCommitId: util.codeCommitId,
@@ -386,7 +366,6 @@ export const typePartMap: ReadonlyMap<TypePartId, TypePart> = new Map<
     id.OpenIdConnectProvider,
     {
       name: "OpenIdConnectProvider",
-      migrationPartId: Maybe.Nothing(),
       description:
         "ソーシャルログインを提供するプロバイダー (例: Google, GitHub)",
       projectId: util.definyCodeProjectId,
@@ -413,7 +392,6 @@ export const typePartMap: ReadonlyMap<TypePartId, TypePart> = new Map<
     id.UrlData,
     {
       name: "UrlData",
-      migrationPartId: Maybe.Nothing(),
       description:
         "デバッグモードかどうか,言語とページの場所. URLとして表現されるデータ. Googleなどの検索エンジンの都合( https://support.google.com/webmasters/answer/182192?hl=ja )で,URLにページの言語を入れて,言語ごとに別のURLである必要がある. デバッグ時のホスト名は http://localhost になる",
       projectId: util.definyCodeProjectId,
@@ -443,7 +421,6 @@ export const typePartMap: ReadonlyMap<TypePartId, TypePart> = new Map<
     id.ClientMode,
     {
       name: "ClientMode",
-      migrationPartId: Maybe.Nothing(),
       description: "デバッグモードか, リリースモード",
       projectId: util.definyCodeProjectId,
       createCommitId: util.codeCommitId,
@@ -467,7 +444,6 @@ export const typePartMap: ReadonlyMap<TypePartId, TypePart> = new Map<
     id.Location,
     {
       name: "Location",
-      migrationPartId: Maybe.Nothing(),
       description:
         "DefinyWebアプリ内での場所を示すもの. URLから求められる. URLに変換できる",
       projectId: util.definyCodeProjectId,
@@ -527,7 +503,6 @@ export const typePartMap: ReadonlyMap<TypePartId, TypePart> = new Map<
     id.Language,
     {
       name: "Language",
-      migrationPartId: Maybe.Nothing(),
       description: "英語,日本語,エスペラント語などの言語",
       projectId: util.definyCodeProjectId,
       createCommitId: util.codeCommitId,
@@ -556,7 +531,6 @@ export const typePartMap: ReadonlyMap<TypePartId, TypePart> = new Map<
     id.User,
     {
       name: "User",
-      migrationPartId: Maybe.Nothing(),
       description: "ユーザーのデータのスナップショット",
       projectId: util.definyCodeProjectId,
       createCommitId: util.codeCommitId,
@@ -607,7 +581,6 @@ export const typePartMap: ReadonlyMap<TypePartId, TypePart> = new Map<
     id.IdAndData,
     {
       name: "IdAndData",
-      migrationPartId: Maybe.Nothing(),
       description: "データを識別するIdとデータ",
       projectId: util.definyCodeProjectId,
       createCommitId: util.codeCommitId,
@@ -635,7 +608,6 @@ export const typePartMap: ReadonlyMap<TypePartId, TypePart> = new Map<
     {
       name: "Project",
       description: "プロジェクト",
-      migrationPartId: Maybe.Nothing(),
       projectId: util.definyCodeProjectId,
       createCommitId: util.codeCommitId,
       attribute: Maybe.Nothing(),
@@ -684,7 +656,6 @@ export const typePartMap: ReadonlyMap<TypePartId, TypePart> = new Map<
     {
       name: "Idea",
       description: "アイデア",
-      migrationPartId: Maybe.Nothing(),
       projectId: util.definyCodeProjectId,
       createCommitId: util.codeCommitId,
       attribute: Maybe.Nothing(),
@@ -738,7 +709,6 @@ export const typePartMap: ReadonlyMap<TypePartId, TypePart> = new Map<
     {
       name: "Comment",
       description: "アイデアのコメント",
-      migrationPartId: Maybe.Nothing(),
       projectId: util.definyCodeProjectId,
       createCommitId: util.codeCommitId,
       attribute: Maybe.Nothing(),
@@ -767,7 +737,6 @@ export const typePartMap: ReadonlyMap<TypePartId, TypePart> = new Map<
     {
       name: "Commit",
       description: "コミット. コードのスナップショット",
-      migrationPartId: Maybe.Nothing(),
       projectId: util.definyCodeProjectId,
       createCommitId: util.codeCommitId,
       attribute: Maybe.Nothing(),
@@ -841,7 +810,6 @@ export const typePartMap: ReadonlyMap<TypePartId, TypePart> = new Map<
     {
       name: "IdeaState",
       description: "アイデアの状況",
-      migrationPartId: Maybe.Nothing(),
       projectId: util.definyCodeProjectId,
       createCommitId: util.codeCommitId,
       attribute: Maybe.Nothing(),
@@ -865,7 +833,6 @@ export const typePartMap: ReadonlyMap<TypePartId, TypePart> = new Map<
     {
       name: "Part",
       description: "パーツの定義",
-      migrationPartId: Maybe.Nothing(),
       projectId: util.definyCodeProjectId,
       createCommitId: util.codeCommitId,
       attribute: Maybe.Nothing(),
@@ -875,12 +842,6 @@ export const typePartMap: ReadonlyMap<TypePartId, TypePart> = new Map<
           name: "name",
           description: "パーツの名前",
           type: type.String,
-        },
-        {
-          name: "migrationPartId",
-          description:
-            "Justのときはパーツは非推奨になっていて移行プログラムのパーツIDが含まれる",
-          type: type.Maybe(type.PartId),
         },
         {
           name: "description",
@@ -915,7 +876,6 @@ export const typePartMap: ReadonlyMap<TypePartId, TypePart> = new Map<
     {
       name: "TypePart",
       description: "型パーツ",
-      migrationPartId: Maybe.Nothing(),
       projectId: util.definyCodeProjectId,
       createCommitId: util.codeCommitId,
       attribute: Maybe.Nothing(),
@@ -925,12 +885,6 @@ export const typePartMap: ReadonlyMap<TypePartId, TypePart> = new Map<
           name: "name",
           description: "型パーツの名前",
           type: type.String,
-        },
-        {
-          name: "migrationPartId",
-          description:
-            "Justのときは型パーツは非推奨になっていて移行プログラムのパーツIDが含まれる",
-          type: type.Maybe(type.PartId),
         },
         {
           name: "description",
@@ -971,7 +925,6 @@ export const typePartMap: ReadonlyMap<TypePartId, TypePart> = new Map<
     {
       name: "TypeAttribute",
       description: "コンパイラに向けた, 型のデータ形式をどうするかの情報",
-      migrationPartId: Maybe.Nothing(),
       projectId: util.definyCodeProjectId,
       createCommitId: util.codeCommitId,
       attribute: Maybe.Nothing(),
@@ -991,7 +944,6 @@ export const typePartMap: ReadonlyMap<TypePartId, TypePart> = new Map<
     {
       name: "TypeParameter",
       description: "型パラメーター",
-      migrationPartId: Maybe.Nothing(),
       projectId: util.definyCodeProjectId,
       createCommitId: util.codeCommitId,
       attribute: Maybe.Nothing(),
@@ -1015,7 +967,6 @@ export const typePartMap: ReadonlyMap<TypePartId, TypePart> = new Map<
     {
       name: "TypePartBody",
       description: "型の定義本体",
-      migrationPartId: Maybe.Nothing(),
       projectId: util.definyCodeProjectId,
       createCommitId: util.codeCommitId,
       attribute: Maybe.Nothing(),
@@ -1044,7 +995,6 @@ export const typePartMap: ReadonlyMap<TypePartId, TypePart> = new Map<
     {
       name: "Member",
       description: "直積型のメンバー",
-      migrationPartId: Maybe.Nothing(),
       projectId: util.definyCodeProjectId,
       createCommitId: util.codeCommitId,
       attribute: Maybe.Nothing(),
@@ -1073,7 +1023,6 @@ export const typePartMap: ReadonlyMap<TypePartId, TypePart> = new Map<
     {
       name: "Pattern",
       description: "直積型のパターン",
-      migrationPartId: Maybe.Nothing(),
       projectId: util.definyCodeProjectId,
       createCommitId: util.codeCommitId,
       attribute: Maybe.Nothing(),
@@ -1102,7 +1051,6 @@ export const typePartMap: ReadonlyMap<TypePartId, TypePart> = new Map<
     {
       name: "TypePartBodyKernel",
       description: "Definyだけでは表現できないデータ型",
-      migrationPartId: Maybe.Nothing(),
       projectId: util.definyCodeProjectId,
       createCommitId: util.codeCommitId,
       attribute: Maybe.Nothing(),
@@ -1154,7 +1102,6 @@ export const typePartMap: ReadonlyMap<TypePartId, TypePart> = new Map<
     {
       name: "Type",
       description: "型",
-      migrationPartId: Maybe.Nothing(),
       projectId: util.definyCodeProjectId,
       createCommitId: util.codeCommitId,
       attribute: Maybe.Nothing(),
@@ -1178,7 +1125,6 @@ export const typePartMap: ReadonlyMap<TypePartId, TypePart> = new Map<
     {
       name: "Expr",
       description: "式",
-      migrationPartId: Maybe.Nothing(),
       projectId: util.definyCodeProjectId,
       createCommitId: util.codeCommitId,
       attribute: Maybe.Nothing(),
@@ -1222,7 +1168,6 @@ export const typePartMap: ReadonlyMap<TypePartId, TypePart> = new Map<
     {
       name: "KernelExpr",
       description: "Definyだけでは表現できない式",
-      migrationPartId: Maybe.Nothing(),
       projectId: util.definyCodeProjectId,
       createCommitId: util.codeCommitId,
       attribute: Maybe.Nothing(),
@@ -1251,7 +1196,6 @@ export const typePartMap: ReadonlyMap<TypePartId, TypePart> = new Map<
     {
       name: "TagReference",
       description: "タグの参照を表す",
-      migrationPartId: Maybe.Nothing(),
       projectId: util.definyCodeProjectId,
       createCommitId: util.codeCommitId,
       attribute: Maybe.Nothing(),
@@ -1275,7 +1219,6 @@ export const typePartMap: ReadonlyMap<TypePartId, TypePart> = new Map<
     {
       name: "FunctionCall",
       description: "関数呼び出し",
-      migrationPartId: Maybe.Nothing(),
       projectId: util.definyCodeProjectId,
       createCommitId: util.codeCommitId,
       attribute: Maybe.Nothing(),
@@ -1299,7 +1242,6 @@ export const typePartMap: ReadonlyMap<TypePartId, TypePart> = new Map<
     {
       name: "LambdaBranch",
       description: "ラムダのブランチ. Just x -> data x のようなところ",
-      migrationPartId: Maybe.Nothing(),
       projectId: util.definyCodeProjectId,
       createCommitId: util.codeCommitId,
       attribute: Maybe.Nothing(),
@@ -1333,7 +1275,6 @@ export const typePartMap: ReadonlyMap<TypePartId, TypePart> = new Map<
     {
       name: "Condition",
       description: "ブランチの式を使う条件",
-      migrationPartId: Maybe.Nothing(),
       projectId: util.definyCodeProjectId,
       createCommitId: util.codeCommitId,
       attribute: Maybe.Nothing(),
@@ -1367,7 +1308,6 @@ export const typePartMap: ReadonlyMap<TypePartId, TypePart> = new Map<
     {
       name: "ConditionTag",
       description: "タグによる条件",
-      migrationPartId: Maybe.Nothing(),
       projectId: util.definyCodeProjectId,
       createCommitId: util.codeCommitId,
       attribute: Maybe.Nothing(),
@@ -1391,7 +1331,6 @@ export const typePartMap: ReadonlyMap<TypePartId, TypePart> = new Map<
     {
       name: "ConditionCapture",
       description: "キャプチャパーツへのキャプチャ",
-      migrationPartId: Maybe.Nothing(),
       projectId: util.definyCodeProjectId,
       createCommitId: util.codeCommitId,
       attribute: Maybe.Nothing(),
@@ -1415,7 +1354,6 @@ export const typePartMap: ReadonlyMap<TypePartId, TypePart> = new Map<
     {
       name: "BranchPartDefinition",
       description: "ラムダのブランチで使えるパーツを定義する部分",
-      migrationPartId: Maybe.Nothing(),
       projectId: util.definyCodeProjectId,
       createCommitId: util.codeCommitId,
       attribute: Maybe.Nothing(),
@@ -1454,7 +1392,6 @@ export const typePartMap: ReadonlyMap<TypePartId, TypePart> = new Map<
     {
       name: "EvaluatedExpr",
       description: "評価しきった式",
-      migrationPartId: Maybe.Nothing(),
       projectId: util.definyCodeProjectId,
       createCommitId: util.codeCommitId,
       attribute: Maybe.Nothing(),
@@ -1493,7 +1430,6 @@ export const typePartMap: ReadonlyMap<TypePartId, TypePart> = new Map<
     {
       name: "KernelCall",
       description: "複数の引数が必要な内部関数の部分呼び出し",
-      migrationPartId: Maybe.Nothing(),
       projectId: util.definyCodeProjectId,
       createCommitId: util.codeCommitId,
       attribute: Maybe.Nothing(),
@@ -1517,7 +1453,6 @@ export const typePartMap: ReadonlyMap<TypePartId, TypePart> = new Map<
     {
       name: "EvaluateExprError",
       description: "評価したときに失敗した原因を表すもの",
-      migrationPartId: Maybe.Nothing(),
       projectId: util.definyCodeProjectId,
       createCommitId: util.codeCommitId,
       attribute: Maybe.Nothing(),
@@ -1551,7 +1486,6 @@ export const typePartMap: ReadonlyMap<TypePartId, TypePart> = new Map<
     {
       name: "TypeError",
       description: "型エラー",
-      migrationPartId: Maybe.Nothing(),
       projectId: util.definyCodeProjectId,
       createCommitId: util.codeCommitId,
       attribute: Maybe.Nothing(),
@@ -1570,7 +1504,6 @@ export const typePartMap: ReadonlyMap<TypePartId, TypePart> = new Map<
     {
       name: "CreateProjectParameter",
       description: "プロジェクト作成時に必要なパラメーター",
-      migrationPartId: Maybe.Nothing(),
       projectId: util.definyCodeProjectId,
       createCommitId: util.codeCommitId,
       attribute: Maybe.Nothing(),
@@ -1594,7 +1527,6 @@ export const typePartMap: ReadonlyMap<TypePartId, TypePart> = new Map<
     {
       name: "CreateIdeaParameter",
       description: "アイデアを作成時に必要なパラメーター",
-      migrationPartId: Maybe.Nothing(),
       projectId: util.definyCodeProjectId,
       createCommitId: util.codeCommitId,
       attribute: Maybe.Nothing(),
@@ -1623,7 +1555,6 @@ export const typePartMap: ReadonlyMap<TypePartId, TypePart> = new Map<
     {
       name: "AddCommentParameter",
       description: "アイデアにコメントを追加するときに必要なパラメーター",
-      migrationPartId: Maybe.Nothing(),
       projectId: util.definyCodeProjectId,
       createCommitId: util.codeCommitId,
       attribute: Maybe.Nothing(),
@@ -1652,7 +1583,6 @@ export const typePartMap: ReadonlyMap<TypePartId, TypePart> = new Map<
     {
       name: "AddCommitParameter",
       description: "提案を作成するときに必要なパラメーター",
-      migrationPartId: Maybe.Nothing(),
       projectId: util.definyCodeProjectId,
       createCommitId: util.codeCommitId,
       attribute: Maybe.Nothing(),
@@ -1676,7 +1606,6 @@ export const typePartMap: ReadonlyMap<TypePartId, TypePart> = new Map<
     {
       name: "AccessTokenAndCommitId",
       description: "コミットを確定状態にしたり, 承認したりするときなどに使う",
-      migrationPartId: Maybe.Nothing(),
       projectId: util.definyCodeProjectId,
       createCommitId: util.codeCommitId,
       attribute: Maybe.Nothing(),
@@ -1700,7 +1629,6 @@ export const typePartMap: ReadonlyMap<TypePartId, TypePart> = new Map<
     {
       name: "LogInState",
       description: "ログイン状態",
-      migrationPartId: Maybe.Nothing(),
       projectId: util.definyCodeProjectId,
       createCommitId: util.codeCommitId,
       attribute: Maybe.Nothing(),
@@ -1761,7 +1689,6 @@ export const typePartMap: ReadonlyMap<TypePartId, TypePart> = new Map<
     {
       name: "AccessTokenAndUserId",
       description: "AccessTokenとUserId",
-      migrationPartId: Maybe.Nothing(),
       projectId: util.definyCodeProjectId,
       createCommitId: util.codeCommitId,
       attribute: Maybe.Nothing(),
@@ -1786,7 +1713,6 @@ export const typePartMap: ReadonlyMap<TypePartId, TypePart> = new Map<
       name: "Resource",
       description:
         "取得日時とデータ本体. データ本体がない場合も含まれているのでMaybe",
-      migrationPartId: Maybe.Nothing(),
       projectId: util.definyCodeProjectId,
       createCommitId: util.codeCommitId,
       attribute: Maybe.Nothing(),
@@ -1814,7 +1740,6 @@ export const typePartMap: ReadonlyMap<TypePartId, TypePart> = new Map<
       name: "ResourceState",
       description:
         "ProjectやUserなどのリソースの状態とデータ. 読み込み中だとか",
-      migrationPartId: Maybe.Nothing(),
       projectId: util.definyCodeProjectId,
       createCommitId: util.codeCommitId,
       attribute: Maybe.Nothing(),
@@ -1896,7 +1821,6 @@ export const typePartMap: ReadonlyMap<TypePartId, TypePart> = new Map<
       name: "StaticResourceState",
       description:
         "キーであるTokenによってデータが必ず1つに決まるもの. 絶対に更新されない",
-      migrationPartId: Maybe.Nothing(),
       projectId: util.definyCodeProjectId,
       createCommitId: util.codeCommitId,
       attribute: Maybe.Nothing(),

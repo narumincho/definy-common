@@ -476,10 +476,6 @@ export type Part = {
    */
   readonly name: String;
   /**
-   * Justのときはパーツは非推奨になっていて移行プログラムのパーツIDが含まれる
-   */
-  readonly migrationPartId: Maybe<PartId>;
-  /**
    * パーツの説明
    */
   readonly description: String;
@@ -510,10 +506,6 @@ export type TypePart = {
    * 型パーツの名前
    */
   readonly name: String;
-  /**
-   * Justのときは型パーツは非推奨になっていて移行プログラムのパーツIDが含まれる
-   */
-  readonly migrationPartId: Maybe<PartId>;
   /**
    * 型パーツの説明
    */
@@ -2393,7 +2385,6 @@ export const Part: { readonly codec: Codec<Part> } = {
     encode: (value: Part): ReadonlyArray<number> =>
       String.codec
         .encode(value.name)
-        .concat(Maybe.codec(PartId.codec).encode(value.migrationPartId))
         .concat(String.codec.encode(value.description))
         .concat(Type.codec.encode(value.type))
         .concat(Expr.codec.encode(value.expr))
@@ -2407,14 +2398,10 @@ export const Part: { readonly codec: Codec<Part> } = {
         readonly result: String;
         readonly nextIndex: number;
       } = String.codec.decode(index, binary);
-      const migrationPartIdAndNextIndex: {
-        readonly result: Maybe<PartId>;
-        readonly nextIndex: number;
-      } = Maybe.codec(PartId.codec).decode(nameAndNextIndex.nextIndex, binary);
       const descriptionAndNextIndex: {
         readonly result: String;
         readonly nextIndex: number;
-      } = String.codec.decode(migrationPartIdAndNextIndex.nextIndex, binary);
+      } = String.codec.decode(nameAndNextIndex.nextIndex, binary);
       const typeAndNextIndex: {
         readonly result: Type;
         readonly nextIndex: number;
@@ -2434,7 +2421,6 @@ export const Part: { readonly codec: Codec<Part> } = {
       return {
         result: {
           name: nameAndNextIndex.result,
-          migrationPartId: migrationPartIdAndNextIndex.result,
           description: descriptionAndNextIndex.result,
           type: typeAndNextIndex.result,
           expr: exprAndNextIndex.result,
@@ -2456,7 +2442,6 @@ export const TypePart: { readonly codec: Codec<TypePart> } = {
     encode: (value: TypePart): ReadonlyArray<number> =>
       String.codec
         .encode(value.name)
-        .concat(Maybe.codec(PartId.codec).encode(value.migrationPartId))
         .concat(String.codec.encode(value.description))
         .concat(ProjectId.codec.encode(value.projectId))
         .concat(CommitId.codec.encode(value.createCommitId))
@@ -2471,14 +2456,10 @@ export const TypePart: { readonly codec: Codec<TypePart> } = {
         readonly result: String;
         readonly nextIndex: number;
       } = String.codec.decode(index, binary);
-      const migrationPartIdAndNextIndex: {
-        readonly result: Maybe<PartId>;
-        readonly nextIndex: number;
-      } = Maybe.codec(PartId.codec).decode(nameAndNextIndex.nextIndex, binary);
       const descriptionAndNextIndex: {
         readonly result: String;
         readonly nextIndex: number;
-      } = String.codec.decode(migrationPartIdAndNextIndex.nextIndex, binary);
+      } = String.codec.decode(nameAndNextIndex.nextIndex, binary);
       const projectIdAndNextIndex: {
         readonly result: ProjectId;
         readonly nextIndex: number;
@@ -2511,7 +2492,6 @@ export const TypePart: { readonly codec: Codec<TypePart> } = {
       return {
         result: {
           name: nameAndNextIndex.result,
-          migrationPartId: migrationPartIdAndNextIndex.result,
           description: descriptionAndNextIndex.result,
           projectId: projectIdAndNextIndex.result,
           createCommitId: createCommitIdAndNextIndex.result,
