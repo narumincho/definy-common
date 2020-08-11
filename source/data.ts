@@ -293,18 +293,6 @@ export type User = {
    * Definyでユーザーが作成された日時
    */
   readonly createTime: Time;
-  /**
-   * プロジェクトに対する いいね
-   */
-  readonly likeProjectIdList: List<ProjectId>;
-  /**
-   * 開発に参加した (書いたコードが使われた) プロジェクト
-   */
-  readonly developProjectIdList: List<ProjectId>;
-  /**
-   * コメントをしたアイデア
-   */
-  readonly commentIdeaIdList: List<IdeaId>;
 };
 
 /**
@@ -1992,10 +1980,7 @@ export const User: { readonly codec: Codec<User> } = {
         .encode(value.name)
         .concat(ImageToken.codec.encode(value.imageHash))
         .concat(String.codec.encode(value.introduction))
-        .concat(Time.codec.encode(value.createTime))
-        .concat(List.codec(ProjectId.codec).encode(value.likeProjectIdList))
-        .concat(List.codec(ProjectId.codec).encode(value.developProjectIdList))
-        .concat(List.codec(IdeaId.codec).encode(value.commentIdeaIdList)),
+        .concat(Time.codec.encode(value.createTime)),
     decode: (
       index: number,
       binary: Uint8Array
@@ -2016,38 +2001,14 @@ export const User: { readonly codec: Codec<User> } = {
         readonly result: Time;
         readonly nextIndex: number;
       } = Time.codec.decode(introductionAndNextIndex.nextIndex, binary);
-      const likeProjectIdListAndNextIndex: {
-        readonly result: List<ProjectId>;
-        readonly nextIndex: number;
-      } = List.codec(ProjectId.codec).decode(
-        createTimeAndNextIndex.nextIndex,
-        binary
-      );
-      const developProjectIdListAndNextIndex: {
-        readonly result: List<ProjectId>;
-        readonly nextIndex: number;
-      } = List.codec(ProjectId.codec).decode(
-        likeProjectIdListAndNextIndex.nextIndex,
-        binary
-      );
-      const commentIdeaIdListAndNextIndex: {
-        readonly result: List<IdeaId>;
-        readonly nextIndex: number;
-      } = List.codec(IdeaId.codec).decode(
-        developProjectIdListAndNextIndex.nextIndex,
-        binary
-      );
       return {
         result: {
           name: nameAndNextIndex.result,
           imageHash: imageHashAndNextIndex.result,
           introduction: introductionAndNextIndex.result,
           createTime: createTimeAndNextIndex.result,
-          likeProjectIdList: likeProjectIdListAndNextIndex.result,
-          developProjectIdList: developProjectIdListAndNextIndex.result,
-          commentIdeaIdList: commentIdeaIdListAndNextIndex.result,
         },
-        nextIndex: commentIdeaIdListAndNextIndex.nextIndex,
+        nextIndex: createTimeAndNextIndex.nextIndex,
       };
     },
   },

@@ -585,21 +585,6 @@ export const typePartMap: ReadonlyMap<TypePartId, TypePart> = new Map<
           description: "Definyでユーザーが作成された日時",
           type: type.Time,
         },
-        {
-          name: "likeProjectIdList",
-          description: "プロジェクトに対する いいね",
-          type: type.List(type.ProjectId),
-        },
-        {
-          name: "developProjectIdList",
-          description: "開発に参加した (書いたコードが使われた) プロジェクト",
-          type: type.List(type.ProjectId),
-        },
-        {
-          name: "commentIdeaIdList",
-          description: "コメントをしたアイデア",
-          type: type.List(type.IdeaId),
-        },
       ]),
     },
   ],
