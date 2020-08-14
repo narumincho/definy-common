@@ -234,15 +234,9 @@ describe("test", () => {
     codecEqual(
       {
         name: "ナルミンチョ",
-        commentIdeaIdList: [],
         createTime: { day: 18440, millisecond: 12000 },
-        developProjectIdList: [],
         imageHash: "0a8eed336ca61252c13da0ff0b82ce37e81b84622a4052ab33693c434b4f6434" as data.ImageToken,
         introduction: "ナルミンチョはDefinyを作っている人です.",
-        likeProjectIdList: [
-          "be9a40a32e2ddb7c8b09aa458fe206a1" as data.ProjectId,
-          "dc2c318f1cab573562497ea1e4b96c0e" as data.ProjectId,
-        ],
       },
       data.User.codec
     );
@@ -254,15 +248,9 @@ describe("test", () => {
         id: "933055412132d6aa46f8dde7159ecb38" as data.UserId,
         data: {
           name: "ナルミンチョ",
-          commentIdeaIdList: [],
           createTime: { day: 18440, millisecond: 12000 },
-          developProjectIdList: [],
           imageHash: "0a8eed336ca61252c13da0ff0b82ce37e81b84622a4052ab33693c434b4f6434" as data.ImageToken,
           introduction: "ナルミンチョはDefinyを作っている人です.",
-          likeProjectIdList: [
-            "be9a40a32e2ddb7c8b09aa458fe206a1" as data.ProjectId,
-            "dc2c318f1cab573562497ea1e4b96c0e" as data.ProjectId,
-          ],
         },
       }),
       data.Maybe.codec(data.IdAndData.codec(data.UserId.codec, data.User.codec))
