@@ -197,6 +197,14 @@ describe("test", () => {
     codecEqual(-(2 ** 31), data.Int32.codec);
   });
 
+  it("boolean true codec", () => {
+    codecEqual(true, data.Bool.codec);
+  });
+
+  it("boolean false codec", () => {
+    codecEqual(false, data.Bool.codec);
+  });
+
   it("string ascii codec", () => {
     codecEqual("sample text", data.String.codec);
   });

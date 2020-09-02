@@ -1058,17 +1058,17 @@ export const Binary: { readonly codec: Codec<Binary> } = {
  */
 export const Bool: {
   /**
-   * 真
-   */
-  readonly True: Bool;
-  /**
    * 偽
    */
   readonly False: Bool;
+  /**
+   * 真
+   */
+  readonly True: Bool;
   readonly codec: Codec<Bool>;
 } = {
-  True: true,
   False: false,
+  True: true,
   codec: {
     encode: (value: Bool): ReadonlyArray<number> => [value ? 1 : 0],
     decode: (
@@ -1080,10 +1080,10 @@ export const Bool: {
         readonly nextIndex: number;
       } = Int32.codec.decode(index, binary);
       if (patternIndex.result === 0) {
-        return { result: Bool.True, nextIndex: patternIndex.nextIndex };
+        return { result: Bool.False, nextIndex: patternIndex.nextIndex };
       }
       if (patternIndex.result === 1) {
-        return { result: Bool.False, nextIndex: patternIndex.nextIndex };
+        return { result: Bool.True, nextIndex: patternIndex.nextIndex };
       }
       throw new Error("存在しないパターンを指定された 型を更新してください");
     },

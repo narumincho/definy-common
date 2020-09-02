@@ -156,7 +156,7 @@ const patternToTagExpr = (
       typePart.attribute._ === "Just" &&
       typePart.attribute.value === "AsBoolean"
     ) {
-      return ts.Expr.BooleanLiteral(patternIndex === 0);
+      return ts.Expr.BooleanLiteral(patternIndex !== 0);
     }
     return ts.Expr.StringLiteral(pattern.name);
   }

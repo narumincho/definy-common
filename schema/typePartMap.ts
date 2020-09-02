@@ -66,13 +66,13 @@ export const typePartMap: ReadonlyMap<TypePartId, TypePart> = new Map<
       typeParameterList: [],
       body: TypePartBody.Sum([
         {
-          name: "True",
-          description: "真",
+          name: "False",
+          description: "偽",
           parameter: Maybe.Nothing(),
         },
         {
-          name: "False",
-          description: "偽",
+          name: "True",
+          description: "真",
           parameter: Maybe.Nothing(),
         },
       ]),
