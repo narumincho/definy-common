@@ -1,10 +1,14 @@
 import * as data from "./data";
+import * as elm from "elm-code-generator/data";
+import * as elmCodeGenerator from "elm-code-generator";
+import * as elmUtil from "elm-code-generator/util";
 import * as hexString from "./kernelType/hexString";
 import * as jsTsCodeGenerator from "js-ts-code-generator";
 import * as ts from "js-ts-code-generator/source/data";
 import * as typeAlias from "./typeAlias";
 import * as util from "./util";
 import * as variable from "./variable";
+import { readonlyArrayType } from "js-ts-code-generator/source/util";
 
 export const releaseOrigin = "https://definy.app";
 export const debugOrigin = "http://localhost:2520";
@@ -748,4 +752,167 @@ const typeParamterCountFromTypePartId = (
   throw new Error(
     "typePart (typePartId =" + (typePartId as string) + ") is not found"
   );
+};
+
+export const generateElmCodeAsString = (
+  typePartMap: ReadonlyMap<data.TypePartId, data.TypePart>
+): string => {
+  return elmCodeGenerator.codeToString(generateElmCode(typePartMap));
+};
+
+export const generateElmCode = (
+  typePartMap: ReadonlyMap<data.TypePartId, data.TypePart>
+): elm.Code => {
+  const allTypePartIdTypePartNameMap = checkTypePartListValidation(typePartMap);
+  return {
+    moduleName: "Data",
+    typeDeclarationList: undefinedFlatMap([...typePartMap], ([_, typePart]) =>
+      typePartToElmTypeDeclaration(typePart, allTypePartIdTypePartNameMap)
+    ),
+  };
+};
+
+const undefinedFlatMap = <Input, Output>(
+  array: ReadonlyArray<Input>,
+  func: (element: Input) => Output | undefined
+) => {
+  const out: Array<Output> = [];
+  for (const element of array) {
+    const outputElement = func(element);
+    if (outputElement !== undefined) {
+      out.push(outputElement);
+    }
+  }
+  return out;
+};
+
+const typePartToElmTypeDeclaration = (
+  typePart: data.TypePart,
+  typePartNameMap: ReadonlyMap<data.TypePartId, string>
+): elm.TypeDeclaration | undefined => {
+  switch (typePart.body._) {
+    case "Product":
+      return elm.TypeDeclaration.TypeAlias({
+        name: stringToElmTypeName(typePart.name),
+        comment: typePart.description,
+        export: true,
+        parameter: typePart.typeParameterList.map(
+          (typeParameter) => typeParameter.name
+        ),
+        type: elm.ElmType.Record(
+          typePart.body.memberList.map(
+            (member): elm.Field => ({
+              name: stringToElmFiledName(member.name),
+              type: definyTypeToElmType(member.type, typePartNameMap),
+            })
+          )
+        ),
+      });
+    case "Sum":
+      return elm.TypeDeclaration.CustomType({
+        name: stringToElmTypeName(typePart.name),
+        comment: typePart.description,
+        export: elm.CustomTypeExportLevel.ExportTypeAndVariant,
+        parameter: typePart.typeParameterList.map(
+          (typeParameter) => typeParameter.name
+        ),
+        variantList: typePart.body.patternList.map(
+          (pattern): elm.Variant => ({
+            name: stringToVariantName(pattern.name),
+            parameter:
+              pattern.parameter._ === "Just"
+                ? [
+                    definyTypeToElmType(
+                      pattern.parameter.value,
+                      typePartNameMap
+                    ),
+                  ]
+                : [],
+          })
+        ),
+      });
+    case "Kernel":
+      return definyTypePartBodyKernelToElmType(
+        typePart,
+        typePart.body.typePartBodyKernel
+      );
+  }
+};
+
+const stringToElmTypeName = (name: string): elm.ElmTypeName => {
+  const typeName = elmCodeGenerator.elmTypeNameFromString(name);
+  switch (typeName._) {
+    case "Just":
+      return typeName.value;
+    case "Nothing":
+      return elmCodeGenerator.elmTypeNameFromStringOrThrow(name + "_");
+  }
+};
+
+const stringToElmFiledName = (name: string): elm.FieldName => {
+  const filedName = elmCodeGenerator.fieldNameFromString(name);
+  switch (filedName._) {
+    case "Just":
+      return filedName.value;
+    case "Nothing":
+      return elmCodeGenerator.fieldNameFromStringOrThrow(name + "_");
+  }
+};
+
+const stringToVariantName = (name: string): elm.VariantName => {
+  const variantName = elmCodeGenerator.variantNameFormString(name);
+  switch (variantName._) {
+    case "Just":
+      return variantName.value;
+    case "Nothing":
+      return elmCodeGenerator.variantNameFormStringOrThrow(name + "_");
+  }
+};
+
+const definyTypePartBodyKernelToElmType = (
+  typePart: data.TypePart,
+  typePartBodyKernel: data.TypePartBodyKernel
+): elm.TypeDeclaration | undefined => {
+  switch (typePartBodyKernel) {
+    case "Function":
+    case "Int32":
+    case "String":
+    case "Binary":
+      return;
+    case "Id":
+    case "Token":
+      return elm.TypeDeclaration.CustomType({
+        name: stringToElmTypeName(typePart.name),
+        comment: typePart.description,
+        export: elm.CustomTypeExportLevel.ExportTypeAndVariant,
+        parameter: [],
+        variantList: [
+          {
+            name: stringToVariantName(typePart.name),
+            parameter: [elmUtil.String],
+          },
+        ],
+      });
+    case "List":
+  }
+};
+
+const definyTypeToElmType = (
+  type: data.Type,
+  typePartNameMap: ReadonlyMap<data.TypePartId, string>
+): elm.ElmType => {
+  const typeName = typePartNameMap.get(type.typePartId);
+  if (typeName === undefined) {
+    throw new Error(
+      "internal error: not found type part name in definyTypeToElmType. typePartId =" +
+        (type.typePartId as string)
+    );
+  }
+
+  return elm.ElmType.LocalType({
+    typeName: stringToElmTypeName(typeName),
+    parameter: type.parameter.map((parameter) =>
+      definyTypeToElmType(parameter, typePartNameMap)
+    ),
+  });
 };
