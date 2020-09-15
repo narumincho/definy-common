@@ -1,7 +1,8 @@
 {
   "compilerOptions": {
-    "target": "ES2020",
+    "target": "ES2019",
     "module": "CommonJS",
+    "lib": ["ES2020"],
     "newLine": "LF",
     "strict": true,
     "forceConsistentCasingInFileNames": true,
