@@ -1526,7 +1526,7 @@ export const typePartMap: ReadonlyMap<TypePartId, TypePart> = new Map<
       typeParameterList: [],
       body: TypePartBody.Product([
         {
-          name: "userToken",
+          name: "accountToken",
           description: "プロジェクトを作るときのアカウント",
           type: type.AccountToken,
         },
@@ -1549,7 +1549,7 @@ export const typePartMap: ReadonlyMap<TypePartId, TypePart> = new Map<
       typeParameterList: [],
       body: TypePartBody.Product([
         {
-          name: "userToken",
+          name: "accountToken",
           description: "プロジェクトを作るときのアカウント",
           type: type.AccountToken,
         },
@@ -1577,7 +1577,7 @@ export const typePartMap: ReadonlyMap<TypePartId, TypePart> = new Map<
       typeParameterList: [],
       body: TypePartBody.Product([
         {
-          name: "userToken",
+          name: "accountToken",
           description: "コメントをするユーザー",
           type: type.AccountToken,
         },
@@ -1605,7 +1605,7 @@ export const typePartMap: ReadonlyMap<TypePartId, TypePart> = new Map<
       typeParameterList: [],
       body: TypePartBody.Product([
         {
-          name: "userToken",
+          name: "accountToken",
           description: "提案を作成するユーザー",
           type: type.AccountToken,
         },

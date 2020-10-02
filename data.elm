@@ -306,22 +306,22 @@ type alias TypeError =
 {-| プロジェクト作成時に必要なパラメーター
 -}
 type alias CreateProjectParameter =
-    { userToken : AccountToken, projectName : String }
+    { accountToken : AccountToken, projectName : String }
 
 {-| アイデアを作成時に必要なパラメーター
 -}
 type alias CreateIdeaParameter =
-    { userToken : AccountToken, ideaName : String, parentId : IdeaId }
+    { accountToken : AccountToken, ideaName : String, parentId : IdeaId }
 
 {-| アイデアにコメントを追加するときに必要なパラメーター
 -}
 type alias AddCommentParameter =
-    { userToken : AccountToken, ideaId : IdeaId, comment : String }
+    { accountToken : AccountToken, ideaId : IdeaId, comment : String }
 
 {-| 提案を作成するときに必要なパラメーター
 -}
 type alias AddCommitParameter =
-    { userToken : AccountToken, ideaId : IdeaId }
+    { accountToken : AccountToken, ideaId : IdeaId }
 
 {-| コミットを確定状態にしたり, 承認したりするときなどに使う
 -}

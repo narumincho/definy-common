@@ -309,22 +309,22 @@ type alias TypeError =
 {-| プロジェクト作成時に必要なパラメーター
 -}
 type alias CreateProjectParameter =
-    { userToken : AccountToken, projectName : String }
+    { accountToken : AccountToken, projectName : String }
 
 {-| アイデアを作成時に必要なパラメーター
 -}
 type alias CreateIdeaParameter =
-    { userToken : AccountToken, ideaName : String, parentId : IdeaId }
+    { accountToken : AccountToken, ideaName : String, parentId : IdeaId }
 
 {-| アイデアにコメントを追加するときに必要なパラメーター
 -}
 type alias AddCommentParameter =
-    { userToken : AccountToken, ideaId : IdeaId, comment : String }
+    { accountToken : AccountToken, ideaId : IdeaId, comment : String }
 
 {-| 提案を作成するときに必要なパラメーター
 -}
 type alias AddCommitParameter =
-    { userToken : AccountToken, ideaId : IdeaId }
+    { accountToken : AccountToken, ideaId : IdeaId }
 
 {-| コミットを確定状態にしたり, 承認したりするときなどに使う
 -}
@@ -1183,7 +1183,7 @@ export type CreateProjectParameter = {
 /**
  * プロジェクトを作るときのアカウント
  */
-readonly userToken: AccountToken; 
+readonly accountToken: AccountToken; 
 /**
  * プロジェクト名
  */
@@ -1198,7 +1198,7 @@ export type CreateIdeaParameter = {
 /**
  * プロジェクトを作るときのアカウント
  */
-readonly userToken: AccountToken; 
+readonly accountToken: AccountToken; 
 /**
  * アイデア名
  */
@@ -1217,7 +1217,7 @@ export type AddCommentParameter = {
 /**
  * コメントをするユーザー
  */
-readonly userToken: AccountToken; 
+readonly accountToken: AccountToken; 
 /**
  * コメントを追加するアイデア
  */
@@ -1236,7 +1236,7 @@ export type AddCommitParameter = {
 /**
  * 提案を作成するユーザー
  */
-readonly userToken: AccountToken; 
+readonly accountToken: AccountToken; 
 /**
  * 提案に関連付けられるアイデア
  */
@@ -2595,10 +2595,10 @@ export const TypeError: { readonly codec: Codec<TypeError> } = { codec: { encode
  * プロジェクト作成時に必要なパラメーター
  * @typePartId 8ac0f1e4609a750afb9e068d9914a2db
  */
-export const CreateProjectParameter: { readonly codec: Codec<CreateProjectParameter> } = { codec: { encode: (value: CreateProjectParameter): ReadonlyArray<number> => (AccountToken.codec.encode(value.userToken).concat(String.codec.encode(value.projectName))), decode: (index: number, binary: Uint8Array): { readonly result: CreateProjectParameter; readonly nextIndex: number } => {
-  const userTokenAndNextIndex: { readonly result: AccountToken; readonly nextIndex: number } = AccountToken.codec.decode(index, binary);
-  const projectNameAndNextIndex: { readonly result: String; readonly nextIndex: number } = String.codec.decode(userTokenAndNextIndex.nextIndex, binary);
-  return { result: { userToken: userTokenAndNextIndex.result, projectName: projectNameAndNextIndex.result }, nextIndex: projectNameAndNextIndex.nextIndex };
+export const CreateProjectParameter: { readonly codec: Codec<CreateProjectParameter> } = { codec: { encode: (value: CreateProjectParameter): ReadonlyArray<number> => (AccountToken.codec.encode(value.accountToken).concat(String.codec.encode(value.projectName))), decode: (index: number, binary: Uint8Array): { readonly result: CreateProjectParameter; readonly nextIndex: number } => {
+  const accountTokenAndNextIndex: { readonly result: AccountToken; readonly nextIndex: number } = AccountToken.codec.decode(index, binary);
+  const projectNameAndNextIndex: { readonly result: String; readonly nextIndex: number } = String.codec.decode(accountTokenAndNextIndex.nextIndex, binary);
+  return { result: { accountToken: accountTokenAndNextIndex.result, projectName: projectNameAndNextIndex.result }, nextIndex: projectNameAndNextIndex.nextIndex };
 } } };
 
 
@@ -2606,11 +2606,11 @@ export const CreateProjectParameter: { readonly codec: Codec<CreateProjectParame
  * アイデアを作成時に必要なパラメーター
  * @typePartId 036e55068c26060c3632062801b0216b
  */
-export const CreateIdeaParameter: { readonly codec: Codec<CreateIdeaParameter> } = { codec: { encode: (value: CreateIdeaParameter): ReadonlyArray<number> => (AccountToken.codec.encode(value.userToken).concat(String.codec.encode(value.ideaName)).concat(IdeaId.codec.encode(value.parentId))), decode: (index: number, binary: Uint8Array): { readonly result: CreateIdeaParameter; readonly nextIndex: number } => {
-  const userTokenAndNextIndex: { readonly result: AccountToken; readonly nextIndex: number } = AccountToken.codec.decode(index, binary);
-  const ideaNameAndNextIndex: { readonly result: String; readonly nextIndex: number } = String.codec.decode(userTokenAndNextIndex.nextIndex, binary);
+export const CreateIdeaParameter: { readonly codec: Codec<CreateIdeaParameter> } = { codec: { encode: (value: CreateIdeaParameter): ReadonlyArray<number> => (AccountToken.codec.encode(value.accountToken).concat(String.codec.encode(value.ideaName)).concat(IdeaId.codec.encode(value.parentId))), decode: (index: number, binary: Uint8Array): { readonly result: CreateIdeaParameter; readonly nextIndex: number } => {
+  const accountTokenAndNextIndex: { readonly result: AccountToken; readonly nextIndex: number } = AccountToken.codec.decode(index, binary);
+  const ideaNameAndNextIndex: { readonly result: String; readonly nextIndex: number } = String.codec.decode(accountTokenAndNextIndex.nextIndex, binary);
   const parentIdAndNextIndex: { readonly result: IdeaId; readonly nextIndex: number } = IdeaId.codec.decode(ideaNameAndNextIndex.nextIndex, binary);
-  return { result: { userToken: userTokenAndNextIndex.result, ideaName: ideaNameAndNextIndex.result, parentId: parentIdAndNextIndex.result }, nextIndex: parentIdAndNextIndex.nextIndex };
+  return { result: { accountToken: accountTokenAndNextIndex.result, ideaName: ideaNameAndNextIndex.result, parentId: parentIdAndNextIndex.result }, nextIndex: parentIdAndNextIndex.nextIndex };
 } } };
 
 
@@ -2618,11 +2618,11 @@ export const CreateIdeaParameter: { readonly codec: Codec<CreateIdeaParameter> }
  * アイデアにコメントを追加するときに必要なパラメーター
  * @typePartId ad7a6a667a36a79c3bbc81f8f0789fe8
  */
-export const AddCommentParameter: { readonly codec: Codec<AddCommentParameter> } = { codec: { encode: (value: AddCommentParameter): ReadonlyArray<number> => (AccountToken.codec.encode(value.userToken).concat(IdeaId.codec.encode(value.ideaId)).concat(String.codec.encode(value.comment))), decode: (index: number, binary: Uint8Array): { readonly result: AddCommentParameter; readonly nextIndex: number } => {
-  const userTokenAndNextIndex: { readonly result: AccountToken; readonly nextIndex: number } = AccountToken.codec.decode(index, binary);
-  const ideaIdAndNextIndex: { readonly result: IdeaId; readonly nextIndex: number } = IdeaId.codec.decode(userTokenAndNextIndex.nextIndex, binary);
+export const AddCommentParameter: { readonly codec: Codec<AddCommentParameter> } = { codec: { encode: (value: AddCommentParameter): ReadonlyArray<number> => (AccountToken.codec.encode(value.accountToken).concat(IdeaId.codec.encode(value.ideaId)).concat(String.codec.encode(value.comment))), decode: (index: number, binary: Uint8Array): { readonly result: AddCommentParameter; readonly nextIndex: number } => {
+  const accountTokenAndNextIndex: { readonly result: AccountToken; readonly nextIndex: number } = AccountToken.codec.decode(index, binary);
+  const ideaIdAndNextIndex: { readonly result: IdeaId; readonly nextIndex: number } = IdeaId.codec.decode(accountTokenAndNextIndex.nextIndex, binary);
   const commentAndNextIndex: { readonly result: String; readonly nextIndex: number } = String.codec.decode(ideaIdAndNextIndex.nextIndex, binary);
-  return { result: { userToken: userTokenAndNextIndex.result, ideaId: ideaIdAndNextIndex.result, comment: commentAndNextIndex.result }, nextIndex: commentAndNextIndex.nextIndex };
+  return { result: { accountToken: accountTokenAndNextIndex.result, ideaId: ideaIdAndNextIndex.result, comment: commentAndNextIndex.result }, nextIndex: commentAndNextIndex.nextIndex };
 } } };
 
 
@@ -2630,10 +2630,10 @@ export const AddCommentParameter: { readonly codec: Codec<AddCommentParameter> }
  * 提案を作成するときに必要なパラメーター
  * @typePartId 8b40f4351fe048ff78f14c523b6f76f1
  */
-export const AddCommitParameter: { readonly codec: Codec<AddCommitParameter> } = { codec: { encode: (value: AddCommitParameter): ReadonlyArray<number> => (AccountToken.codec.encode(value.userToken).concat(IdeaId.codec.encode(value.ideaId))), decode: (index: number, binary: Uint8Array): { readonly result: AddCommitParameter; readonly nextIndex: number } => {
-  const userTokenAndNextIndex: { readonly result: AccountToken; readonly nextIndex: number } = AccountToken.codec.decode(index, binary);
-  const ideaIdAndNextIndex: { readonly result: IdeaId; readonly nextIndex: number } = IdeaId.codec.decode(userTokenAndNextIndex.nextIndex, binary);
-  return { result: { userToken: userTokenAndNextIndex.result, ideaId: ideaIdAndNextIndex.result }, nextIndex: ideaIdAndNextIndex.nextIndex };
+export const AddCommitParameter: { readonly codec: Codec<AddCommitParameter> } = { codec: { encode: (value: AddCommitParameter): ReadonlyArray<number> => (AccountToken.codec.encode(value.accountToken).concat(IdeaId.codec.encode(value.ideaId))), decode: (index: number, binary: Uint8Array): { readonly result: AddCommitParameter; readonly nextIndex: number } => {
+  const accountTokenAndNextIndex: { readonly result: AccountToken; readonly nextIndex: number } = AccountToken.codec.decode(index, binary);
+  const ideaIdAndNextIndex: { readonly result: IdeaId; readonly nextIndex: number } = IdeaId.codec.decode(accountTokenAndNextIndex.nextIndex, binary);
+  return { result: { accountToken: accountTokenAndNextIndex.result, ideaId: ideaIdAndNextIndex.result }, nextIndex: ideaIdAndNextIndex.nextIndex };
 } } };
 
 

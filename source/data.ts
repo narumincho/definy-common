@@ -822,7 +822,7 @@ export type CreateProjectParameter = {
   /**
    * プロジェクトを作るときのアカウント
    */
-  readonly userToken: AccountToken;
+  readonly accountToken: AccountToken;
   /**
    * プロジェクト名
    */
@@ -837,7 +837,7 @@ export type CreateIdeaParameter = {
   /**
    * プロジェクトを作るときのアカウント
    */
-  readonly userToken: AccountToken;
+  readonly accountToken: AccountToken;
   /**
    * アイデア名
    */
@@ -856,7 +856,7 @@ export type AddCommentParameter = {
   /**
    * コメントをするユーザー
    */
-  readonly userToken: AccountToken;
+  readonly accountToken: AccountToken;
   /**
    * コメントを追加するアイデア
    */
@@ -875,7 +875,7 @@ export type AddCommitParameter = {
   /**
    * 提案を作成するユーザー
    */
-  readonly userToken: AccountToken;
+  readonly accountToken: AccountToken;
   /**
    * 提案に関連付けられるアイデア
    */
@@ -3789,7 +3789,7 @@ export const CreateProjectParameter: {
   codec: {
     encode: (value: CreateProjectParameter): ReadonlyArray<number> =>
       AccountToken.codec
-        .encode(value.userToken)
+        .encode(value.accountToken)
         .concat(String.codec.encode(value.projectName)),
     decode: (
       index: number,
@@ -3798,17 +3798,17 @@ export const CreateProjectParameter: {
       readonly result: CreateProjectParameter;
       readonly nextIndex: number;
     } => {
-      const userTokenAndNextIndex: {
+      const accountTokenAndNextIndex: {
         readonly result: AccountToken;
         readonly nextIndex: number;
       } = AccountToken.codec.decode(index, binary);
       const projectNameAndNextIndex: {
         readonly result: String;
         readonly nextIndex: number;
-      } = String.codec.decode(userTokenAndNextIndex.nextIndex, binary);
+      } = String.codec.decode(accountTokenAndNextIndex.nextIndex, binary);
       return {
         result: {
-          userToken: userTokenAndNextIndex.result,
+          accountToken: accountTokenAndNextIndex.result,
           projectName: projectNameAndNextIndex.result,
         },
         nextIndex: projectNameAndNextIndex.nextIndex,
@@ -3827,28 +3827,28 @@ export const CreateIdeaParameter: {
   codec: {
     encode: (value: CreateIdeaParameter): ReadonlyArray<number> =>
       AccountToken.codec
-        .encode(value.userToken)
+        .encode(value.accountToken)
         .concat(String.codec.encode(value.ideaName))
         .concat(IdeaId.codec.encode(value.parentId)),
     decode: (
       index: number,
       binary: Uint8Array
     ): { readonly result: CreateIdeaParameter; readonly nextIndex: number } => {
-      const userTokenAndNextIndex: {
+      const accountTokenAndNextIndex: {
         readonly result: AccountToken;
         readonly nextIndex: number;
       } = AccountToken.codec.decode(index, binary);
       const ideaNameAndNextIndex: {
         readonly result: String;
         readonly nextIndex: number;
-      } = String.codec.decode(userTokenAndNextIndex.nextIndex, binary);
+      } = String.codec.decode(accountTokenAndNextIndex.nextIndex, binary);
       const parentIdAndNextIndex: {
         readonly result: IdeaId;
         readonly nextIndex: number;
       } = IdeaId.codec.decode(ideaNameAndNextIndex.nextIndex, binary);
       return {
         result: {
-          userToken: userTokenAndNextIndex.result,
+          accountToken: accountTokenAndNextIndex.result,
           ideaName: ideaNameAndNextIndex.result,
           parentId: parentIdAndNextIndex.result,
         },
@@ -3868,28 +3868,28 @@ export const AddCommentParameter: {
   codec: {
     encode: (value: AddCommentParameter): ReadonlyArray<number> =>
       AccountToken.codec
-        .encode(value.userToken)
+        .encode(value.accountToken)
         .concat(IdeaId.codec.encode(value.ideaId))
         .concat(String.codec.encode(value.comment)),
     decode: (
       index: number,
       binary: Uint8Array
     ): { readonly result: AddCommentParameter; readonly nextIndex: number } => {
-      const userTokenAndNextIndex: {
+      const accountTokenAndNextIndex: {
         readonly result: AccountToken;
         readonly nextIndex: number;
       } = AccountToken.codec.decode(index, binary);
       const ideaIdAndNextIndex: {
         readonly result: IdeaId;
         readonly nextIndex: number;
-      } = IdeaId.codec.decode(userTokenAndNextIndex.nextIndex, binary);
+      } = IdeaId.codec.decode(accountTokenAndNextIndex.nextIndex, binary);
       const commentAndNextIndex: {
         readonly result: String;
         readonly nextIndex: number;
       } = String.codec.decode(ideaIdAndNextIndex.nextIndex, binary);
       return {
         result: {
-          userToken: userTokenAndNextIndex.result,
+          accountToken: accountTokenAndNextIndex.result,
           ideaId: ideaIdAndNextIndex.result,
           comment: commentAndNextIndex.result,
         },
@@ -3909,23 +3909,23 @@ export const AddCommitParameter: {
   codec: {
     encode: (value: AddCommitParameter): ReadonlyArray<number> =>
       AccountToken.codec
-        .encode(value.userToken)
+        .encode(value.accountToken)
         .concat(IdeaId.codec.encode(value.ideaId)),
     decode: (
       index: number,
       binary: Uint8Array
     ): { readonly result: AddCommitParameter; readonly nextIndex: number } => {
-      const userTokenAndNextIndex: {
+      const accountTokenAndNextIndex: {
         readonly result: AccountToken;
         readonly nextIndex: number;
       } = AccountToken.codec.decode(index, binary);
       const ideaIdAndNextIndex: {
         readonly result: IdeaId;
         readonly nextIndex: number;
-      } = IdeaId.codec.decode(userTokenAndNextIndex.nextIndex, binary);
+      } = IdeaId.codec.decode(accountTokenAndNextIndex.nextIndex, binary);
       return {
         result: {
-          userToken: userTokenAndNextIndex.result,
+          accountToken: accountTokenAndNextIndex.result,
           ideaId: ideaIdAndNextIndex.result,
         },
         nextIndex: ideaIdAndNextIndex.nextIndex,
