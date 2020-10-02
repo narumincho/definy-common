@@ -11,7 +11,7 @@ const codecEqual = <T>(value: T, codec: data.Codec<T>): void => {
 describe("test", () => {
   it("https://definy.app/ is Home in English", () => {
     expect(
-      main.urlDataAndAccessTokenFromUrl(new URL("https://definy.app/")).urlData
+      main.urlDataAndAccountTokenFromUrl(new URL("https://definy.app/")).urlData
     ).toEqual<data.UrlData>({
       clientMode: "Release",
       location: data.Location.Home,
@@ -20,7 +20,7 @@ describe("test", () => {
   });
   it("project url", () => {
     expect(
-      main.urlDataAndAccessTokenFromUrl(
+      main.urlDataAndAccountTokenFromUrl(
         new URL(
           "https://definy.app/project/580d8d6a54cf43e4452a0bba6694a4ed?hl=ja"
         )
@@ -35,9 +35,9 @@ describe("test", () => {
   });
   it("local host", () => {
     const url = new URL(
-      "http://localhost:2520/user/580d8d6a54cf43e4452a0bba6694a4ed?hl=eo#access-token=f81919b78537257302b50f776b77a90b984cc3d75fa899f9f460ff972dcc8cb0"
+      "http://localhost:2520/user/580d8d6a54cf43e4452a0bba6694a4ed?hl=eo#account-token=f81919b78537257302b50f776b77a90b984cc3d75fa899f9f460ff972dcc8cb0"
     );
-    expect(main.urlDataAndAccessTokenFromUrl(url).urlData).toEqual<
+    expect(main.urlDataAndAccountTokenFromUrl(url).urlData).toEqual<
       data.UrlData
     >({
       clientMode: "DebugMode",
@@ -47,15 +47,15 @@ describe("test", () => {
       language: "Esperanto",
     });
   });
-  it("accessToken", () => {
+  it("accountToken", () => {
     const url = new URL(
-      "http://localhost:2520/user/580d8d6a54cf43e4452a0bba6694a4ed?hl=eo#access-token=f81919b78537257302b50f776b77a90b984cc3d75fa899f9f460ff972dcc8cb0"
+      "http://localhost:2520/user/580d8d6a54cf43e4452a0bba6694a4ed?hl=eo#account-token=f81919b78537257302b50f776b77a90b984cc3d75fa899f9f460ff972dcc8cb0"
     );
-    expect(main.urlDataAndAccessTokenFromUrl(url).accessToken).toEqual<
-      data.Maybe<data.AccessToken>
+    expect(main.urlDataAndAccountTokenFromUrl(url).accountToken).toEqual<
+      data.Maybe<data.AccountToken>
     >(
       data.Maybe.Just(
-        "f81919b78537257302b50f776b77a90b984cc3d75fa899f9f460ff972dcc8cb0" as data.AccessToken
+        "f81919b78537257302b50f776b77a90b984cc3d75fa899f9f460ff972dcc8cb0" as data.AccountToken
       )
     );
   });
@@ -67,11 +67,11 @@ describe("test", () => {
       ),
       language: "Esperanto",
     };
-    const url = main.urlDataAndAccessTokenToUrl(
+    const url = main.urlDataAndAccountTokenToUrl(
       languageAndLocation,
       data.Maybe.Nothing()
     );
-    const decodedLanguageAndLocation: data.UrlData = main.urlDataAndAccessTokenFromUrl(
+    const decodedLanguageAndLocation: data.UrlData = main.urlDataAndAccountTokenFromUrl(
       url
     ).urlData;
     expect(languageAndLocation).toEqual(decodedLanguageAndLocation);
@@ -226,8 +226,8 @@ describe("test", () => {
 
   it("token codec", () => {
     codecEqual(
-      "24b6b3789d903e841490ac04ffc2b6f9848ea529b2d9db380d190583b09995e6" as data.AccessToken,
-      data.AccessToken.codec
+      "24b6b3789d903e841490ac04ffc2b6f9848ea529b2d9db380d190583b09995e6" as data.AccountToken,
+      data.AccountToken.codec
     );
   });
 

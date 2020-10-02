@@ -277,11 +277,11 @@ export const typePartMap: ReadonlyMap<TypePartId, TypePart> = new Map<
     },
   ],
   [
-    id.AccessToken,
+    id.AccountToken,
     {
-      name: "AccessToken",
+      name: "AccountToken",
       description:
-        "アクセストークン. アクセストークンを持っていれば特定のユーザーであるが証明される. これが盗まれた場合,不正に得た相手はそのユーザーになりすますことができる",
+        "アカウントトークン. アカウントトークンを持っていればアクセストークンをDefinyのサーバーにリクエストした際に得られるIDのアカウントを保有していると証明できる. サーバーにハッシュ化したものを保存している. これが盗まれた場合,不正に得た人はアカウントを乗っ取ることができる. 有効期限はなし, 最後に発行したアカウントトークン以外は無効になる",
       projectId: util.definyCodeProjectId,
       createCommitId: util.codeCommitId,
       attribute: Maybe.Nothing(),
@@ -1526,9 +1526,9 @@ export const typePartMap: ReadonlyMap<TypePartId, TypePart> = new Map<
       typeParameterList: [],
       body: TypePartBody.Product([
         {
-          name: "accessToken",
+          name: "userToken",
           description: "プロジェクトを作るときのアカウント",
-          type: type.AccessToken,
+          type: type.UserToken,
         },
         {
           name: "projectName",
@@ -1549,9 +1549,9 @@ export const typePartMap: ReadonlyMap<TypePartId, TypePart> = new Map<
       typeParameterList: [],
       body: TypePartBody.Product([
         {
-          name: "accessToken",
+          name: "userToken",
           description: "プロジェクトを作るときのアカウント",
-          type: type.AccessToken,
+          type: type.UserToken,
         },
         {
           name: "ideaName",
@@ -1577,9 +1577,9 @@ export const typePartMap: ReadonlyMap<TypePartId, TypePart> = new Map<
       typeParameterList: [],
       body: TypePartBody.Product([
         {
-          name: "accessToken",
+          name: "userToken",
           description: "コメントをするユーザー",
-          type: type.AccessToken,
+          type: type.UserToken,
         },
         {
           name: "ideaId",
@@ -1605,9 +1605,9 @@ export const typePartMap: ReadonlyMap<TypePartId, TypePart> = new Map<
       typeParameterList: [],
       body: TypePartBody.Product([
         {
-          name: "accessToken",
+          name: "userToken",
           description: "提案を作成するユーザー",
-          type: type.AccessToken,
+          type: type.UserToken,
         },
         {
           name: "ideaId",
@@ -1618,9 +1618,9 @@ export const typePartMap: ReadonlyMap<TypePartId, TypePart> = new Map<
     },
   ],
   [
-    id.AccessTokenAndCommitId,
+    id.AccountTokenAndCommitId,
     {
-      name: "AccessTokenAndCommitId",
+      name: "AccountTokenAndCommitId",
       description: "コミットを確定状態にしたり, 承認したりするときなどに使う",
       projectId: util.definyCodeProjectId,
       createCommitId: util.codeCommitId,
@@ -1628,9 +1628,9 @@ export const typePartMap: ReadonlyMap<TypePartId, TypePart> = new Map<
       typeParameterList: [],
       body: TypePartBody.Product([
         {
-          name: "accessToken",
-          description: "アクセストークン",
-          type: type.AccessToken,
+          name: "accountToken",
+          description: "アカウントトークン",
+          type: type.UserToken,
         },
         {
           name: "commitId",
@@ -1651,13 +1651,13 @@ export const typePartMap: ReadonlyMap<TypePartId, TypePart> = new Map<
       typeParameterList: [],
       body: TypePartBody.Sum([
         {
-          name: "WaitLoadingAccessTokenFromIndexedDB",
-          description: "アクセストークンをindexedDBから読み取る状態",
+          name: "WaitLoadingAccountTokenFromIndexedDB",
+          description: "アカウントトークンをindexedDBから読み取る状態",
           parameter: Maybe.Nothing(),
         },
         {
-          name: "LoadingAccessTokenFromIndexedDB",
-          description: "アクセストークンをindexedDBから読み取っている状態",
+          name: "LoadingAccountTokenFromIndexedDB",
+          description: "アカウントトークンをindexedDBから読み取っている状態",
           parameter: Maybe.Nothing(),
         },
         {
@@ -1681,39 +1681,39 @@ export const typePartMap: ReadonlyMap<TypePartId, TypePart> = new Map<
           parameter: Maybe.Just(type.String),
         },
         {
-          name: "WaitVerifyingAccessToken",
+          name: "WaitVerifyingAccountToken",
           description:
-            "アクセストークンの検証とログインしているユーザーの情報を取得する状態",
-          parameter: Maybe.Just(type.AccessToken),
+            "アカウントトークンの検証とログインしているユーザーの情報を取得する状態",
+          parameter: Maybe.Just(type.UserToken),
         },
         {
-          name: "VerifyingAccessToken",
+          name: "VerifyingAccountToken",
           description:
-            "アクセストークンの検証とログインしているユーザーの情報を取得している状態",
-          parameter: Maybe.Just(type.AccessToken),
+            "アカウントトークンの検証とログインしているユーザーの情報を取得している状態",
+          parameter: Maybe.Just(type.UserToken),
         },
         {
           name: "LoggedIn",
           description: "ログインしている状態",
-          parameter: Maybe.Just(type.AccessTokenAndUserId),
+          parameter: Maybe.Just(type.AccountTokenAndUserId),
         },
       ]),
     },
   ],
   [
-    id.AccessTokenAndUserId,
+    id.AccountTokenAndUserId,
     {
-      name: "AccessTokenAndUserId",
-      description: "AccessTokenとUserId",
+      name: "AccountTokenAndUserId",
+      description: "AccountTokenとUserId",
       projectId: util.definyCodeProjectId,
       createCommitId: util.codeCommitId,
       attribute: Maybe.Nothing(),
       typeParameterList: [],
       body: TypePartBody.Product([
         {
-          name: "accessToken",
-          description: "AccessToken",
-          type: type.AccessToken,
+          name: "accountToken",
+          description: "accountToken",
+          type: type.UserToken,
         },
         {
           name: "userId",

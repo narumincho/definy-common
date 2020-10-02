@@ -39,7 +39,7 @@ export const TypePartId = noParameterType(id.TypePartId);
 
 export const TagId = noParameterType(id.TagId);
 
-export const AccessToken = noParameterType(id.AccessToken);
+export const UserToken = noParameterType(id.AccountToken);
 
 export const PartHash = noParameterType(id.PartHash);
 
@@ -139,8 +139,8 @@ export const AddCommentParameter = noParameterType(id.AddCommentParameter);
 
 export const AddCommitParameter = noParameterType(id.AddCommitParameter);
 
-export const AccessTokenAndCommitId = noParameterType(
-  id.AccessTokenAndCommitId
+export const AccountTokenAndCommitId = noParameterType(
+  id.AccountTokenAndCommitId
 );
 
 export const LogInState = noParameterType(id.LogInState);
@@ -160,4 +160,4 @@ export const StaticResourceState = (dataType: data.Type): data.Type => ({
   parameter: [dataType],
 });
 
-export const AccessTokenAndUserId = noParameterType(id.AccessTokenAndUserId);
+export const AccountTokenAndUserId = noParameterType(id.AccountTokenAndUserId);

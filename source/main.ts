@@ -8,7 +8,6 @@ import * as ts from "js-ts-code-generator/source/data";
 import * as typeAlias from "./typeAlias";
 import * as util from "./util";
 import * as variable from "./variable";
-import { readonlyArrayType } from "js-ts-code-generator/source/util";
 
 export const releaseOrigin = "https://definy.app";
 export const debugOrigin = "http://localhost:2520";
@@ -26,9 +25,9 @@ export const clientModeToOriginUrl = (clientMode: data.ClientMode): URL => {
 const languageQueryKey = "hl";
 export const defaultLanguage: data.Language = "English";
 
-export const urlDataAndAccessTokenToUrl = (
+export const urlDataAndAccountTokenToUrl = (
   urlData: data.UrlData,
-  accessToken: data.Maybe<data.AccessToken>
+  accountToken: data.Maybe<data.AccountToken>
 ): URL => {
   const url = clientModeToOriginUrl(urlData.clientMode);
   url.pathname = locationToPath(urlData.location);
@@ -36,8 +35,8 @@ export const urlDataAndAccessTokenToUrl = (
     languageQueryKey,
     languageToIdString(urlData.language)
   );
-  if (accessToken._ === "Just") {
-    url.hash = "access-token=" + (accessToken.value as string);
+  if (accountToken._ === "Just") {
+    url.hash = "account-token=" + (accountToken.value as string);
   }
   return url;
 };
@@ -80,9 +79,9 @@ const languageToIdString = (language: data.Language): string => {
  * URLのパスを場所のデータに変換する
  * @param url `https://definy.app/project/580d8d6a54cf43e4452a0bba6694a4ed?hl=ja` のようなURL
  */
-export const urlDataAndAccessTokenFromUrl = (
+export const urlDataAndAccountTokenFromUrl = (
   url: URL
-): { urlData: data.UrlData; accessToken: data.Maybe<data.AccessToken> } => {
+): { urlData: data.UrlData; accountToken: data.Maybe<data.AccountToken> } => {
   const languageId = url.searchParams.get(languageQueryKey);
   const language: data.Language =
     languageId === null ? defaultLanguage : languageFromIdString(languageId);
@@ -92,7 +91,7 @@ export const urlDataAndAccessTokenFromUrl = (
       location: locationFromUrl(url.pathname),
       language,
     },
-    accessToken: accessTokenFromUrl(url.hash),
+    accountToken: accountTokenFromUrl(url.hash),
   };
 };
 
@@ -143,12 +142,12 @@ const languageFromIdString = (languageAsString: string): data.Language => {
   return defaultLanguage;
 };
 
-const accessTokenFromUrl = (hash: string): data.Maybe<data.AccessToken> => {
-  const matchResult = hash.match(/access-token=(?<token>[0-9a-f]{64})/u);
+const accountTokenFromUrl = (hash: string): data.Maybe<data.AccountToken> => {
+  const matchResult = hash.match(/account-token=(?<token>[0-9a-f]{64})/u);
   if (matchResult === null || matchResult.groups === undefined) {
     return data.Maybe.Nothing();
   }
-  return data.Maybe.Just(matchResult.groups.token as data.AccessToken);
+  return data.Maybe.Just(matchResult.groups.token as data.AccountToken);
 };
 
 export const stringToValidUserName = (userName: string): string | null => {
