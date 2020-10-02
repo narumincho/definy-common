@@ -1528,7 +1528,7 @@ export const typePartMap: ReadonlyMap<TypePartId, TypePart> = new Map<
         {
           name: "userToken",
           description: "プロジェクトを作るときのアカウント",
-          type: type.UserToken,
+          type: type.AccountToken,
         },
         {
           name: "projectName",
@@ -1551,7 +1551,7 @@ export const typePartMap: ReadonlyMap<TypePartId, TypePart> = new Map<
         {
           name: "userToken",
           description: "プロジェクトを作るときのアカウント",
-          type: type.UserToken,
+          type: type.AccountToken,
         },
         {
           name: "ideaName",
@@ -1579,7 +1579,7 @@ export const typePartMap: ReadonlyMap<TypePartId, TypePart> = new Map<
         {
           name: "userToken",
           description: "コメントをするユーザー",
-          type: type.UserToken,
+          type: type.AccountToken,
         },
         {
           name: "ideaId",
@@ -1607,7 +1607,7 @@ export const typePartMap: ReadonlyMap<TypePartId, TypePart> = new Map<
         {
           name: "userToken",
           description: "提案を作成するユーザー",
-          type: type.UserToken,
+          type: type.AccountToken,
         },
         {
           name: "ideaId",
@@ -1630,7 +1630,7 @@ export const typePartMap: ReadonlyMap<TypePartId, TypePart> = new Map<
         {
           name: "accountToken",
           description: "アカウントトークン",
-          type: type.UserToken,
+          type: type.AccountToken,
         },
         {
           name: "commitId",
@@ -1684,13 +1684,13 @@ export const typePartMap: ReadonlyMap<TypePartId, TypePart> = new Map<
           name: "WaitVerifyingAccountToken",
           description:
             "アカウントトークンの検証とログインしているユーザーの情報を取得する状態",
-          parameter: Maybe.Just(type.UserToken),
+          parameter: Maybe.Just(type.AccountToken),
         },
         {
           name: "VerifyingAccountToken",
           description:
             "アカウントトークンの検証とログインしているユーザーの情報を取得している状態",
-          parameter: Maybe.Just(type.UserToken),
+          parameter: Maybe.Just(type.AccountToken),
         },
         {
           name: "LoggedIn",
@@ -1713,7 +1713,7 @@ export const typePartMap: ReadonlyMap<TypePartId, TypePart> = new Map<
         {
           name: "accountToken",
           description: "accountToken",
-          type: type.UserToken,
+          type: type.AccountToken,
         },
         {
           name: "userId",
@@ -1886,6 +1886,29 @@ export const typePartMap: ReadonlyMap<TypePartId, TypePart> = new Map<
           name: "Retrying",
           description: "Unknownだったリソースをサーバーに問い合わせ中",
           parameter: Maybe.Nothing(),
+        },
+      ]),
+    },
+  ],
+  [
+    id.AccountTokenAndProjectId,
+    {
+      name: "AccountTokenAndProjectId",
+      description: "アカウントトークンとプロジェクトID",
+      projectId: util.definyCodeProjectId,
+      createCommitId: util.codeCommitId,
+      attribute: Maybe.Nothing(),
+      typeParameterList: [],
+      body: TypePartBody.Product([
+        {
+          name: "accountToken",
+          description: "アカウントトークン",
+          type: type.AccountToken,
+        },
+        {
+          name: "projectId",
+          description: "プロジェクトID",
+          type: type.ProjectId,
         },
       ]),
     },

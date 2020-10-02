@@ -1,7 +1,7 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`test Elm code generator snapshot 1`] = `
-"module Data exposing (Bool(..), Maybe(..), Result(..), ProjectId(..), UserId(..), IdeaId(..), CommitId(..), ImageToken(..), PartId(..), TypePartId(..), TagId(..), AccountToken(..), PartHash(..), TypePartHash(..), ReleasePartId(..), ReleaseTypePartId(..), Time, RequestLogInUrlRequestData, OpenIdConnectProvider(..), UrlData, ClientMode(..), Location(..), Language(..), User, IdAndData, Project, Idea, Comment, Commit, IdeaState(..), Part, TypePart, TypeAttribute(..), TypeParameter, TypePartBody(..), Member, Pattern, TypePartBodyKernel(..), Type, Expr(..), KernelExpr(..), TagReference, FunctionCall, LambdaBranch, Condition(..), ConditionTag, ConditionCapture, BranchPartDefinition, EvaluatedExpr(..), KernelCall, EvaluateExprError(..), TypeError, CreateProjectParameter, CreateIdeaParameter, AddCommentParameter, AddCommitParameter, AccountTokenAndCommitId, LogInState(..), AccountTokenAndUserId, Resource, ResourceState(..), StaticResourceState(..))
+"module Data exposing (Bool(..), Maybe(..), Result(..), ProjectId(..), UserId(..), IdeaId(..), CommitId(..), ImageToken(..), PartId(..), TypePartId(..), TagId(..), AccountToken(..), PartHash(..), TypePartHash(..), ReleasePartId(..), ReleaseTypePartId(..), Time, RequestLogInUrlRequestData, OpenIdConnectProvider(..), UrlData, ClientMode(..), Location(..), Language(..), User, IdAndData, Project, Idea, Comment, Commit, IdeaState(..), Part, TypePart, TypeAttribute(..), TypeParameter, TypePartBody(..), Member, Pattern, TypePartBodyKernel(..), Type, Expr(..), KernelExpr(..), TagReference, FunctionCall, LambdaBranch, Condition(..), ConditionTag, ConditionCapture, BranchPartDefinition, EvaluatedExpr(..), KernelCall, EvaluateExprError(..), TypeError, CreateProjectParameter, CreateIdeaParameter, AddCommentParameter, AddCommitParameter, AccountTokenAndCommitId, LogInState(..), AccountTokenAndUserId, Resource, ResourceState(..), StaticResourceState(..), AccountTokenAndProjectId)
 
 import String
 
@@ -379,6 +379,11 @@ type StaticResourceState data
     | Requesting
     | WaitRetrying
     | Retrying
+
+{-| アカウントトークンとプロジェクトID
+-}
+type alias AccountTokenAndProjectId =
+    { accountToken : AccountToken, projectId : ProjectId }
 "
 `;
 
@@ -1302,6 +1307,21 @@ export type ResourceState<data extends unknown> = { readonly _: \\"Loaded\\"; re
  * @typePartId 134205335ce83693fd83994e907acabd
  */
 export type StaticResourceState<data extends unknown> = { readonly _: \\"Loaded\\"; readonly data: data } | { readonly _: \\"Unknown\\" } | { readonly _: \\"WaitLoading\\" } | { readonly _: \\"Loading\\" } | { readonly _: \\"WaitRequesting\\" } | { readonly _: \\"Requesting\\" } | { readonly _: \\"WaitRetrying\\" } | { readonly _: \\"Retrying\\" };
+
+
+/**
+ * アカウントトークンとプロジェクトID
+ * @typePartId 4143a0787c0f06dfddc2f2f13f7e7a20
+ */
+export type AccountTokenAndProjectId = { 
+/**
+ * アカウントトークン
+ */
+readonly accountToken: AccountToken; 
+/**
+ * プロジェクトID
+ */
+readonly projectId: ProjectId };
 
 
 /**
@@ -2967,6 +2987,17 @@ readonly Retrying: <data extends unknown>() => StaticResourceState<data>; readon
   }
   throw new Error(\\"存在しないパターンを指定された 型を更新してください\\");
 } }) };
+
+
+/**
+ * アカウントトークンとプロジェクトID
+ * @typePartId 4143a0787c0f06dfddc2f2f13f7e7a20
+ */
+export const AccountTokenAndProjectId: { readonly codec: Codec<AccountTokenAndProjectId> } = { codec: { encode: (value: AccountTokenAndProjectId): ReadonlyArray<number> => (AccountToken.codec.encode(value.accountToken).concat(ProjectId.codec.encode(value.projectId))), decode: (index: number, binary: Uint8Array): { readonly result: AccountTokenAndProjectId; readonly nextIndex: number } => {
+  const accountTokenAndNextIndex: { readonly result: AccountToken; readonly nextIndex: number } = AccountToken.codec.decode(index, binary);
+  const projectIdAndNextIndex: { readonly result: ProjectId; readonly nextIndex: number } = ProjectId.codec.decode(accountTokenAndNextIndex.nextIndex, binary);
+  return { result: { accountToken: accountTokenAndNextIndex.result, projectId: projectIdAndNextIndex.result }, nextIndex: projectIdAndNextIndex.nextIndex };
+} } };
 
 
 "

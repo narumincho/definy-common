@@ -39,7 +39,7 @@ export const TypePartId = noParameterType(id.TypePartId);
 
 export const TagId = noParameterType(id.TagId);
 
-export const UserToken = noParameterType(id.AccountToken);
+export const AccountToken = noParameterType(id.AccountToken);
 
 export const PartHash = noParameterType(id.PartHash);
 
@@ -161,3 +161,7 @@ export const StaticResourceState = (dataType: data.Type): data.Type => ({
 });
 
 export const AccountTokenAndUserId = noParameterType(id.AccountTokenAndUserId);
+
+export const AccountTokenAndProjectId = noParameterType(
+  id.AccountTokenAndProjectId
+);

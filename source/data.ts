@@ -985,6 +985,21 @@ export type StaticResourceState<data extends unknown> =
   | { readonly _: "Retrying" };
 
 /**
+ * アカウントトークンとプロジェクトID
+ * @typePartId 4143a0787c0f06dfddc2f2f13f7e7a20
+ */
+export type AccountTokenAndProjectId = {
+  /**
+   * アカウントトークン
+   */
+  readonly accountToken: AccountToken;
+  /**
+   * プロジェクトID
+   */
+  readonly projectId: ProjectId;
+};
+
+/**
  * -2 147 483 648 ～ 2 147 483 647. 32bit 符号付き整数. JavaScriptのnumberとして扱える. numberの32bit符号あり整数をSigned Leb128のバイナリに変換する
  * @typePartId ccf22e92cea3639683c0271d65d00673
  */
@@ -4604,4 +4619,42 @@ export const StaticResourceState: {
       throw new Error("存在しないパターンを指定された 型を更新してください");
     },
   }),
+};
+
+/**
+ * アカウントトークンとプロジェクトID
+ * @typePartId 4143a0787c0f06dfddc2f2f13f7e7a20
+ */
+export const AccountTokenAndProjectId: {
+  readonly codec: Codec<AccountTokenAndProjectId>;
+} = {
+  codec: {
+    encode: (value: AccountTokenAndProjectId): ReadonlyArray<number> =>
+      AccountToken.codec
+        .encode(value.accountToken)
+        .concat(ProjectId.codec.encode(value.projectId)),
+    decode: (
+      index: number,
+      binary: Uint8Array
+    ): {
+      readonly result: AccountTokenAndProjectId;
+      readonly nextIndex: number;
+    } => {
+      const accountTokenAndNextIndex: {
+        readonly result: AccountToken;
+        readonly nextIndex: number;
+      } = AccountToken.codec.decode(index, binary);
+      const projectIdAndNextIndex: {
+        readonly result: ProjectId;
+        readonly nextIndex: number;
+      } = ProjectId.codec.decode(accountTokenAndNextIndex.nextIndex, binary);
+      return {
+        result: {
+          accountToken: accountTokenAndNextIndex.result,
+          projectId: projectIdAndNextIndex.result,
+        },
+        nextIndex: projectIdAndNextIndex.nextIndex,
+      };
+    },
+  },
 };
