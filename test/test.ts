@@ -1,5 +1,6 @@
 import * as data from "../source/data";
 import * as main from "../source/main";
+import * as typePartMap from "../schema/typePartMap";
 import * as util from "../source/util";
 
 const codecEqual = <T>(value: T, codec: data.Codec<T>): void => {
@@ -263,5 +264,15 @@ describe("test", () => {
       }),
       data.Maybe.codec(data.IdAndData.codec(data.UserId.codec, data.User.codec))
     );
+  });
+  it("Elm code generator snapshot", () => {
+    expect(
+      main.generateElmCodeAsString(typePartMap.typePartMap)
+    ).toMatchSnapshot();
+  });
+  it("TypeScript code generator snapshot", () => {
+    expect(
+      main.generateTypeScriptCodeAsString(typePartMap.typePartMap)
+    ).toMatchSnapshot();
   });
 });

@@ -900,16 +900,20 @@ const definyTypeToElmType = (
   type: data.Type,
   typePartNameMap: ReadonlyMap<data.TypePartId, string>
 ): elm.ElmType => {
-  const typeName = typePartNameMap.get(type.typePartId);
-  if (typeName === undefined) {
+  const typePartName = typePartNameMap.get(type.typePartId);
+  if (typePartName === undefined) {
     throw new Error(
       "internal error: not found type part name in definyTypeToElmType. typePartId =" +
         (type.typePartId as string)
     );
   }
+  // TODO 型パラメーターかどうかの判定を名前でしてしまっている
+  if (util.isFirstLowerCaseName(typePartName)) {
+    return elm.ElmType.TypeParameter(typePartName);
+  }
 
   return elm.ElmType.LocalType({
-    typeName: stringToElmTypeName(typeName),
+    typeName: stringToElmTypeName(typePartName),
     parameter: type.parameter.map((parameter) =>
       definyTypeToElmType(parameter, typePartNameMap)
     ),
