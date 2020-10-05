@@ -10,8 +10,6 @@ const encodeDefinition = (
 ): ts.Function => {
   const valueName = identifer.fromString("value");
   const valueVar = ts.Expr.Variable(valueName);
-  const resultName = identifer.fromString("result");
-  const resultVar = ts.Expr.Variable(resultName);
   const iName = identifer.fromString("i");
   const iVar = ts.Expr.Variable(iName);
 
@@ -28,33 +26,48 @@ const encodeDefinition = (
       },
     ],
     statementList: [
-      ts.Statement.VariableDefinition({
-        isConst: true,
-        name: resultName,
-        type: tsUtil.arrayType(ts.Type.Number),
-        expr: ts.Expr.ArrayLiteral([]),
-      }),
-      ts.Statement.For({
-        counterVariableName: iName,
-        untilExpr: ts.Expr.NumberLiteral(byteSize),
-        statementList: [
-          ts.Statement.Set({
-            target: ts.Expr.Get({ expr: resultVar, propertyExpr: iVar }),
-            operatorMaybe: ts.Maybe.Nothing(),
-            expr: tsUtil.callNumberMethod("parseInt", [
-              tsUtil.callMethod(valueVar, "slice", [
-                tsUtil.multiplication(iVar, ts.Expr.NumberLiteral(2)),
-                tsUtil.addition(
-                  tsUtil.multiplication(iVar, ts.Expr.NumberLiteral(2)),
-                  ts.Expr.NumberLiteral(2)
-                ),
-              ]),
-              ts.Expr.NumberLiteral(16),
+      ts.Statement.Return(
+        tsUtil.callMethod(
+          ts.Expr.GlobalObjects(identifer.fromString("Array")),
+          "from",
+          [
+            ts.Expr.ObjectLiteral([
+              ts.Member.KeyValue({
+                key: "length",
+                value: ts.Expr.NumberLiteral(byteSize),
+              }),
             ]),
-          }),
-        ],
-      }),
-      ts.Statement.Return(resultVar),
+            ts.Expr.Lambda({
+              typeParameterList: [],
+              parameterList: [
+                {
+                  name: identifer.fromString("_"),
+                  type: ts.Type.Undefined,
+                },
+                {
+                  name: iName,
+                  type: ts.Type.Number,
+                },
+              ],
+              returnType: ts.Type.Number,
+              statementList: [
+                ts.Statement.Return(
+                  tsUtil.callNumberMethod("parseInt", [
+                    tsUtil.callMethod(valueVar, "slice", [
+                      tsUtil.multiplication(iVar, ts.Expr.NumberLiteral(2)),
+                      tsUtil.addition(
+                        tsUtil.multiplication(iVar, ts.Expr.NumberLiteral(2)),
+                        ts.Expr.NumberLiteral(2)
+                      ),
+                    ]),
+                    ts.Expr.NumberLiteral(16),
+                  ])
+                ),
+              ],
+            }),
+          ]
+        )
+      ),
     ],
   };
 };

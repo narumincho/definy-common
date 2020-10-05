@@ -6,13 +6,10 @@ import * as a from "util";
 /**
  * UserId, ProjectIdなどのIdをバイナリ形式にエンコードする
  */
-export const encodeId = (value: string): ReadonlyArray<number> => {
-  const result: Array<number> = [];
-  for (let i = 0; i < 16; i += 1) {
-    result[i] = Number.parseInt(value.slice(i * 2, i * 2 + 2), 16);
-  }
-  return result;
-};
+export const encodeId = (value: string): ReadonlyArray<number> =>
+  Array.from({ length: 16 }, (_: undefined, i: number): number =>
+    Number.parseInt(value.slice(i * 2, i * 2 + 2), 16)
+  );
 
 /**
  * バイナリ形式をUserId, ProjectIdなどのIdにデコードする
@@ -32,13 +29,10 @@ export const decodeId = (
 /**
  * ImageTokenなどのTokenをバイナリ形式にエンコードする
  */
-export const encodeToken = (value: string): ReadonlyArray<number> => {
-  const result: Array<number> = [];
-  for (let i = 0; i < 32; i += 1) {
-    result[i] = Number.parseInt(value.slice(i * 2, i * 2 + 2), 16);
-  }
-  return result;
-};
+export const encodeToken = (value: string): ReadonlyArray<number> =>
+  Array.from({ length: 32 }, (_: undefined, i: number): number =>
+    Number.parseInt(value.slice(i * 2, i * 2 + 2), 16)
+  );
 
 /**
  * バイナリ形式をImageTokenなどのTokenにエンコードする
