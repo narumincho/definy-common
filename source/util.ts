@@ -267,3 +267,9 @@ export const stringToTypePartName = (text: string): string | undefined => {
 export const isValidTypePartName = (text: string): boolean => {
   return /^[a-z][a-zA-Z0-9]*$/u.test(text) && text.length <= 64;
 };
+
+/** 型パーツIDから型パラメーターをしていしない型を指定する */
+export const noParameterType = (typePartId: data.TypePartId): data.Type => ({
+  typePartId,
+  parameter: [],
+});
