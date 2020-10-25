@@ -14,7 +14,7 @@
     "url": "https://github.com/narumincho/definy-core.git"
   },
   "dependencies": {
-    "elm-code-generator": "0.0.0",
+    "elm-code-generator": "0.0.1",
     "js-ts-code-generator": "0.3.3"
   },
   "devDependencies": {
