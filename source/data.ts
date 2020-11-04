@@ -896,22 +896,13 @@ export type AccountTokenAndCommitId = {
  * @typePartId d562fe803c7e40c32269e24c1435e4d1
  */
 export type LogInState =
-  | { readonly _: "WaitLoadingAccountTokenFromIndexedDB" }
   | { readonly _: "LoadingAccountTokenFromIndexedDB" }
   | { readonly _: "Guest" }
-  | {
-      readonly _: "WaitRequestingLogInUrl";
-      readonly openIdConnectProvider: OpenIdConnectProvider;
-    }
   | {
       readonly _: "RequestingLogInUrl";
       readonly openIdConnectProvider: OpenIdConnectProvider;
     }
   | { readonly _: "JumpingToLogInPage"; readonly string: String }
-  | {
-      readonly _: "WaitVerifyingAccountToken";
-      readonly accountToken: AccountToken;
-    }
   | { readonly _: "VerifyingAccountToken"; readonly accountToken: AccountToken }
   | {
       readonly _: "LoggedIn";
@@ -955,13 +946,9 @@ export type Resource<data extends unknown> = {
 export type ResourceState<data extends unknown> =
   | { readonly _: "Loaded"; readonly dataResource: Resource<data> }
   | { readonly _: "Unknown" }
-  | { readonly _: "WaitLoading" }
   | { readonly _: "Loading" }
-  | { readonly _: "WaitRequesting" }
   | { readonly _: "Requesting" }
-  | { readonly _: "WaitUpdating"; readonly dataResource: Resource<data> }
   | { readonly _: "Updating"; readonly dataResource: Resource<data> }
-  | { readonly _: "WaitRetrying" }
   | { readonly _: "Retrying" };
 
 /**
@@ -971,11 +958,8 @@ export type ResourceState<data extends unknown> =
 export type StaticResourceState<data extends unknown> =
   | { readonly _: "Loaded"; readonly data: data }
   | { readonly _: "Unknown" }
-  | { readonly _: "WaitLoading" }
   | { readonly _: "Loading" }
-  | { readonly _: "WaitRequesting" }
   | { readonly _: "Requesting" }
-  | { readonly _: "WaitRetrying" }
   | { readonly _: "Retrying" };
 
 /**
@@ -3972,10 +3956,6 @@ export const AccountTokenAndCommitId: {
  */
 export const LogInState: {
   /**
-   * アカウントトークンをindexedDBから読み取る状態
-   */
-  readonly WaitLoadingAccountTokenFromIndexedDB: LogInState;
-  /**
    * アカウントトークンをindexedDBから読み取っている状態
    */
   readonly LoadingAccountTokenFromIndexedDB: LogInState;
@@ -3984,10 +3964,6 @@ export const LogInState: {
    */
   readonly Guest: LogInState;
   /**
-   * ログインボタンを押したあとの状態
-   */
-  readonly WaitRequestingLogInUrl: (a: OpenIdConnectProvider) => LogInState;
-  /**
    * ログインへの画面URLをリクエストした状態
    */
   readonly RequestingLogInUrl: (a: OpenIdConnectProvider) => LogInState;
@@ -3995,10 +3971,6 @@ export const LogInState: {
    * ログインURLを受け取り,ログイン画面へ移行中
    */
   readonly JumpingToLogInPage: (a: String) => LogInState;
-  /**
-   * アカウントトークンの検証とログインしているユーザーの情報を取得する状態
-   */
-  readonly WaitVerifyingAccountToken: (a: AccountToken) => LogInState;
   /**
    * アカウントトークンの検証とログインしているユーザーの情報を取得している状態
    */
@@ -4009,24 +3981,14 @@ export const LogInState: {
   readonly LoggedIn: (a: AccountTokenAndUserId) => LogInState;
   readonly codec: Codec<LogInState>;
 } = {
-  WaitLoadingAccountTokenFromIndexedDB: {
-    _: "WaitLoadingAccountTokenFromIndexedDB",
-  },
   LoadingAccountTokenFromIndexedDB: { _: "LoadingAccountTokenFromIndexedDB" },
   Guest: { _: "Guest" },
-  WaitRequestingLogInUrl: (
-    openIdConnectProvider: OpenIdConnectProvider
-  ): LogInState => ({ _: "WaitRequestingLogInUrl", openIdConnectProvider }),
   RequestingLogInUrl: (
     openIdConnectProvider: OpenIdConnectProvider
   ): LogInState => ({ _: "RequestingLogInUrl", openIdConnectProvider }),
   JumpingToLogInPage: (string_: String): LogInState => ({
     _: "JumpingToLogInPage",
     string: string_,
-  }),
-  WaitVerifyingAccountToken: (accountToken: AccountToken): LogInState => ({
-    _: "WaitVerifyingAccountToken",
-    accountToken,
   }),
   VerifyingAccountToken: (accountToken: AccountToken): LogInState => ({
     _: "VerifyingAccountToken",
@@ -4039,36 +4001,25 @@ export const LogInState: {
   codec: {
     encode: (value: LogInState): ReadonlyArray<number> => {
       switch (value._) {
-        case "WaitLoadingAccountTokenFromIndexedDB": {
+        case "LoadingAccountTokenFromIndexedDB": {
           return [0];
         }
-        case "LoadingAccountTokenFromIndexedDB": {
+        case "Guest": {
           return [1];
         }
-        case "Guest": {
-          return [2];
-        }
-        case "WaitRequestingLogInUrl": {
-          return [3].concat(
-            OpenIdConnectProvider.codec.encode(value.openIdConnectProvider)
-          );
-        }
         case "RequestingLogInUrl": {
-          return [4].concat(
+          return [2].concat(
             OpenIdConnectProvider.codec.encode(value.openIdConnectProvider)
           );
         }
         case "JumpingToLogInPage": {
-          return [5].concat(String.codec.encode(value.string));
-        }
-        case "WaitVerifyingAccountToken": {
-          return [6].concat(AccountToken.codec.encode(value.accountToken));
+          return [3].concat(String.codec.encode(value.string));
         }
         case "VerifyingAccountToken": {
-          return [7].concat(AccountToken.codec.encode(value.accountToken));
+          return [4].concat(AccountToken.codec.encode(value.accountToken));
         }
         case "LoggedIn": {
-          return [8].concat(
+          return [5].concat(
             AccountTokenAndUserId.codec.encode(value.accountTokenAndUserId)
           );
         }
@@ -4084,30 +4035,14 @@ export const LogInState: {
       } = Int32.codec.decode(index, binary);
       if (patternIndex.result === 0) {
         return {
-          result: LogInState.WaitLoadingAccountTokenFromIndexedDB,
-          nextIndex: patternIndex.nextIndex,
-        };
-      }
-      if (patternIndex.result === 1) {
-        return {
           result: LogInState.LoadingAccountTokenFromIndexedDB,
           nextIndex: patternIndex.nextIndex,
         };
       }
-      if (patternIndex.result === 2) {
+      if (patternIndex.result === 1) {
         return { result: LogInState.Guest, nextIndex: patternIndex.nextIndex };
       }
-      if (patternIndex.result === 3) {
-        const result: {
-          readonly result: OpenIdConnectProvider;
-          readonly nextIndex: number;
-        } = OpenIdConnectProvider.codec.decode(patternIndex.nextIndex, binary);
-        return {
-          result: LogInState.WaitRequestingLogInUrl(result.result),
-          nextIndex: result.nextIndex,
-        };
-      }
-      if (patternIndex.result === 4) {
+      if (patternIndex.result === 2) {
         const result: {
           readonly result: OpenIdConnectProvider;
           readonly nextIndex: number;
@@ -4117,7 +4052,7 @@ export const LogInState: {
           nextIndex: result.nextIndex,
         };
       }
-      if (patternIndex.result === 5) {
+      if (patternIndex.result === 3) {
         const result: {
           readonly result: String;
           readonly nextIndex: number;
@@ -4127,17 +4062,7 @@ export const LogInState: {
           nextIndex: result.nextIndex,
         };
       }
-      if (patternIndex.result === 6) {
-        const result: {
-          readonly result: AccountToken;
-          readonly nextIndex: number;
-        } = AccountToken.codec.decode(patternIndex.nextIndex, binary);
-        return {
-          result: LogInState.WaitVerifyingAccountToken(result.result),
-          nextIndex: result.nextIndex,
-        };
-      }
-      if (patternIndex.result === 7) {
+      if (patternIndex.result === 4) {
         const result: {
           readonly result: AccountToken;
           readonly nextIndex: number;
@@ -4147,7 +4072,7 @@ export const LogInState: {
           nextIndex: result.nextIndex,
         };
       }
-      if (patternIndex.result === 8) {
+      if (patternIndex.result === 5) {
         const result: {
           readonly result: AccountTokenAndUserId;
           readonly nextIndex: number;
@@ -4253,37 +4178,19 @@ export const ResourceState: {
    */
   readonly Unknown: <data extends unknown>() => ResourceState<data>;
   /**
-   * indexedDBにアクセス待ち
-   */
-  readonly WaitLoading: <data extends unknown>() => ResourceState<data>;
-  /**
    * indexedDBにアクセス中
    */
   readonly Loading: <data extends unknown>() => ResourceState<data>;
   /**
-   * サーバに問い合わせ待ち
-   */
-  readonly WaitRequesting: <data extends unknown>() => ResourceState<data>;
-  /**
    * サーバに問い合わせ中
    */
   readonly Requesting: <data extends unknown>() => ResourceState<data>;
-  /**
-   * 更新待ち
-   */
-  readonly WaitUpdating: <data extends unknown>(
-    a: Resource<data>
-  ) => ResourceState<data>;
   /**
    * サーバーに問い合わせてリソースを更新中
    */
   readonly Updating: <data extends unknown>(
     a: Resource<data>
   ) => ResourceState<data>;
-  /**
-   * Unknownだったリソースをサーバーに問い合わせ待ち
-   */
-  readonly WaitRetrying: <data extends unknown>() => ResourceState<data>;
   /**
    * Unknownだったリソースをサーバーに問い合わせ中
    */
@@ -4296,25 +4203,13 @@ export const ResourceState: {
     dataResource: Resource<data>
   ): ResourceState<data> => ({ _: "Loaded", dataResource }),
   Unknown: <data extends unknown>(): ResourceState<data> => ({ _: "Unknown" }),
-  WaitLoading: <data extends unknown>(): ResourceState<data> => ({
-    _: "WaitLoading",
-  }),
   Loading: <data extends unknown>(): ResourceState<data> => ({ _: "Loading" }),
-  WaitRequesting: <data extends unknown>(): ResourceState<data> => ({
-    _: "WaitRequesting",
-  }),
   Requesting: <data extends unknown>(): ResourceState<data> => ({
     _: "Requesting",
   }),
-  WaitUpdating: <data extends unknown>(
-    dataResource: Resource<data>
-  ): ResourceState<data> => ({ _: "WaitUpdating", dataResource }),
   Updating: <data extends unknown>(
     dataResource: Resource<data>
   ): ResourceState<data> => ({ _: "Updating", dataResource }),
-  WaitRetrying: <data extends unknown>(): ResourceState<data> => ({
-    _: "WaitRetrying",
-  }),
   Retrying: <data extends unknown>(): ResourceState<data> => ({
     _: "Retrying",
   }),
@@ -4331,33 +4226,19 @@ export const ResourceState: {
         case "Unknown": {
           return [1];
         }
-        case "WaitLoading": {
+        case "Loading": {
           return [2];
         }
-        case "Loading": {
+        case "Requesting": {
           return [3];
         }
-        case "WaitRequesting": {
-          return [4];
-        }
-        case "Requesting": {
-          return [5];
-        }
-        case "WaitUpdating": {
-          return [6].concat(
-            Resource.codec(dataCodec).encode(value.dataResource)
-          );
-        }
         case "Updating": {
-          return [7].concat(
+          return [4].concat(
             Resource.codec(dataCodec).encode(value.dataResource)
           );
-        }
-        case "WaitRetrying": {
-          return [8];
         }
         case "Retrying": {
-          return [9];
+          return [5];
         }
       }
     },
@@ -4387,39 +4268,17 @@ export const ResourceState: {
       }
       if (patternIndex.result === 2) {
         return {
-          result: ResourceState.WaitLoading(),
+          result: ResourceState.Loading(),
           nextIndex: patternIndex.nextIndex,
         };
       }
       if (patternIndex.result === 3) {
         return {
-          result: ResourceState.Loading(),
-          nextIndex: patternIndex.nextIndex,
-        };
-      }
-      if (patternIndex.result === 4) {
-        return {
-          result: ResourceState.WaitRequesting(),
-          nextIndex: patternIndex.nextIndex,
-        };
-      }
-      if (patternIndex.result === 5) {
-        return {
           result: ResourceState.Requesting(),
           nextIndex: patternIndex.nextIndex,
         };
       }
-      if (patternIndex.result === 6) {
-        const result: {
-          readonly result: Resource<data>;
-          readonly nextIndex: number;
-        } = Resource.codec(dataCodec).decode(patternIndex.nextIndex, binary);
-        return {
-          result: ResourceState.WaitUpdating(result.result),
-          nextIndex: result.nextIndex,
-        };
-      }
-      if (patternIndex.result === 7) {
+      if (patternIndex.result === 4) {
         const result: {
           readonly result: Resource<data>;
           readonly nextIndex: number;
@@ -4429,13 +4288,7 @@ export const ResourceState: {
           nextIndex: result.nextIndex,
         };
       }
-      if (patternIndex.result === 8) {
-        return {
-          result: ResourceState.WaitRetrying(),
-          nextIndex: patternIndex.nextIndex,
-        };
-      }
-      if (patternIndex.result === 9) {
+      if (patternIndex.result === 5) {
         return {
           result: ResourceState.Retrying(),
           nextIndex: patternIndex.nextIndex,
@@ -4460,27 +4313,13 @@ export const StaticResourceState: {
    */
   readonly Unknown: <data extends unknown>() => StaticResourceState<data>;
   /**
-   * indexedDBにアクセス待ち
-   */
-  readonly WaitLoading: <data extends unknown>() => StaticResourceState<data>;
-  /**
    * indexedDBにアクセス中
    */
   readonly Loading: <data extends unknown>() => StaticResourceState<data>;
   /**
-   * サーバに問い合わせ待ち
-   */
-  readonly WaitRequesting: <data extends unknown>() => StaticResourceState<
-    data
-  >;
-  /**
    * サーバに問い合わせ中
    */
   readonly Requesting: <data extends unknown>() => StaticResourceState<data>;
-  /**
-   * Unknownだったリソースをサーバーに問い合わせ待ち
-   */
-  readonly WaitRetrying: <data extends unknown>() => StaticResourceState<data>;
   /**
    * Unknownだったリソースをサーバーに問い合わせ中
    */
@@ -4496,20 +4335,11 @@ export const StaticResourceState: {
   Unknown: <data extends unknown>(): StaticResourceState<data> => ({
     _: "Unknown",
   }),
-  WaitLoading: <data extends unknown>(): StaticResourceState<data> => ({
-    _: "WaitLoading",
-  }),
   Loading: <data extends unknown>(): StaticResourceState<data> => ({
     _: "Loading",
   }),
-  WaitRequesting: <data extends unknown>(): StaticResourceState<data> => ({
-    _: "WaitRequesting",
-  }),
   Requesting: <data extends unknown>(): StaticResourceState<data> => ({
     _: "Requesting",
-  }),
-  WaitRetrying: <data extends unknown>(): StaticResourceState<data> => ({
-    _: "WaitRetrying",
   }),
   Retrying: <data extends unknown>(): StaticResourceState<data> => ({
     _: "Retrying",
@@ -4525,23 +4355,14 @@ export const StaticResourceState: {
         case "Unknown": {
           return [1];
         }
-        case "WaitLoading": {
+        case "Loading": {
           return [2];
         }
-        case "Loading": {
+        case "Requesting": {
           return [3];
         }
-        case "WaitRequesting": {
-          return [4];
-        }
-        case "Requesting": {
-          return [5];
-        }
-        case "WaitRetrying": {
-          return [6];
-        }
         case "Retrying": {
-          return [7];
+          return [4];
         }
       }
     },
@@ -4574,35 +4395,17 @@ export const StaticResourceState: {
       }
       if (patternIndex.result === 2) {
         return {
-          result: StaticResourceState.WaitLoading(),
+          result: StaticResourceState.Loading(),
           nextIndex: patternIndex.nextIndex,
         };
       }
       if (patternIndex.result === 3) {
         return {
-          result: StaticResourceState.Loading(),
-          nextIndex: patternIndex.nextIndex,
-        };
-      }
-      if (patternIndex.result === 4) {
-        return {
-          result: StaticResourceState.WaitRequesting(),
-          nextIndex: patternIndex.nextIndex,
-        };
-      }
-      if (patternIndex.result === 5) {
-        return {
           result: StaticResourceState.Requesting(),
           nextIndex: patternIndex.nextIndex,
         };
       }
-      if (patternIndex.result === 6) {
-        return {
-          result: StaticResourceState.WaitRetrying(),
-          nextIndex: patternIndex.nextIndex,
-        };
-      }
-      if (patternIndex.result === 7) {
+      if (patternIndex.result === 4) {
         return {
           result: StaticResourceState.Retrying(),
           nextIndex: patternIndex.nextIndex,

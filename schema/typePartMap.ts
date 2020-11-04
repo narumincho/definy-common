@@ -1651,11 +1651,6 @@ export const typePartMap: ReadonlyMap<TypePartId, TypePart> = new Map<
       typeParameterList: [],
       body: TypePartBody.Sum([
         {
-          name: "WaitLoadingAccountTokenFromIndexedDB",
-          description: "アカウントトークンをindexedDBから読み取る状態",
-          parameter: Maybe.Nothing(),
-        },
-        {
           name: "LoadingAccountTokenFromIndexedDB",
           description: "アカウントトークンをindexedDBから読み取っている状態",
           parameter: Maybe.Nothing(),
@@ -1666,11 +1661,6 @@ export const typePartMap: ReadonlyMap<TypePartId, TypePart> = new Map<
           parameter: Maybe.Nothing(),
         },
         {
-          name: "WaitRequestingLogInUrl",
-          description: "ログインボタンを押したあとの状態",
-          parameter: Maybe.Just(type.OpenIdConnectProvider),
-        },
-        {
           name: "RequestingLogInUrl",
           description: "ログインへの画面URLをリクエストした状態",
           parameter: Maybe.Just(type.OpenIdConnectProvider),
@@ -1679,12 +1669,6 @@ export const typePartMap: ReadonlyMap<TypePartId, TypePart> = new Map<
           name: "JumpingToLogInPage",
           description: "ログインURLを受け取り,ログイン画面へ移行中",
           parameter: Maybe.Just(type.String),
-        },
-        {
-          name: "WaitVerifyingAccountToken",
-          description:
-            "アカウントトークンの検証とログインしているユーザーの情報を取得する状態",
-          parameter: Maybe.Just(type.AccountToken),
         },
         {
           name: "VerifyingAccountToken",
@@ -1779,34 +1763,14 @@ export const typePartMap: ReadonlyMap<TypePartId, TypePart> = new Map<
           parameter: Maybe.Nothing(),
         },
         {
-          name: "WaitLoading",
-          description: "indexedDBにアクセス待ち",
-          parameter: Maybe.Nothing(),
-        },
-        {
           name: "Loading",
           description: "indexedDBにアクセス中",
-          parameter: Maybe.Nothing(),
-        },
-        {
-          name: "WaitRequesting",
-          description: "サーバに問い合わせ待ち",
           parameter: Maybe.Nothing(),
         },
         {
           name: "Requesting",
           description: "サーバに問い合わせ中",
           parameter: Maybe.Nothing(),
-        },
-        {
-          name: "WaitUpdating",
-          description: "更新待ち",
-          parameter: Maybe.Just(
-            type.Resource({
-              typePartId: resourceStateDataTypePartId,
-              parameter: [],
-            })
-          ),
         },
         {
           name: "Updating",
@@ -1817,11 +1781,6 @@ export const typePartMap: ReadonlyMap<TypePartId, TypePart> = new Map<
               parameter: [],
             })
           ),
-        },
-        {
-          name: "WaitRetrying",
-          description: "Unknownだったリソースをサーバーに問い合わせ待ち",
-          parameter: Maybe.Nothing(),
         },
         {
           name: "Retrying",
@@ -1858,28 +1817,13 @@ export const typePartMap: ReadonlyMap<TypePartId, TypePart> = new Map<
           parameter: Maybe.Nothing(),
         },
         {
-          name: "WaitLoading",
-          description: "indexedDBにアクセス待ち",
-          parameter: Maybe.Nothing(),
-        },
-        {
           name: "Loading",
           description: "indexedDBにアクセス中",
           parameter: Maybe.Nothing(),
         },
         {
-          name: "WaitRequesting",
-          description: "サーバに問い合わせ待ち",
-          parameter: Maybe.Nothing(),
-        },
-        {
           name: "Requesting",
           description: "サーバに問い合わせ中",
-          parameter: Maybe.Nothing(),
-        },
-        {
-          name: "WaitRetrying",
-          description: "Unknownだったリソースをサーバーに問い合わせ待ち",
           parameter: Maybe.Nothing(),
         },
         {
