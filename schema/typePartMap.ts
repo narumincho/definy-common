@@ -1782,11 +1782,6 @@ export const typePartMap: ReadonlyMap<TypePartId, TypePart> = new Map<
             })
           ),
         },
-        {
-          name: "Retrying",
-          description: "Unknownだったリソースをサーバーに問い合わせ中",
-          parameter: Maybe.Nothing(),
-        },
       ]),
     },
   ],
@@ -1824,11 +1819,6 @@ export const typePartMap: ReadonlyMap<TypePartId, TypePart> = new Map<
         {
           name: "Requesting",
           description: "サーバに問い合わせ中",
-          parameter: Maybe.Nothing(),
-        },
-        {
-          name: "Retrying",
-          description: "Unknownだったリソースをサーバーに問い合わせ中",
           parameter: Maybe.Nothing(),
         },
       ]),

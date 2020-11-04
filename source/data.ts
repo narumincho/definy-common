@@ -948,8 +948,7 @@ export type ResourceState<data extends unknown> =
   | { readonly _: "Unknown" }
   | { readonly _: "Loading" }
   | { readonly _: "Requesting" }
-  | { readonly _: "Updating"; readonly dataResource: Resource<data> }
-  | { readonly _: "Retrying" };
+  | { readonly _: "Updating"; readonly dataResource: Resource<data> };
 
 /**
  * キーであるTokenによってデータが必ず1つに決まるもの. 絶対に更新されない
@@ -959,8 +958,7 @@ export type StaticResourceState<data extends unknown> =
   | { readonly _: "Loaded"; readonly data: data }
   | { readonly _: "Unknown" }
   | { readonly _: "Loading" }
-  | { readonly _: "Requesting" }
-  | { readonly _: "Retrying" };
+  | { readonly _: "Requesting" };
 
 /**
  * アカウントトークンとプロジェクトID
@@ -4191,10 +4189,6 @@ export const ResourceState: {
   readonly Updating: <data extends unknown>(
     a: Resource<data>
   ) => ResourceState<data>;
-  /**
-   * Unknownだったリソースをサーバーに問い合わせ中
-   */
-  readonly Retrying: <data extends unknown>() => ResourceState<data>;
   readonly codec: <data extends unknown>(
     a: Codec<data>
   ) => Codec<ResourceState<data>>;
@@ -4210,9 +4204,6 @@ export const ResourceState: {
   Updating: <data extends unknown>(
     dataResource: Resource<data>
   ): ResourceState<data> => ({ _: "Updating", dataResource }),
-  Retrying: <data extends unknown>(): ResourceState<data> => ({
-    _: "Retrying",
-  }),
   codec: <data extends unknown>(
     dataCodec: Codec<data>
   ): Codec<ResourceState<data>> => ({
@@ -4236,9 +4227,6 @@ export const ResourceState: {
           return [4].concat(
             Resource.codec(dataCodec).encode(value.dataResource)
           );
-        }
-        case "Retrying": {
-          return [5];
         }
       }
     },
@@ -4288,12 +4276,6 @@ export const ResourceState: {
           nextIndex: result.nextIndex,
         };
       }
-      if (patternIndex.result === 5) {
-        return {
-          result: ResourceState.Retrying(),
-          nextIndex: patternIndex.nextIndex,
-        };
-      }
       throw new Error("存在しないパターンを指定された 型を更新してください");
     },
   }),
@@ -4320,10 +4302,6 @@ export const StaticResourceState: {
    * サーバに問い合わせ中
    */
   readonly Requesting: <data extends unknown>() => StaticResourceState<data>;
-  /**
-   * Unknownだったリソースをサーバーに問い合わせ中
-   */
-  readonly Retrying: <data extends unknown>() => StaticResourceState<data>;
   readonly codec: <data extends unknown>(
     a: Codec<data>
   ) => Codec<StaticResourceState<data>>;
@@ -4341,9 +4319,6 @@ export const StaticResourceState: {
   Requesting: <data extends unknown>(): StaticResourceState<data> => ({
     _: "Requesting",
   }),
-  Retrying: <data extends unknown>(): StaticResourceState<data> => ({
-    _: "Retrying",
-  }),
   codec: <data extends unknown>(
     dataCodec: Codec<data>
   ): Codec<StaticResourceState<data>> => ({
@@ -4360,9 +4335,6 @@ export const StaticResourceState: {
         }
         case "Requesting": {
           return [3];
-        }
-        case "Retrying": {
-          return [4];
         }
       }
     },
@@ -4402,12 +4374,6 @@ export const StaticResourceState: {
       if (patternIndex.result === 3) {
         return {
           result: StaticResourceState.Requesting(),
-          nextIndex: patternIndex.nextIndex,
-        };
-      }
-      if (patternIndex.result === 4) {
-        return {
-          result: StaticResourceState.Retrying(),
           nextIndex: patternIndex.nextIndex,
         };
       }

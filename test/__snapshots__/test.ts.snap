@@ -334,13 +334,10 @@ type alias AccountTokenAndCommitId =
 {-| ログイン状態
 -}
 type LogInState
-    = WaitLoadingAccountTokenFromIndexedDB
-    | LoadingAccountTokenFromIndexedDB
+    = LoadingAccountTokenFromIndexedDB
     | Guest
-    | WaitRequestingLogInUrl OpenIdConnectProvider
     | RequestingLogInUrl OpenIdConnectProvider
     | JumpingToLogInPage String
-    | WaitVerifyingAccountToken AccountToken
     | VerifyingAccountToken AccountToken
     | LoggedIn AccountTokenAndUserId
 
@@ -352,33 +349,24 @@ type alias AccountTokenAndUserId =
 {-| 取得日時とデータ本体. データ本体がない場合も含まれているのでMaybe
 -}
 type alias Resource data =
-    { getTime : Time, dataMaybe : (Maybe data) }
+    { getTime : Time, data : data }
 
 {-| ProjectやUserなどのリソースの状態とデータ. 読み込み中だとか
 -}
 type ResourceState data
     = Loaded (Resource data)
     | Unknown
-    | WaitLoading
     | Loading
-    | WaitRequesting
     | Requesting
-    | WaitUpdating (Resource data)
     | Updating (Resource data)
-    | WaitRetrying
-    | Retrying
 
 {-| キーであるTokenによってデータが必ず1つに決まるもの. 絶対に更新されない
 -}
 type StaticResourceState data
     = Loaded data
     | Unknown
-    | WaitLoading
     | Loading
-    | WaitRequesting
     | Requesting
-    | WaitRetrying
-    | Retrying
 
 {-| アカウントトークンとプロジェクトID
 -}
@@ -1250,7 +1238,7 @@ readonly commitId: CommitId };
  * ログイン状態
  * @typePartId d562fe803c7e40c32269e24c1435e4d1
  */
-export type LogInState = { readonly _: \\"WaitLoadingAccountTokenFromIndexedDB\\" } | { readonly _: \\"LoadingAccountTokenFromIndexedDB\\" } | { readonly _: \\"Guest\\" } | { readonly _: \\"WaitRequestingLogInUrl\\"; readonly openIdConnectProvider: OpenIdConnectProvider } | { readonly _: \\"RequestingLogInUrl\\"; readonly openIdConnectProvider: OpenIdConnectProvider } | { readonly _: \\"JumpingToLogInPage\\"; readonly string: String } | { readonly _: \\"WaitVerifyingAccountToken\\"; readonly accountToken: AccountToken } | { readonly _: \\"VerifyingAccountToken\\"; readonly accountToken: AccountToken } | { readonly _: \\"LoggedIn\\"; readonly accountTokenAndUserId: AccountTokenAndUserId };
+export type LogInState = { readonly _: \\"LoadingAccountTokenFromIndexedDB\\" } | { readonly _: \\"Guest\\" } | { readonly _: \\"RequestingLogInUrl\\"; readonly openIdConnectProvider: OpenIdConnectProvider } | { readonly _: \\"JumpingToLogInPage\\"; readonly string: String } | { readonly _: \\"VerifyingAccountToken\\"; readonly accountToken: AccountToken } | { readonly _: \\"LoggedIn\\"; readonly accountTokenAndUserId: AccountTokenAndUserId };
 
 
 /**
@@ -1280,21 +1268,21 @@ readonly getTime: Time;
 /**
  * データ本体
  */
-readonly dataMaybe: Maybe<data> };
+readonly data: data };
 
 
 /**
  * ProjectやUserなどのリソースの状態とデータ. 読み込み中だとか
  * @typePartId 833fbf3dcab7e9365f334f8b00c24d55
  */
-export type ResourceState<data extends unknown> = { readonly _: \\"Loaded\\"; readonly dataResource: Resource<data> } | { readonly _: \\"Unknown\\" } | { readonly _: \\"WaitLoading\\" } | { readonly _: \\"Loading\\" } | { readonly _: \\"WaitRequesting\\" } | { readonly _: \\"Requesting\\" } | { readonly _: \\"WaitUpdating\\"; readonly dataResource: Resource<data> } | { readonly _: \\"Updating\\"; readonly dataResource: Resource<data> } | { readonly _: \\"WaitRetrying\\" } | { readonly _: \\"Retrying\\" };
+export type ResourceState<data extends unknown> = { readonly _: \\"Loaded\\"; readonly dataResource: Resource<data> } | { readonly _: \\"Unknown\\" } | { readonly _: \\"Loading\\" } | { readonly _: \\"Requesting\\" } | { readonly _: \\"Updating\\"; readonly dataResource: Resource<data> };
 
 
 /**
  * キーであるTokenによってデータが必ず1つに決まるもの. 絶対に更新されない
  * @typePartId 134205335ce83693fd83994e907acabd
  */
-export type StaticResourceState<data extends unknown> = { readonly _: \\"Loaded\\"; readonly data: data } | { readonly _: \\"Unknown\\" } | { readonly _: \\"WaitLoading\\" } | { readonly _: \\"Loading\\" } | { readonly _: \\"WaitRequesting\\" } | { readonly _: \\"Requesting\\" } | { readonly _: \\"WaitRetrying\\" } | { readonly _: \\"Retrying\\" };
+export type StaticResourceState<data extends unknown> = { readonly _: \\"Loaded\\"; readonly data: data } | { readonly _: \\"Unknown\\" } | { readonly _: \\"Loading\\" } | { readonly _: \\"Requesting\\" };
 
 
 /**
@@ -2642,10 +2630,6 @@ export const AccountTokenAndCommitId: { readonly codec: Codec<AccountTokenAndCom
  */
 export const LogInState: { 
 /**
- * アカウントトークンをindexedDBから読み取る状態
- */
-readonly WaitLoadingAccountTokenFromIndexedDB: LogInState; 
-/**
  * アカウントトークンをindexedDBから読み取っている状態
  */
 readonly LoadingAccountTokenFromIndexedDB: LogInState; 
@@ -2653,10 +2637,6 @@ readonly LoadingAccountTokenFromIndexedDB: LogInState;
  * ログインしていない状態
  */
 readonly Guest: LogInState; 
-/**
- * ログインボタンを押したあとの状態
- */
-readonly WaitRequestingLogInUrl: (a: OpenIdConnectProvider) => LogInState; 
 /**
  * ログインへの画面URLをリクエストした状態
  */
@@ -2666,78 +2646,54 @@ readonly RequestingLogInUrl: (a: OpenIdConnectProvider) => LogInState;
  */
 readonly JumpingToLogInPage: (a: String) => LogInState; 
 /**
- * アカウントトークンの検証とログインしているユーザーの情報を取得する状態
- */
-readonly WaitVerifyingAccountToken: (a: AccountToken) => LogInState; 
-/**
  * アカウントトークンの検証とログインしているユーザーの情報を取得している状態
  */
 readonly VerifyingAccountToken: (a: AccountToken) => LogInState; 
 /**
  * ログインしている状態
  */
-readonly LoggedIn: (a: AccountTokenAndUserId) => LogInState; readonly codec: Codec<LogInState> } = { WaitLoadingAccountTokenFromIndexedDB: { _: \\"WaitLoadingAccountTokenFromIndexedDB\\" }, LoadingAccountTokenFromIndexedDB: { _: \\"LoadingAccountTokenFromIndexedDB\\" }, Guest: { _: \\"Guest\\" }, WaitRequestingLogInUrl: (openIdConnectProvider: OpenIdConnectProvider): LogInState => ({ _: \\"WaitRequestingLogInUrl\\", openIdConnectProvider }), RequestingLogInUrl: (openIdConnectProvider: OpenIdConnectProvider): LogInState => ({ _: \\"RequestingLogInUrl\\", openIdConnectProvider }), JumpingToLogInPage: (string_: String): LogInState => ({ _: \\"JumpingToLogInPage\\", string: string_ }), WaitVerifyingAccountToken: (accountToken: AccountToken): LogInState => ({ _: \\"WaitVerifyingAccountToken\\", accountToken }), VerifyingAccountToken: (accountToken: AccountToken): LogInState => ({ _: \\"VerifyingAccountToken\\", accountToken }), LoggedIn: (accountTokenAndUserId: AccountTokenAndUserId): LogInState => ({ _: \\"LoggedIn\\", accountTokenAndUserId }), codec: { encode: (value: LogInState): ReadonlyArray<number> => {
+readonly LoggedIn: (a: AccountTokenAndUserId) => LogInState; readonly codec: Codec<LogInState> } = { LoadingAccountTokenFromIndexedDB: { _: \\"LoadingAccountTokenFromIndexedDB\\" }, Guest: { _: \\"Guest\\" }, RequestingLogInUrl: (openIdConnectProvider: OpenIdConnectProvider): LogInState => ({ _: \\"RequestingLogInUrl\\", openIdConnectProvider }), JumpingToLogInPage: (string_: String): LogInState => ({ _: \\"JumpingToLogInPage\\", string: string_ }), VerifyingAccountToken: (accountToken: AccountToken): LogInState => ({ _: \\"VerifyingAccountToken\\", accountToken }), LoggedIn: (accountTokenAndUserId: AccountTokenAndUserId): LogInState => ({ _: \\"LoggedIn\\", accountTokenAndUserId }), codec: { encode: (value: LogInState): ReadonlyArray<number> => {
   switch (value._) {
-    case \\"WaitLoadingAccountTokenFromIndexedDB\\": {
+    case \\"LoadingAccountTokenFromIndexedDB\\": {
       return [0];
     }
-    case \\"LoadingAccountTokenFromIndexedDB\\": {
+    case \\"Guest\\": {
       return [1];
     }
-    case \\"Guest\\": {
-      return [2];
-    }
-    case \\"WaitRequestingLogInUrl\\": {
-      return [3].concat(OpenIdConnectProvider.codec.encode(value.openIdConnectProvider));
-    }
     case \\"RequestingLogInUrl\\": {
-      return [4].concat(OpenIdConnectProvider.codec.encode(value.openIdConnectProvider));
+      return [2].concat(OpenIdConnectProvider.codec.encode(value.openIdConnectProvider));
     }
     case \\"JumpingToLogInPage\\": {
-      return [5].concat(String.codec.encode(value.string));
-    }
-    case \\"WaitVerifyingAccountToken\\": {
-      return [6].concat(AccountToken.codec.encode(value.accountToken));
+      return [3].concat(String.codec.encode(value.string));
     }
     case \\"VerifyingAccountToken\\": {
-      return [7].concat(AccountToken.codec.encode(value.accountToken));
+      return [4].concat(AccountToken.codec.encode(value.accountToken));
     }
     case \\"LoggedIn\\": {
-      return [8].concat(AccountTokenAndUserId.codec.encode(value.accountTokenAndUserId));
+      return [5].concat(AccountTokenAndUserId.codec.encode(value.accountTokenAndUserId));
     }
   }
 }, decode: (index: number, binary: Uint8Array): { readonly result: LogInState; readonly nextIndex: number } => {
   const patternIndex: { readonly result: number; readonly nextIndex: number } = Int32.codec.decode(index, binary);
   if (patternIndex.result === 0) {
-    return { result: LogInState.WaitLoadingAccountTokenFromIndexedDB, nextIndex: patternIndex.nextIndex };
-  }
-  if (patternIndex.result === 1) {
     return { result: LogInState.LoadingAccountTokenFromIndexedDB, nextIndex: patternIndex.nextIndex };
   }
-  if (patternIndex.result === 2) {
+  if (patternIndex.result === 1) {
     return { result: LogInState.Guest, nextIndex: patternIndex.nextIndex };
   }
-  if (patternIndex.result === 3) {
-    const result: { readonly result: OpenIdConnectProvider; readonly nextIndex: number } = OpenIdConnectProvider.codec.decode(patternIndex.nextIndex, binary);
-    return { result: LogInState.WaitRequestingLogInUrl(result.result), nextIndex: result.nextIndex };
-  }
-  if (patternIndex.result === 4) {
+  if (patternIndex.result === 2) {
     const result: { readonly result: OpenIdConnectProvider; readonly nextIndex: number } = OpenIdConnectProvider.codec.decode(patternIndex.nextIndex, binary);
     return { result: LogInState.RequestingLogInUrl(result.result), nextIndex: result.nextIndex };
   }
-  if (patternIndex.result === 5) {
+  if (patternIndex.result === 3) {
     const result: { readonly result: String; readonly nextIndex: number } = String.codec.decode(patternIndex.nextIndex, binary);
     return { result: LogInState.JumpingToLogInPage(result.result), nextIndex: result.nextIndex };
   }
-  if (patternIndex.result === 6) {
-    const result: { readonly result: AccountToken; readonly nextIndex: number } = AccountToken.codec.decode(patternIndex.nextIndex, binary);
-    return { result: LogInState.WaitVerifyingAccountToken(result.result), nextIndex: result.nextIndex };
-  }
-  if (patternIndex.result === 7) {
+  if (patternIndex.result === 4) {
     const result: { readonly result: AccountToken; readonly nextIndex: number } = AccountToken.codec.decode(patternIndex.nextIndex, binary);
     return { result: LogInState.VerifyingAccountToken(result.result), nextIndex: result.nextIndex };
   }
-  if (patternIndex.result === 8) {
+  if (patternIndex.result === 5) {
     const result: { readonly result: AccountTokenAndUserId; readonly nextIndex: number } = AccountTokenAndUserId.codec.decode(patternIndex.nextIndex, binary);
     return { result: LogInState.LoggedIn(result.result), nextIndex: result.nextIndex };
   }
@@ -2760,10 +2716,10 @@ export const AccountTokenAndUserId: { readonly codec: Codec<AccountTokenAndUserI
  * 取得日時とデータ本体. データ本体がない場合も含まれているのでMaybe
  * @typePartId f7590073f3ed06452193dddbb91e82e0
  */
-export const Resource: { readonly codec: <data extends unknown>(a: Codec<data>) => Codec<Resource<data>> } = { codec: <data extends unknown>(dataCodec: Codec<data>): Codec<Resource<data>> => ({ encode: (value: Resource<data>): ReadonlyArray<number> => (Time.codec.encode(value.getTime).concat(Maybe.codec(dataCodec).encode(value.dataMaybe))), decode: (index: number, binary: Uint8Array): { readonly result: Resource<data>; readonly nextIndex: number } => {
+export const Resource: { readonly codec: <data extends unknown>(a: Codec<data>) => Codec<Resource<data>> } = { codec: <data extends unknown>(dataCodec: Codec<data>): Codec<Resource<data>> => ({ encode: (value: Resource<data>): ReadonlyArray<number> => (Time.codec.encode(value.getTime).concat(dataCodec.encode(value.data))), decode: (index: number, binary: Uint8Array): { readonly result: Resource<data>; readonly nextIndex: number } => {
   const getTimeAndNextIndex: { readonly result: Time; readonly nextIndex: number } = Time.codec.decode(index, binary);
-  const dataMaybeAndNextIndex: { readonly result: Maybe<data>; readonly nextIndex: number } = Maybe.codec(dataCodec).decode(getTimeAndNextIndex.nextIndex, binary);
-  return { result: { getTime: getTimeAndNextIndex.result, dataMaybe: dataMaybeAndNextIndex.result }, nextIndex: dataMaybeAndNextIndex.nextIndex };
+  const dataAndNextIndex: { readonly result: data; readonly nextIndex: number } = dataCodec.decode(getTimeAndNextIndex.nextIndex, binary);
+  return { result: { getTime: getTimeAndNextIndex.result, data: dataAndNextIndex.result }, nextIndex: dataAndNextIndex.nextIndex };
 } }) };
 
 
@@ -2781,37 +2737,17 @@ readonly Loaded: <data extends unknown>(a: Resource<data>) => ResourceState<data
  */
 readonly Unknown: <data extends unknown>() => ResourceState<data>; 
 /**
- * indexedDBにアクセス待ち
- */
-readonly WaitLoading: <data extends unknown>() => ResourceState<data>; 
-/**
  * indexedDBにアクセス中
  */
 readonly Loading: <data extends unknown>() => ResourceState<data>; 
-/**
- * サーバに問い合わせ待ち
- */
-readonly WaitRequesting: <data extends unknown>() => ResourceState<data>; 
 /**
  * サーバに問い合わせ中
  */
 readonly Requesting: <data extends unknown>() => ResourceState<data>; 
 /**
- * 更新待ち
- */
-readonly WaitUpdating: <data extends unknown>(a: Resource<data>) => ResourceState<data>; 
-/**
  * サーバーに問い合わせてリソースを更新中
  */
-readonly Updating: <data extends unknown>(a: Resource<data>) => ResourceState<data>; 
-/**
- * Unknownだったリソースをサーバーに問い合わせ待ち
- */
-readonly WaitRetrying: <data extends unknown>() => ResourceState<data>; 
-/**
- * Unknownだったリソースをサーバーに問い合わせ中
- */
-readonly Retrying: <data extends unknown>() => ResourceState<data>; readonly codec: <data extends unknown>(a: Codec<data>) => Codec<ResourceState<data>> } = { Loaded: <data extends unknown>(dataResource: Resource<data>): ResourceState<data> => ({ _: \\"Loaded\\", dataResource }), Unknown: <data extends unknown>(): ResourceState<data> => ({ _: \\"Unknown\\" }), WaitLoading: <data extends unknown>(): ResourceState<data> => ({ _: \\"WaitLoading\\" }), Loading: <data extends unknown>(): ResourceState<data> => ({ _: \\"Loading\\" }), WaitRequesting: <data extends unknown>(): ResourceState<data> => ({ _: \\"WaitRequesting\\" }), Requesting: <data extends unknown>(): ResourceState<data> => ({ _: \\"Requesting\\" }), WaitUpdating: <data extends unknown>(dataResource: Resource<data>): ResourceState<data> => ({ _: \\"WaitUpdating\\", dataResource }), Updating: <data extends unknown>(dataResource: Resource<data>): ResourceState<data> => ({ _: \\"Updating\\", dataResource }), WaitRetrying: <data extends unknown>(): ResourceState<data> => ({ _: \\"WaitRetrying\\" }), Retrying: <data extends unknown>(): ResourceState<data> => ({ _: \\"Retrying\\" }), codec: <data extends unknown>(dataCodec: Codec<data>): Codec<ResourceState<data>> => ({ encode: (value: ResourceState<data>): ReadonlyArray<number> => {
+readonly Updating: <data extends unknown>(a: Resource<data>) => ResourceState<data>; readonly codec: <data extends unknown>(a: Codec<data>) => Codec<ResourceState<data>> } = { Loaded: <data extends unknown>(dataResource: Resource<data>): ResourceState<data> => ({ _: \\"Loaded\\", dataResource }), Unknown: <data extends unknown>(): ResourceState<data> => ({ _: \\"Unknown\\" }), Loading: <data extends unknown>(): ResourceState<data> => ({ _: \\"Loading\\" }), Requesting: <data extends unknown>(): ResourceState<data> => ({ _: \\"Requesting\\" }), Updating: <data extends unknown>(dataResource: Resource<data>): ResourceState<data> => ({ _: \\"Updating\\", dataResource }), codec: <data extends unknown>(dataCodec: Codec<data>): Codec<ResourceState<data>> => ({ encode: (value: ResourceState<data>): ReadonlyArray<number> => {
   switch (value._) {
     case \\"Loaded\\": {
       return [0].concat(Resource.codec(dataCodec).encode(value.dataResource));
@@ -2819,29 +2755,14 @@ readonly Retrying: <data extends unknown>() => ResourceState<data>; readonly cod
     case \\"Unknown\\": {
       return [1];
     }
-    case \\"WaitLoading\\": {
+    case \\"Loading\\": {
       return [2];
     }
-    case \\"Loading\\": {
+    case \\"Requesting\\": {
       return [3];
     }
-    case \\"WaitRequesting\\": {
-      return [4];
-    }
-    case \\"Requesting\\": {
-      return [5];
-    }
-    case \\"WaitUpdating\\": {
-      return [6].concat(Resource.codec(dataCodec).encode(value.dataResource));
-    }
     case \\"Updating\\": {
-      return [7].concat(Resource.codec(dataCodec).encode(value.dataResource));
-    }
-    case \\"WaitRetrying\\": {
-      return [8];
-    }
-    case \\"Retrying\\": {
-      return [9];
+      return [4].concat(Resource.codec(dataCodec).encode(value.dataResource));
     }
   }
 }, decode: (index: number, binary: Uint8Array): { readonly result: ResourceState<data>; readonly nextIndex: number } => {
@@ -2854,30 +2775,14 @@ readonly Retrying: <data extends unknown>() => ResourceState<data>; readonly cod
     return { result: ResourceState.Unknown(), nextIndex: patternIndex.nextIndex };
   }
   if (patternIndex.result === 2) {
-    return { result: ResourceState.WaitLoading(), nextIndex: patternIndex.nextIndex };
-  }
-  if (patternIndex.result === 3) {
     return { result: ResourceState.Loading(), nextIndex: patternIndex.nextIndex };
   }
-  if (patternIndex.result === 4) {
-    return { result: ResourceState.WaitRequesting(), nextIndex: patternIndex.nextIndex };
-  }
-  if (patternIndex.result === 5) {
+  if (patternIndex.result === 3) {
     return { result: ResourceState.Requesting(), nextIndex: patternIndex.nextIndex };
   }
-  if (patternIndex.result === 6) {
-    const result: { readonly result: Resource<data>; readonly nextIndex: number } = Resource.codec(dataCodec).decode(patternIndex.nextIndex, binary);
-    return { result: ResourceState.WaitUpdating(result.result), nextIndex: result.nextIndex };
-  }
-  if (patternIndex.result === 7) {
+  if (patternIndex.result === 4) {
     const result: { readonly result: Resource<data>; readonly nextIndex: number } = Resource.codec(dataCodec).decode(patternIndex.nextIndex, binary);
     return { result: ResourceState.Updating(result.result), nextIndex: result.nextIndex };
-  }
-  if (patternIndex.result === 8) {
-    return { result: ResourceState.WaitRetrying(), nextIndex: patternIndex.nextIndex };
-  }
-  if (patternIndex.result === 9) {
-    return { result: ResourceState.Retrying(), nextIndex: patternIndex.nextIndex };
   }
   throw new Error(\\"存在しないパターンを指定された 型を更新してください\\");
 } }) };
@@ -2897,29 +2802,13 @@ readonly Loaded: <data extends unknown>(a: data) => StaticResourceState<data>;
  */
 readonly Unknown: <data extends unknown>() => StaticResourceState<data>; 
 /**
- * indexedDBにアクセス待ち
- */
-readonly WaitLoading: <data extends unknown>() => StaticResourceState<data>; 
-/**
  * indexedDBにアクセス中
  */
 readonly Loading: <data extends unknown>() => StaticResourceState<data>; 
 /**
- * サーバに問い合わせ待ち
- */
-readonly WaitRequesting: <data extends unknown>() => StaticResourceState<data>; 
-/**
  * サーバに問い合わせ中
  */
-readonly Requesting: <data extends unknown>() => StaticResourceState<data>; 
-/**
- * Unknownだったリソースをサーバーに問い合わせ待ち
- */
-readonly WaitRetrying: <data extends unknown>() => StaticResourceState<data>; 
-/**
- * Unknownだったリソースをサーバーに問い合わせ中
- */
-readonly Retrying: <data extends unknown>() => StaticResourceState<data>; readonly codec: <data extends unknown>(a: Codec<data>) => Codec<StaticResourceState<data>> } = { Loaded: <data extends unknown>(data: data): StaticResourceState<data> => ({ _: \\"Loaded\\", data }), Unknown: <data extends unknown>(): StaticResourceState<data> => ({ _: \\"Unknown\\" }), WaitLoading: <data extends unknown>(): StaticResourceState<data> => ({ _: \\"WaitLoading\\" }), Loading: <data extends unknown>(): StaticResourceState<data> => ({ _: \\"Loading\\" }), WaitRequesting: <data extends unknown>(): StaticResourceState<data> => ({ _: \\"WaitRequesting\\" }), Requesting: <data extends unknown>(): StaticResourceState<data> => ({ _: \\"Requesting\\" }), WaitRetrying: <data extends unknown>(): StaticResourceState<data> => ({ _: \\"WaitRetrying\\" }), Retrying: <data extends unknown>(): StaticResourceState<data> => ({ _: \\"Retrying\\" }), codec: <data extends unknown>(dataCodec: Codec<data>): Codec<StaticResourceState<data>> => ({ encode: (value: StaticResourceState<data>): ReadonlyArray<number> => {
+readonly Requesting: <data extends unknown>() => StaticResourceState<data>; readonly codec: <data extends unknown>(a: Codec<data>) => Codec<StaticResourceState<data>> } = { Loaded: <data extends unknown>(data: data): StaticResourceState<data> => ({ _: \\"Loaded\\", data }), Unknown: <data extends unknown>(): StaticResourceState<data> => ({ _: \\"Unknown\\" }), Loading: <data extends unknown>(): StaticResourceState<data> => ({ _: \\"Loading\\" }), Requesting: <data extends unknown>(): StaticResourceState<data> => ({ _: \\"Requesting\\" }), codec: <data extends unknown>(dataCodec: Codec<data>): Codec<StaticResourceState<data>> => ({ encode: (value: StaticResourceState<data>): ReadonlyArray<number> => {
   switch (value._) {
     case \\"Loaded\\": {
       return [0].concat(dataCodec.encode(value.data));
@@ -2927,23 +2816,11 @@ readonly Retrying: <data extends unknown>() => StaticResourceState<data>; readon
     case \\"Unknown\\": {
       return [1];
     }
-    case \\"WaitLoading\\": {
+    case \\"Loading\\": {
       return [2];
     }
-    case \\"Loading\\": {
-      return [3];
-    }
-    case \\"WaitRequesting\\": {
-      return [4];
-    }
     case \\"Requesting\\": {
-      return [5];
-    }
-    case \\"WaitRetrying\\": {
-      return [6];
-    }
-    case \\"Retrying\\": {
-      return [7];
+      return [3];
     }
   }
 }, decode: (index: number, binary: Uint8Array): { readonly result: StaticResourceState<data>; readonly nextIndex: number } => {
@@ -2956,22 +2833,10 @@ readonly Retrying: <data extends unknown>() => StaticResourceState<data>; readon
     return { result: StaticResourceState.Unknown(), nextIndex: patternIndex.nextIndex };
   }
   if (patternIndex.result === 2) {
-    return { result: StaticResourceState.WaitLoading(), nextIndex: patternIndex.nextIndex };
-  }
-  if (patternIndex.result === 3) {
     return { result: StaticResourceState.Loading(), nextIndex: patternIndex.nextIndex };
   }
-  if (patternIndex.result === 4) {
-    return { result: StaticResourceState.WaitRequesting(), nextIndex: patternIndex.nextIndex };
-  }
-  if (patternIndex.result === 5) {
+  if (patternIndex.result === 3) {
     return { result: StaticResourceState.Requesting(), nextIndex: patternIndex.nextIndex };
-  }
-  if (patternIndex.result === 6) {
-    return { result: StaticResourceState.WaitRetrying(), nextIndex: patternIndex.nextIndex };
-  }
-  if (patternIndex.result === 7) {
-    return { result: StaticResourceState.Retrying(), nextIndex: patternIndex.nextIndex };
   }
   throw new Error(\\"存在しないパターンを指定された 型を更新してください\\");
 } }) };
