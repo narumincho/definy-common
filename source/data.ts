@@ -945,7 +945,7 @@ export type Resource<data extends unknown> = {
   /**
    * データ本体
    */
-  readonly dataMaybe: Maybe<data>;
+  readonly data: data;
 };
 
 /**
@@ -4213,9 +4213,7 @@ export const Resource: {
     dataCodec: Codec<data>
   ): Codec<Resource<data>> => ({
     encode: (value: Resource<data>): ReadonlyArray<number> =>
-      Time.codec
-        .encode(value.getTime)
-        .concat(Maybe.codec(dataCodec).encode(value.dataMaybe)),
+      Time.codec.encode(value.getTime).concat(dataCodec.encode(value.data)),
     decode: (
       index: number,
       binary: Uint8Array
@@ -4224,16 +4222,16 @@ export const Resource: {
         readonly result: Time;
         readonly nextIndex: number;
       } = Time.codec.decode(index, binary);
-      const dataMaybeAndNextIndex: {
-        readonly result: Maybe<data>;
+      const dataAndNextIndex: {
+        readonly result: data;
         readonly nextIndex: number;
-      } = Maybe.codec(dataCodec).decode(getTimeAndNextIndex.nextIndex, binary);
+      } = dataCodec.decode(getTimeAndNextIndex.nextIndex, binary);
       return {
         result: {
           getTime: getTimeAndNextIndex.result,
-          dataMaybe: dataMaybeAndNextIndex.result,
+          data: dataAndNextIndex.result,
         },
-        nextIndex: dataMaybeAndNextIndex.nextIndex,
+        nextIndex: dataAndNextIndex.nextIndex,
       };
     },
   }),

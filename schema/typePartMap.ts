@@ -1740,12 +1740,12 @@ export const typePartMap: ReadonlyMap<TypePartId, TypePart> = new Map<
           type: type.Time,
         },
         {
-          name: "dataMaybe",
+          name: "data",
           description: "データ本体",
-          type: type.Maybe({
+          type: {
             typePartId: resourceDataTypePartId,
             parameter: [],
-          }),
+          },
         },
       ]),
     },
