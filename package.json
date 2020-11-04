@@ -7,7 +7,8 @@
   "license": "Apache-2.0",
   "scripts": {
     "test": "jest --watch --verbose false",
-    "generateCode": "node ./schema/start.js"
+    "generateCode": "node ./schema/start.js",
+    "typeCheck": "tsc --project source/tsconfig.json --noEmit --watch"
   },
   "repository": {
     "type": "git",

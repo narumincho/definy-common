@@ -1,7 +1,7 @@
 import * as data from "./data";
-import * as elm from "elm-code-generator/data";
+import * as elm from "elm-code-generator/source/data";
 import * as elmCodeGenerator from "elm-code-generator";
-import * as elmUtil from "elm-code-generator/util";
+import * as elmUtil from "elm-code-generator/source/util";
 import * as hexString from "./kernelType/hexString";
 import * as jsTsCodeGenerator from "js-ts-code-generator";
 import * as ts from "js-ts-code-generator/source/data";
