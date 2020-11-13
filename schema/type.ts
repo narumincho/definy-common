@@ -145,8 +145,8 @@ export const AccountTokenAndCommitId = noParameterType(
 
 export const LogInState = noParameterType(id.LogInState);
 
-export const Resource = (dataType: data.Type): data.Type => ({
-  typePartId: id.Resource,
+export const WithTime = (dataType: data.Type): data.Type => ({
+  typePartId: id.WithTime,
   parameter: [dataType],
 });
 

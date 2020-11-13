@@ -1708,11 +1708,10 @@ export const typePartMap: ReadonlyMap<TypePartId, TypePart> = new Map<
     },
   ],
   [
-    id.Resource,
+    id.WithTime,
     {
-      name: "Resource",
-      description:
-        "取得日時とデータ本体. データ本体がない場合も含まれているのでMaybe",
+      name: "WithTime",
+      description: "取得日時と任意のデータ",
       projectId: util.definyCodeProjectId,
       createCommitId: util.codeCommitId,
       attribute: Maybe.Nothing(),
@@ -1725,7 +1724,7 @@ export const typePartMap: ReadonlyMap<TypePartId, TypePart> = new Map<
         },
         {
           name: "data",
-          description: "データ本体",
+          description: "データ",
           type: {
             typePartId: resourceDataTypePartId,
             parameter: [],
@@ -1751,21 +1750,21 @@ export const typePartMap: ReadonlyMap<TypePartId, TypePart> = new Map<
           name: "Loaded",
           description: "読み込み済み",
           parameter: Maybe.Just(
-            type.Resource({
+            type.WithTime({
               typePartId: resourceStateDataTypePartId,
               parameter: [],
             })
           ),
         },
         {
-          name: "Unknown",
-          description: "データを取得できなかった (サーバーの障害, オフライン)",
-          parameter: Maybe.Nothing(),
+          name: "Deleted",
+          description: "削除されたか, 存在しない",
+          parameter: Maybe.Just(type.Time),
         },
         {
-          name: "Loading",
-          description: "indexedDBにアクセス中",
-          parameter: Maybe.Nothing(),
+          name: "Unknown",
+          description: "データを取得できなかった (サーバーの障害, オフライン)",
+          parameter: Maybe.Just(type.Time),
         },
         {
           name: "Requesting",
@@ -1774,9 +1773,9 @@ export const typePartMap: ReadonlyMap<TypePartId, TypePart> = new Map<
         },
         {
           name: "Updating",
-          description: "サーバーに問い合わせてリソースを更新中",
+          description: "サーバーに問い合わせて新しいリソースを取得中",
           parameter: Maybe.Just(
-            type.Resource({
+            type.WithTime({
               typePartId: resourceStateDataTypePartId,
               parameter: [],
             })

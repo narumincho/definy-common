@@ -925,16 +925,16 @@ export type AccountTokenAndUserId = {
 };
 
 /**
- * 取得日時とデータ本体. データ本体がない場合も含まれているのでMaybe
+ * 取得日時と任意のデータ
  * @typePartId f7590073f3ed06452193dddbb91e82e0
  */
-export type Resource<data extends unknown> = {
+export type WithTime<data extends unknown> = {
   /**
    * データベースから取得した日時
    */
   readonly getTime: Time;
   /**
-   * データ本体
+   * データ
    */
   readonly data: data;
 };
@@ -944,11 +944,11 @@ export type Resource<data extends unknown> = {
  * @typePartId 833fbf3dcab7e9365f334f8b00c24d55
  */
 export type ResourceState<data extends unknown> =
-  | { readonly _: "Loaded"; readonly dataResource: Resource<data> }
-  | { readonly _: "Unknown" }
-  | { readonly _: "Loading" }
+  | { readonly _: "Loaded"; readonly dataWithTime: WithTime<data> }
+  | { readonly _: "Deleted"; readonly time: Time }
+  | { readonly _: "Unknown"; readonly time: Time }
   | { readonly _: "Requesting" }
-  | { readonly _: "Updating"; readonly dataResource: Resource<data> };
+  | { readonly _: "Updating"; readonly dataWithTime: WithTime<data> };
 
 /**
  * キーであるTokenによってデータが必ず1つに決まるもの. 絶対に更新されない
@@ -4124,23 +4124,23 @@ export const AccountTokenAndUserId: {
 };
 
 /**
- * 取得日時とデータ本体. データ本体がない場合も含まれているのでMaybe
+ * 取得日時と任意のデータ
  * @typePartId f7590073f3ed06452193dddbb91e82e0
  */
-export const Resource: {
+export const WithTime: {
   readonly codec: <data extends unknown>(
     a: Codec<data>
-  ) => Codec<Resource<data>>;
+  ) => Codec<WithTime<data>>;
 } = {
   codec: <data extends unknown>(
     dataCodec: Codec<data>
-  ): Codec<Resource<data>> => ({
-    encode: (value: Resource<data>): ReadonlyArray<number> =>
+  ): Codec<WithTime<data>> => ({
+    encode: (value: WithTime<data>): ReadonlyArray<number> =>
       Time.codec.encode(value.getTime).concat(dataCodec.encode(value.data)),
     decode: (
       index: number,
       binary: Uint8Array
-    ): { readonly result: Resource<data>; readonly nextIndex: number } => {
+    ): { readonly result: WithTime<data>; readonly nextIndex: number } => {
       const getTimeAndNextIndex: {
         readonly result: Time;
         readonly nextIndex: number;
@@ -4169,41 +4169,47 @@ export const ResourceState: {
    * 読み込み済み
    */
   readonly Loaded: <data extends unknown>(
-    a: Resource<data>
+    a: WithTime<data>
   ) => ResourceState<data>;
+  /**
+   * 削除されたか, 存在しない
+   */
+  readonly Deleted: <data extends unknown>(a: Time) => ResourceState<data>;
   /**
    * データを取得できなかった (サーバーの障害, オフライン)
    */
-  readonly Unknown: <data extends unknown>() => ResourceState<data>;
-  /**
-   * indexedDBにアクセス中
-   */
-  readonly Loading: <data extends unknown>() => ResourceState<data>;
+  readonly Unknown: <data extends unknown>(a: Time) => ResourceState<data>;
   /**
    * サーバに問い合わせ中
    */
   readonly Requesting: <data extends unknown>() => ResourceState<data>;
   /**
-   * サーバーに問い合わせてリソースを更新中
+   * サーバーに問い合わせて新しいリソースを取得中
    */
   readonly Updating: <data extends unknown>(
-    a: Resource<data>
+    a: WithTime<data>
   ) => ResourceState<data>;
   readonly codec: <data extends unknown>(
     a: Codec<data>
   ) => Codec<ResourceState<data>>;
 } = {
   Loaded: <data extends unknown>(
-    dataResource: Resource<data>
-  ): ResourceState<data> => ({ _: "Loaded", dataResource }),
-  Unknown: <data extends unknown>(): ResourceState<data> => ({ _: "Unknown" }),
-  Loading: <data extends unknown>(): ResourceState<data> => ({ _: "Loading" }),
+    dataWithTime: WithTime<data>
+  ): ResourceState<data> => ({ _: "Loaded", dataWithTime }),
+  Deleted: <data extends unknown>(time: Time): ResourceState<data> => ({
+    _: "Deleted",
+    time,
+  }),
+  Unknown: <data extends unknown>(time: Time): ResourceState<data> => ({
+    _: "Unknown",
+    time,
+  }),
   Requesting: <data extends unknown>(): ResourceState<data> => ({
     _: "Requesting",
   }),
   Updating: <data extends unknown>(
-    dataResource: Resource<data>
-  ): ResourceState<data> => ({ _: "Updating", dataResource }),
+    dataWithTime: WithTime<data>
+  ): ResourceState<data> => ({ _: "Updating", dataWithTime }),
   codec: <data extends unknown>(
     dataCodec: Codec<data>
   ): Codec<ResourceState<data>> => ({
@@ -4211,21 +4217,21 @@ export const ResourceState: {
       switch (value._) {
         case "Loaded": {
           return [0].concat(
-            Resource.codec(dataCodec).encode(value.dataResource)
+            WithTime.codec(dataCodec).encode(value.dataWithTime)
           );
         }
-        case "Unknown": {
-          return [1];
+        case "Deleted": {
+          return [1].concat(Time.codec.encode(value.time));
         }
-        case "Loading": {
-          return [2];
+        case "Unknown": {
+          return [2].concat(Time.codec.encode(value.time));
         }
         case "Requesting": {
           return [3];
         }
         case "Updating": {
           return [4].concat(
-            Resource.codec(dataCodec).encode(value.dataResource)
+            WithTime.codec(dataCodec).encode(value.dataWithTime)
           );
         }
       }
@@ -4240,24 +4246,32 @@ export const ResourceState: {
       } = Int32.codec.decode(index, binary);
       if (patternIndex.result === 0) {
         const result: {
-          readonly result: Resource<data>;
+          readonly result: WithTime<data>;
           readonly nextIndex: number;
-        } = Resource.codec(dataCodec).decode(patternIndex.nextIndex, binary);
+        } = WithTime.codec(dataCodec).decode(patternIndex.nextIndex, binary);
         return {
           result: ResourceState.Loaded(result.result),
           nextIndex: result.nextIndex,
         };
       }
       if (patternIndex.result === 1) {
+        const result: {
+          readonly result: Time;
+          readonly nextIndex: number;
+        } = Time.codec.decode(patternIndex.nextIndex, binary);
         return {
-          result: ResourceState.Unknown(),
-          nextIndex: patternIndex.nextIndex,
+          result: ResourceState.Deleted(result.result),
+          nextIndex: result.nextIndex,
         };
       }
       if (patternIndex.result === 2) {
+        const result: {
+          readonly result: Time;
+          readonly nextIndex: number;
+        } = Time.codec.decode(patternIndex.nextIndex, binary);
         return {
-          result: ResourceState.Loading(),
-          nextIndex: patternIndex.nextIndex,
+          result: ResourceState.Unknown(result.result),
+          nextIndex: result.nextIndex,
         };
       }
       if (patternIndex.result === 3) {
@@ -4268,9 +4282,9 @@ export const ResourceState: {
       }
       if (patternIndex.result === 4) {
         const result: {
-          readonly result: Resource<data>;
+          readonly result: WithTime<data>;
           readonly nextIndex: number;
-        } = Resource.codec(dataCodec).decode(patternIndex.nextIndex, binary);
+        } = WithTime.codec(dataCodec).decode(patternIndex.nextIndex, binary);
         return {
           result: ResourceState.Updating(result.result),
           nextIndex: result.nextIndex,
