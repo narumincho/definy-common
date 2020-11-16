@@ -95,3 +95,27 @@ export const setTypePartName: ApiCodec<
     )
   ),
 };
+
+export const setTypePartDescription: ApiCodec<
+  d.SetTypePartDescriptionParameter,
+  d.WithTime<d.Maybe<d.List<d.IdAndData<d.TypePartId, d.TypePart>>>>
+> = {
+  request: d.SetTypePartDescriptionParameter.codec,
+  response: d.WithTime.codec(
+    d.Maybe.codec(
+      d.List.codec(d.IdAndData.codec(d.TypePartId.codec, d.TypePart.codec))
+    )
+  ),
+};
+
+export const setTypePartBody: ApiCodec<
+  d.SetTypePartBodyParameter,
+  d.WithTime<d.Maybe<d.List<d.IdAndData<d.TypePartId, d.TypePart>>>>
+> = {
+  request: d.SetTypePartBodyParameter.codec,
+  response: d.WithTime.codec(
+    d.Maybe.codec(
+      d.List.codec(d.IdAndData.codec(d.TypePartId.codec, d.TypePart.codec))
+    )
+  ),
+};
