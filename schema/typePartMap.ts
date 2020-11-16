@@ -1846,4 +1846,88 @@ export const typePartMap: ReadonlyMap<TypePartId, TypePart> = new Map<
       ]),
     },
   ],
+  [
+    id.SetTypePartNameParameter,
+    {
+      name: "SetTypePartNameParameter",
+      description: "型パーツの名前を変更する",
+      projectId: util.definyCodeProjectId,
+      createCommitId: util.codeCommitId,
+      attribute: Maybe.Nothing(),
+      typeParameterList: [],
+      body: TypePartBody.Product([
+        {
+          name: "accountToken",
+          description: "アカウントトークン",
+          type: type.AccountToken,
+        },
+        {
+          name: "typePartId",
+          description: "名前を変える型パーツID",
+          type: type.TypePartId,
+        },
+        {
+          name: "name",
+          description: "設定する名前",
+          type: type.String,
+        },
+      ]),
+    },
+  ],
+  [
+    id.SetTypePartDescriptionParameter,
+    {
+      name: "SetTypePartDescriptionParameter",
+      description: "型パーツの説明文を変更する",
+      projectId: util.definyCodeProjectId,
+      createCommitId: util.codeCommitId,
+      attribute: Maybe.Nothing(),
+      typeParameterList: [],
+      body: TypePartBody.Product([
+        {
+          name: "accountToken",
+          description: "アカウントトークン",
+          type: type.AccountToken,
+        },
+        {
+          name: "typePartId",
+          description: "名前を変える型パーツID",
+          type: type.TypePartId,
+        },
+        {
+          name: "description",
+          description: "設定する説明文",
+          type: type.String,
+        },
+      ]),
+    },
+  ],
+  [
+    id.SetTypePartBodyParameter,
+    {
+      name: "SetTypePartBodyParameter",
+      description: "型パーツの本体を変更する",
+      projectId: util.definyCodeProjectId,
+      createCommitId: util.codeCommitId,
+      attribute: Maybe.Nothing(),
+      typeParameterList: [],
+      body: TypePartBody.Product([
+        {
+          name: "accountToken",
+          description: "アカウントトークン",
+          type: type.AccountToken,
+        },
+        {
+          name: "typePartId",
+          description: "名前を変える型パーツID",
+          type: type.TypePartId,
+        },
+        {
+          name: "typePartBody",
+          description: "型パーツの本体",
+          type: type.TypePartBody,
+        },
+      ]),
+    },
+  ],
 ]);

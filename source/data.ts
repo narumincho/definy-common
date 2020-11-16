@@ -976,6 +976,63 @@ export type AccountTokenAndProjectId = {
 };
 
 /**
+ * 型パーツの名前を変更する
+ * @typePartId adb52012e9699ed614a5e096980bc7f2
+ */
+export type SetTypePartNameParameter = {
+  /**
+   * アカウントトークン
+   */
+  readonly accountToken: AccountToken;
+  /**
+   * 名前を変える型パーツID
+   */
+  readonly typePartId: TypePartId;
+  /**
+   * 設定する名前
+   */
+  readonly name: String;
+};
+
+/**
+ * 型パーツの説明文を変更する
+ * @typePartId ad9469d33e4ad7dc0fffd51e5fe8a381
+ */
+export type SetTypePartDescriptionParameter = {
+  /**
+   * アカウントトークン
+   */
+  readonly accountToken: AccountToken;
+  /**
+   * 名前を変える型パーツID
+   */
+  readonly typePartId: TypePartId;
+  /**
+   * 設定する説明文
+   */
+  readonly description: String;
+};
+
+/**
+ * 型パーツの本体を変更する
+ * @typePartId acf17c00f4f61de20fe64062df79eef3
+ */
+export type SetTypePartBodyParameter = {
+  /**
+   * アカウントトークン
+   */
+  readonly accountToken: AccountToken;
+  /**
+   * 名前を変える型パーツID
+   */
+  readonly typePartId: TypePartId;
+  /**
+   * 型パーツの本体
+   */
+  readonly typePartBody: TypePartBody;
+};
+
+/**
  * -2 147 483 648 ～ 2 147 483 647. 32bit 符号付き整数. JavaScriptのnumberとして扱える. numberの32bit符号あり整数をSigned Leb128のバイナリに変換する
  * @typePartId ccf22e92cea3639683c0271d65d00673
  */
@@ -4429,6 +4486,138 @@ export const AccountTokenAndProjectId: {
           projectId: projectIdAndNextIndex.result,
         },
         nextIndex: projectIdAndNextIndex.nextIndex,
+      };
+    },
+  },
+};
+
+/**
+ * 型パーツの名前を変更する
+ * @typePartId adb52012e9699ed614a5e096980bc7f2
+ */
+export const SetTypePartNameParameter: {
+  readonly codec: Codec<SetTypePartNameParameter>;
+} = {
+  codec: {
+    encode: (value: SetTypePartNameParameter): ReadonlyArray<number> =>
+      AccountToken.codec
+        .encode(value.accountToken)
+        .concat(TypePartId.codec.encode(value.typePartId))
+        .concat(String.codec.encode(value.name)),
+    decode: (
+      index: number,
+      binary: Uint8Array
+    ): {
+      readonly result: SetTypePartNameParameter;
+      readonly nextIndex: number;
+    } => {
+      const accountTokenAndNextIndex: {
+        readonly result: AccountToken;
+        readonly nextIndex: number;
+      } = AccountToken.codec.decode(index, binary);
+      const typePartIdAndNextIndex: {
+        readonly result: TypePartId;
+        readonly nextIndex: number;
+      } = TypePartId.codec.decode(accountTokenAndNextIndex.nextIndex, binary);
+      const nameAndNextIndex: {
+        readonly result: String;
+        readonly nextIndex: number;
+      } = String.codec.decode(typePartIdAndNextIndex.nextIndex, binary);
+      return {
+        result: {
+          accountToken: accountTokenAndNextIndex.result,
+          typePartId: typePartIdAndNextIndex.result,
+          name: nameAndNextIndex.result,
+        },
+        nextIndex: nameAndNextIndex.nextIndex,
+      };
+    },
+  },
+};
+
+/**
+ * 型パーツの説明文を変更する
+ * @typePartId ad9469d33e4ad7dc0fffd51e5fe8a381
+ */
+export const SetTypePartDescriptionParameter: {
+  readonly codec: Codec<SetTypePartDescriptionParameter>;
+} = {
+  codec: {
+    encode: (value: SetTypePartDescriptionParameter): ReadonlyArray<number> =>
+      AccountToken.codec
+        .encode(value.accountToken)
+        .concat(TypePartId.codec.encode(value.typePartId))
+        .concat(String.codec.encode(value.description)),
+    decode: (
+      index: number,
+      binary: Uint8Array
+    ): {
+      readonly result: SetTypePartDescriptionParameter;
+      readonly nextIndex: number;
+    } => {
+      const accountTokenAndNextIndex: {
+        readonly result: AccountToken;
+        readonly nextIndex: number;
+      } = AccountToken.codec.decode(index, binary);
+      const typePartIdAndNextIndex: {
+        readonly result: TypePartId;
+        readonly nextIndex: number;
+      } = TypePartId.codec.decode(accountTokenAndNextIndex.nextIndex, binary);
+      const descriptionAndNextIndex: {
+        readonly result: String;
+        readonly nextIndex: number;
+      } = String.codec.decode(typePartIdAndNextIndex.nextIndex, binary);
+      return {
+        result: {
+          accountToken: accountTokenAndNextIndex.result,
+          typePartId: typePartIdAndNextIndex.result,
+          description: descriptionAndNextIndex.result,
+        },
+        nextIndex: descriptionAndNextIndex.nextIndex,
+      };
+    },
+  },
+};
+
+/**
+ * 型パーツの本体を変更する
+ * @typePartId acf17c00f4f61de20fe64062df79eef3
+ */
+export const SetTypePartBodyParameter: {
+  readonly codec: Codec<SetTypePartBodyParameter>;
+} = {
+  codec: {
+    encode: (value: SetTypePartBodyParameter): ReadonlyArray<number> =>
+      AccountToken.codec
+        .encode(value.accountToken)
+        .concat(TypePartId.codec.encode(value.typePartId))
+        .concat(TypePartBody.codec.encode(value.typePartBody)),
+    decode: (
+      index: number,
+      binary: Uint8Array
+    ): {
+      readonly result: SetTypePartBodyParameter;
+      readonly nextIndex: number;
+    } => {
+      const accountTokenAndNextIndex: {
+        readonly result: AccountToken;
+        readonly nextIndex: number;
+      } = AccountToken.codec.decode(index, binary);
+      const typePartIdAndNextIndex: {
+        readonly result: TypePartId;
+        readonly nextIndex: number;
+      } = TypePartId.codec.decode(accountTokenAndNextIndex.nextIndex, binary);
+      const typePartBodyAndNextIndex: {
+        readonly result: TypePartBody;
+        readonly nextIndex: number;
+      } = TypePartBody.codec.decode(typePartIdAndNextIndex.nextIndex, binary);
+      return {
+        result: {
+          accountToken: accountTokenAndNextIndex.result,
+          typePartId: typePartIdAndNextIndex.result,
+          typePartBody: typePartBodyAndNextIndex.result,
+        },
+        nextIndex: typePartBodyAndNextIndex.nextIndex,
       };
     },
   },

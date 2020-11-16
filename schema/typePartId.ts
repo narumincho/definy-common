@@ -69,3 +69,6 @@ export const ResourceState = "833fbf3dcab7e9365f334f8b00c24d55" as T;
 export const StaticResourceState = "134205335ce83693fd83994e907acabd" as T;
 export const AccountTokenAndUserId = "895fb0f083f1828da2c56b25ed77eb54" as T;
 export const AccountTokenAndProjectId = "4143a0787c0f06dfddc2f2f13f7e7a20" as T;
+export const SetTypePartNameParameter = "adb52012e9699ed614a5e096980bc7f2" as T;
+export const SetTypePartDescriptionParameter = "ad9469d33e4ad7dc0fffd51e5fe8a381" as T;
+export const SetTypePartBodyParameter = "acf17c00f4f61de20fe64062df79eef3" as T;

@@ -165,3 +165,14 @@ export const AccountTokenAndUserId = noParameterType(id.AccountTokenAndUserId);
 export const AccountTokenAndProjectId = noParameterType(
   id.AccountTokenAndProjectId
 );
+
+export const SetTypePartNameParameter = noParameterType(
+  id.SetTypePartNameParameter
+);
+
+export const SetTypePartDescriptionParameter = noParameterType(
+  id.SetTypePartDescriptionParameter
+);
+export const SetTypePartBodyParameter = noParameterType(
+  id.SetTypePartBodyParameter
+);
