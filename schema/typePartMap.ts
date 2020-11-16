@@ -1771,16 +1771,6 @@ export const typePartMap: ReadonlyMap<TypePartId, TypePart> = new Map<
           description: "サーバに問い合わせ中",
           parameter: Maybe.Nothing(),
         },
-        {
-          name: "Updating",
-          description: "サーバーに問い合わせて新しいリソースを取得中",
-          parameter: Maybe.Just(
-            type.WithTime({
-              typePartId: resourceStateDataTypePartId,
-              parameter: [],
-            })
-          ),
-        },
       ]),
     },
   ],
@@ -1789,7 +1779,7 @@ export const typePartMap: ReadonlyMap<TypePartId, TypePart> = new Map<
     {
       name: "StaticResourceState",
       description:
-        "キーであるTokenによってデータが必ず1つに決まるもの. 絶対に更新されない",
+        "キーであるTokenによってデータが必ず1つに決まるもの. 絶対に更新されない. リソースがないということはデータが不正な状態になっているということ",
       projectId: util.definyCodeProjectId,
       createCommitId: util.codeCommitId,
       attribute: Maybe.Nothing(),

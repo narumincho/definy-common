@@ -358,9 +358,8 @@ type ResourceState data
     | Deleted Time
     | Unknown Time
     | Requesting
-    | Updating (WithTime data)
 
-{-| キーであるTokenによってデータが必ず1つに決まるもの. 絶対に更新されない
+{-| キーであるTokenによってデータが必ず1つに決まるもの. 絶対に更新されない. リソースがないということはデータが不正な状態になっているということ
 -}
 type StaticResourceState data
     = Loaded data
@@ -1290,11 +1289,11 @@ readonly data: data };
  * ProjectやUserなどのリソースの状態とデータ. 読み込み中だとか
  * @typePartId 833fbf3dcab7e9365f334f8b00c24d55
  */
-export type ResourceState<data extends unknown> = { readonly _: \\"Loaded\\"; readonly dataWithTime: WithTime<data> } | { readonly _: \\"Deleted\\"; readonly time: Time } | { readonly _: \\"Unknown\\"; readonly time: Time } | { readonly _: \\"Requesting\\" } | { readonly _: \\"Updating\\"; readonly dataWithTime: WithTime<data> };
+export type ResourceState<data extends unknown> = { readonly _: \\"Loaded\\"; readonly dataWithTime: WithTime<data> } | { readonly _: \\"Deleted\\"; readonly time: Time } | { readonly _: \\"Unknown\\"; readonly time: Time } | { readonly _: \\"Requesting\\" };
 
 
 /**
- * キーであるTokenによってデータが必ず1つに決まるもの. 絶対に更新されない
+ * キーであるTokenによってデータが必ず1つに決まるもの. 絶対に更新されない. リソースがないということはデータが不正な状態になっているということ
  * @typePartId 134205335ce83693fd83994e907acabd
  */
 export type StaticResourceState<data extends unknown> = { readonly _: \\"Loaded\\"; readonly data: data } | { readonly _: \\"Unknown\\" } | { readonly _: \\"Loading\\" } | { readonly _: \\"Requesting\\" };
@@ -2815,11 +2814,7 @@ readonly Unknown: <data extends unknown>(a: Time) => ResourceState<data>;
 /**
  * サーバに問い合わせ中
  */
-readonly Requesting: <data extends unknown>() => ResourceState<data>; 
-/**
- * サーバーに問い合わせて新しいリソースを取得中
- */
-readonly Updating: <data extends unknown>(a: WithTime<data>) => ResourceState<data>; readonly codec: <data extends unknown>(a: Codec<data>) => Codec<ResourceState<data>> } = { Loaded: <data extends unknown>(dataWithTime: WithTime<data>): ResourceState<data> => ({ _: \\"Loaded\\", dataWithTime }), Deleted: <data extends unknown>(time: Time): ResourceState<data> => ({ _: \\"Deleted\\", time }), Unknown: <data extends unknown>(time: Time): ResourceState<data> => ({ _: \\"Unknown\\", time }), Requesting: <data extends unknown>(): ResourceState<data> => ({ _: \\"Requesting\\" }), Updating: <data extends unknown>(dataWithTime: WithTime<data>): ResourceState<data> => ({ _: \\"Updating\\", dataWithTime }), codec: <data extends unknown>(dataCodec: Codec<data>): Codec<ResourceState<data>> => ({ encode: (value: ResourceState<data>): ReadonlyArray<number> => {
+readonly Requesting: <data extends unknown>() => ResourceState<data>; readonly codec: <data extends unknown>(a: Codec<data>) => Codec<ResourceState<data>> } = { Loaded: <data extends unknown>(dataWithTime: WithTime<data>): ResourceState<data> => ({ _: \\"Loaded\\", dataWithTime }), Deleted: <data extends unknown>(time: Time): ResourceState<data> => ({ _: \\"Deleted\\", time }), Unknown: <data extends unknown>(time: Time): ResourceState<data> => ({ _: \\"Unknown\\", time }), Requesting: <data extends unknown>(): ResourceState<data> => ({ _: \\"Requesting\\" }), codec: <data extends unknown>(dataCodec: Codec<data>): Codec<ResourceState<data>> => ({ encode: (value: ResourceState<data>): ReadonlyArray<number> => {
   switch (value._) {
     case \\"Loaded\\": {
       return [0].concat(WithTime.codec(dataCodec).encode(value.dataWithTime));
@@ -2832,9 +2827,6 @@ readonly Updating: <data extends unknown>(a: WithTime<data>) => ResourceState<da
     }
     case \\"Requesting\\": {
       return [3];
-    }
-    case \\"Updating\\": {
-      return [4].concat(WithTime.codec(dataCodec).encode(value.dataWithTime));
     }
   }
 }, decode: (index: number, binary: Uint8Array): { readonly result: ResourceState<data>; readonly nextIndex: number } => {
@@ -2854,16 +2846,12 @@ readonly Updating: <data extends unknown>(a: WithTime<data>) => ResourceState<da
   if (patternIndex.result === 3) {
     return { result: ResourceState.Requesting(), nextIndex: patternIndex.nextIndex };
   }
-  if (patternIndex.result === 4) {
-    const result: { readonly result: WithTime<data>; readonly nextIndex: number } = WithTime.codec(dataCodec).decode(patternIndex.nextIndex, binary);
-    return { result: ResourceState.Updating(result.result), nextIndex: result.nextIndex };
-  }
   throw new Error(\\"存在しないパターンを指定された 型を更新してください\\");
 } }) };
 
 
 /**
- * キーであるTokenによってデータが必ず1つに決まるもの. 絶対に更新されない
+ * キーであるTokenによってデータが必ず1つに決まるもの. 絶対に更新されない. リソースがないということはデータが不正な状態になっているということ
  * @typePartId 134205335ce83693fd83994e907acabd
  */
 export const StaticResourceState: { 

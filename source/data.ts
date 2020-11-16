@@ -947,11 +947,10 @@ export type ResourceState<data extends unknown> =
   | { readonly _: "Loaded"; readonly dataWithTime: WithTime<data> }
   | { readonly _: "Deleted"; readonly time: Time }
   | { readonly _: "Unknown"; readonly time: Time }
-  | { readonly _: "Requesting" }
-  | { readonly _: "Updating"; readonly dataWithTime: WithTime<data> };
+  | { readonly _: "Requesting" };
 
 /**
- * キーであるTokenによってデータが必ず1つに決まるもの. 絶対に更新されない
+ * キーであるTokenによってデータが必ず1つに決まるもの. 絶対に更新されない. リソースがないということはデータが不正な状態になっているということ
  * @typePartId 134205335ce83693fd83994e907acabd
  */
 export type StaticResourceState<data extends unknown> =
@@ -4240,12 +4239,6 @@ export const ResourceState: {
    * サーバに問い合わせ中
    */
   readonly Requesting: <data extends unknown>() => ResourceState<data>;
-  /**
-   * サーバーに問い合わせて新しいリソースを取得中
-   */
-  readonly Updating: <data extends unknown>(
-    a: WithTime<data>
-  ) => ResourceState<data>;
   readonly codec: <data extends unknown>(
     a: Codec<data>
   ) => Codec<ResourceState<data>>;
@@ -4264,9 +4257,6 @@ export const ResourceState: {
   Requesting: <data extends unknown>(): ResourceState<data> => ({
     _: "Requesting",
   }),
-  Updating: <data extends unknown>(
-    dataWithTime: WithTime<data>
-  ): ResourceState<data> => ({ _: "Updating", dataWithTime }),
   codec: <data extends unknown>(
     dataCodec: Codec<data>
   ): Codec<ResourceState<data>> => ({
@@ -4285,11 +4275,6 @@ export const ResourceState: {
         }
         case "Requesting": {
           return [3];
-        }
-        case "Updating": {
-          return [4].concat(
-            WithTime.codec(dataCodec).encode(value.dataWithTime)
-          );
         }
       }
     },
@@ -4337,23 +4322,13 @@ export const ResourceState: {
           nextIndex: patternIndex.nextIndex,
         };
       }
-      if (patternIndex.result === 4) {
-        const result: {
-          readonly result: WithTime<data>;
-          readonly nextIndex: number;
-        } = WithTime.codec(dataCodec).decode(patternIndex.nextIndex, binary);
-        return {
-          result: ResourceState.Updating(result.result),
-          nextIndex: result.nextIndex,
-        };
-      }
       throw new Error("存在しないパターンを指定された 型を更新してください");
     },
   }),
 };
 
 /**
- * キーであるTokenによってデータが必ず1つに決まるもの. 絶対に更新されない
+ * キーであるTokenによってデータが必ず1つに決まるもの. 絶対に更新されない. リソースがないということはデータが不正な状態になっているということ
  * @typePartId 134205335ce83693fd83994e907acabd
  */
 export const StaticResourceState: {
