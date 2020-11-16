@@ -78,12 +78,31 @@ const typePartWIthAttributeToTsType = (
 ): ts.Type => {
   switch (typeAttribute) {
     case "AsBoolean":
-      if (typePart.body._ !== "Sum" || typePart.body.patternList.length !== 2) {
-        throw new Error(
-          "attribute == Just(AsBoolean) type part need sum and have 2 patterns"
-        );
+      if (
+        typePart.body._ === "Sum" &&
+        typePart.body.patternList.length === 2 &&
+        typePart.body.patternList.every(
+          (pattern) => pattern.parameter._ === "Nothing"
+        )
+      ) {
+        return ts.Type.Boolean;
       }
-      return ts.Type.Boolean;
+      throw new Error(
+        "attribute == Just(AsBoolean) type part need sum, have 2 patterns, All pattern parameters are empty"
+      );
+    case "AsUndefined":
+      if (
+        typePart.body._ === "Sum" &&
+        typePart.body.patternList.length === 1 &&
+        typePart.body.patternList.every(
+          (pattern) => pattern.parameter._ === "Nothing"
+        )
+      ) {
+        return ts.Type.Undefined;
+      }
+      throw new Error(
+        "attribute == Just(AsUndefined) type part need sum and have 1 patterns, All pattern parameters are empty"
+      );
   }
 };
 

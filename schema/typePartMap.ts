@@ -949,7 +949,13 @@ export const typePartMap: ReadonlyMap<TypePartId, TypePart> = new Map<
         {
           name: "AsBoolean",
           description:
-            "JavaScriptのbooleanとしれ扱うように指示する. 定義が True | Falseのような形のみをサポートする",
+            "JavaScript, TypeScript で boolean として扱うように指示する. 定義が2つのパターンで両方パラメーターなし false, trueの順である必要がある",
+          parameter: Maybe.Nothing(),
+        },
+        {
+          name: "AsUndefined",
+          description:
+            "JavaScript, TypeScript で undefined として扱うように指示する. 定義が1つのパターンでパラメーターなしである必要がある",
           parameter: Maybe.Nothing(),
         },
       ]),

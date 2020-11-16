@@ -534,7 +534,7 @@ export type TypePart = {
  * コンパイラに向けた, 型のデータ形式をどうするかの情報
  * @typePartId 225e93ce3e35aa0bd76d07ea6f6b89cf
  */
-export type TypeAttribute = "AsBoolean";
+export type TypeAttribute = "AsBoolean" | "AsUndefined";
 
 /**
  * 型パラメーター
@@ -2578,17 +2578,25 @@ export const TypePart: { readonly codec: Codec<TypePart> } = {
  */
 export const TypeAttribute: {
   /**
-   * JavaScriptのbooleanとしれ扱うように指示する. 定義が True | Falseのような形のみをサポートする
+   * JavaScript, TypeScript で boolean として扱うように指示する. 定義が2つのパターンで両方パラメーターなし false, trueの順である必要がある
    */
   readonly AsBoolean: TypeAttribute;
+  /**
+   * JavaScript, TypeScript で undefined として扱うように指示する. 定義が1つのパターンでパラメーターなしである必要がある
+   */
+  readonly AsUndefined: TypeAttribute;
   readonly codec: Codec<TypeAttribute>;
 } = {
   AsBoolean: "AsBoolean",
+  AsUndefined: "AsUndefined",
   codec: {
     encode: (value: TypeAttribute): ReadonlyArray<number> => {
       switch (value) {
         case "AsBoolean": {
           return [0];
+        }
+        case "AsUndefined": {
+          return [1];
         }
       }
     },
@@ -2603,6 +2611,12 @@ export const TypeAttribute: {
       if (patternIndex.result === 0) {
         return {
           result: TypeAttribute.AsBoolean,
+          nextIndex: patternIndex.nextIndex,
+        };
+      }
+      if (patternIndex.result === 1) {
+        return {
+          result: TypeAttribute.AsUndefined,
           nextIndex: patternIndex.nextIndex,
         };
       }
