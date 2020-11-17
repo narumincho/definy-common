@@ -41,12 +41,11 @@ export const createProject: ApiCodec<
   ),
 };
 
-// TODO : create unit type !
 export const getTop50Project: ApiCodec<
-  d.Bool,
+  d.Unit,
   d.WithTime<ReadonlyArray<d.IdAndData<d.ProjectId, d.Project>>>
 > = {
-  request: d.Bool.codec,
+  request: d.Unit.codec,
   response: d.WithTime.codec(
     d.List.codec(d.IdAndData.codec(d.ProjectId.codec, d.Project.codec))
   ),
