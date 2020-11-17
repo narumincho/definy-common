@@ -4,6 +4,7 @@ import * as util from "../source/util";
 import {
   Maybe,
   TypeAttribute,
+  TypeParameter,
   TypePart,
   TypePartBody,
   TypePartBodyKernel,
@@ -24,46 +25,55 @@ const resourceStateDataTypePartId = "5089ac70cf7b31947a7ba2c244212578" as TypePa
 
 const staticResourceStateDataTypePartId = "c99b0600c7aca05a1716e4a4c3519cec" as TypePartId;
 
+const t = (param: {
+  name: string;
+  description: string;
+  attribute?: TypeAttribute;
+  typeParameterList?: ReadonlyArray<TypeParameter>;
+  body: TypePartBody;
+}): TypePart => {
+  return {
+    name: param.name,
+    description: param.description,
+    attribute:
+      param.attribute === undefined
+        ? Maybe.Nothing()
+        : Maybe.Just(param.attribute),
+    projectId: util.definyCodeProjectId,
+    typeParameterList: param.typeParameterList ?? [],
+    body: param.body,
+  };
+};
+
 export const typePartMap: ReadonlyMap<TypePartId, TypePart> = new Map<
   TypePartId,
   TypePart
 >([
   [
     id.Int32,
-    {
+    t({
       name: "Int32",
       description:
         "-2 147 483 648 ～ 2 147 483 647. 32bit 符号付き整数. JavaScriptのnumberとして扱える. numberの32bit符号あり整数をSigned Leb128のバイナリに変換する",
-      projectId: util.definyCodeProjectId,
-      createCommitId: util.codeCommitId,
-      attribute: Maybe.Nothing(),
-      typeParameterList: [],
       body: TypePartBody.Kernel(TypePartBodyKernel.Int32),
-    },
+    }),
   ],
   [
     id.Binary,
-    {
+    t({
       name: "Binary",
       description:
         "バイナリ. JavaScriptのUint8Arrayで扱える. 最初にLED128でバイト数, その次にバイナリそのまま",
-      projectId: util.definyCodeProjectId,
-      createCommitId: util.codeCommitId,
-      attribute: Maybe.Nothing(),
-      typeParameterList: [],
       body: TypePartBody.Kernel(TypePartBodyKernel.Binary),
-    },
+    }),
   ],
   [
     id.Bool,
-    {
+    t({
       name: "Bool",
       description:
         "Bool. 真か偽. JavaScriptのbooleanで扱える. true: 1, false: 0. (1byte)としてバイナリに変換する",
-      projectId: util.definyCodeProjectId,
-      createCommitId: util.codeCommitId,
-      attribute: Maybe.Just(TypeAttribute.AsBoolean),
-      typeParameterList: [],
+      attribute: TypeAttribute.AsBoolean,
       body: TypePartBody.Sum([
         {
           name: "False",
@@ -76,16 +86,13 @@ export const typePartMap: ReadonlyMap<TypePartId, TypePart> = new Map<
           parameter: Maybe.Nothing(),
         },
       ]),
-    },
+    }),
   ],
   [
     id.List,
-    {
+    t({
       name: "List",
       description: "リスト. JavaScriptのArrayで扱う",
-      projectId: util.definyCodeProjectId,
-      createCommitId: util.codeCommitId,
-      attribute: Maybe.Nothing(),
       typeParameterList: [
         {
           name: "e",
@@ -93,17 +100,14 @@ export const typePartMap: ReadonlyMap<TypePartId, TypePart> = new Map<
         },
       ],
       body: TypePartBody.Kernel(TypePartBodyKernel.List),
-    },
+    }),
   ],
   [
     id.Maybe,
-    {
+    t({
       name: "Maybe",
       description:
         "Maybe. nullableのようなもの. 今後はRustのstd::Optionに出力するために属性をつける?",
-      projectId: util.definyCodeProjectId,
-      createCommitId: util.codeCommitId,
-      attribute: Maybe.Nothing(),
       typeParameterList: [
         {
           typePartId: maybeValueTypePartId,
@@ -125,17 +129,14 @@ export const typePartMap: ReadonlyMap<TypePartId, TypePart> = new Map<
           parameter: Maybe.Nothing(),
         },
       ]),
-    },
+    }),
   ],
   [
     id.Result,
-    {
+    t({
       name: "Result",
       description:
         "成功と失敗を表す型. 今後はRustのstd::Resultに出力するために属性をつける?",
-      projectId: util.definyCodeProjectId,
-      createCommitId: util.codeCommitId,
-      attribute: Maybe.Nothing(),
       typeParameterList: [
         {
           typePartId: resultOkTypePartId,
@@ -164,30 +165,23 @@ export const typePartMap: ReadonlyMap<TypePartId, TypePart> = new Map<
           }),
         },
       ]),
-    },
+    }),
   ],
   [
     id.String,
-    {
+    t({
       name: "String",
       description:
         "文字列. JavaScriptのstringで扱う. バイナリ形式はUTF-8. 不正な文字が入っている可能性がある",
-      projectId: util.definyCodeProjectId,
-      createCommitId: util.codeCommitId,
-      attribute: Maybe.Nothing(),
-      typeParameterList: [],
       body: TypePartBody.Kernel(TypePartBodyKernel.String),
-    },
+    }),
   ],
   [
     id.Unit,
-    {
+    t({
       name: "Unit",
       description: "Unit. 1つの値しかない型. JavaScriptのundefinedで扱う",
-      projectId: util.definyCodeProjectId,
-      createCommitId: util.codeCommitId,
-      attribute: Maybe.Just(TypeAttribute.AsUndefined),
-      typeParameterList: [],
+      attribute: TypeAttribute.AsUndefined,
       body: TypePartBody.Sum([
         {
           name: "Unit",
@@ -195,180 +189,124 @@ export const typePartMap: ReadonlyMap<TypePartId, TypePart> = new Map<
           parameter: Maybe.Nothing(),
         },
       ]),
-    },
+    }),
   ],
   [
     id.ProjectId,
-    {
+    t({
       name: "ProjectId",
       description: "プロジェクトの識別子",
-      projectId: util.definyCodeProjectId,
-      createCommitId: util.codeCommitId,
-      attribute: Maybe.Nothing(),
-      typeParameterList: [],
       body: TypePartBody.Kernel(TypePartBodyKernel.Id),
-    },
+    }),
   ],
   [
     id.UserId,
-    {
+    t({
       name: "UserId",
       description: "ユーザーの識別子",
-      projectId: util.definyCodeProjectId,
-      createCommitId: util.codeCommitId,
-      attribute: Maybe.Nothing(),
-      typeParameterList: [],
       body: TypePartBody.Kernel(TypePartBodyKernel.Id),
-    },
+    }),
   ],
   [
     id.IdeaId,
-    {
+    t({
       name: "IdeaId",
       description: "アイデアの識別子",
-      projectId: util.definyCodeProjectId,
-      createCommitId: util.codeCommitId,
-      attribute: Maybe.Nothing(),
-      typeParameterList: [],
       body: TypePartBody.Kernel(TypePartBodyKernel.Id),
-    },
+    }),
   ],
   [
     id.CommitId,
-    {
+    t({
       name: "CommitId",
       description: "提案の識別子",
-      projectId: util.definyCodeProjectId,
-      createCommitId: util.codeCommitId,
-      attribute: Maybe.Nothing(),
-      typeParameterList: [],
       body: TypePartBody.Kernel(TypePartBodyKernel.Id),
-    },
+    }),
   ],
   [
     id.ImageToken,
-    {
+    t({
       name: "ImageToken",
       description:
         "画像から求められるトークン.キャッシュのキーとして使われる.1つのトークンに対して永久に1つの画像データしか表さない. キャッシュを更新する必要はない",
-      projectId: util.definyCodeProjectId,
-      createCommitId: util.codeCommitId,
-      attribute: Maybe.Nothing(),
-      typeParameterList: [],
       body: TypePartBody.Kernel(TypePartBodyKernel.Token),
-    },
+    }),
   ],
   [
     id.PartId,
-    {
+    t({
       name: "PartId",
       description: "パーツの識別子",
-      projectId: util.definyCodeProjectId,
-      createCommitId: util.codeCommitId,
-      attribute: Maybe.Nothing(),
-      typeParameterList: [],
       body: TypePartBody.Kernel(TypePartBodyKernel.Id),
-    },
+    }),
   ],
   [
     id.TypePartId,
-    {
+    t({
       name: "TypePartId",
       description: "型パーツの識別子",
-      projectId: util.definyCodeProjectId,
-      createCommitId: util.codeCommitId,
-      attribute: Maybe.Nothing(),
-      typeParameterList: [],
       body: TypePartBody.Kernel(TypePartBodyKernel.Id),
-    },
+    }),
   ],
   [
     id.TagId,
-    {
+    t({
       name: "TagId",
       description: "タグの識別子",
-      projectId: util.definyCodeProjectId,
-      createCommitId: util.codeCommitId,
-      attribute: Maybe.Nothing(),
-      typeParameterList: [],
       body: TypePartBody.Kernel(TypePartBodyKernel.Id),
-    },
+    }),
   ],
   [
     id.AccountToken,
-    {
+    t({
       name: "AccountToken",
       description:
         "アカウントトークン. アカウントトークンを持っていればアクセストークンをDefinyのサーバーにリクエストした際に得られるIDのアカウントを保有していると証明できる. サーバーにハッシュ化したものを保存している. これが盗まれた場合,不正に得た人はアカウントを乗っ取ることができる. 有効期限はなし, 最後に発行したアカウントトークン以外は無効になる",
-      projectId: util.definyCodeProjectId,
-      createCommitId: util.codeCommitId,
-      attribute: Maybe.Nothing(),
-      typeParameterList: [],
       body: TypePartBody.Kernel(TypePartBodyKernel.Token),
-    },
+    }),
   ],
   [
     id.PartHash,
-    {
+    t({
       name: "PartHash",
       description:
         "コミット内に入る. パーツのハッシュ化したもの. ハッシュ化にはパーツ名やドキュメントも含める",
-      projectId: util.definyCodeProjectId,
-      createCommitId: util.codeCommitId,
-      attribute: Maybe.Nothing(),
-      typeParameterList: [],
       body: TypePartBody.Kernel(TypePartBodyKernel.Token),
-    },
+    }),
   ],
   [
     id.TypePartHash,
-    {
+    t({
       name: "TypePartHash",
       description:
         "コミット内に入る. 型パーツのハッシュ化したもの. ハッシュ化には型パーツ名やドキュメントも含める",
-      projectId: util.definyCodeProjectId,
-      createCommitId: util.codeCommitId,
-      attribute: Maybe.Nothing(),
-      typeParameterList: [],
       body: TypePartBody.Kernel(TypePartBodyKernel.Token),
-    },
+    }),
   ],
   [
     id.ReleasePartId,
-    {
+    t({
       name: "ReleasePartId",
       description:
         "他のプロジェクトのパーツを使うときに使う. 互換性が維持される限り,IDが同じになる",
-      projectId: util.definyCodeProjectId,
-      createCommitId: util.codeCommitId,
-      attribute: Maybe.Nothing(),
-      typeParameterList: [],
       body: TypePartBody.Kernel(TypePartBodyKernel.Id),
-    },
+    }),
   ],
   [
     id.ReleaseTypePartId,
-    {
+    t({
       name: "ReleaseTypePartId",
       description:
         "他のプロジェクトの型パーツを使うときに使う. 互換性が維持される限り,IDが同じになる",
-      projectId: util.definyCodeProjectId,
-      createCommitId: util.codeCommitId,
-      attribute: Maybe.Nothing(),
-      typeParameterList: [],
       body: TypePartBody.Kernel(TypePartBodyKernel.Id),
-    },
+    }),
   ],
   [
     id.Time,
-    {
+    t({
       name: "Time",
       description:
         "日時. 0001-01-01T00:00:00.000Z to 9999-12-31T23:59:59.999Z 最小単位はミリ秒. ミリ秒の求め方は day*1000*60*60*24 + millisecond",
-      projectId: util.definyCodeProjectId,
-      createCommitId: util.codeCommitId,
-      typeParameterList: [],
-      attribute: Maybe.Nothing(),
       body: TypePartBody.Product([
         {
           name: "day",
@@ -381,17 +319,13 @@ export const typePartMap: ReadonlyMap<TypePartId, TypePart> = new Map<
           type: type.Int32,
         },
       ]),
-    },
+    }),
   ],
   [
     id.RequestLogInUrlRequestData,
-    {
+    t({
       name: "RequestLogInUrlRequestData",
       description: "ログインのURLを発行するために必要なデータ",
-      projectId: util.definyCodeProjectId,
-      createCommitId: util.codeCommitId,
-      typeParameterList: [],
-      attribute: Maybe.Nothing(),
       body: TypePartBody.Product([
         {
           name: "openIdConnectProvider",
@@ -404,18 +338,14 @@ export const typePartMap: ReadonlyMap<TypePartId, TypePart> = new Map<
           type: type.UrlData,
         },
       ]),
-    },
+    }),
   ],
   [
     id.OpenIdConnectProvider,
-    {
+    t({
       name: "OpenIdConnectProvider",
       description:
         "ソーシャルログインを提供するプロバイダー (例: Google, GitHub)",
-      projectId: util.definyCodeProjectId,
-      createCommitId: util.codeCommitId,
-      typeParameterList: [],
-      attribute: Maybe.Nothing(),
       body: TypePartBody.Sum([
         {
           name: "Google",
@@ -430,18 +360,14 @@ export const typePartMap: ReadonlyMap<TypePartId, TypePart> = new Map<
           parameter: Maybe.Nothing(),
         },
       ]),
-    },
+    }),
   ],
   [
     id.UrlData,
-    {
+    t({
       name: "UrlData",
       description:
         "デバッグモードかどうか,言語とページの場所. URLとして表現されるデータ. Googleなどの検索エンジンの都合( https://support.google.com/webmasters/answer/182192?hl=ja )で,URLにページの言語を入れて,言語ごとに別のURLである必要がある. デバッグ時のホスト名は http://localhost になる",
-      projectId: util.definyCodeProjectId,
-      createCommitId: util.codeCommitId,
-      attribute: Maybe.Nothing(),
-      typeParameterList: [],
       body: TypePartBody.Product([
         {
           name: "clientMode",
@@ -459,17 +385,13 @@ export const typePartMap: ReadonlyMap<TypePartId, TypePart> = new Map<
           type: type.Language,
         },
       ]),
-    },
+    }),
   ],
   [
     id.ClientMode,
-    {
+    t({
       name: "ClientMode",
       description: "デバッグモードか, リリースモード",
-      projectId: util.definyCodeProjectId,
-      createCommitId: util.codeCommitId,
-      attribute: Maybe.Nothing(),
-      typeParameterList: [],
       body: TypePartBody.Sum([
         {
           name: "DebugMode",
@@ -482,18 +404,14 @@ export const typePartMap: ReadonlyMap<TypePartId, TypePart> = new Map<
           parameter: Maybe.Nothing(),
         },
       ]),
-    },
+    }),
   ],
   [
     id.Location,
-    {
+    t({
       name: "Location",
       description:
         "DefinyWebアプリ内での場所を示すもの. URLから求められる. URLに変換できる",
-      projectId: util.definyCodeProjectId,
-      createCommitId: util.codeCommitId,
-      attribute: Maybe.Nothing(),
-      typeParameterList: [],
       body: TypePartBody.Sum([
         {
           name: "Home",
@@ -541,17 +459,13 @@ export const typePartMap: ReadonlyMap<TypePartId, TypePart> = new Map<
           parameter: Maybe.Nothing(),
         },
       ]),
-    },
+    }),
   ],
   [
     id.Language,
-    {
+    t({
       name: "Language",
       description: "英語,日本語,エスペラント語などの言語",
-      projectId: util.definyCodeProjectId,
-      createCommitId: util.codeCommitId,
-      attribute: Maybe.Nothing(),
-      typeParameterList: [],
       body: TypePartBody.Sum([
         {
           name: "Japanese",
@@ -569,17 +483,13 @@ export const typePartMap: ReadonlyMap<TypePartId, TypePart> = new Map<
           parameter: Maybe.Nothing(),
         },
       ]),
-    },
+    }),
   ],
   [
     id.User,
-    {
+    t({
       name: "User",
       description: "ユーザーのデータのスナップショット",
-      projectId: util.definyCodeProjectId,
-      createCommitId: util.codeCommitId,
-      attribute: Maybe.Nothing(),
-      typeParameterList: [],
       body: TypePartBody.Product([
         {
           name: "name",
@@ -604,16 +514,13 @@ export const typePartMap: ReadonlyMap<TypePartId, TypePart> = new Map<
           type: type.Time,
         },
       ]),
-    },
+    }),
   ],
   [
     id.IdAndData,
-    {
+    t({
       name: "IdAndData",
       description: "データを識別するIdとデータ",
-      projectId: util.definyCodeProjectId,
-      createCommitId: util.codeCommitId,
-      attribute: Maybe.Nothing(),
       typeParameterList: [
         { name: "id", typePartId: idAndDataIdTypePartId },
         { name: "data", typePartId: idAndDataDataTypePartId },
@@ -630,17 +537,13 @@ export const typePartMap: ReadonlyMap<TypePartId, TypePart> = new Map<
           type: { typePartId: idAndDataDataTypePartId, parameter: [] },
         },
       ]),
-    },
+    }),
   ],
   [
     id.Project,
-    {
+    t({
       name: "Project",
       description: "プロジェクト",
-      projectId: util.definyCodeProjectId,
-      createCommitId: util.codeCommitId,
-      attribute: Maybe.Nothing(),
-      typeParameterList: [],
       body: TypePartBody.Product([
         {
           name: "name",
@@ -683,17 +586,13 @@ export const typePartMap: ReadonlyMap<TypePartId, TypePart> = new Map<
           type: type.CommitId,
         },
       ]),
-    },
+    }),
   ],
   [
     id.Idea,
-    {
+    t({
       name: "Idea",
       description: "アイデア",
-      projectId: util.definyCodeProjectId,
-      createCommitId: util.codeCommitId,
-      attribute: Maybe.Nothing(),
-      typeParameterList: [],
       body: TypePartBody.Product([
         {
           name: "name",
@@ -736,17 +635,13 @@ export const typePartMap: ReadonlyMap<TypePartId, TypePart> = new Map<
           type: type.IdeaState,
         },
       ]),
-    },
+    }),
   ],
   [
     id.Comment,
-    {
+    t({
       name: "Comment",
       description: "アイデアのコメント",
-      projectId: util.definyCodeProjectId,
-      createCommitId: util.codeCommitId,
-      attribute: Maybe.Nothing(),
-      typeParameterList: [],
       body: TypePartBody.Product([
         {
           name: "createUserId",
@@ -764,17 +659,13 @@ export const typePartMap: ReadonlyMap<TypePartId, TypePart> = new Map<
           type: type.String,
         },
       ]),
-    },
+    }),
   ],
   [
     id.Commit,
-    {
+    t({
       name: "Commit",
       description: "コミット. コードのスナップショット",
-      projectId: util.definyCodeProjectId,
-      createCommitId: util.codeCommitId,
-      attribute: Maybe.Nothing(),
-      typeParameterList: [],
       body: TypePartBody.Product([
         {
           name: "createUserId",
@@ -837,17 +728,13 @@ export const typePartMap: ReadonlyMap<TypePartId, TypePart> = new Map<
           type: type.Time,
         },
       ]),
-    },
+    }),
   ],
   [
     id.IdeaState,
-    {
+    t({
       name: "IdeaState",
       description: "アイデアの状況",
-      projectId: util.definyCodeProjectId,
-      createCommitId: util.codeCommitId,
-      attribute: Maybe.Nothing(),
-      typeParameterList: [],
       body: TypePartBody.Sum([
         {
           name: "Creating",
@@ -860,17 +747,13 @@ export const typePartMap: ReadonlyMap<TypePartId, TypePart> = new Map<
           parameter: Maybe.Just(type.CommitId),
         },
       ]),
-    },
+    }),
   ],
   [
     id.Part,
-    {
+    t({
       name: "Part",
       description: "パーツの定義",
-      projectId: util.definyCodeProjectId,
-      createCommitId: util.codeCommitId,
-      attribute: Maybe.Nothing(),
-      typeParameterList: [],
       body: TypePartBody.Product([
         {
           name: "name",
@@ -903,17 +786,13 @@ export const typePartMap: ReadonlyMap<TypePartId, TypePart> = new Map<
           type: type.CommitId,
         },
       ]),
-    },
+    }),
   ],
   [
     id.TypePart,
-    {
+    t({
       name: "TypePart",
       description: "型パーツ",
-      projectId: util.definyCodeProjectId,
-      createCommitId: util.codeCommitId,
-      attribute: Maybe.Nothing(),
-      typeParameterList: [],
       body: TypePartBody.Product([
         {
           name: "name",
@@ -929,11 +808,6 @@ export const typePartMap: ReadonlyMap<TypePartId, TypePart> = new Map<
           name: "projectId",
           description: "所属しているプロジェクトのID",
           type: type.ProjectId,
-        },
-        {
-          name: "createCommitId",
-          description: "この型パーツが作成されたコミット",
-          type: type.CommitId,
         },
         {
           name: "attribute",
@@ -952,17 +826,13 @@ export const typePartMap: ReadonlyMap<TypePartId, TypePart> = new Map<
           type: type.TypePartBody,
         },
       ]),
-    },
+    }),
   ],
   [
     id.TypeAttribute,
-    {
+    t({
       name: "TypeAttribute",
       description: "コンパイラに向けた, 型のデータ形式をどうするかの情報",
-      projectId: util.definyCodeProjectId,
-      createCommitId: util.codeCommitId,
-      attribute: Maybe.Nothing(),
-      typeParameterList: [],
       body: TypePartBody.Sum([
         {
           name: "AsBoolean",
@@ -977,17 +847,13 @@ export const typePartMap: ReadonlyMap<TypePartId, TypePart> = new Map<
           parameter: Maybe.Nothing(),
         },
       ]),
-    },
+    }),
   ],
   [
     id.TypeParameter,
-    {
+    t({
       name: "TypeParameter",
       description: "型パラメーター",
-      projectId: util.definyCodeProjectId,
-      createCommitId: util.codeCommitId,
-      attribute: Maybe.Nothing(),
-      typeParameterList: [],
       body: TypePartBody.Product([
         {
           name: "name",
@@ -1000,17 +866,13 @@ export const typePartMap: ReadonlyMap<TypePartId, TypePart> = new Map<
           type: type.TypePartId,
         },
       ]),
-    },
+    }),
   ],
   [
     id.TypePartBody,
-    {
+    t({
       name: "TypePartBody",
       description: "型の定義本体",
-      projectId: util.definyCodeProjectId,
-      createCommitId: util.codeCommitId,
-      attribute: Maybe.Nothing(),
-      typeParameterList: [],
       body: TypePartBody.Sum([
         {
           name: "Product",
@@ -1028,17 +890,13 @@ export const typePartMap: ReadonlyMap<TypePartId, TypePart> = new Map<
           parameter: Maybe.Just(type.TypePartBodyKernel),
         },
       ]),
-    },
+    }),
   ],
   [
     id.Member,
-    {
+    t({
       name: "Member",
       description: "直積型のメンバー",
-      projectId: util.definyCodeProjectId,
-      createCommitId: util.codeCommitId,
-      attribute: Maybe.Nothing(),
-      typeParameterList: [],
       body: TypePartBody.Product([
         {
           name: "name",
@@ -1056,17 +914,13 @@ export const typePartMap: ReadonlyMap<TypePartId, TypePart> = new Map<
           type: type.Type,
         },
       ]),
-    },
+    }),
   ],
   [
     id.Pattern,
-    {
+    t({
       name: "Pattern",
       description: "直積型のパターン",
-      projectId: util.definyCodeProjectId,
-      createCommitId: util.codeCommitId,
-      attribute: Maybe.Nothing(),
-      typeParameterList: [],
       body: TypePartBody.Product([
         {
           name: "name",
@@ -1084,17 +938,13 @@ export const typePartMap: ReadonlyMap<TypePartId, TypePart> = new Map<
           type: type.Maybe(type.Type),
         },
       ]),
-    },
+    }),
   ],
   [
     id.TypePartBodyKernel,
-    {
+    t({
       name: "TypePartBodyKernel",
       description: "Definyだけでは表現できないデータ型",
-      projectId: util.definyCodeProjectId,
-      createCommitId: util.codeCommitId,
-      attribute: Maybe.Nothing(),
-      typeParameterList: [],
       body: TypePartBody.Sum([
         {
           name: "Function",
@@ -1135,17 +985,13 @@ export const typePartMap: ReadonlyMap<TypePartId, TypePart> = new Map<
           parameter: Maybe.Nothing(),
         },
       ]),
-    },
+    }),
   ],
   [
     id.Type,
-    {
+    t({
       name: "Type",
       description: "型",
-      projectId: util.definyCodeProjectId,
-      createCommitId: util.codeCommitId,
-      attribute: Maybe.Nothing(),
-      typeParameterList: [],
       body: TypePartBody.Product([
         {
           name: "typePartId",
@@ -1158,17 +1004,13 @@ export const typePartMap: ReadonlyMap<TypePartId, TypePart> = new Map<
           type: type.List(type.Type),
         },
       ]),
-    },
+    }),
   ],
   [
     id.Expr,
-    {
+    t({
       name: "Expr",
       description: "式",
-      projectId: util.definyCodeProjectId,
-      createCommitId: util.codeCommitId,
-      attribute: Maybe.Nothing(),
-      typeParameterList: [],
       body: TypePartBody.Sum([
         {
           name: "Kernel",
@@ -1201,17 +1043,13 @@ export const typePartMap: ReadonlyMap<TypePartId, TypePart> = new Map<
           parameter: Maybe.Just(type.List(type.LambdaBranch)),
         },
       ]),
-    },
+    }),
   ],
   [
     id.KernelExpr,
-    {
+    t({
       name: "KernelExpr",
       description: "Definyだけでは表現できない式",
-      projectId: util.definyCodeProjectId,
-      createCommitId: util.codeCommitId,
-      attribute: Maybe.Nothing(),
-      typeParameterList: [],
       body: TypePartBody.Sum([
         {
           name: "Int32Add",
@@ -1229,17 +1067,13 @@ export const typePartMap: ReadonlyMap<TypePartId, TypePart> = new Map<
           parameter: Maybe.Nothing(),
         },
       ]),
-    },
+    }),
   ],
   [
     id.TagReference,
-    {
+    t({
       name: "TagReference",
       description: "タグの参照を表す",
-      projectId: util.definyCodeProjectId,
-      createCommitId: util.codeCommitId,
-      attribute: Maybe.Nothing(),
-      typeParameterList: [],
       body: TypePartBody.Product([
         {
           name: "typePartId",
@@ -1252,17 +1086,13 @@ export const typePartMap: ReadonlyMap<TypePartId, TypePart> = new Map<
           type: type.TagId,
         },
       ]),
-    },
+    }),
   ],
   [
     id.FunctionCall,
-    {
+    t({
       name: "FunctionCall",
       description: "関数呼び出し",
-      projectId: util.definyCodeProjectId,
-      createCommitId: util.codeCommitId,
-      attribute: Maybe.Nothing(),
-      typeParameterList: [],
       body: TypePartBody.Product([
         {
           name: "function",
@@ -1275,17 +1105,13 @@ export const typePartMap: ReadonlyMap<TypePartId, TypePart> = new Map<
           type: type.Expr,
         },
       ]),
-    },
+    }),
   ],
   [
     id.LambdaBranch,
-    {
+    t({
       name: "LambdaBranch",
       description: "ラムダのブランチ. Just x -> data x のようなところ",
-      projectId: util.definyCodeProjectId,
-      createCommitId: util.codeCommitId,
-      attribute: Maybe.Nothing(),
-      typeParameterList: [],
       body: TypePartBody.Product([
         {
           name: "condition",
@@ -1308,17 +1134,13 @@ export const typePartMap: ReadonlyMap<TypePartId, TypePart> = new Map<
           type: type.Expr,
         },
       ]),
-    },
+    }),
   ],
   [
     id.Condition,
-    {
+    t({
       name: "Condition",
       description: "ブランチの式を使う条件",
-      projectId: util.definyCodeProjectId,
-      createCommitId: util.codeCommitId,
-      attribute: Maybe.Nothing(),
-      typeParameterList: [],
       body: TypePartBody.Sum([
         {
           name: "ByTag",
@@ -1341,17 +1163,13 @@ export const typePartMap: ReadonlyMap<TypePartId, TypePart> = new Map<
           parameter: Maybe.Just(type.Int32),
         },
       ]),
-    },
+    }),
   ],
   [
     id.ConditionTag,
-    {
+    t({
       name: "ConditionTag",
       description: "タグによる条件",
-      projectId: util.definyCodeProjectId,
-      createCommitId: util.codeCommitId,
-      attribute: Maybe.Nothing(),
-      typeParameterList: [],
       body: TypePartBody.Product([
         {
           name: "tag",
@@ -1364,17 +1182,13 @@ export const typePartMap: ReadonlyMap<TypePartId, TypePart> = new Map<
           type: type.Maybe(type.Condition),
         },
       ]),
-    },
+    }),
   ],
   [
     id.ConditionCapture,
-    {
+    t({
       name: "ConditionCapture",
       description: "キャプチャパーツへのキャプチャ",
-      projectId: util.definyCodeProjectId,
-      createCommitId: util.codeCommitId,
-      attribute: Maybe.Nothing(),
-      typeParameterList: [],
       body: TypePartBody.Product([
         {
           name: "name",
@@ -1387,17 +1201,13 @@ export const typePartMap: ReadonlyMap<TypePartId, TypePart> = new Map<
           type: type.PartId,
         },
       ]),
-    },
+    }),
   ],
   [
     id.BranchPartDefinition,
-    {
+    t({
       name: "BranchPartDefinition",
       description: "ラムダのブランチで使えるパーツを定義する部分",
-      projectId: util.definyCodeProjectId,
-      createCommitId: util.codeCommitId,
-      attribute: Maybe.Nothing(),
-      typeParameterList: [],
       body: TypePartBody.Product([
         {
           name: "partId",
@@ -1425,17 +1235,13 @@ export const typePartMap: ReadonlyMap<TypePartId, TypePart> = new Map<
           type: type.Expr,
         },
       ]),
-    },
+    }),
   ],
   [
     id.EvaluatedExpr,
-    {
+    t({
       name: "EvaluatedExpr",
       description: "評価しきった式",
-      projectId: util.definyCodeProjectId,
-      createCommitId: util.codeCommitId,
-      attribute: Maybe.Nothing(),
-      typeParameterList: [],
       body: TypePartBody.Sum([
         {
           name: "Kernel",
@@ -1463,17 +1269,13 @@ export const typePartMap: ReadonlyMap<TypePartId, TypePart> = new Map<
           parameter: Maybe.Just(type.KernelCall),
         },
       ]),
-    },
+    }),
   ],
   [
     id.KernelCall,
-    {
+    t({
       name: "KernelCall",
       description: "複数の引数が必要な内部関数の部分呼び出し",
-      projectId: util.definyCodeProjectId,
-      createCommitId: util.codeCommitId,
-      attribute: Maybe.Nothing(),
-      typeParameterList: [],
       body: TypePartBody.Product([
         {
           name: "kernel",
@@ -1486,17 +1288,13 @@ export const typePartMap: ReadonlyMap<TypePartId, TypePart> = new Map<
           type: type.EvaluatedExpr,
         },
       ]),
-    },
+    }),
   ],
   [
     id.EvaluateExprError,
-    {
+    t({
       name: "EvaluateExprError",
       description: "評価したときに失敗した原因を表すもの",
-      projectId: util.definyCodeProjectId,
-      createCommitId: util.codeCommitId,
-      attribute: Maybe.Nothing(),
-      typeParameterList: [],
       body: TypePartBody.Sum([
         {
           name: "NeedPartDefinition",
@@ -1519,17 +1317,13 @@ export const typePartMap: ReadonlyMap<TypePartId, TypePart> = new Map<
           parameter: Maybe.Nothing(),
         },
       ]),
-    },
+    }),
   ],
   [
     id.TypeError,
-    {
+    t({
       name: "TypeError",
       description: "型エラー",
-      projectId: util.definyCodeProjectId,
-      createCommitId: util.codeCommitId,
-      attribute: Maybe.Nothing(),
-      typeParameterList: [],
       body: TypePartBody.Product([
         {
           name: "message",
@@ -1537,17 +1331,13 @@ export const typePartMap: ReadonlyMap<TypePartId, TypePart> = new Map<
           type: type.String,
         },
       ]),
-    },
+    }),
   ],
   [
     id.CreateProjectParameter,
-    {
+    t({
       name: "CreateProjectParameter",
       description: "プロジェクト作成時に必要なパラメーター",
-      projectId: util.definyCodeProjectId,
-      createCommitId: util.codeCommitId,
-      attribute: Maybe.Nothing(),
-      typeParameterList: [],
       body: TypePartBody.Product([
         {
           name: "accountToken",
@@ -1560,17 +1350,13 @@ export const typePartMap: ReadonlyMap<TypePartId, TypePart> = new Map<
           type: type.String,
         },
       ]),
-    },
+    }),
   ],
   [
     id.CreateIdeaParameter,
-    {
+    t({
       name: "CreateIdeaParameter",
       description: "アイデアを作成時に必要なパラメーター",
-      projectId: util.definyCodeProjectId,
-      createCommitId: util.codeCommitId,
-      attribute: Maybe.Nothing(),
-      typeParameterList: [],
       body: TypePartBody.Product([
         {
           name: "accountToken",
@@ -1588,17 +1374,13 @@ export const typePartMap: ReadonlyMap<TypePartId, TypePart> = new Map<
           type: type.IdeaId,
         },
       ]),
-    },
+    }),
   ],
   [
     id.AddCommentParameter,
-    {
+    t({
       name: "AddCommentParameter",
       description: "アイデアにコメントを追加するときに必要なパラメーター",
-      projectId: util.definyCodeProjectId,
-      createCommitId: util.codeCommitId,
-      attribute: Maybe.Nothing(),
-      typeParameterList: [],
       body: TypePartBody.Product([
         {
           name: "accountToken",
@@ -1616,17 +1398,13 @@ export const typePartMap: ReadonlyMap<TypePartId, TypePart> = new Map<
           type: type.String,
         },
       ]),
-    },
+    }),
   ],
   [
     id.AddCommitParameter,
-    {
+    t({
       name: "AddCommitParameter",
       description: "提案を作成するときに必要なパラメーター",
-      projectId: util.definyCodeProjectId,
-      createCommitId: util.codeCommitId,
-      attribute: Maybe.Nothing(),
-      typeParameterList: [],
       body: TypePartBody.Product([
         {
           name: "accountToken",
@@ -1639,17 +1417,13 @@ export const typePartMap: ReadonlyMap<TypePartId, TypePart> = new Map<
           type: type.IdeaId,
         },
       ]),
-    },
+    }),
   ],
   [
     id.AccountTokenAndCommitId,
-    {
+    t({
       name: "AccountTokenAndCommitId",
       description: "コミットを確定状態にしたり, 承認したりするときなどに使う",
-      projectId: util.definyCodeProjectId,
-      createCommitId: util.codeCommitId,
-      attribute: Maybe.Nothing(),
-      typeParameterList: [],
       body: TypePartBody.Product([
         {
           name: "accountToken",
@@ -1662,17 +1436,13 @@ export const typePartMap: ReadonlyMap<TypePartId, TypePart> = new Map<
           type: type.CommitId,
         },
       ]),
-    },
+    }),
   ],
   [
     id.LogInState,
-    {
+    t({
       name: "LogInState",
       description: "ログイン状態",
-      projectId: util.definyCodeProjectId,
-      createCommitId: util.codeCommitId,
-      attribute: Maybe.Nothing(),
-      typeParameterList: [],
       body: TypePartBody.Sum([
         {
           name: "LoadingAccountTokenFromIndexedDB",
@@ -1706,17 +1476,13 @@ export const typePartMap: ReadonlyMap<TypePartId, TypePart> = new Map<
           parameter: Maybe.Just(type.AccountTokenAndUserId),
         },
       ]),
-    },
+    }),
   ],
   [
     id.AccountTokenAndUserId,
-    {
+    t({
       name: "AccountTokenAndUserId",
       description: "AccountTokenとUserId",
-      projectId: util.definyCodeProjectId,
-      createCommitId: util.codeCommitId,
-      attribute: Maybe.Nothing(),
-      typeParameterList: [],
       body: TypePartBody.Product([
         {
           name: "accountToken",
@@ -1729,16 +1495,13 @@ export const typePartMap: ReadonlyMap<TypePartId, TypePart> = new Map<
           type: type.UserId,
         },
       ]),
-    },
+    }),
   ],
   [
     id.WithTime,
-    {
+    t({
       name: "WithTime",
       description: "取得日時と任意のデータ",
-      projectId: util.definyCodeProjectId,
-      createCommitId: util.codeCommitId,
-      attribute: Maybe.Nothing(),
       typeParameterList: [{ name: "data", typePartId: resourceDataTypePartId }],
       body: TypePartBody.Product([
         {
@@ -1755,17 +1518,14 @@ export const typePartMap: ReadonlyMap<TypePartId, TypePart> = new Map<
           },
         },
       ]),
-    },
+    }),
   ],
   [
     id.ResourceState,
-    {
+    t({
       name: "ResourceState",
       description:
         "ProjectやUserなどのリソースの状態とデータ. 読み込み中だとか",
-      projectId: util.definyCodeProjectId,
-      createCommitId: util.codeCommitId,
-      attribute: Maybe.Nothing(),
       typeParameterList: [
         { name: "data", typePartId: resourceStateDataTypePartId },
       ],
@@ -1796,17 +1556,14 @@ export const typePartMap: ReadonlyMap<TypePartId, TypePart> = new Map<
           parameter: Maybe.Nothing(),
         },
       ]),
-    },
+    }),
   ],
   [
     id.StaticResourceState,
-    {
+    t({
       name: "StaticResourceState",
       description:
         "キーであるTokenによってデータが必ず1つに決まるもの. 絶対に更新されない. リソースがないということはデータが不正な状態になっているということ",
-      projectId: util.definyCodeProjectId,
-      createCommitId: util.codeCommitId,
-      attribute: Maybe.Nothing(),
       typeParameterList: [
         { name: "data", typePartId: staticResourceStateDataTypePartId },
       ],
@@ -1835,17 +1592,13 @@ export const typePartMap: ReadonlyMap<TypePartId, TypePart> = new Map<
           parameter: Maybe.Nothing(),
         },
       ]),
-    },
+    }),
   ],
   [
     id.AccountTokenAndProjectId,
-    {
+    t({
       name: "AccountTokenAndProjectId",
       description: "アカウントトークンとプロジェクトID",
-      projectId: util.definyCodeProjectId,
-      createCommitId: util.codeCommitId,
-      attribute: Maybe.Nothing(),
-      typeParameterList: [],
       body: TypePartBody.Product([
         {
           name: "accountToken",
@@ -1858,17 +1611,13 @@ export const typePartMap: ReadonlyMap<TypePartId, TypePart> = new Map<
           type: type.ProjectId,
         },
       ]),
-    },
+    }),
   ],
   [
     id.SetTypePartNameParameter,
-    {
+    t({
       name: "SetTypePartNameParameter",
       description: "型パーツの名前を変更する",
-      projectId: util.definyCodeProjectId,
-      createCommitId: util.codeCommitId,
-      attribute: Maybe.Nothing(),
-      typeParameterList: [],
       body: TypePartBody.Product([
         {
           name: "accountToken",
@@ -1886,17 +1635,13 @@ export const typePartMap: ReadonlyMap<TypePartId, TypePart> = new Map<
           type: type.String,
         },
       ]),
-    },
+    }),
   ],
   [
     id.SetTypePartDescriptionParameter,
-    {
+    t({
       name: "SetTypePartDescriptionParameter",
       description: "型パーツの説明文を変更する",
-      projectId: util.definyCodeProjectId,
-      createCommitId: util.codeCommitId,
-      attribute: Maybe.Nothing(),
-      typeParameterList: [],
       body: TypePartBody.Product([
         {
           name: "accountToken",
@@ -1914,17 +1659,13 @@ export const typePartMap: ReadonlyMap<TypePartId, TypePart> = new Map<
           type: type.String,
         },
       ]),
-    },
+    }),
   ],
   [
     id.SetTypePartBodyParameter,
-    {
+    t({
       name: "SetTypePartBodyParameter",
       description: "型パーツの本体を変更する",
-      projectId: util.definyCodeProjectId,
-      createCommitId: util.codeCommitId,
-      attribute: Maybe.Nothing(),
-      typeParameterList: [],
       body: TypePartBody.Product([
         {
           name: "accountToken",
@@ -1942,6 +1683,6 @@ export const typePartMap: ReadonlyMap<TypePartId, TypePart> = new Map<
           type: type.TypePartBody,
         },
       ]),
-    },
+    }),
   ],
 ]);

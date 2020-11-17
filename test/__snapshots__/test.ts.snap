@@ -184,7 +184,7 @@ type alias Part =
 {-| 型パーツ
 -}
 type alias TypePart =
-    { name : String, description : String, projectId : ProjectId, createCommitId : CommitId, attribute : (Maybe TypeAttribute), typeParameterList : (List TypeParameter), body : TypePartBody }
+    { name : String, description : String, projectId : ProjectId, attribute : (Maybe TypeAttribute), typeParameterList : (List TypeParameter), body : TypePartBody }
 
 {-| コンパイラに向けた, 型のデータ形式をどうするかの情報
 -}
@@ -904,10 +904,6 @@ readonly description: String;
  * 所属しているプロジェクトのID
  */
 readonly projectId: ProjectId; 
-/**
- * この型パーツが作成されたコミット
- */
-readonly createCommitId: CommitId; 
 /**
  * コンパイラに与える,この型を表現するのにどういう特殊な状態にするかという情報
  */
@@ -2059,15 +2055,14 @@ export const Part: { readonly codec: Codec<Part> } = { codec: { encode: (value: 
  * 型パーツ
  * @typePartId 95932121474f7db6f7a1256734be7746
  */
-export const TypePart: { readonly codec: Codec<TypePart> } = { codec: { encode: (value: TypePart): ReadonlyArray<number> => (String.codec.encode(value.name).concat(String.codec.encode(value.description)).concat(ProjectId.codec.encode(value.projectId)).concat(CommitId.codec.encode(value.createCommitId)).concat(Maybe.codec(TypeAttribute.codec).encode(value.attribute)).concat(List.codec(TypeParameter.codec).encode(value.typeParameterList)).concat(TypePartBody.codec.encode(value.body))), decode: (index: number, binary: Uint8Array): { readonly result: TypePart; readonly nextIndex: number } => {
+export const TypePart: { readonly codec: Codec<TypePart> } = { codec: { encode: (value: TypePart): ReadonlyArray<number> => (String.codec.encode(value.name).concat(String.codec.encode(value.description)).concat(ProjectId.codec.encode(value.projectId)).concat(Maybe.codec(TypeAttribute.codec).encode(value.attribute)).concat(List.codec(TypeParameter.codec).encode(value.typeParameterList)).concat(TypePartBody.codec.encode(value.body))), decode: (index: number, binary: Uint8Array): { readonly result: TypePart; readonly nextIndex: number } => {
   const nameAndNextIndex: { readonly result: String; readonly nextIndex: number } = String.codec.decode(index, binary);
   const descriptionAndNextIndex: { readonly result: String; readonly nextIndex: number } = String.codec.decode(nameAndNextIndex.nextIndex, binary);
   const projectIdAndNextIndex: { readonly result: ProjectId; readonly nextIndex: number } = ProjectId.codec.decode(descriptionAndNextIndex.nextIndex, binary);
-  const createCommitIdAndNextIndex: { readonly result: CommitId; readonly nextIndex: number } = CommitId.codec.decode(projectIdAndNextIndex.nextIndex, binary);
-  const attributeAndNextIndex: { readonly result: Maybe<TypeAttribute>; readonly nextIndex: number } = Maybe.codec(TypeAttribute.codec).decode(createCommitIdAndNextIndex.nextIndex, binary);
+  const attributeAndNextIndex: { readonly result: Maybe<TypeAttribute>; readonly nextIndex: number } = Maybe.codec(TypeAttribute.codec).decode(projectIdAndNextIndex.nextIndex, binary);
   const typeParameterListAndNextIndex: { readonly result: List<TypeParameter>; readonly nextIndex: number } = List.codec(TypeParameter.codec).decode(attributeAndNextIndex.nextIndex, binary);
   const bodyAndNextIndex: { readonly result: TypePartBody; readonly nextIndex: number } = TypePartBody.codec.decode(typeParameterListAndNextIndex.nextIndex, binary);
-  return { result: { name: nameAndNextIndex.result, description: descriptionAndNextIndex.result, projectId: projectIdAndNextIndex.result, createCommitId: createCommitIdAndNextIndex.result, attribute: attributeAndNextIndex.result, typeParameterList: typeParameterListAndNextIndex.result, body: bodyAndNextIndex.result }, nextIndex: bodyAndNextIndex.nextIndex };
+  return { result: { name: nameAndNextIndex.result, description: descriptionAndNextIndex.result, projectId: projectIdAndNextIndex.result, attribute: attributeAndNextIndex.result, typeParameterList: typeParameterListAndNextIndex.result, body: bodyAndNextIndex.result }, nextIndex: bodyAndNextIndex.nextIndex };
 } } };
 
 

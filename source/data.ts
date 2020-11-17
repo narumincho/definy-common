@@ -519,10 +519,6 @@ export type TypePart = {
    */
   readonly projectId: ProjectId;
   /**
-   * この型パーツが作成されたコミット
-   */
-  readonly createCommitId: CommitId;
-  /**
    * コンパイラに与える,この型を表現するのにどういう特殊な状態にするかという情報
    */
   readonly attribute: Maybe<TypeAttribute>;
@@ -2541,7 +2537,6 @@ export const TypePart: { readonly codec: Codec<TypePart> } = {
         .encode(value.name)
         .concat(String.codec.encode(value.description))
         .concat(ProjectId.codec.encode(value.projectId))
-        .concat(CommitId.codec.encode(value.createCommitId))
         .concat(Maybe.codec(TypeAttribute.codec).encode(value.attribute))
         .concat(List.codec(TypeParameter.codec).encode(value.typeParameterList))
         .concat(TypePartBody.codec.encode(value.body)),
@@ -2561,15 +2556,11 @@ export const TypePart: { readonly codec: Codec<TypePart> } = {
         readonly result: ProjectId;
         readonly nextIndex: number;
       } = ProjectId.codec.decode(descriptionAndNextIndex.nextIndex, binary);
-      const createCommitIdAndNextIndex: {
-        readonly result: CommitId;
-        readonly nextIndex: number;
-      } = CommitId.codec.decode(projectIdAndNextIndex.nextIndex, binary);
       const attributeAndNextIndex: {
         readonly result: Maybe<TypeAttribute>;
         readonly nextIndex: number;
       } = Maybe.codec(TypeAttribute.codec).decode(
-        createCommitIdAndNextIndex.nextIndex,
+        projectIdAndNextIndex.nextIndex,
         binary
       );
       const typeParameterListAndNextIndex: {
@@ -2591,7 +2582,6 @@ export const TypePart: { readonly codec: Codec<TypePart> } = {
           name: nameAndNextIndex.result,
           description: descriptionAndNextIndex.result,
           projectId: projectIdAndNextIndex.result,
-          createCommitId: createCommitIdAndNextIndex.result,
           attribute: attributeAndNextIndex.result,
           typeParameterList: typeParameterListAndNextIndex.result,
           body: bodyAndNextIndex.result,
