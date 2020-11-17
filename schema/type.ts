@@ -23,6 +23,8 @@ export const Result = (ok: data.Type, error: data.Type): data.Type => ({
 });
 export const String = noParameterType(id.String);
 
+export const Unit = noParameterType(id.Unit);
+
 export const ProjectId = noParameterType(id.ProjectId);
 
 export const UserId = noParameterType(id.UserId);

@@ -152,11 +152,13 @@ const patternToTagExpr = (
   allTypePartIdTypePartNameMap: ReadonlyMap<data.TypePartId, string>
 ) => {
   if (util.isTagTypeAllNoParameter(patternList)) {
-    if (
-      typePart.attribute._ === "Just" &&
-      typePart.attribute.value === "AsBoolean"
-    ) {
-      return ts.Expr.BooleanLiteral(patternIndex !== 0);
+    if (typePart.attribute._ === "Just") {
+      switch (typePart.attribute.value) {
+        case "AsBoolean":
+          return ts.Expr.BooleanLiteral(patternIndex !== 0);
+        case "AsUndefined":
+          return ts.Expr.UndefinedLiteral;
+      }
     }
     return ts.Expr.StringLiteral(pattern.name);
   }
@@ -330,24 +332,11 @@ const encodeExprDefinition = (
             allTypePartIdTypePartNameMap
           );
         case "Sum":
-          if (
-            typePart.attribute._ === "Just" &&
-            typePart.attribute.value === data.TypeAttribute.AsBoolean
-          ) {
-            return [
-              ts.Statement.Return(
-                ts.Expr.ArrayLiteral([
-                  {
-                    expr: ts.Expr.ConditionalOperator({
-                      condition: valueVar,
-                      thenExpr: ts.Expr.NumberLiteral(1),
-                      elseExpr: ts.Expr.NumberLiteral(0),
-                    }),
-                    spread: false,
-                  },
-                ])
-              ),
-            ];
+          if (typePart.attribute._ === "Just") {
+            return encodeStatementListWithAttribute(
+              valueVar,
+              typePart.attribute.value
+            );
           }
           return sumEncodeDefinitionStatementList(
             typePart.body.patternList,
@@ -363,6 +352,31 @@ const encodeExprDefinition = (
       }
     }
   );
+
+const encodeStatementListWithAttribute = (
+  valueVar: ts.Expr,
+  typeAttribute: data.TypeAttribute
+): ReadonlyArray<ts.Statement> => {
+  switch (typeAttribute) {
+    case "AsBoolean":
+      return [
+        ts.Statement.Return(
+          ts.Expr.ArrayLiteral([
+            {
+              expr: ts.Expr.ConditionalOperator({
+                condition: valueVar,
+                thenExpr: ts.Expr.NumberLiteral(1),
+                elseExpr: ts.Expr.NumberLiteral(0),
+              }),
+              spread: false,
+            },
+          ])
+        ),
+      ];
+    case "AsUndefined":
+      return [ts.Statement.Return(ts.Expr.ArrayLiteral([]))];
+  }
+};
 
 const productEncodeDefinitionStatementList = (
   memberList: ReadonlyArray<data.Member>,
@@ -508,6 +522,26 @@ const decodeExprDefinition = (
             allTypePartIdTypePartNameMap
           );
         case "Sum":
+          if (
+            typePart.attribute._ === "Just" &&
+            typePart.attribute.value === "AsUndefined"
+          ) {
+            const [unitPattern] = typePart.body.patternList;
+            if (unitPattern === undefined) {
+              throw new Error("unit do not has pattern !");
+            }
+            return [
+              codec.returnStatement(
+                patternUse(
+                  typePart.name,
+                  true,
+                  unitPattern.name,
+                  data.Maybe.Nothing()
+                ),
+                parameterIndex
+              ),
+            ];
+          }
           return sumDecodeDefinitionStatementList(
             typePart.body.patternList,
             typePart.name,

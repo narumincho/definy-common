@@ -107,6 +107,12 @@ export type Result<ok extends unknown, error extends unknown> =
 export type String = string;
 
 /**
+ * Unit. 1つの値しかない型. JavaScriptのundefinedで扱う
+ * @typePartId 2df0cf39f4b05c960c34856663d26fd1
+ */
+export type Unit = undefined;
+
+/**
  * プロジェクトの識別子
  * @typePartId 4e3ab0f9499404a5fa100c4b57835906
  */
@@ -1344,6 +1350,30 @@ export const String: { readonly codec: Codec<String> } = {
       }
       return { result: new a.TextDecoder().decode(textBinary), nextIndex };
     },
+  },
+};
+
+/**
+ * Unit. 1つの値しかない型. JavaScriptのundefinedで扱う
+ * @typePartId 2df0cf39f4b05c960c34856663d26fd1
+ */
+export const Unit: {
+  /**
+   * Unit型にある.唯一の値
+   */
+  readonly Unit: Unit;
+  readonly codec: Codec<Unit>;
+} = {
+  Unit: undefined,
+  codec: {
+    encode: (value: Unit): ReadonlyArray<number> => [],
+    decode: (
+      index: number,
+      binary: Uint8Array
+    ): { readonly result: Unit; readonly nextIndex: number } => ({
+      result: Unit.Unit,
+      nextIndex: index,
+    }),
   },
 };
 

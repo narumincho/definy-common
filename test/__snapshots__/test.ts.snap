@@ -1,7 +1,7 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`test Elm code generator snapshot 1`] = `
-"module Data exposing (Bool(..), Maybe(..), Result(..), ProjectId(..), UserId(..), IdeaId(..), CommitId(..), ImageToken(..), PartId(..), TypePartId(..), TagId(..), AccountToken(..), PartHash(..), TypePartHash(..), ReleasePartId(..), ReleaseTypePartId(..), Time, RequestLogInUrlRequestData, OpenIdConnectProvider(..), UrlData, ClientMode(..), Location(..), Language(..), User, IdAndData, Project, Idea, Comment, Commit, IdeaState(..), Part, TypePart, TypeAttribute(..), TypeParameter, TypePartBody(..), Member, Pattern, TypePartBodyKernel(..), Type, Expr(..), KernelExpr(..), TagReference, FunctionCall, LambdaBranch, Condition(..), ConditionTag, ConditionCapture, BranchPartDefinition, EvaluatedExpr(..), KernelCall, EvaluateExprError(..), TypeError, CreateProjectParameter, CreateIdeaParameter, AddCommentParameter, AddCommitParameter, AccountTokenAndCommitId, LogInState(..), AccountTokenAndUserId, WithTime, ResourceState(..), StaticResourceState(..), AccountTokenAndProjectId, SetTypePartNameParameter, SetTypePartDescriptionParameter, SetTypePartBodyParameter)
+"module Data exposing (Bool(..), Maybe(..), Result(..), Unit(..), ProjectId(..), UserId(..), IdeaId(..), CommitId(..), ImageToken(..), PartId(..), TypePartId(..), TagId(..), AccountToken(..), PartHash(..), TypePartHash(..), ReleasePartId(..), ReleaseTypePartId(..), Time, RequestLogInUrlRequestData, OpenIdConnectProvider(..), UrlData, ClientMode(..), Location(..), Language(..), User, IdAndData, Project, Idea, Comment, Commit, IdeaState(..), Part, TypePart, TypeAttribute(..), TypeParameter, TypePartBody(..), Member, Pattern, TypePartBodyKernel(..), Type, Expr(..), KernelExpr(..), TagReference, FunctionCall, LambdaBranch, Condition(..), ConditionTag, ConditionCapture, BranchPartDefinition, EvaluatedExpr(..), KernelCall, EvaluateExprError(..), TypeError, CreateProjectParameter, CreateIdeaParameter, AddCommentParameter, AddCommitParameter, AccountTokenAndCommitId, LogInState(..), AccountTokenAndUserId, WithTime, ResourceState(..), StaticResourceState(..), AccountTokenAndProjectId, SetTypePartNameParameter, SetTypePartDescriptionParameter, SetTypePartBodyParameter)
 
 import String
 
@@ -22,6 +22,11 @@ type Maybe value
 type Result ok error
     = Ok ok
     | Error error
+
+{-| Unit. 1つの値しかない型. JavaScriptのundefinedで扱う
+-}
+type Unit
+    = Unit
 
 {-| プロジェクトの識別子
 -}
@@ -477,6 +482,13 @@ export type Result<ok extends unknown, error extends unknown> = { readonly _: \\
  * @typePartId f1f830d23ffab8cec4d0191d157b9fc4
  */
 export type String = string;
+
+
+/**
+ * Unit. 1つの値しかない型. JavaScriptのundefinedで扱う
+ * @typePartId 2df0cf39f4b05c960c34856663d26fd1
+ */
+export type Unit = undefined;
 
 
 /**
@@ -1549,6 +1561,17 @@ export const String: { readonly codec: Codec<String> } = { codec: { encode: (val
   }
   return { result: new a.TextDecoder().decode(textBinary), nextIndex };
 } } };
+
+
+/**
+ * Unit. 1つの値しかない型. JavaScriptのundefinedで扱う
+ * @typePartId 2df0cf39f4b05c960c34856663d26fd1
+ */
+export const Unit: { 
+/**
+ * Unit型にある.唯一の値
+ */
+readonly Unit: Unit; readonly codec: Codec<Unit> } = { Unit: undefined, codec: { encode: (value: Unit): ReadonlyArray<number> => [], decode: (index: number, binary: Uint8Array): { readonly result: Unit; readonly nextIndex: number } => ({ result: Unit.Unit, nextIndex: index }) } };
 
 
 /**

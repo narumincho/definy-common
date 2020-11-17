@@ -7,7 +7,7 @@ export const List = "d7a1efe440138793962eed5625de8196" as T;
 export const Maybe = "cdd7dd74dd0f2036b44dcae6aaac46f5" as T;
 export const Result = "943ef399d0891f897f26bc02fa24af70" as T;
 export const String = "f1f830d23ffab8cec4d0191d157b9fc4" as T;
-
+export const Unit = "2df0cf39f4b05c960c34856663d26fd1" as T;
 export const ProjectId = "4e3ab0f9499404a5fa100c4b57835906" as T;
 export const UserId = "5a71cddc0b95298cb57ec66089190e9b" as T;
 export const IdeaId = "719fa4020ae23a96d301d9fa31d8fcaf" as T;

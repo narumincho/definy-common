@@ -180,6 +180,24 @@ export const typePartMap: ReadonlyMap<TypePartId, TypePart> = new Map<
     },
   ],
   [
+    id.Unit,
+    {
+      name: "Unit",
+      description: "Unit. 1つの値しかない型. JavaScriptのundefinedで扱う",
+      projectId: util.definyCodeProjectId,
+      createCommitId: util.codeCommitId,
+      attribute: Maybe.Just(TypeAttribute.AsUndefined),
+      typeParameterList: [],
+      body: TypePartBody.Sum([
+        {
+          name: "Unit",
+          description: "Unit型にある.唯一の値",
+          parameter: Maybe.Nothing(),
+        },
+      ]),
+    },
+  ],
+  [
     id.ProjectId,
     {
       name: "ProjectId",
