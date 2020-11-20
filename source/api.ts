@@ -1,5 +1,7 @@
 import * as d from "./data";
 
+export type GetCodecType<codec> = codec extends d.Codec<infer t> ? t : never;
+
 export type ApiCodec<Request, Response> = {
   request: d.Codec<Request>;
   response: d.Codec<Response>;
