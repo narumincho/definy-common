@@ -988,7 +988,7 @@ export type SetTypePartListParameter = {
   /**
    * プロジェクトID
    */
-  readonly projectId: TypePartId;
+  readonly projectId: ProjectId;
   /**
    * 型パーツのリスト
    */
@@ -4473,7 +4473,7 @@ export const SetTypePartListParameter: {
     encode: (value: SetTypePartListParameter): ReadonlyArray<number> =>
       AccountToken.codec
         .encode(value.accountToken)
-        .concat(TypePartId.codec.encode(value.projectId))
+        .concat(ProjectId.codec.encode(value.projectId))
         .concat(
           List.codec(IdAndData.codec(TypePartId.codec, TypePart.codec)).encode(
             value.typePartList
@@ -4491,9 +4491,9 @@ export const SetTypePartListParameter: {
         readonly nextIndex: number;
       } = AccountToken.codec.decode(index, binary);
       const projectIdAndNextIndex: {
-        readonly result: TypePartId;
+        readonly result: ProjectId;
         readonly nextIndex: number;
-      } = TypePartId.codec.decode(accountTokenAndNextIndex.nextIndex, binary);
+      } = ProjectId.codec.decode(accountTokenAndNextIndex.nextIndex, binary);
       const typePartListAndNextIndex: {
         readonly result: List<IdAndData<TypePartId, TypePart>>;
         readonly nextIndex: number;

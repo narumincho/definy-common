@@ -381,7 +381,7 @@ type alias AccountTokenAndProjectId =
 {-| 型パーツのリストを変更する
 -}
 type alias SetTypePartListParameter =
-    { accountToken : AccountToken, projectId : TypePartId, typePartList : (List (IdAndData TypePartId TypePart)) }
+    { accountToken : AccountToken, projectId : ProjectId, typePartList : (List (IdAndData TypePartId TypePart)) }
 "
 `;
 
@@ -1325,7 +1325,7 @@ readonly accountToken: AccountToken;
 /**
  * プロジェクトID
  */
-readonly projectId: TypePartId; 
+readonly projectId: ProjectId; 
 /**
  * 型パーツのリスト
  */
@@ -2900,9 +2900,9 @@ export const AccountTokenAndProjectId: { readonly codec: Codec<AccountTokenAndPr
  * 型パーツのリストを変更する
  * @typePartId 0d8c602dce6d495c31fbde469acf235d
  */
-export const SetTypePartListParameter: { readonly codec: Codec<SetTypePartListParameter> } = { codec: { encode: (value: SetTypePartListParameter): ReadonlyArray<number> => (AccountToken.codec.encode(value.accountToken).concat(TypePartId.codec.encode(value.projectId)).concat(List.codec(IdAndData.codec(TypePartId.codec, TypePart.codec)).encode(value.typePartList))), decode: (index: number, binary: Uint8Array): { readonly result: SetTypePartListParameter; readonly nextIndex: number } => {
+export const SetTypePartListParameter: { readonly codec: Codec<SetTypePartListParameter> } = { codec: { encode: (value: SetTypePartListParameter): ReadonlyArray<number> => (AccountToken.codec.encode(value.accountToken).concat(ProjectId.codec.encode(value.projectId)).concat(List.codec(IdAndData.codec(TypePartId.codec, TypePart.codec)).encode(value.typePartList))), decode: (index: number, binary: Uint8Array): { readonly result: SetTypePartListParameter; readonly nextIndex: number } => {
   const accountTokenAndNextIndex: { readonly result: AccountToken; readonly nextIndex: number } = AccountToken.codec.decode(index, binary);
-  const projectIdAndNextIndex: { readonly result: TypePartId; readonly nextIndex: number } = TypePartId.codec.decode(accountTokenAndNextIndex.nextIndex, binary);
+  const projectIdAndNextIndex: { readonly result: ProjectId; readonly nextIndex: number } = ProjectId.codec.decode(accountTokenAndNextIndex.nextIndex, binary);
   const typePartListAndNextIndex: { readonly result: List<IdAndData<TypePartId, TypePart>>; readonly nextIndex: number } = List.codec(IdAndData.codec(TypePartId.codec, TypePart.codec)).decode(projectIdAndNextIndex.nextIndex, binary);
   return { result: { accountToken: accountTokenAndNextIndex.result, projectId: projectIdAndNextIndex.result, typePartList: typePartListAndNextIndex.result }, nextIndex: typePartListAndNextIndex.nextIndex };
 } } };

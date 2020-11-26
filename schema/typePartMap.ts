@@ -1627,7 +1627,7 @@ export const typePartMap: ReadonlyMap<TypePartId, TypePart> = new Map<
         {
           name: "projectId",
           description: "プロジェクトID",
-          type: type.TypePartId,
+          type: type.ProjectId,
         },
         {
           name: "typePartList",
