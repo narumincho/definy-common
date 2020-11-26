@@ -1614,10 +1614,10 @@ export const typePartMap: ReadonlyMap<TypePartId, TypePart> = new Map<
     }),
   ],
   [
-    id.SetTypePartNameParameter,
+    id.SetTypePartListParameter,
     t({
-      name: "SetTypePartNameParameter",
-      description: "型パーツの名前を変更する",
+      name: "SetTypePartListParameter",
+      description: "型パーツのリストを変更する",
       body: TypePartBody.Product([
         {
           name: "accountToken",
@@ -1625,62 +1625,14 @@ export const typePartMap: ReadonlyMap<TypePartId, TypePart> = new Map<
           type: type.AccountToken,
         },
         {
-          name: "typePartId",
-          description: "名前を変える型パーツID",
+          name: "projectId",
+          description: "プロジェクトID",
           type: type.TypePartId,
         },
         {
-          name: "name",
-          description: "設定する名前",
-          type: type.String,
-        },
-      ]),
-    }),
-  ],
-  [
-    id.SetTypePartDescriptionParameter,
-    t({
-      name: "SetTypePartDescriptionParameter",
-      description: "型パーツの説明文を変更する",
-      body: TypePartBody.Product([
-        {
-          name: "accountToken",
-          description: "アカウントトークン",
-          type: type.AccountToken,
-        },
-        {
-          name: "typePartId",
-          description: "名前を変える型パーツID",
-          type: type.TypePartId,
-        },
-        {
-          name: "description",
-          description: "設定する説明文",
-          type: type.String,
-        },
-      ]),
-    }),
-  ],
-  [
-    id.SetTypePartBodyParameter,
-    t({
-      name: "SetTypePartBodyParameter",
-      description: "型パーツの本体を変更する",
-      body: TypePartBody.Product([
-        {
-          name: "accountToken",
-          description: "アカウントトークン",
-          type: type.AccountToken,
-        },
-        {
-          name: "typePartId",
-          description: "名前を変える型パーツID",
-          type: type.TypePartId,
-        },
-        {
-          name: "typePartBody",
-          description: "型パーツの本体",
-          type: type.TypePartBody,
+          name: "typePartList",
+          description: "型パーツのリスト",
+          type: type.List(type.IdAndData(type.TypePartId, type.TypePart)),
         },
       ]),
     }),
