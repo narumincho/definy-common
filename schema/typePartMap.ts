@@ -40,7 +40,8 @@ const t = (param: {
         ? Maybe.Nothing()
         : Maybe.Just(param.attribute),
     projectId: util.definyCodeProjectId,
-    typeParameterList: param.typeParameterList ?? [],
+    typeParameterList:
+      param.typeParameterList === undefined ? [] : param.typeParameterList,
     body: param.body,
   };
 };

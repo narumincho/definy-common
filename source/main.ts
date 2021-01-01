@@ -589,7 +589,7 @@ const checkTypePartListValidation = (
         "duplicate type part id. typePartId = " +
           (typePartId as string) +
           " typePart = " +
-          JSON.stringify((typePart as unknown) as JSONValue)
+          JSON.stringify(typePart)
       );
     }
     typePartIdSet.add(typePartId);

@@ -13,13 +13,13 @@ jobs:
       - name: checkout repository
         uses: actions/checkout@v2
       - name: setup Node.js
-        uses: actions/setup-node@v1
+        uses: actions/setup-node@v2
         with:
           node-version: "12"
       - name: Install npm dependencies (npm ci)
         run: npm ci
       - name: npm test (using jest)
-        run: npx jest --verbose false
+        run: npx jest
 
   npm-publish:
     name: npm publish
@@ -28,7 +28,7 @@ jobs:
       - name: checkout repository
         uses: actions/checkout@v2
       - name: setup Node.js
-        uses: actions/setup-node@v1
+        uses: actions/setup-node@v2
         with:
           node-version: "12"
       - name: Install npm dependencies (npm ci)
@@ -44,7 +44,7 @@ jobs:
           token: ${{ secrets.NPM_AUTH_TOKEN }}
       - name: create release tag
         if: steps.publish.outputs.type != 'none'
-        uses: actions/create-release@latest
+        uses: actions/create-release@1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
