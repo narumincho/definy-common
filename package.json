@@ -16,7 +16,8 @@
   },
   "dependencies": {
     "elm-code-generator": "0.0.1",
-    "js-ts-code-generator": "0.3.4"
+    "js-ts-code-generator": "0.3.4",
+    "rust_js_ts_gen": "0.0.1"
   },
   "devDependencies": {
     "@types/jest": "26.0.19",
