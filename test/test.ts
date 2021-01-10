@@ -2,7 +2,6 @@
 /// <reference path="../node_modules/better-typescript-lib/lib.esnext.full.d.ts" />
 import * as data from "../source/data";
 import * as main from "../source/main";
-import * as r from "rust_js_ts_gen";
 import * as typePartMap from "../schema/typePartMap";
 import * as util from "../source/util";
 
@@ -277,8 +276,5 @@ describe("test", () => {
     expect(
       main.generateTypeScriptCodeAsString(typePartMap.typePartMap)
     ).toMatchSnapshot();
-  });
-  it("by rust", () => {
-    console.log(r.code("newFunction"));
   });
 });
