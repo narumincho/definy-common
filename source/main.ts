@@ -1,6 +1,3 @@
-// eslint-disable-next-line @typescript-eslint/triple-slash-reference
-/// <reference path="../node_modules/better-typescript-lib/lib.esnext.full.d.ts" />
-
 import * as data from "./data";
 import * as elm from "elm-code-generator/source/data";
 import * as elmCodeGenerator from "elm-code-generator";
