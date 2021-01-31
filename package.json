@@ -34,21 +34,7 @@
     "typescript": "4.1.3"
   },
   "jest": {
-    "moduleFileExtensions": [
-      "ts",
-      "js"
-    ],
-    "transform": {
-      "^.+\\.ts$": "ts-jest"
-    },
-    "globals": {
-      "ts-jest": {
-        "tsconfig": "./test/tsconfig.json"
-      }
-    },
-    "testMatch": [
-      "**/test/*.ts"
-    ]
+    "preset": "ts-jest"
   },
   "eslintConfig": {
     "extends": [
@@ -74,7 +60,7 @@
       "project": [
         "./source/tsconfig.json",
         "./schema/tsconfig.json",
-        "./test/tsconfig.json"
+        "./tsconfig.json"
       ]
     },
     "rules": {
