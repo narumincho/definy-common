@@ -12,8 +12,6 @@ export const type = ts.Type.String;
 export const codec = (): ts.Expr =>
   tsUtil.get(ts.Expr.Variable(name), util.codecPropertyName);
 
-const globalProcess = ts.Expr.GlobalObjects(identifer.fromString("process"));
-
 export const encodeDefinitionStatementList = (
   valueVar: ts.Expr
 ): ReadonlyArray<ts.Statement> => {
@@ -29,22 +27,7 @@ export const encodeDefinitionStatementList = (
         {
           expr: tsUtil.callMethod(
             ts.Expr.New({
-              expr: ts.Expr.ConditionalOperator({
-                condition: tsUtil.logicalOr(
-                  tsUtil.equal(globalProcess, ts.Expr.UndefinedLiteral),
-                  tsUtil.equal(
-                    tsUtil.get(globalProcess, "title"),
-                    ts.Expr.StringLiteral("browser")
-                  )
-                ),
-                thenExpr: ts.Expr.GlobalObjects(
-                  identifer.fromString("TextEncoder")
-                ),
-                elseExpr: ts.Expr.ImportedVariable({
-                  moduleName: "util",
-                  name: identifer.fromString("TextEncoder"),
-                }),
-              }),
+              expr: ts.Expr.GlobalObjects(identifer.fromString("TextEncoder")),
               parameterList: [],
             }),
             util.encodePropertyName,
@@ -74,7 +57,6 @@ export const decodeDefinitionStatementList = (
   const nextIndexVar = ts.Expr.Variable(nextIndexName);
   const textBinaryName = identifer.fromString("textBinary");
   const textBinaryVar = ts.Expr.Variable(textBinaryName);
-  const isBrowserName = identifer.fromString("isBrowser");
 
   return [
     ts.Statement.VariableDefinition({
@@ -98,41 +80,10 @@ export const decodeDefinitionStatementList = (
         nextIndexVar,
       ]),
     }),
-    ts.Statement.VariableDefinition({
-      isConst: true,
-      name: isBrowserName,
-      type: ts.Type.Boolean,
-      expr: tsUtil.logicalOr(
-        tsUtil.equal(globalProcess, ts.Expr.UndefinedLiteral),
-        tsUtil.equal(
-          tsUtil.get(globalProcess, "title"),
-          ts.Expr.StringLiteral("browser")
-        )
-      ),
-    }),
-    ts.Statement.If({
-      condition: ts.Expr.Variable(isBrowserName),
-      thenStatementList: [
-        c.returnStatement(
-          tsUtil.callMethod(
-            ts.Expr.New({
-              expr: ts.Expr.GlobalObjects(identifer.fromString("TextDecoder")),
-              parameterList: [],
-            }),
-            "decode",
-            [textBinaryVar]
-          ),
-          nextIndexVar
-        ),
-      ],
-    }),
     c.returnStatement(
       tsUtil.callMethod(
         ts.Expr.New({
-          expr: ts.Expr.ImportedVariable({
-            moduleName: "util",
-            name: identifer.fromString("TextDecoder"),
-          }),
+          expr: ts.Expr.GlobalObjects(identifer.fromString("TextDecoder")),
           parameterList: [],
         }),
         "decode",
