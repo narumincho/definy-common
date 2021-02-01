@@ -15,7 +15,7 @@ jobs:
       - name: setup Node.js
         uses: actions/setup-node@v2
         with:
-          node-version: "12"
+          node-version: "14"
       - name: Install npm dependencies (npm ci)
         run: npm ci
       - name: npm test (using jest)
@@ -30,13 +30,11 @@ jobs:
       - name: setup Node.js
         uses: actions/setup-node@v2
         with:
-          node-version: "12"
+          node-version: "14"
       - name: Install npm dependencies (npm ci)
         run: npm ci
       - name: Transpile source
-        run: npx tsc --project ./source/tsconfig.json
-      - name: Transpile schema
-        run: npx tsc --project ./schema/tsconfig.json
+        run: npx tsc --project ./tsconfig.json
       - name: npm publish
         id: publish
         uses: JS-DevTools/npm-publish@v1

@@ -1,9 +1,0 @@
-node_modules
-.npmignore
-.gitignore
-.github
-.vscode
-test
-generateCode.js
-*.ts
-!*.d.ts

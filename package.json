@@ -7,9 +7,9 @@
   "license": "Apache-2.0",
   "scripts": {
     "test": "jest --watch",
-    "pregenerateCode": "npx tsc --project ./schema/tsconfig.json",
-    "generateCode": "node ./schema/dist/schema/main.js",
-    "typeCheck": "tsc --project source/tsconfig.json --noEmit --watch"
+    "pregenerateCode": "npx tsc --project ./tsconfig.json --outDir schemaJs",
+    "generateCode": "node ./schemaJs/schema/main.js",
+    "typeCheck": "tsc --project ./tsconfig.json --noEmit"
   },
   "repository": {
     "type": "git",
@@ -33,6 +33,10 @@
     "ts-jest": "26.5.0",
     "typescript": "4.1.3"
   },
+  "files": [
+    "**/*.d.ts",
+    "**/*.js"
+  ],
   "jest": {
     "preset": "ts-jest"
   },
@@ -58,8 +62,6 @@
       },
       "sourceType": "module",
       "project": [
-        "./source/tsconfig.json",
-        "./schema/tsconfig.json",
         "./tsconfig.json"
       ]
     },
