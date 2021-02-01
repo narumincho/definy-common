@@ -994,6 +994,25 @@ export type SetTypePartListParameter = {
 };
 
 /**
+ * 1つの型パーツを保存するために指定するパラメーター
+ * @typePartId 07487975f6e0bc57211f0a19110be2b1
+ */
+export type SetTypePartParameter = {
+  /**
+   * アカウントトークン
+   */
+  readonly accountToken: AccountToken;
+  /**
+   * 型パーツのID
+   */
+  readonly typePartId: TypePartId;
+  /**
+   * 型パーツ
+   */
+  readonly typePart: TypePart;
+};
+
+/**
  * -2 147 483 648 ～ 2 147 483 647. 32bit 符号付き整数. JavaScriptのnumberとして扱える. numberの32bit符号あり整数をSigned Leb128のバイナリに変換する
  * @typePartId ccf22e92cea3639683c0271d65d00673
  */
@@ -4726,6 +4745,56 @@ export const SetTypePartListParameter: {
           typePartList: typePartListAndNextIndex.result,
         },
         nextIndex: typePartListAndNextIndex.nextIndex,
+      };
+    },
+  },
+};
+
+/**
+ * 1つの型パーツを保存するために指定するパラメーター
+ * @typePartId 07487975f6e0bc57211f0a19110be2b1
+ */
+export const SetTypePartParameter: {
+  readonly codec: Codec<SetTypePartParameter>;
+  /**
+   * 型を合わせる上で便利なヘルパー関数
+   */
+  readonly helper: (a: SetTypePartParameter) => SetTypePartParameter;
+} = {
+  helper: (setTypePartParameter: SetTypePartParameter): SetTypePartParameter =>
+    setTypePartParameter,
+  codec: {
+    encode: (value: SetTypePartParameter): ReadonlyArray<number> =>
+      AccountToken.codec
+        .encode(value.accountToken)
+        .concat(TypePartId.codec.encode(value.typePartId))
+        .concat(TypePart.codec.encode(value.typePart)),
+    decode: (
+      index: number,
+      binary: Uint8Array
+    ): {
+      readonly result: SetTypePartParameter;
+      readonly nextIndex: number;
+    } => {
+      const accountTokenAndNextIndex: {
+        readonly result: AccountToken;
+        readonly nextIndex: number;
+      } = AccountToken.codec.decode(index, binary);
+      const typePartIdAndNextIndex: {
+        readonly result: TypePartId;
+        readonly nextIndex: number;
+      } = TypePartId.codec.decode(accountTokenAndNextIndex.nextIndex, binary);
+      const typePartAndNextIndex: {
+        readonly result: TypePart;
+        readonly nextIndex: number;
+      } = TypePart.codec.decode(typePartIdAndNextIndex.nextIndex, binary);
+      return {
+        result: {
+          accountToken: accountTokenAndNextIndex.result,
+          typePartId: typePartIdAndNextIndex.result,
+          typePart: typePartAndNextIndex.result,
+        },
+        nextIndex: typePartAndNextIndex.nextIndex,
       };
     },
   },

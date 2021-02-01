@@ -1638,4 +1638,28 @@ export const typePartMap: ReadonlyMap<TypePartId, TypePart> = new Map<
       ]),
     }),
   ],
+  [
+    id.SetTypePartParameter,
+    t({
+      name: "SetTypePartParameter",
+      description: "1つの型パーツを保存するために指定するパラメーター",
+      body: TypePartBody.Product([
+        {
+          name: "accountToken",
+          description: "アカウントトークン",
+          type: type.AccountToken,
+        },
+        {
+          name: "typePartId",
+          description: "型パーツのID",
+          type: type.TypePartId,
+        },
+        {
+          name: "typePart",
+          description: "型パーツ",
+          type: type.TypePart,
+        },
+      ]),
+    }),
+  ],
 ]);

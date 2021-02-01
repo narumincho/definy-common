@@ -83,6 +83,14 @@ export const addTypePart: ApiCodec<
   ),
 };
 
+export const setTypePart: ApiCodec<
+  d.SetTypePartParameter,
+  d.WithTime<d.Maybe<d.TypePart>>
+> = {
+  request: d.SetTypePartParameter.codec,
+  response: d.WithTime.codec(d.Maybe.codec(d.TypePart.codec)),
+};
+
 export const setTypePartList: ApiCodec<
   d.SetTypePartListParameter,
   d.WithTime<d.Maybe<d.List<d.IdAndData<d.TypePartId, d.TypePart>>>>

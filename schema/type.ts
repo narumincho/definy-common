@@ -171,3 +171,5 @@ export const AccountTokenAndProjectId = noParameterType(
 export const SetTypePartListParameter = noParameterType(
   id.SetTypePartListParameter
 );
+
+export const SetTypePartParameter = noParameterType(id.SetTypePartParameter);
