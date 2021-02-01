@@ -18,8 +18,10 @@ jobs:
           node-version: "14"
       - name: Install npm dependencies (npm ci)
         run: npm ci
-      - name: npm test (using jest)
-        run: npx jest
+      - name: Transpile source
+        run: npx tsc --project ./tsconfig.json
+      - name: Run test
+        run: node test.js
 
   npm-publish:
     name: npm publish
