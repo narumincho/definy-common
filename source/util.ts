@@ -165,6 +165,7 @@ export const typeToMemberOrParameterName = (
 export const codecPropertyName = "codec";
 export const encodePropertyName = "encode";
 export const decodePropertyName = "decode";
+export const helperName = "helper";
 export const resultProperty = "result";
 export const nextIndexProperty = "nextIndex";
 

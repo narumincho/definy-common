@@ -44,7 +44,30 @@ const typePartToVariableType = (
   };
 
   switch (typePart.body._) {
-    case "Product":
+    case "Product": {
+      /** ジェネリック付きの型 */
+      const type = ts.Type.WithTypeParameter({
+        type: ts.Type.ScopeInFile(identifer.fromString(typePart.name)),
+        typeParameterList: typePart.typeParameterList.map((typeParameter) =>
+          ts.Type.ScopeInFile(identifer.fromString(typeParameter.name))
+        ),
+      });
+      return ts.Type.Object([
+        codecTsMemberType,
+        {
+          name: util.helperName,
+          document: "型を合わせる上で便利なヘルパー関数",
+          required: true,
+          type: ts.Type.Function({
+            typeParameterList: typePart.typeParameterList.map((typeParameter) =>
+              identifer.fromString(typeParameter.name)
+            ),
+            parameterList: [type],
+            return: type,
+          }),
+        },
+      ]);
+    }
     case "Kernel":
       return ts.Type.Object([codecTsMemberType]);
     case "Sum":
@@ -113,33 +136,71 @@ const typePartToVariableExpr = (
   typePart: data.TypePart,
   allTypePartIdTypePartNameMap: ReadonlyMap<data.TypePartId, string>
 ): ts.Expr => {
-  const codecMember = typePartToCodecMember(
-    typePart,
-    allTypePartIdTypePartNameMap
-  );
   switch (typePart.body._) {
-    case "Product":
+    case "Product": {
+      const parameterIdentifer = identifer.fromString(
+        util.firstLowerCase(typePart.name)
+      );
+      /** ジェネリック付きの型 */
+      const type = ts.Type.WithTypeParameter({
+        type: ts.Type.ScopeInFile(identifer.fromString(typePart.name)),
+        typeParameterList: typePart.typeParameterList.map((typeParameter) =>
+          ts.Type.ScopeInFile(identifer.fromString(typeParameter.name))
+        ),
+      });
+      return ts.Expr.ObjectLiteral([
+        ts.Member.KeyValue({
+          key: util.helperName,
+          value: ts.Expr.Lambda({
+            parameterList: [
+              {
+                name: parameterIdentifer,
+                type,
+              },
+            ],
+            typeParameterList: typePart.typeParameterList.map((typeParameter) =>
+              identifer.fromString(typeParameter.name)
+            ),
+            returnType: type,
+            statementList: [
+              ts.Statement.Return(ts.Expr.Variable(parameterIdentifer)),
+            ],
+          }),
+        }),
+        ts.Member.KeyValue({
+          key: util.codecPropertyName,
+          value: codecExprDefinition(typePart, allTypePartIdTypePartNameMap),
+        }),
+      ]);
+    }
     case "Kernel":
-      return ts.Expr.ObjectLiteral(codecMember);
+      return ts.Expr.ObjectLiteral([
+        ts.Member.KeyValue({
+          key: util.codecPropertyName,
+          value: codecExprDefinition(typePart, allTypePartIdTypePartNameMap),
+        }),
+      ]);
 
     case "Sum": {
       const { patternList } = typePart.body;
-      return ts.Expr.ObjectLiteral(
-        patternList
-          .map((pattern, index) =>
-            ts.Member.KeyValue({
-              key: pattern.name,
-              value: patternToTagExpr(
-                typePart,
-                patternList,
-                pattern,
-                index,
-                allTypePartIdTypePartNameMap
-              ),
-            })
-          )
-          .concat(codecMember)
-      );
+      return ts.Expr.ObjectLiteral([
+        ...patternList.map((pattern, index) =>
+          ts.Member.KeyValue({
+            key: pattern.name,
+            value: patternToTagExpr(
+              typePart,
+              patternList,
+              pattern,
+              index,
+              allTypePartIdTypePartNameMap
+            ),
+          })
+        ),
+        ts.Member.KeyValue({
+          key: util.codecPropertyName,
+          value: codecExprDefinition(typePart, allTypePartIdTypePartNameMap),
+        }),
+      ]);
     }
   }
 };
@@ -247,18 +308,6 @@ const typePartToCodecType = (typePart: data.TypePart): ts.Type =>
     ts.Type.ScopeInFile(identifer.fromString(typePart.name)),
     typePart.typeParameterList.map((typeParameter) => typeParameter.name)
   );
-
-const typePartToCodecMember = (
-  typePart: data.TypePart,
-  allTypePartIdTypePartNameMap: ReadonlyMap<data.TypePartId, string>
-): ReadonlyArray<ts.Member> => {
-  return [
-    ts.Member.KeyValue({
-      key: util.codecPropertyName,
-      value: codecExprDefinition(typePart, allTypePartIdTypePartNameMap),
-    }),
-  ];
-};
 
 const codecExprDefinition = (
   typePart: data.TypePart,

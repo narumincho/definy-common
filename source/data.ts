@@ -1568,7 +1568,14 @@ export const ReleaseTypePartId: { readonly codec: Codec<ReleaseTypePartId> } = {
  * 日時. 0001-01-01T00:00:00.000Z to 9999-12-31T23:59:59.999Z 最小単位はミリ秒. ミリ秒の求め方は day*1000*60*60*24 + millisecond
  * @typePartId fa64c1721a3285f112a4118b66b43712
  */
-export const Time: { readonly codec: Codec<Time> } = {
+export const Time: {
+  readonly codec: Codec<Time>;
+  /**
+   * 型を合わせる上で便利なヘルパー関数
+   */
+  readonly helper: (a: Time) => Time;
+} = {
+  helper: (time: Time): Time => time,
   codec: {
     encode: (value: Time): ReadonlyArray<number> =>
       Int32.codec
@@ -1603,7 +1610,16 @@ export const Time: { readonly codec: Codec<Time> } = {
  */
 export const RequestLogInUrlRequestData: {
   readonly codec: Codec<RequestLogInUrlRequestData>;
+  /**
+   * 型を合わせる上で便利なヘルパー関数
+   */
+  readonly helper: (
+    a: RequestLogInUrlRequestData
+  ) => RequestLogInUrlRequestData;
 } = {
+  helper: (
+    requestLogInUrlRequestData: RequestLogInUrlRequestData
+  ): RequestLogInUrlRequestData => requestLogInUrlRequestData,
   codec: {
     encode: (value: RequestLogInUrlRequestData): ReadonlyArray<number> =>
       OpenIdConnectProvider.codec
@@ -1698,7 +1714,14 @@ export const OpenIdConnectProvider: {
  * デバッグモードかどうか,言語とページの場所. URLとして表現されるデータ. Googleなどの検索エンジンの都合( https://support.google.com/webmasters/answer/182192?hl=ja )で,URLにページの言語を入れて,言語ごとに別のURLである必要がある. デバッグ時のホスト名は http://localhost になる
  * @typePartId dc3b3cd3f125b344fb60a91c0b184f3e
  */
-export const UrlData: { readonly codec: Codec<UrlData> } = {
+export const UrlData: {
+  readonly codec: Codec<UrlData>;
+  /**
+   * 型を合わせる上で便利なヘルパー関数
+   */
+  readonly helper: (a: UrlData) => UrlData;
+} = {
+  helper: (urlData: UrlData): UrlData => urlData,
   codec: {
     encode: (value: UrlData): ReadonlyArray<number> =>
       ClientMode.codec
@@ -2006,7 +2029,14 @@ export const Language: {
  * ユーザーのデータのスナップショット
  * @typePartId 655cea387d1aca74e54df4fc2888bcbb
  */
-export const User: { readonly codec: Codec<User> } = {
+export const User: {
+  readonly codec: Codec<User>;
+  /**
+   * 型を合わせる上で便利なヘルパー関数
+   */
+  readonly helper: (a: User) => User;
+} = {
+  helper: (user: User): User => user,
   codec: {
     encode: (value: User): ReadonlyArray<number> =>
       String.codec
@@ -2056,7 +2086,16 @@ export const IdAndData: {
     a: Codec<id>,
     b: Codec<data>
   ) => Codec<IdAndData<id, data>>;
+  /**
+   * 型を合わせる上で便利なヘルパー関数
+   */
+  readonly helper: <id extends unknown, data extends unknown>(
+    a: IdAndData<id, data>
+  ) => IdAndData<id, data>;
 } = {
+  helper: <id extends unknown, data extends unknown>(
+    idAndData: IdAndData<id, data>
+  ): IdAndData<id, data> => idAndData,
   codec: <id extends unknown, data extends unknown>(
     idCodec: Codec<id>,
     dataCodec: Codec<data>
@@ -2087,7 +2126,14 @@ export const IdAndData: {
  * プロジェクト
  * @typePartId 3fb93c7e94724891d2a224c6f945acbd
  */
-export const Project: { readonly codec: Codec<Project> } = {
+export const Project: {
+  readonly codec: Codec<Project>;
+  /**
+   * 型を合わせる上で便利なヘルパー関数
+   */
+  readonly helper: (a: Project) => Project;
+} = {
+  helper: (project: Project): Project => project,
   codec: {
     encode: (value: Project): ReadonlyArray<number> =>
       String.codec
@@ -2156,7 +2202,14 @@ export const Project: { readonly codec: Codec<Project> } = {
  * アイデア
  * @typePartId 98d993c8105a292781e3d3291fb477b6
  */
-export const Idea: { readonly codec: Codec<Idea> } = {
+export const Idea: {
+  readonly codec: Codec<Idea>;
+  /**
+   * 型を合わせる上で便利なヘルパー関数
+   */
+  readonly helper: (a: Idea) => Idea;
+} = {
+  helper: (idea: Idea): Idea => idea,
   codec: {
     encode: (value: Idea): ReadonlyArray<number> =>
       String.codec
@@ -2231,7 +2284,14 @@ export const Idea: { readonly codec: Codec<Idea> } = {
  * アイデアのコメント
  * @typePartId ce630fa90ed090bd14c941915abd3293
  */
-export const Comment: { readonly codec: Codec<Comment> } = {
+export const Comment: {
+  readonly codec: Codec<Comment>;
+  /**
+   * 型を合わせる上で便利なヘルパー関数
+   */
+  readonly helper: (a: Comment) => Comment;
+} = {
+  helper: (comment: Comment): Comment => comment,
   codec: {
     encode: (value: Comment): ReadonlyArray<number> =>
       UserId.codec
@@ -2270,7 +2330,14 @@ export const Comment: { readonly codec: Codec<Comment> } = {
  * コミット. コードのスナップショット
  * @typePartId f16c59a2158d9642481085d2492007f8
  */
-export const Commit: { readonly codec: Codec<Commit> } = {
+export const Commit: {
+  readonly codec: Codec<Commit>;
+  /**
+   * 型を合わせる上で便利なヘルパー関数
+   */
+  readonly helper: (a: Commit) => Commit;
+} = {
+  helper: (commit: Commit): Commit => commit,
   codec: {
     encode: (value: Commit): ReadonlyArray<number> =>
       UserId.codec
@@ -2429,7 +2496,14 @@ export const IdeaState: {
  * パーツの定義
  * @typePartId 68599f9f5f2405a4f83d4dc4a8d4dfd7
  */
-export const Part: { readonly codec: Codec<Part> } = {
+export const Part: {
+  readonly codec: Codec<Part>;
+  /**
+   * 型を合わせる上で便利なヘルパー関数
+   */
+  readonly helper: (a: Part) => Part;
+} = {
+  helper: (part: Part): Part => part,
   codec: {
     encode: (value: Part): ReadonlyArray<number> =>
       String.codec
@@ -2486,7 +2560,14 @@ export const Part: { readonly codec: Codec<Part> } = {
  * 型パーツ
  * @typePartId 95932121474f7db6f7a1256734be7746
  */
-export const TypePart: { readonly codec: Codec<TypePart> } = {
+export const TypePart: {
+  readonly codec: Codec<TypePart>;
+  /**
+   * 型を合わせる上で便利なヘルパー関数
+   */
+  readonly helper: (a: TypePart) => TypePart;
+} = {
+  helper: (typePart: TypePart): TypePart => typePart,
   codec: {
     encode: (value: TypePart): ReadonlyArray<number> =>
       String.codec
@@ -2605,7 +2686,14 @@ export const TypeAttribute: {
  * 型パラメーター
  * @typePartId e1333f2af01621585b96e47aea9bfee1
  */
-export const TypeParameter: { readonly codec: Codec<TypeParameter> } = {
+export const TypeParameter: {
+  readonly codec: Codec<TypeParameter>;
+  /**
+   * 型を合わせる上で便利なヘルパー関数
+   */
+  readonly helper: (a: TypeParameter) => TypeParameter;
+} = {
+  helper: (typeParameter: TypeParameter): TypeParameter => typeParameter,
   codec: {
     encode: (value: TypeParameter): ReadonlyArray<number> =>
       String.codec
@@ -2730,7 +2818,14 @@ export const TypePartBody: {
  * 直積型のメンバー
  * @typePartId 73b8e53686ac76acb085cb096f658d58
  */
-export const Member: { readonly codec: Codec<Member> } = {
+export const Member: {
+  readonly codec: Codec<Member>;
+  /**
+   * 型を合わせる上で便利なヘルパー関数
+   */
+  readonly helper: (a: Member) => Member;
+} = {
+  helper: (member: Member): Member => member,
   codec: {
     encode: (value: Member): ReadonlyArray<number> =>
       String.codec
@@ -2769,7 +2864,14 @@ export const Member: { readonly codec: Codec<Member> } = {
  * 直積型のパターン
  * @typePartId 512c55527a1ce9822e1e51b2f6063789
  */
-export const Pattern: { readonly codec: Codec<Pattern> } = {
+export const Pattern: {
+  readonly codec: Codec<Pattern>;
+  /**
+   * 型を合わせる上で便利なヘルパー関数
+   */
+  readonly helper: (a: Pattern) => Pattern;
+} = {
+  helper: (pattern: Pattern): Pattern => pattern,
   codec: {
     encode: (value: Pattern): ReadonlyArray<number> =>
       String.codec
@@ -2934,7 +3036,14 @@ export const TypePartBodyKernel: {
  * 型
  * @typePartId 0e16754e227d7287a01596ee10e1244f
  */
-export const Type: { readonly codec: Codec<Type> } = {
+export const Type: {
+  readonly codec: Codec<Type>;
+  /**
+   * 型を合わせる上で便利なヘルパー関数
+   */
+  readonly helper: (a: Type) => Type;
+} = {
+  helper: (type_: Type): Type => type_,
   codec: {
     encode: (value: Type): ReadonlyArray<number> =>
       TypePartId.codec
@@ -3184,7 +3293,14 @@ export const KernelExpr: {
  * タグの参照を表す
  * @typePartId 9e622b94f66cccedeb7cd9eb10232867
  */
-export const TagReference: { readonly codec: Codec<TagReference> } = {
+export const TagReference: {
+  readonly codec: Codec<TagReference>;
+  /**
+   * 型を合わせる上で便利なヘルパー関数
+   */
+  readonly helper: (a: TagReference) => TagReference;
+} = {
+  helper: (tagReference: TagReference): TagReference => tagReference,
   codec: {
     encode: (value: TagReference): ReadonlyArray<number> =>
       TypePartId.codec
@@ -3217,7 +3333,14 @@ export const TagReference: { readonly codec: Codec<TagReference> } = {
  * 関数呼び出し
  * @typePartId eb48ccda184401de37cee133ee046e94
  */
-export const FunctionCall: { readonly codec: Codec<FunctionCall> } = {
+export const FunctionCall: {
+  readonly codec: Codec<FunctionCall>;
+  /**
+   * 型を合わせる上で便利なヘルパー関数
+   */
+  readonly helper: (a: FunctionCall) => FunctionCall;
+} = {
+  helper: (functionCall: FunctionCall): FunctionCall => functionCall,
   codec: {
     encode: (value: FunctionCall): ReadonlyArray<number> =>
       Expr.codec
@@ -3250,7 +3373,14 @@ export const FunctionCall: { readonly codec: Codec<FunctionCall> } = {
  * ラムダのブランチ. Just x -> data x のようなところ
  * @typePartId e1c39a207e4c950b326f1294550f40ac
  */
-export const LambdaBranch: { readonly codec: Codec<LambdaBranch> } = {
+export const LambdaBranch: {
+  readonly codec: Codec<LambdaBranch>;
+  /**
+   * 型を合わせる上で便利なヘルパー関数
+   */
+  readonly helper: (a: LambdaBranch) => LambdaBranch;
+} = {
+  helper: (lambdaBranch: LambdaBranch): LambdaBranch => lambdaBranch,
   codec: {
     encode: (value: LambdaBranch): ReadonlyArray<number> =>
       Condition.codec
@@ -3398,7 +3528,14 @@ export const Condition: {
  * タグによる条件
  * @typePartId 46ec720c126a7093a527d29c176c5b59
  */
-export const ConditionTag: { readonly codec: Codec<ConditionTag> } = {
+export const ConditionTag: {
+  readonly codec: Codec<ConditionTag>;
+  /**
+   * 型を合わせる上で便利なヘルパー関数
+   */
+  readonly helper: (a: ConditionTag) => ConditionTag;
+} = {
+  helper: (conditionTag: ConditionTag): ConditionTag => conditionTag,
   codec: {
     encode: (value: ConditionTag): ReadonlyArray<number> =>
       TagId.codec
@@ -3434,7 +3571,15 @@ export const ConditionTag: { readonly codec: Codec<ConditionTag> } = {
  * キャプチャパーツへのキャプチャ
  * @typePartId 1e0084ab494ca046f98cd6334ecf0944
  */
-export const ConditionCapture: { readonly codec: Codec<ConditionCapture> } = {
+export const ConditionCapture: {
+  readonly codec: Codec<ConditionCapture>;
+  /**
+   * 型を合わせる上で便利なヘルパー関数
+   */
+  readonly helper: (a: ConditionCapture) => ConditionCapture;
+} = {
+  helper: (conditionCapture: ConditionCapture): ConditionCapture =>
+    conditionCapture,
   codec: {
     encode: (value: ConditionCapture): ReadonlyArray<number> =>
       String.codec.encode(value.name).concat(PartId.codec.encode(value.partId)),
@@ -3467,7 +3612,13 @@ export const ConditionCapture: { readonly codec: Codec<ConditionCapture> } = {
  */
 export const BranchPartDefinition: {
   readonly codec: Codec<BranchPartDefinition>;
+  /**
+   * 型を合わせる上で便利なヘルパー関数
+   */
+  readonly helper: (a: BranchPartDefinition) => BranchPartDefinition;
 } = {
+  helper: (branchPartDefinition: BranchPartDefinition): BranchPartDefinition =>
+    branchPartDefinition,
   codec: {
     encode: (value: BranchPartDefinition): ReadonlyArray<number> =>
       PartId.codec
@@ -3653,7 +3804,14 @@ export const EvaluatedExpr: {
  * 複数の引数が必要な内部関数の部分呼び出し
  * @typePartId 1db3d6bfb8b0b396a3f94f062d37a630
  */
-export const KernelCall: { readonly codec: Codec<KernelCall> } = {
+export const KernelCall: {
+  readonly codec: Codec<KernelCall>;
+  /**
+   * 型を合わせる上で便利なヘルパー関数
+   */
+  readonly helper: (a: KernelCall) => KernelCall;
+} = {
+  helper: (kernelCall: KernelCall): KernelCall => kernelCall,
   codec: {
     encode: (value: KernelCall): ReadonlyArray<number> =>
       KernelExpr.codec
@@ -3781,7 +3939,14 @@ export const EvaluateExprError: {
  * 型エラー
  * @typePartId 466fbfeeb2d6ead0f6bd0833b5ea3d71
  */
-export const TypeError: { readonly codec: Codec<TypeError> } = {
+export const TypeError: {
+  readonly codec: Codec<TypeError>;
+  /**
+   * 型を合わせる上で便利なヘルパー関数
+   */
+  readonly helper: (a: TypeError) => TypeError;
+} = {
+  helper: (typeError: TypeError): TypeError => typeError,
   codec: {
     encode: (value: TypeError): ReadonlyArray<number> =>
       String.codec.encode(value.message),
@@ -3807,7 +3972,14 @@ export const TypeError: { readonly codec: Codec<TypeError> } = {
  */
 export const CreateProjectParameter: {
   readonly codec: Codec<CreateProjectParameter>;
+  /**
+   * 型を合わせる上で便利なヘルパー関数
+   */
+  readonly helper: (a: CreateProjectParameter) => CreateProjectParameter;
 } = {
+  helper: (
+    createProjectParameter: CreateProjectParameter
+  ): CreateProjectParameter => createProjectParameter,
   codec: {
     encode: (value: CreateProjectParameter): ReadonlyArray<number> =>
       AccountToken.codec
@@ -3845,7 +4017,13 @@ export const CreateProjectParameter: {
  */
 export const CreateIdeaParameter: {
   readonly codec: Codec<CreateIdeaParameter>;
+  /**
+   * 型を合わせる上で便利なヘルパー関数
+   */
+  readonly helper: (a: CreateIdeaParameter) => CreateIdeaParameter;
 } = {
+  helper: (createIdeaParameter: CreateIdeaParameter): CreateIdeaParameter =>
+    createIdeaParameter,
   codec: {
     encode: (value: CreateIdeaParameter): ReadonlyArray<number> =>
       AccountToken.codec
@@ -3886,7 +4064,13 @@ export const CreateIdeaParameter: {
  */
 export const AddCommentParameter: {
   readonly codec: Codec<AddCommentParameter>;
+  /**
+   * 型を合わせる上で便利なヘルパー関数
+   */
+  readonly helper: (a: AddCommentParameter) => AddCommentParameter;
 } = {
+  helper: (addCommentParameter: AddCommentParameter): AddCommentParameter =>
+    addCommentParameter,
   codec: {
     encode: (value: AddCommentParameter): ReadonlyArray<number> =>
       AccountToken.codec
@@ -3927,7 +4111,13 @@ export const AddCommentParameter: {
  */
 export const AddCommitParameter: {
   readonly codec: Codec<AddCommitParameter>;
+  /**
+   * 型を合わせる上で便利なヘルパー関数
+   */
+  readonly helper: (a: AddCommitParameter) => AddCommitParameter;
 } = {
+  helper: (addCommitParameter: AddCommitParameter): AddCommitParameter =>
+    addCommitParameter,
   codec: {
     encode: (value: AddCommitParameter): ReadonlyArray<number> =>
       AccountToken.codec
@@ -3962,7 +4152,14 @@ export const AddCommitParameter: {
  */
 export const AccountTokenAndCommitId: {
   readonly codec: Codec<AccountTokenAndCommitId>;
+  /**
+   * 型を合わせる上で便利なヘルパー関数
+   */
+  readonly helper: (a: AccountTokenAndCommitId) => AccountTokenAndCommitId;
 } = {
+  helper: (
+    accountTokenAndCommitId: AccountTokenAndCommitId
+  ): AccountTokenAndCommitId => accountTokenAndCommitId,
   codec: {
     encode: (value: AccountTokenAndCommitId): ReadonlyArray<number> =>
       AccountToken.codec
@@ -4137,7 +4334,14 @@ export const LogInState: {
  */
 export const AccountTokenAndUserId: {
   readonly codec: Codec<AccountTokenAndUserId>;
+  /**
+   * 型を合わせる上で便利なヘルパー関数
+   */
+  readonly helper: (a: AccountTokenAndUserId) => AccountTokenAndUserId;
 } = {
+  helper: (
+    accountTokenAndUserId: AccountTokenAndUserId
+  ): AccountTokenAndUserId => accountTokenAndUserId,
   codec: {
     encode: (value: AccountTokenAndUserId): ReadonlyArray<number> =>
       AccountToken.codec
@@ -4177,7 +4381,13 @@ export const WithTime: {
   readonly codec: <data extends unknown>(
     a: Codec<data>
   ) => Codec<WithTime<data>>;
+  /**
+   * 型を合わせる上で便利なヘルパー関数
+   */
+  readonly helper: <data extends unknown>(a: WithTime<data>) => WithTime<data>;
 } = {
+  helper: <data extends unknown>(withTime: WithTime<data>): WithTime<data> =>
+    withTime,
   codec: <data extends unknown>(
     dataCodec: Codec<data>
   ): Codec<WithTime<data>> => ({
@@ -4424,7 +4634,14 @@ export const StaticResourceState: {
  */
 export const AccountTokenAndProjectId: {
   readonly codec: Codec<AccountTokenAndProjectId>;
+  /**
+   * 型を合わせる上で便利なヘルパー関数
+   */
+  readonly helper: (a: AccountTokenAndProjectId) => AccountTokenAndProjectId;
 } = {
+  helper: (
+    accountTokenAndProjectId: AccountTokenAndProjectId
+  ): AccountTokenAndProjectId => accountTokenAndProjectId,
   codec: {
     encode: (value: AccountTokenAndProjectId): ReadonlyArray<number> =>
       AccountToken.codec
@@ -4462,7 +4679,14 @@ export const AccountTokenAndProjectId: {
  */
 export const SetTypePartListParameter: {
   readonly codec: Codec<SetTypePartListParameter>;
+  /**
+   * 型を合わせる上で便利なヘルパー関数
+   */
+  readonly helper: (a: SetTypePartListParameter) => SetTypePartListParameter;
 } = {
+  helper: (
+    setTypePartListParameter: SetTypePartListParameter
+  ): SetTypePartListParameter => setTypePartListParameter,
   codec: {
     encode: (value: SetTypePartListParameter): ReadonlyArray<number> =>
       AccountToken.codec
