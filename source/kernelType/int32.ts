@@ -121,11 +121,20 @@ export const decodeDefinitionStatementList = (
       ts.Statement.VariableDefinition({
         isConst: true,
         name: byteName,
-        type: ts.Type.Number,
+        type: ts.Type.Union([ts.Type.Number, ts.Type.Undefined]),
         expr: ts.Expr.Get({
           expr: parameterBinary,
           propertyExpr: tsUtil.addition(parameterIndex, offsetVar),
         }),
+      }),
+      // もし byteVar が undefined だったら throw する
+      ts.Statement.If({
+        condition: tsUtil.equal(byteVar, ts.Expr.UndefinedLiteral),
+        thenStatementList: [
+          ts.Statement.ThrowError(
+            ts.Expr.StringLiteral("invalid byte in decode int32")
+          ),
+        ],
       }),
       ts.Statement.Set({
         target: resultVar,

@@ -200,10 +200,11 @@ export const firstLowerCase = (text: string): string =>
   text.substring(0, 1).toLowerCase() + text.substring(1);
 
 export const isFirstUpperCaseName = (text: string): boolean => {
-  if (text === "") {
+  const [firstChar] = text;
+  if (firstChar === undefined) {
     return false;
   }
-  if (!"ABCDEFGHIJKLMNOPQRSTUVWXYZ".includes(text[0])) {
+  if (!"ABCDEFGHIJKLMNOPQRSTUVWXYZ".includes(firstChar)) {
     return false;
   }
   for (const char of text.slice(1)) {
@@ -219,10 +220,11 @@ export const isFirstUpperCaseName = (text: string): boolean => {
 };
 
 export const isFirstLowerCaseName = (text: string): boolean => {
-  if (text === "") {
+  const [firstChar] = text;
+  if (firstChar === undefined) {
     return false;
   }
-  if (!"abcdefghijklmnopqrstuvwxyz".includes(text[0])) {
+  if (!"abcdefghijklmnopqrstuvwxyz".includes(firstChar)) {
     return false;
   }
   for (const char of text.slice(1)) {

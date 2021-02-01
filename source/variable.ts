@@ -383,15 +383,16 @@ const productEncodeDefinitionStatementList = (
   parameter: ts.Expr,
   allTypePartIdTypePartNameMap: ReadonlyMap<data.TypePartId, string>
 ): ReadonlyArray<ts.Statement> => {
-  if (memberList.length === 0) {
+  const [firstMember] = memberList;
+  if (firstMember === undefined) {
     return [ts.Statement.Return(ts.Expr.ArrayLiteral([]))];
   }
   let e = ts.Expr.Call({
     expr: tsUtil.get(
-      codecExprUse(memberList[0].type, allTypePartIdTypePartNameMap),
+      codecExprUse(firstMember.type, allTypePartIdTypePartNameMap),
       util.encodePropertyName
     ),
-    parameterList: [tsUtil.get(parameter, memberList[0].name)],
+    parameterList: [tsUtil.get(parameter, firstMember.name)],
   });
   for (const member of memberList.slice(1)) {
     e = tsUtil.callMethod(e, "concat", [
@@ -487,13 +488,11 @@ const kernelEncodeDefinitionStatementList = (
     case "Token":
       return hexString.tokenEncodeDefinitionStatementList(valueVar);
     case "List": {
-      if (typePart.typeParameterList.length !== 1) {
+      const [elementType] = typePart.typeParameterList;
+      if (elementType === undefined) {
         throw new Error("List type need one type paramter");
       }
-      return list.encodeDefinitionStatementList(
-        typePart.typeParameterList[0].name,
-        valueVar
-      );
+      return list.encodeDefinitionStatementList(elementType.name, valueVar);
     }
   }
 };
@@ -770,11 +769,12 @@ const kernelDecodeDefinitionStatementList = (
         parameterBinary
       );
     case "List": {
-      if (typePart.typeParameterList.length !== 1) {
+      const [elementType] = typePart.typeParameterList;
+      if (elementType === undefined) {
         throw new Error("List type need one type paramter");
       }
       return list.decodeDefinitionStatementList(
-        typePart.typeParameterList[0].name,
+        elementType.name,
         parameterIndex,
         parameterBinary
       );

@@ -1022,7 +1022,10 @@ export const Int32: { readonly codec: Codec<Int32> } = {
       let result: number = 0;
       let offset: number = 0;
       while (true) {
-        const byte: number = binary[index + offset];
+        const byte: number | undefined = binary[index + offset];
+        if (byte === undefined) {
+          throw new Error("invalid byte in decode int32");
+        }
         result |= (byte & 127) << (offset * 7);
         offset += 1;
         if ((128 & byte) === 0) {

@@ -144,21 +144,19 @@ const typePartBodyKernelToTsType = (
   kernel: data.TypePartBodyKernel
 ): ts.Type => {
   switch (kernel) {
-    case "Function":
-      if (typePart.typeParameterList.length !== 2) {
+    case "Function": {
+      const [inputType, outputType] = typePart.typeParameterList;
+      if (inputType === undefined || outputType === undefined) {
         throw new Error("kernel function type need 2 type parameter");
       }
       return ts.Type.Function({
         parameterList: [
-          ts.Type.ScopeInFile(
-            identifer.fromString(typePart.typeParameterList[0].name)
-          ),
+          ts.Type.ScopeInFile(identifer.fromString(inputType.name)),
         ],
-        return: ts.Type.ScopeInFile(
-          identifer.fromString(typePart.typeParameterList[1].name)
-        ),
+        return: ts.Type.ScopeInFile(identifer.fromString(outputType.name)),
         typeParameterList: [],
       });
+    }
     case "Int32":
       return ts.Type.Number;
     case "String":
@@ -178,16 +176,16 @@ const typePartBodyKernelToTsType = (
           },
         ]),
       });
-    case "List":
-      if (typePart.typeParameterList.length !== 1) {
+    case "List": {
+      const [elementType] = typePart.typeParameterList;
+      if (elementType === undefined) {
         throw new Error(
           "attribute == Just(AsArray) type part need one type parameter"
         );
       }
       return tsUtil.readonlyArrayType(
-        ts.Type.ScopeInFile(
-          identifer.fromString(typePart.typeParameterList[0].name)
-        )
+        ts.Type.ScopeInFile(identifer.fromString(elementType.name))
       );
+    }
   }
 };
