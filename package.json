@@ -1,6 +1,6 @@
 {
   "name": "definy-core",
-  "version": "0.2.15",
+  "version": "0.2.16",
   "description": "Definy common logic and type definition",
   "main": "source/main.js",
   "author": "narumincho <narumincho.starfy@gmail.com> (https://narumincho.com)",
