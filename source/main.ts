@@ -761,7 +761,7 @@ export const generateElmCodeAsString = (
 
 export const generateElmCode = (
   typePartMap: ReadonlyMap<data.TypePartId, data.TypePart>
-): elm.Code => {
+): elm.ElmCode => {
   const allTypePartIdTypePartNameMap = checkTypePartListValidation(typePartMap);
   return {
     moduleName: "Data",
@@ -788,10 +788,10 @@ const undefinedFlatMap = <Input, Output>(
 const typePartToElmTypeDeclaration = (
   typePart: data.TypePart,
   typePartNameMap: ReadonlyMap<data.TypePartId, string>
-): elm.TypeDeclaration | undefined => {
+): elm.ElmTypeDeclaration | undefined => {
   switch (typePart.body._) {
     case "Product":
-      return elm.TypeDeclaration.TypeAlias({
+      return elm.ElmTypeDeclaration.TypeAlias({
         name: stringToElmTypeName(typePart.name),
         comment: typePart.description,
         export: true,
@@ -800,7 +800,7 @@ const typePartToElmTypeDeclaration = (
         ),
         type: elm.ElmType.Record(
           typePart.body.memberList.map(
-            (member): elm.Field => ({
+            (member): elm.ElmField => ({
               name: stringToElmFiledName(member.name),
               type: definyTypeToElmType(member.type, typePartNameMap),
             })
@@ -808,15 +808,15 @@ const typePartToElmTypeDeclaration = (
         ),
       });
     case "Sum":
-      return elm.TypeDeclaration.CustomType({
+      return elm.ElmTypeDeclaration.CustomType({
         name: stringToElmTypeName(typePart.name),
         comment: typePart.description,
-        export: elm.CustomTypeExportLevel.ExportTypeAndVariant,
+        export: elm.ElmCustomTypeExportLevel.ExportTypeAndVariant,
         parameter: typePart.typeParameterList.map(
           (typeParameter) => typeParameter.name
         ),
         variantList: typePart.body.patternList.map(
-          (pattern): elm.Variant => ({
+          (pattern): elm.ElmVariant => ({
             name: stringToVariantName(pattern.name),
             parameter:
               pattern.parameter._ === "Just"
@@ -848,7 +848,7 @@ const stringToElmTypeName = (name: string): elm.ElmTypeName => {
   }
 };
 
-const stringToElmFiledName = (name: string): elm.FieldName => {
+const stringToElmFiledName = (name: string): elm.ElmFieldName => {
   const filedName = elmCodeGenerator.fieldNameFromString(name);
   switch (filedName._) {
     case "Just":
@@ -858,7 +858,7 @@ const stringToElmFiledName = (name: string): elm.FieldName => {
   }
 };
 
-const stringToVariantName = (name: string): elm.VariantName => {
+const stringToVariantName = (name: string): elm.ElmVariantName => {
   const variantName = elmCodeGenerator.variantNameFormString(name);
   switch (variantName._) {
     case "Just":
@@ -871,7 +871,7 @@ const stringToVariantName = (name: string): elm.VariantName => {
 const definyTypePartBodyKernelToElmType = (
   typePart: data.TypePart,
   typePartBodyKernel: data.TypePartBodyKernel
-): elm.TypeDeclaration | undefined => {
+): elm.ElmTypeDeclaration | undefined => {
   switch (typePartBodyKernel) {
     case "Function":
     case "Int32":
@@ -880,10 +880,10 @@ const definyTypePartBodyKernelToElmType = (
       return;
     case "Id":
     case "Token":
-      return elm.TypeDeclaration.CustomType({
+      return elm.ElmTypeDeclaration.CustomType({
         name: stringToElmTypeName(typePart.name),
         comment: typePart.description,
-        export: elm.CustomTypeExportLevel.ExportTypeAndVariant,
+        export: elm.ElmCustomTypeExportLevel.ExportTypeAndVariant,
         parameter: [],
         variantList: [
           {

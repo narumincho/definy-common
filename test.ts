@@ -1,7 +1,6 @@
 import * as data from "./source/data";
 import * as main from "./source/main";
 import * as util from "./source/util";
-// import { promises as fs } from "fs";
 import { strict as strictAssert } from "assert";
 
 const codecEqual = <T>(
