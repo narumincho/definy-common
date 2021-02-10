@@ -4,7 +4,7 @@ import * as elmCodeGenerator from "elm-code-generator";
 import * as elmUtil from "elm-code-generator/source/util";
 import * as hexString from "./kernelType/hexString";
 import * as jsTsCodeGenerator from "js-ts-code-generator";
-import * as ts from "js-ts-code-generator/source/data";
+import * as ts from "js-ts-code-generator/data";
 import * as typeAlias from "./typeAlias";
 import * as util from "./util";
 import * as variable from "./variable";
@@ -549,7 +549,7 @@ export const generateJavaScriptCodeAsString = (
 
 export const generateTypeScriptCode = (
   typePartMap: ReadonlyMap<data.TypePartId, data.TypePart>
-): ts.Code => {
+): ts.JsTsCode => {
   const allTypePartIdTypePartNameMap = checkTypePartListValidation(typePartMap);
   return {
     exportDefinitionList: [

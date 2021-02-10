@@ -1,8 +1,8 @@
 import * as c from "./codec";
-import * as identifer from "js-ts-code-generator/source/identifer";
+import * as identifer from "js-ts-code-generator/identifer";
 import * as string from "./string";
-import * as ts from "js-ts-code-generator/source/data";
-import * as tsUtil from "js-ts-code-generator/source/util";
+import * as ts from "js-ts-code-generator/data";
+import * as tsUtil from "js-ts-code-generator/util";
 import * as util from "../util";
 
 export const name = identifer.fromString("Url");
