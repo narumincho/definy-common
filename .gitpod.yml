@@ -1,2 +1,10 @@
+image:
+  file: .gitpod.Dockerfile
+
 tasks:
   - init: npm install
+
+vscode:
+  extensions:
+    - dbaeumer.vscode-eslint@2.1.8:02aHhbJ0Q4aGdjHXlTdVKg==
+    - esbenp.prettier-vscode@5.9.1:iOd2sieSR48o6zF3hElemQ==
