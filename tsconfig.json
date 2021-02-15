@@ -9,6 +9,5 @@
     "forceConsistentCasingInFileNames": true,
     "declaration": true,
     "noUncheckedIndexedAccess": true
-  },
-  "exclude": ["jsOut"]
+  }
 }

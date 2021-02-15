@@ -6,10 +6,8 @@
   "author": "narumincho <narumincho.starfy@gmail.com> (https://narumincho.com)",
   "license": "Apache-2.0",
   "scripts": {
-    "pretest": "npx tsc --project ./tsconfig.json --outDir jsOut",
-    "test": "node ./jsOut/test.js",
-    "pregenerateCode": "npx tsc --project ./tsconfig.json --outDir jsOut",
-    "generateCode": "node ./jsOut/schema/main.js",
+    "test": "ts-node ./test.ts",
+    "generateCode": "ts-node ./schema/main.ts",
     "typeCheck": "tsc --project ./tsconfig.json --noEmit"
   },
   "repository": {
@@ -29,6 +27,7 @@
     "eslint-config-prettier": "7.2.0",
     "eslint-plugin-prettier": "3.3.1",
     "prettier": "2.2.1",
+    "ts-node": "9.1.1",
     "typescript": "4.1.4"
   },
   "files": [
