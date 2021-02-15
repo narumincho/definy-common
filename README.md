@@ -16,3 +16,7 @@ Definy のサーバーとブラウザの
 npm script の `generateCode` は `schema` フォルダ内に書かれている Definy の 型定義から, コードを生成する.
 
 生成されたコードは [`source/data.ts`](https://github.com/narumincho/definy-core/blob/main/source/data.ts) に出力され, definy-core 自身で使われている
+
+## 各ファイルの依存関係
+
+![各ファイルの依存関係のグラフ図](graph.svg)
