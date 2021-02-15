@@ -18,10 +18,8 @@ jobs:
           node-version: "14"
       - name: Install npm dependencies (npm ci)
         run: npm ci
-      - name: Transpile source
-        run: npx tsc --project ./tsconfig.json
       - name: Run test
-        run: node test.js
+        run: npm run test
 
   npm-publish:
     name: npm publish
@@ -36,7 +34,7 @@ jobs:
       - name: Install npm dependencies (npm ci)
         run: npm ci
       - name: Transpile source
-        run: npx tsc --project ./tsconfig.json
+        run: npm run build
       - name: npm publish
         id: publish
         uses: JS-DevTools/npm-publish@v1
