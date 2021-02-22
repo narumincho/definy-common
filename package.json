@@ -2,15 +2,15 @@
   "name": "definy-core",
   "version": "0.2.19",
   "description": "Definy common logic and type definition",
-  "main": "source/main.js",
-  "types": "source/main.d.ts",
+  "main": "main.js",
+  "types": "main.d.ts",
   "author": "narumincho <narumincho.starfy@gmail.com> (https://narumincho.com)",
   "license": "Apache-2.0",
   "scripts": {
     "test": "ts-node ./test.ts",
     "typeCheck": "tsc --noEmit",
     "build": "tsc",
-    "generate-graph": "npx depcruise --output-type dot --collapse 3 source/main.ts | dot -T svg > graph.svg"
+    "generate-graph": "npx depcruise --output-type dot --collapse 3 main.ts | dot -T svg > graph.svg"
   },
   "repository": {
     "type": "git",
