@@ -29,8 +29,6 @@ export const ProjectId = noParameterType(id.ProjectId);
 
 export const UserId = noParameterType(id.UserId);
 
-export const IdeaId = noParameterType(id.IdeaId);
-
 export const CommitId = noParameterType(id.CommitId);
 
 export const ImageToken = noParameterType(id.ImageToken);
@@ -79,14 +77,6 @@ export const IdAndData = (
 
 export const Project = noParameterType(id.Project);
 
-export const Idea = noParameterType(id.Idea);
-
-export const Comment = noParameterType(id.Comment);
-
-export const Code = noParameterType(id.Commit);
-
-export const IdeaState = noParameterType(id.IdeaState);
-
 export const Part = noParameterType(id.Part);
 
 export const TypePart = noParameterType(id.TypePart);
@@ -133,16 +123,6 @@ export const TypeError = noParameterType(id.TypeError);
 
 export const CreateProjectParameter = noParameterType(
   id.CreateProjectParameter
-);
-
-export const CreateIdeaParameter = noParameterType(id.CreateIdeaParameter);
-
-export const AddCommentParameter = noParameterType(id.AddCommentParameter);
-
-export const AddCommitParameter = noParameterType(id.AddCommitParameter);
-
-export const AccountTokenAndCommitId = noParameterType(
-  id.AccountTokenAndCommitId
 );
 
 export const LogInState = noParameterType(id.LogInState);

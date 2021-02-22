@@ -123,18 +123,6 @@ export type ProjectId = string & { readonly _projectId: never };
 export type UserId = string & { readonly _userId: never };
 
 /**
- * アイデアの識別子
- * @typePartId 719fa4020ae23a96d301d9fa31d8fcaf
- */
-export type IdeaId = string & { readonly _ideaId: never };
-
-/**
- * 提案の識別子
- * @typePartId 72cc637f6803ef5ca7536889a7fff52e
- */
-export type CommitId = string & { readonly _commitId: never };
-
-/**
  * 画像から求められるトークン.キャッシュのキーとして使われる.1つのトークンに対して永久に1つの画像データしか表さない. キャッシュを更新する必要はない
  * @typePartId b193be207840b5b489517eb5d7b492b2
  */
@@ -258,8 +246,6 @@ export type Location =
   | { readonly _: "CreateProject" }
   | { readonly _: "Project"; readonly projectId: ProjectId }
   | { readonly _: "User"; readonly userId: UserId }
-  | { readonly _: "Idea"; readonly ideaId: IdeaId }
-  | { readonly _: "Commit"; readonly commitId: CommitId }
   | { readonly _: "Setting" }
   | { readonly _: "About" }
   | { readonly _: "Debug" };
@@ -337,136 +323,7 @@ export type Project = {
    * 更新日時
    */
   readonly updateTime: Time;
-  /**
-   * ルートのアイデア
-   */
-  readonly rootIdeaId: IdeaId;
-  /**
-   * リリースされたコミット
-   */
-  readonly commitId: CommitId;
 };
-
-/**
- * アイデア
- * @typePartId 98d993c8105a292781e3d3291fb477b6
- */
-export type Idea = {
-  /**
-   * アイデア名 最大240文字まで
-   */
-  readonly name: String;
-  /**
-   * 言い出しっぺ
-   */
-  readonly createUserId: UserId;
-  /**
-   * 作成日時
-   */
-  readonly createTime: Time;
-  /**
-   * 対象のプロジェクト
-   */
-  readonly projectId: ProjectId;
-  /**
-   * アイデアのコメント
-   */
-  readonly commentList: List<Comment>;
-  /**
-   * 親のアイデア
-   */
-  readonly parentIdeaId: Maybe<IdeaId>;
-  /**
-   * 更新日時
-   */
-  readonly updateTime: Time;
-  /**
-   * アイデアの状態
-   */
-  readonly state: IdeaState;
-};
-
-/**
- * アイデアのコメント
- * @typePartId ce630fa90ed090bd14c941915abd3293
- */
-export type Comment = {
-  /**
-   * 作成者
-   */
-  readonly createUserId: UserId;
-  /**
-   * 作成日時
-   */
-  readonly createTime: Time;
-  /**
-   * 本文 1～10000文字
-   */
-  readonly body: String;
-};
-
-/**
- * コミット. コードのスナップショット
- * @typePartId f16c59a2158d9642481085d2492007f8
- */
-export type Commit = {
-  /**
-   * 作成者
-   */
-  readonly createUserId: UserId;
-  /**
-   * 説明
-   */
-  readonly description: String;
-  /**
-   * まだ確定していないか
-   */
-  readonly isDraft: Bool;
-  /**
-   * プロジェクト名
-   */
-  readonly projectName: String;
-  /**
-   * プロジェクトの画像
-   */
-  readonly projectImage: ImageToken;
-  /**
-   * プロジェクトのアイコン
-   */
-  readonly projectIcon: ImageToken;
-  /**
-   * パーツ
-   */
-  readonly partHashList: List<PartHash>;
-  /**
-   * 型パーツ
-   */
-  readonly typePartHashList: List<TypePartHash>;
-  /**
-   * 変更をするプロジェクト
-   */
-  readonly projectId: ProjectId;
-  /**
-   * 投稿したアイデアID
-   */
-  readonly ideaId: IdeaId;
-  /**
-   * 作成日時
-   */
-  readonly createTime: Time;
-  /**
-   * 更新日時
-   */
-  readonly updateTime: Time;
-};
-
-/**
- * アイデアの状況
- * @typePartId 9b97c1996665f1009a2f5a0f334d6bff
- */
-export type IdeaState =
-  | { readonly _: "Creating" }
-  | { readonly _: "Approved"; readonly commitId: CommitId };
 
 /**
  * パーツの定義
@@ -493,10 +350,6 @@ export type Part = {
    * 所属しているプロジェクトのID
    */
   readonly projectId: ProjectId;
-  /**
-   * このパーツが作成されたコミット
-   */
-  readonly createCommitId: CommitId;
 };
 
 /**
@@ -821,74 +674,6 @@ export type CreateProjectParameter = {
    * プロジェクト名
    */
   readonly projectName: String;
-};
-
-/**
- * アイデアを作成時に必要なパラメーター
- * @typePartId 036e55068c26060c3632062801b0216b
- */
-export type CreateIdeaParameter = {
-  /**
-   * プロジェクトを作るときのアカウント
-   */
-  readonly accountToken: AccountToken;
-  /**
-   * アイデア名
-   */
-  readonly ideaName: String;
-  /**
-   * 親アイデアID
-   */
-  readonly parentId: IdeaId;
-};
-
-/**
- * アイデアにコメントを追加するときに必要なパラメーター
- * @typePartId ad7a6a667a36a79c3bbc81f8f0789fe8
- */
-export type AddCommentParameter = {
-  /**
-   * コメントをするユーザー
-   */
-  readonly accountToken: AccountToken;
-  /**
-   * コメントを追加するアイデア
-   */
-  readonly ideaId: IdeaId;
-  /**
-   * コメント本文
-   */
-  readonly comment: String;
-};
-
-/**
- * 提案を作成するときに必要なパラメーター
- * @typePartId 8b40f4351fe048ff78f14c523b6f76f1
- */
-export type AddCommitParameter = {
-  /**
-   * 提案を作成するユーザー
-   */
-  readonly accountToken: AccountToken;
-  /**
-   * 提案に関連付けられるアイデア
-   */
-  readonly ideaId: IdeaId;
-};
-
-/**
- * コミットを確定状態にしたり, 承認したりするときなどに使う
- * @typePartId 74280d6a5db1d48b6815a73a819756c3
- */
-export type AccountTokenAndCommitId = {
-  /**
-   * アカウントトークン
-   */
-  readonly accountToken: AccountToken;
-  /**
-   * commitId
-   */
-  readonly commitId: CommitId;
 };
 
 /**
@@ -1385,42 +1170,6 @@ export const UserId: { readonly codec: Codec<UserId> } = {
 };
 
 /**
- * アイデアの識別子
- * @typePartId 719fa4020ae23a96d301d9fa31d8fcaf
- */
-export const IdeaId: { readonly codec: Codec<IdeaId> } = {
-  codec: {
-    encode: (value: IdeaId): ReadonlyArray<number> => encodeId(value),
-    decode: (
-      index: number,
-      binary: Uint8Array
-    ): { readonly result: IdeaId; readonly nextIndex: number } =>
-      decodeId(index, binary) as {
-        readonly result: IdeaId;
-        readonly nextIndex: number;
-      },
-  },
-};
-
-/**
- * 提案の識別子
- * @typePartId 72cc637f6803ef5ca7536889a7fff52e
- */
-export const CommitId: { readonly codec: Codec<CommitId> } = {
-  codec: {
-    encode: (value: CommitId): ReadonlyArray<number> => encodeId(value),
-    decode: (
-      index: number,
-      binary: Uint8Array
-    ): { readonly result: CommitId; readonly nextIndex: number } =>
-      decodeId(index, binary) as {
-        readonly result: CommitId;
-        readonly nextIndex: number;
-      },
-  },
-};
-
-/**
  * 画像から求められるトークン.キャッシュのキーとして使われる.1つのトークンに対して永久に1つの画像データしか表さない. キャッシュを更新する必要はない
  * @typePartId b193be207840b5b489517eb5d7b492b2
  */
@@ -1850,14 +1599,6 @@ export const Location: {
    */
   readonly User: (a: UserId) => Location;
   /**
-   * アイデア詳細ページ
-   */
-  readonly Idea: (a: IdeaId) => Location;
-  /**
-   * コミットの詳細, 編集ページ
-   */
-  readonly Commit: (a: CommitId) => Location;
-  /**
    * 設定ページ
    */
   readonly Setting: Location;
@@ -1875,8 +1616,6 @@ export const Location: {
   CreateProject: { _: "CreateProject" },
   Project: (projectId: ProjectId): Location => ({ _: "Project", projectId }),
   User: (userId: UserId): Location => ({ _: "User", userId }),
-  Idea: (ideaId: IdeaId): Location => ({ _: "Idea", ideaId }),
-  Commit: (commitId: CommitId): Location => ({ _: "Commit", commitId }),
   Setting: { _: "Setting" },
   About: { _: "About" },
   Debug: { _: "Debug" },
@@ -1895,20 +1634,14 @@ export const Location: {
         case "User": {
           return [3].concat(UserId.codec.encode(value.userId));
         }
-        case "Idea": {
-          return [4].concat(IdeaId.codec.encode(value.ideaId));
-        }
-        case "Commit": {
-          return [5].concat(CommitId.codec.encode(value.commitId));
-        }
         case "Setting": {
-          return [6];
+          return [4];
         }
         case "About": {
-          return [7];
+          return [5];
         }
         case "Debug": {
-          return [8];
+          return [6];
         }
       }
     },
@@ -1950,32 +1683,12 @@ export const Location: {
         };
       }
       if (patternIndex.result === 4) {
-        const result: {
-          readonly result: IdeaId;
-          readonly nextIndex: number;
-        } = IdeaId.codec.decode(patternIndex.nextIndex, binary);
-        return {
-          result: Location.Idea(result.result),
-          nextIndex: result.nextIndex,
-        };
-      }
-      if (patternIndex.result === 5) {
-        const result: {
-          readonly result: CommitId;
-          readonly nextIndex: number;
-        } = CommitId.codec.decode(patternIndex.nextIndex, binary);
-        return {
-          result: Location.Commit(result.result),
-          nextIndex: result.nextIndex,
-        };
-      }
-      if (patternIndex.result === 6) {
         return { result: Location.Setting, nextIndex: patternIndex.nextIndex };
       }
-      if (patternIndex.result === 7) {
+      if (patternIndex.result === 5) {
         return { result: Location.About, nextIndex: patternIndex.nextIndex };
       }
-      if (patternIndex.result === 8) {
+      if (patternIndex.result === 6) {
         return { result: Location.Debug, nextIndex: patternIndex.nextIndex };
       }
       throw new Error("存在しないパターンを指定された 型を更新してください");
@@ -2161,9 +1874,7 @@ export const Project: {
         .concat(ImageToken.codec.encode(value.imageHash))
         .concat(Time.codec.encode(value.createTime))
         .concat(UserId.codec.encode(value.createUserId))
-        .concat(Time.codec.encode(value.updateTime))
-        .concat(IdeaId.codec.encode(value.rootIdeaId))
-        .concat(CommitId.codec.encode(value.commitId)),
+        .concat(Time.codec.encode(value.updateTime)),
     decode: (
       index: number,
       binary: Uint8Array
@@ -2192,14 +1903,6 @@ export const Project: {
         readonly result: Time;
         readonly nextIndex: number;
       } = Time.codec.decode(createUserIdAndNextIndex.nextIndex, binary);
-      const rootIdeaIdAndNextIndex: {
-        readonly result: IdeaId;
-        readonly nextIndex: number;
-      } = IdeaId.codec.decode(updateTimeAndNextIndex.nextIndex, binary);
-      const commitIdAndNextIndex: {
-        readonly result: CommitId;
-        readonly nextIndex: number;
-      } = CommitId.codec.decode(rootIdeaIdAndNextIndex.nextIndex, binary);
       return {
         result: {
           name: nameAndNextIndex.result,
@@ -2208,305 +1911,9 @@ export const Project: {
           createTime: createTimeAndNextIndex.result,
           createUserId: createUserIdAndNextIndex.result,
           updateTime: updateTimeAndNextIndex.result,
-          rootIdeaId: rootIdeaIdAndNextIndex.result,
-          commitId: commitIdAndNextIndex.result,
-        },
-        nextIndex: commitIdAndNextIndex.nextIndex,
-      };
-    },
-  },
-};
-
-/**
- * アイデア
- * @typePartId 98d993c8105a292781e3d3291fb477b6
- */
-export const Idea: {
-  readonly codec: Codec<Idea>;
-  /**
-   * 型を合わせる上で便利なヘルパー関数
-   */
-  readonly helper: (a: Idea) => Idea;
-} = {
-  helper: (idea: Idea): Idea => idea,
-  codec: {
-    encode: (value: Idea): ReadonlyArray<number> =>
-      String.codec
-        .encode(value.name)
-        .concat(UserId.codec.encode(value.createUserId))
-        .concat(Time.codec.encode(value.createTime))
-        .concat(ProjectId.codec.encode(value.projectId))
-        .concat(List.codec(Comment.codec).encode(value.commentList))
-        .concat(Maybe.codec(IdeaId.codec).encode(value.parentIdeaId))
-        .concat(Time.codec.encode(value.updateTime))
-        .concat(IdeaState.codec.encode(value.state)),
-    decode: (
-      index: number,
-      binary: Uint8Array
-    ): { readonly result: Idea; readonly nextIndex: number } => {
-      const nameAndNextIndex: {
-        readonly result: String;
-        readonly nextIndex: number;
-      } = String.codec.decode(index, binary);
-      const createUserIdAndNextIndex: {
-        readonly result: UserId;
-        readonly nextIndex: number;
-      } = UserId.codec.decode(nameAndNextIndex.nextIndex, binary);
-      const createTimeAndNextIndex: {
-        readonly result: Time;
-        readonly nextIndex: number;
-      } = Time.codec.decode(createUserIdAndNextIndex.nextIndex, binary);
-      const projectIdAndNextIndex: {
-        readonly result: ProjectId;
-        readonly nextIndex: number;
-      } = ProjectId.codec.decode(createTimeAndNextIndex.nextIndex, binary);
-      const commentListAndNextIndex: {
-        readonly result: List<Comment>;
-        readonly nextIndex: number;
-      } = List.codec(Comment.codec).decode(
-        projectIdAndNextIndex.nextIndex,
-        binary
-      );
-      const parentIdeaIdAndNextIndex: {
-        readonly result: Maybe<IdeaId>;
-        readonly nextIndex: number;
-      } = Maybe.codec(IdeaId.codec).decode(
-        commentListAndNextIndex.nextIndex,
-        binary
-      );
-      const updateTimeAndNextIndex: {
-        readonly result: Time;
-        readonly nextIndex: number;
-      } = Time.codec.decode(parentIdeaIdAndNextIndex.nextIndex, binary);
-      const stateAndNextIndex: {
-        readonly result: IdeaState;
-        readonly nextIndex: number;
-      } = IdeaState.codec.decode(updateTimeAndNextIndex.nextIndex, binary);
-      return {
-        result: {
-          name: nameAndNextIndex.result,
-          createUserId: createUserIdAndNextIndex.result,
-          createTime: createTimeAndNextIndex.result,
-          projectId: projectIdAndNextIndex.result,
-          commentList: commentListAndNextIndex.result,
-          parentIdeaId: parentIdeaIdAndNextIndex.result,
-          updateTime: updateTimeAndNextIndex.result,
-          state: stateAndNextIndex.result,
-        },
-        nextIndex: stateAndNextIndex.nextIndex,
-      };
-    },
-  },
-};
-
-/**
- * アイデアのコメント
- * @typePartId ce630fa90ed090bd14c941915abd3293
- */
-export const Comment: {
-  readonly codec: Codec<Comment>;
-  /**
-   * 型を合わせる上で便利なヘルパー関数
-   */
-  readonly helper: (a: Comment) => Comment;
-} = {
-  helper: (comment: Comment): Comment => comment,
-  codec: {
-    encode: (value: Comment): ReadonlyArray<number> =>
-      UserId.codec
-        .encode(value.createUserId)
-        .concat(Time.codec.encode(value.createTime))
-        .concat(String.codec.encode(value.body)),
-    decode: (
-      index: number,
-      binary: Uint8Array
-    ): { readonly result: Comment; readonly nextIndex: number } => {
-      const createUserIdAndNextIndex: {
-        readonly result: UserId;
-        readonly nextIndex: number;
-      } = UserId.codec.decode(index, binary);
-      const createTimeAndNextIndex: {
-        readonly result: Time;
-        readonly nextIndex: number;
-      } = Time.codec.decode(createUserIdAndNextIndex.nextIndex, binary);
-      const bodyAndNextIndex: {
-        readonly result: String;
-        readonly nextIndex: number;
-      } = String.codec.decode(createTimeAndNextIndex.nextIndex, binary);
-      return {
-        result: {
-          createUserId: createUserIdAndNextIndex.result,
-          createTime: createTimeAndNextIndex.result,
-          body: bodyAndNextIndex.result,
-        },
-        nextIndex: bodyAndNextIndex.nextIndex,
-      };
-    },
-  },
-};
-
-/**
- * コミット. コードのスナップショット
- * @typePartId f16c59a2158d9642481085d2492007f8
- */
-export const Commit: {
-  readonly codec: Codec<Commit>;
-  /**
-   * 型を合わせる上で便利なヘルパー関数
-   */
-  readonly helper: (a: Commit) => Commit;
-} = {
-  helper: (commit: Commit): Commit => commit,
-  codec: {
-    encode: (value: Commit): ReadonlyArray<number> =>
-      UserId.codec
-        .encode(value.createUserId)
-        .concat(String.codec.encode(value.description))
-        .concat(Bool.codec.encode(value.isDraft))
-        .concat(String.codec.encode(value.projectName))
-        .concat(ImageToken.codec.encode(value.projectImage))
-        .concat(ImageToken.codec.encode(value.projectIcon))
-        .concat(List.codec(PartHash.codec).encode(value.partHashList))
-        .concat(List.codec(TypePartHash.codec).encode(value.typePartHashList))
-        .concat(ProjectId.codec.encode(value.projectId))
-        .concat(IdeaId.codec.encode(value.ideaId))
-        .concat(Time.codec.encode(value.createTime))
-        .concat(Time.codec.encode(value.updateTime)),
-    decode: (
-      index: number,
-      binary: Uint8Array
-    ): { readonly result: Commit; readonly nextIndex: number } => {
-      const createUserIdAndNextIndex: {
-        readonly result: UserId;
-        readonly nextIndex: number;
-      } = UserId.codec.decode(index, binary);
-      const descriptionAndNextIndex: {
-        readonly result: String;
-        readonly nextIndex: number;
-      } = String.codec.decode(createUserIdAndNextIndex.nextIndex, binary);
-      const isDraftAndNextIndex: {
-        readonly result: Bool;
-        readonly nextIndex: number;
-      } = Bool.codec.decode(descriptionAndNextIndex.nextIndex, binary);
-      const projectNameAndNextIndex: {
-        readonly result: String;
-        readonly nextIndex: number;
-      } = String.codec.decode(isDraftAndNextIndex.nextIndex, binary);
-      const projectImageAndNextIndex: {
-        readonly result: ImageToken;
-        readonly nextIndex: number;
-      } = ImageToken.codec.decode(projectNameAndNextIndex.nextIndex, binary);
-      const projectIconAndNextIndex: {
-        readonly result: ImageToken;
-        readonly nextIndex: number;
-      } = ImageToken.codec.decode(projectImageAndNextIndex.nextIndex, binary);
-      const partHashListAndNextIndex: {
-        readonly result: List<PartHash>;
-        readonly nextIndex: number;
-      } = List.codec(PartHash.codec).decode(
-        projectIconAndNextIndex.nextIndex,
-        binary
-      );
-      const typePartHashListAndNextIndex: {
-        readonly result: List<TypePartHash>;
-        readonly nextIndex: number;
-      } = List.codec(TypePartHash.codec).decode(
-        partHashListAndNextIndex.nextIndex,
-        binary
-      );
-      const projectIdAndNextIndex: {
-        readonly result: ProjectId;
-        readonly nextIndex: number;
-      } = ProjectId.codec.decode(
-        typePartHashListAndNextIndex.nextIndex,
-        binary
-      );
-      const ideaIdAndNextIndex: {
-        readonly result: IdeaId;
-        readonly nextIndex: number;
-      } = IdeaId.codec.decode(projectIdAndNextIndex.nextIndex, binary);
-      const createTimeAndNextIndex: {
-        readonly result: Time;
-        readonly nextIndex: number;
-      } = Time.codec.decode(ideaIdAndNextIndex.nextIndex, binary);
-      const updateTimeAndNextIndex: {
-        readonly result: Time;
-        readonly nextIndex: number;
-      } = Time.codec.decode(createTimeAndNextIndex.nextIndex, binary);
-      return {
-        result: {
-          createUserId: createUserIdAndNextIndex.result,
-          description: descriptionAndNextIndex.result,
-          isDraft: isDraftAndNextIndex.result,
-          projectName: projectNameAndNextIndex.result,
-          projectImage: projectImageAndNextIndex.result,
-          projectIcon: projectIconAndNextIndex.result,
-          partHashList: partHashListAndNextIndex.result,
-          typePartHashList: typePartHashListAndNextIndex.result,
-          projectId: projectIdAndNextIndex.result,
-          ideaId: ideaIdAndNextIndex.result,
-          createTime: createTimeAndNextIndex.result,
-          updateTime: updateTimeAndNextIndex.result,
         },
         nextIndex: updateTimeAndNextIndex.nextIndex,
       };
-    },
-  },
-};
-
-/**
- * アイデアの状況
- * @typePartId 9b97c1996665f1009a2f5a0f334d6bff
- */
-export const IdeaState: {
-  /**
-   * コミットと子アイデアとコメントを受付中
-   */
-  readonly Creating: IdeaState;
-  /**
-   * 実現するコミットが作られ, 承認された
-   */
-  readonly Approved: (a: CommitId) => IdeaState;
-  readonly codec: Codec<IdeaState>;
-} = {
-  Creating: { _: "Creating" },
-  Approved: (commitId: CommitId): IdeaState => ({ _: "Approved", commitId }),
-  codec: {
-    encode: (value: IdeaState): ReadonlyArray<number> => {
-      switch (value._) {
-        case "Creating": {
-          return [0];
-        }
-        case "Approved": {
-          return [1].concat(CommitId.codec.encode(value.commitId));
-        }
-      }
-    },
-    decode: (
-      index: number,
-      binary: Uint8Array
-    ): { readonly result: IdeaState; readonly nextIndex: number } => {
-      const patternIndex: {
-        readonly result: number;
-        readonly nextIndex: number;
-      } = Int32.codec.decode(index, binary);
-      if (patternIndex.result === 0) {
-        return {
-          result: IdeaState.Creating,
-          nextIndex: patternIndex.nextIndex,
-        };
-      }
-      if (patternIndex.result === 1) {
-        const result: {
-          readonly result: CommitId;
-          readonly nextIndex: number;
-        } = CommitId.codec.decode(patternIndex.nextIndex, binary);
-        return {
-          result: IdeaState.Approved(result.result),
-          nextIndex: result.nextIndex,
-        };
-      }
-      throw new Error("存在しないパターンを指定された 型を更新してください");
     },
   },
 };
@@ -2530,8 +1937,7 @@ export const Part: {
         .concat(String.codec.encode(value.description))
         .concat(Type.codec.encode(value.type))
         .concat(Expr.codec.encode(value.expr))
-        .concat(ProjectId.codec.encode(value.projectId))
-        .concat(CommitId.codec.encode(value.createCommitId)),
+        .concat(ProjectId.codec.encode(value.projectId)),
     decode: (
       index: number,
       binary: Uint8Array
@@ -2556,10 +1962,6 @@ export const Part: {
         readonly result: ProjectId;
         readonly nextIndex: number;
       } = ProjectId.codec.decode(exprAndNextIndex.nextIndex, binary);
-      const createCommitIdAndNextIndex: {
-        readonly result: CommitId;
-        readonly nextIndex: number;
-      } = CommitId.codec.decode(projectIdAndNextIndex.nextIndex, binary);
       return {
         result: {
           name: nameAndNextIndex.result,
@@ -2567,9 +1969,8 @@ export const Part: {
           type: typeAndNextIndex.result,
           expr: exprAndNextIndex.result,
           projectId: projectIdAndNextIndex.result,
-          createCommitId: createCommitIdAndNextIndex.result,
         },
-        nextIndex: createCommitIdAndNextIndex.nextIndex,
+        nextIndex: projectIdAndNextIndex.nextIndex,
       };
     },
   },
@@ -4025,186 +3426,6 @@ export const CreateProjectParameter: {
           projectName: projectNameAndNextIndex.result,
         },
         nextIndex: projectNameAndNextIndex.nextIndex,
-      };
-    },
-  },
-};
-
-/**
- * アイデアを作成時に必要なパラメーター
- * @typePartId 036e55068c26060c3632062801b0216b
- */
-export const CreateIdeaParameter: {
-  readonly codec: Codec<CreateIdeaParameter>;
-  /**
-   * 型を合わせる上で便利なヘルパー関数
-   */
-  readonly helper: (a: CreateIdeaParameter) => CreateIdeaParameter;
-} = {
-  helper: (createIdeaParameter: CreateIdeaParameter): CreateIdeaParameter =>
-    createIdeaParameter,
-  codec: {
-    encode: (value: CreateIdeaParameter): ReadonlyArray<number> =>
-      AccountToken.codec
-        .encode(value.accountToken)
-        .concat(String.codec.encode(value.ideaName))
-        .concat(IdeaId.codec.encode(value.parentId)),
-    decode: (
-      index: number,
-      binary: Uint8Array
-    ): { readonly result: CreateIdeaParameter; readonly nextIndex: number } => {
-      const accountTokenAndNextIndex: {
-        readonly result: AccountToken;
-        readonly nextIndex: number;
-      } = AccountToken.codec.decode(index, binary);
-      const ideaNameAndNextIndex: {
-        readonly result: String;
-        readonly nextIndex: number;
-      } = String.codec.decode(accountTokenAndNextIndex.nextIndex, binary);
-      const parentIdAndNextIndex: {
-        readonly result: IdeaId;
-        readonly nextIndex: number;
-      } = IdeaId.codec.decode(ideaNameAndNextIndex.nextIndex, binary);
-      return {
-        result: {
-          accountToken: accountTokenAndNextIndex.result,
-          ideaName: ideaNameAndNextIndex.result,
-          parentId: parentIdAndNextIndex.result,
-        },
-        nextIndex: parentIdAndNextIndex.nextIndex,
-      };
-    },
-  },
-};
-
-/**
- * アイデアにコメントを追加するときに必要なパラメーター
- * @typePartId ad7a6a667a36a79c3bbc81f8f0789fe8
- */
-export const AddCommentParameter: {
-  readonly codec: Codec<AddCommentParameter>;
-  /**
-   * 型を合わせる上で便利なヘルパー関数
-   */
-  readonly helper: (a: AddCommentParameter) => AddCommentParameter;
-} = {
-  helper: (addCommentParameter: AddCommentParameter): AddCommentParameter =>
-    addCommentParameter,
-  codec: {
-    encode: (value: AddCommentParameter): ReadonlyArray<number> =>
-      AccountToken.codec
-        .encode(value.accountToken)
-        .concat(IdeaId.codec.encode(value.ideaId))
-        .concat(String.codec.encode(value.comment)),
-    decode: (
-      index: number,
-      binary: Uint8Array
-    ): { readonly result: AddCommentParameter; readonly nextIndex: number } => {
-      const accountTokenAndNextIndex: {
-        readonly result: AccountToken;
-        readonly nextIndex: number;
-      } = AccountToken.codec.decode(index, binary);
-      const ideaIdAndNextIndex: {
-        readonly result: IdeaId;
-        readonly nextIndex: number;
-      } = IdeaId.codec.decode(accountTokenAndNextIndex.nextIndex, binary);
-      const commentAndNextIndex: {
-        readonly result: String;
-        readonly nextIndex: number;
-      } = String.codec.decode(ideaIdAndNextIndex.nextIndex, binary);
-      return {
-        result: {
-          accountToken: accountTokenAndNextIndex.result,
-          ideaId: ideaIdAndNextIndex.result,
-          comment: commentAndNextIndex.result,
-        },
-        nextIndex: commentAndNextIndex.nextIndex,
-      };
-    },
-  },
-};
-
-/**
- * 提案を作成するときに必要なパラメーター
- * @typePartId 8b40f4351fe048ff78f14c523b6f76f1
- */
-export const AddCommitParameter: {
-  readonly codec: Codec<AddCommitParameter>;
-  /**
-   * 型を合わせる上で便利なヘルパー関数
-   */
-  readonly helper: (a: AddCommitParameter) => AddCommitParameter;
-} = {
-  helper: (addCommitParameter: AddCommitParameter): AddCommitParameter =>
-    addCommitParameter,
-  codec: {
-    encode: (value: AddCommitParameter): ReadonlyArray<number> =>
-      AccountToken.codec
-        .encode(value.accountToken)
-        .concat(IdeaId.codec.encode(value.ideaId)),
-    decode: (
-      index: number,
-      binary: Uint8Array
-    ): { readonly result: AddCommitParameter; readonly nextIndex: number } => {
-      const accountTokenAndNextIndex: {
-        readonly result: AccountToken;
-        readonly nextIndex: number;
-      } = AccountToken.codec.decode(index, binary);
-      const ideaIdAndNextIndex: {
-        readonly result: IdeaId;
-        readonly nextIndex: number;
-      } = IdeaId.codec.decode(accountTokenAndNextIndex.nextIndex, binary);
-      return {
-        result: {
-          accountToken: accountTokenAndNextIndex.result,
-          ideaId: ideaIdAndNextIndex.result,
-        },
-        nextIndex: ideaIdAndNextIndex.nextIndex,
-      };
-    },
-  },
-};
-
-/**
- * コミットを確定状態にしたり, 承認したりするときなどに使う
- * @typePartId 74280d6a5db1d48b6815a73a819756c3
- */
-export const AccountTokenAndCommitId: {
-  readonly codec: Codec<AccountTokenAndCommitId>;
-  /**
-   * 型を合わせる上で便利なヘルパー関数
-   */
-  readonly helper: (a: AccountTokenAndCommitId) => AccountTokenAndCommitId;
-} = {
-  helper: (
-    accountTokenAndCommitId: AccountTokenAndCommitId
-  ): AccountTokenAndCommitId => accountTokenAndCommitId,
-  codec: {
-    encode: (value: AccountTokenAndCommitId): ReadonlyArray<number> =>
-      AccountToken.codec
-        .encode(value.accountToken)
-        .concat(CommitId.codec.encode(value.commitId)),
-    decode: (
-      index: number,
-      binary: Uint8Array
-    ): {
-      readonly result: AccountTokenAndCommitId;
-      readonly nextIndex: number;
-    } => {
-      const accountTokenAndNextIndex: {
-        readonly result: AccountToken;
-        readonly nextIndex: number;
-      } = AccountToken.codec.decode(index, binary);
-      const commitIdAndNextIndex: {
-        readonly result: CommitId;
-        readonly nextIndex: number;
-      } = CommitId.codec.decode(accountTokenAndNextIndex.nextIndex, binary);
-      return {
-        result: {
-          accountToken: accountTokenAndNextIndex.result,
-          commitId: commitIdAndNextIndex.result,
-        },
-        nextIndex: commitIdAndNextIndex.nextIndex,
       };
     },
   },

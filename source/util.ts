@@ -242,8 +242,6 @@ export const isFirstLowerCaseName = (text: string): boolean => {
 
 export const definyCodeProjectId = "1e4531eba1d93cd9f9f31a8bc49551a2" as data.ProjectId;
 
-export const codeCommitId = "009a2b68a9239b0bf1f541d8b88582dd" as data.CommitId;
-
 /** エディタ上で型の名前を作る. 先頭は小文字だがエディタ上は大文字 */
 export const stringToTypePartName = (text: string): string | undefined => {
   const normalizedText = text.normalize("NFKC");

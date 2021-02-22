@@ -209,22 +209,6 @@ export const typePartMap: ReadonlyMap<TypePartId, TypePart> = new Map<
     }),
   ],
   [
-    id.IdeaId,
-    t({
-      name: "IdeaId",
-      description: "アイデアの識別子",
-      body: TypePartBody.Kernel(TypePartBodyKernel.Id),
-    }),
-  ],
-  [
-    id.CommitId,
-    t({
-      name: "CommitId",
-      description: "提案の識別子",
-      body: TypePartBody.Kernel(TypePartBodyKernel.Id),
-    }),
-  ],
-  [
     id.ImageToken,
     t({
       name: "ImageToken",
@@ -435,16 +419,6 @@ export const typePartMap: ReadonlyMap<TypePartId, TypePart> = new Map<
           parameter: Maybe.Just(type.UserId),
         },
         {
-          name: "Idea",
-          description: "アイデア詳細ページ",
-          parameter: Maybe.Just(type.IdeaId),
-        },
-        {
-          name: "Commit",
-          description: "コミットの詳細, 編集ページ",
-          parameter: Maybe.Just(type.CommitId),
-        },
-        {
           name: "Setting",
           description: "設定ページ",
           parameter: Maybe.Nothing(),
@@ -576,177 +550,6 @@ export const typePartMap: ReadonlyMap<TypePartId, TypePart> = new Map<
           description: "更新日時",
           type: type.Time,
         },
-        {
-          name: "rootIdeaId",
-          description: "ルートのアイデア",
-          type: type.IdeaId,
-        },
-        {
-          name: "commitId",
-          description: "リリースされたコミット",
-          type: type.CommitId,
-        },
-      ]),
-    }),
-  ],
-  [
-    id.Idea,
-    t({
-      name: "Idea",
-      description: "アイデア",
-      body: TypePartBody.Product([
-        {
-          name: "name",
-          description: "アイデア名 最大240文字まで",
-          type: type.String,
-        },
-        {
-          name: "createUserId",
-          description: "言い出しっぺ",
-          type: type.UserId,
-        },
-        {
-          name: "createTime",
-          description: "作成日時 ",
-          type: type.Time,
-        },
-        {
-          name: "projectId",
-          description: "対象のプロジェクト",
-          type: type.ProjectId,
-        },
-        {
-          name: "commentList",
-          description: "アイデアのコメント",
-          type: type.List(type.Comment),
-        },
-        {
-          name: "parentIdeaId",
-          description: "親のアイデア",
-          type: type.Maybe(type.IdeaId),
-        },
-        {
-          name: "updateTime",
-          description: "更新日時",
-          type: type.Time,
-        },
-        {
-          name: "state",
-          description: "アイデアの状態",
-          type: type.IdeaState,
-        },
-      ]),
-    }),
-  ],
-  [
-    id.Comment,
-    t({
-      name: "Comment",
-      description: "アイデアのコメント",
-      body: TypePartBody.Product([
-        {
-          name: "createUserId",
-          description: "作成者",
-          type: type.UserId,
-        },
-        {
-          name: "createTime",
-          description: "作成日時",
-          type: type.Time,
-        },
-        {
-          name: "body",
-          description: "本文 1～10000文字",
-          type: type.String,
-        },
-      ]),
-    }),
-  ],
-  [
-    id.Commit,
-    t({
-      name: "Commit",
-      description: "コミット. コードのスナップショット",
-      body: TypePartBody.Product([
-        {
-          name: "createUserId",
-          description: "作成者",
-          type: type.UserId,
-        },
-        {
-          name: "description",
-          description: "説明",
-          type: type.String,
-        },
-        {
-          name: "isDraft",
-          description: "まだ確定していないか",
-          type: type.Bool,
-        },
-        {
-          name: "projectName",
-          description: "プロジェクト名",
-          type: type.String,
-        },
-        {
-          name: "projectImage",
-          description: "プロジェクトの画像",
-          type: type.ImageToken,
-        },
-        {
-          name: "projectIcon",
-          description: "プロジェクトのアイコン",
-          type: type.ImageToken,
-        },
-        {
-          name: "partHashList",
-          description: "パーツ",
-          type: type.List(type.PartHash),
-        },
-        {
-          name: "typePartHashList",
-          description: "型パーツ",
-          type: type.List(type.TypePartHash),
-        },
-        {
-          name: "projectId",
-          description: "変更をするプロジェクト",
-          type: type.ProjectId,
-        },
-        {
-          name: "ideaId",
-          description: "投稿したアイデアID",
-          type: type.IdeaId,
-        },
-        {
-          name: "createTime",
-          description: "作成日時",
-          type: type.Time,
-        },
-        {
-          name: "updateTime",
-          description: "更新日時",
-          type: type.Time,
-        },
-      ]),
-    }),
-  ],
-  [
-    id.IdeaState,
-    t({
-      name: "IdeaState",
-      description: "アイデアの状況",
-      body: TypePartBody.Sum([
-        {
-          name: "Creating",
-          description: "コミットと子アイデアとコメントを受付中",
-          parameter: Maybe.Nothing(),
-        },
-        {
-          name: "Approved",
-          description: "実現するコミットが作られ, 承認された",
-          parameter: Maybe.Just(type.CommitId),
-        },
       ]),
     }),
   ],
@@ -780,11 +583,6 @@ export const typePartMap: ReadonlyMap<TypePartId, TypePart> = new Map<
           name: "projectId",
           description: "所属しているプロジェクトのID",
           type: type.ProjectId,
-        },
-        {
-          name: "createCommitId",
-          description: "このパーツが作成されたコミット",
-          type: type.CommitId,
         },
       ]),
     }),
@@ -1349,92 +1147,6 @@ export const typePartMap: ReadonlyMap<TypePartId, TypePart> = new Map<
           name: "projectName",
           description: "プロジェクト名",
           type: type.String,
-        },
-      ]),
-    }),
-  ],
-  [
-    id.CreateIdeaParameter,
-    t({
-      name: "CreateIdeaParameter",
-      description: "アイデアを作成時に必要なパラメーター",
-      body: TypePartBody.Product([
-        {
-          name: "accountToken",
-          description: "プロジェクトを作るときのアカウント",
-          type: type.AccountToken,
-        },
-        {
-          name: "ideaName",
-          description: "アイデア名",
-          type: type.String,
-        },
-        {
-          name: "parentId",
-          description: "親アイデアID",
-          type: type.IdeaId,
-        },
-      ]),
-    }),
-  ],
-  [
-    id.AddCommentParameter,
-    t({
-      name: "AddCommentParameter",
-      description: "アイデアにコメントを追加するときに必要なパラメーター",
-      body: TypePartBody.Product([
-        {
-          name: "accountToken",
-          description: "コメントをするユーザー",
-          type: type.AccountToken,
-        },
-        {
-          name: "ideaId",
-          description: "コメントを追加するアイデア",
-          type: type.IdeaId,
-        },
-        {
-          name: "comment",
-          description: "コメント本文",
-          type: type.String,
-        },
-      ]),
-    }),
-  ],
-  [
-    id.AddCommitParameter,
-    t({
-      name: "AddCommitParameter",
-      description: "提案を作成するときに必要なパラメーター",
-      body: TypePartBody.Product([
-        {
-          name: "accountToken",
-          description: "提案を作成するユーザー",
-          type: type.AccountToken,
-        },
-        {
-          name: "ideaId",
-          description: "提案に関連付けられるアイデア",
-          type: type.IdeaId,
-        },
-      ]),
-    }),
-  ],
-  [
-    id.AccountTokenAndCommitId,
-    t({
-      name: "AccountTokenAndCommitId",
-      description: "コミットを確定状態にしたり, 承認したりするときなどに使う",
-      body: TypePartBody.Product([
-        {
-          name: "accountToken",
-          description: "アカウントトークン",
-          type: type.AccountToken,
-        },
-        {
-          name: "commitId",
-          description: "commitId",
-          type: type.CommitId,
         },
       ]),
     }),
