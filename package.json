@@ -1,6 +1,6 @@
 {
   "name": "definy-core",
-  "version": "0.2.18",
+  "version": "0.2.19",
   "description": "Definy common logic and type definition",
   "main": "source/main.js",
   "types": "source/main.d.ts",
