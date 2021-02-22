@@ -149,8 +149,6 @@ export const evaluateSuggestionExpr = (
       return evaluatePartReference(sourceAndCache, expr.partId);
     case "TagReference":
       return data.Result.Ok(data.EvaluatedExpr.TagReference(expr.tagReference));
-    case "Lambda":
-      return data.Result.Error([data.EvaluateExprError.NotSupported]);
     case "FunctionCall":
       return evaluateSuggestionFunctionCall(sourceAndCache, expr.functionCall);
   }
@@ -237,9 +235,9 @@ const evaluateFunctionCallResultOk = (
     }
   }
   return data.Result.Error([
-    data.EvaluateExprError.TypeError({
-      message: "関数のところにkernel,kernelCall以外が来てしまった",
-    }),
+    data.EvaluateExprError.TypeError(
+      "関数のところにkernel,kernelCall以外が来てしまった"
+    ),
   ]);
 };
 
@@ -260,9 +258,7 @@ const int32Add = (
       }
   }
   return data.Result.Error([
-    data.EvaluateExprError.TypeError({
-      message: "int32Addで整数が渡されなかった",
-    }),
+    data.EvaluateExprError.TypeError("int32Addで整数が渡されなかった"),
   ]);
 };
 
@@ -283,9 +279,7 @@ const int32Mul = (
       }
   }
   return data.Result.Error([
-    data.EvaluateExprError.TypeError({
-      message: "int33Mulで整数が渡されなかった",
-    }),
+    data.EvaluateExprError.TypeError("int33Mulで整数が渡されなかった"),
   ]);
 };
 
@@ -306,9 +300,7 @@ const int32Sub = (
       }
   }
   return data.Result.Error([
-    data.EvaluateExprError.TypeError({
-      message: "int33Subで整数が渡されなかった",
-    }),
+    data.EvaluateExprError.TypeError("int33Subで整数が渡されなかった"),
   ]);
 };
 
@@ -329,10 +321,6 @@ export const exprToDebugString = (expr: data.Expr): string => {
         " " +
         exprToDebugString(expr.functionCall.parameter)
       );
-    case "Lambda":
-      return (
-        "λ( " + expr.lambdaBranchList.map(lambdaBranchToString).join(",") + ")"
-      );
   }
 };
 
@@ -344,47 +332,6 @@ const kernelToString = (kernelExpr: data.KernelExpr): string => {
       return "-";
     case "Int32Mul":
       return "*";
-  }
-};
-
-const lambdaBranchToString = (lambdaBranch: data.LambdaBranch): string => {
-  return (
-    (lambdaBranch.description === ""
-      ? ""
-      : "{-" + lambdaBranch.description + "-}") +
-    conditionToString(lambdaBranch.condition) +
-    " → " +
-    exprToDebugString(lambdaBranch.expr)
-  );
-};
-
-const conditionToString = (condition: data.Condition): string => {
-  switch (condition._) {
-    case "ByTag":
-      return (
-        "#" +
-        (condition.conditionTag.tag as string) +
-        " " +
-        util.maybeUnwrap(
-          condition.conditionTag.parameter,
-          conditionToString,
-          ""
-        ) +
-        ")"
-      );
-    case "ByCapture": {
-      const capturePartName: string = condition.conditionCapture.name;
-      return (
-        capturePartName +
-        "(" +
-        (condition.conditionCapture.partId as string) +
-        ")"
-      );
-    }
-    case "Any":
-      return "_";
-    case "Int32":
-      return condition.int32.toString();
   }
 };
 

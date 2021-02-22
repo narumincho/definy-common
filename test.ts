@@ -167,8 +167,8 @@ codecEqual(
 );
 
 codecEqual(
-  "756200c85a0ff28f08daa2d201d616a9" as data.UserId,
-  data.UserId.codec,
+  "756200c85a0ff28f08daa2d201d616a9" as data.AccountId,
+  data.AccountId.codec,
   "id codec"
 );
 
@@ -176,23 +176,25 @@ codecEqual(
   {
     name: "ナルミンチョ",
     createTime: { day: 18440, millisecond: 12000 },
-    imageHash: "0a8eed336ca61252c13da0ff0b82ce37e81b84622a4052ab33693c434b4f6434" as data.ImageToken,
+    imageHash: "0a8eed336ca61252c13da0ff0b82ce37e81b84622a4052ab33693c434b4f6434" as data.ImageHash,
     introduction: "ナルミンチョはDefinyを作っている人です.",
   },
-  data.User.codec,
+  data.Account.codec,
   "user codec"
 );
 
-codecEqual<data.Maybe<data.IdAndData<data.UserId, data.User>>>(
+codecEqual<data.Maybe<data.IdAndData<data.AccountId, data.Account>>>(
   data.Maybe.Just({
-    id: "933055412132d6aa46f8dde7159ecb38" as data.UserId,
+    id: "933055412132d6aa46f8dde7159ecb38" as data.AccountId,
     data: {
       name: "ナルミンチョ",
       createTime: { day: 18440, millisecond: 12000 },
-      imageHash: "0a8eed336ca61252c13da0ff0b82ce37e81b84622a4052ab33693c434b4f6434" as data.ImageToken,
+      imageHash: "0a8eed336ca61252c13da0ff0b82ce37e81b84622a4052ab33693c434b4f6434" as data.ImageHash,
       introduction: "ナルミンチョはDefinyを作っている人です.",
     },
   }),
-  data.Maybe.codec(data.IdAndData.codec(data.UserId.codec, data.User.codec)),
+  data.Maybe.codec(
+    data.IdAndData.codec(data.AccountId.codec, data.Account.codec)
+  ),
   "Maybe (IdAndData UserId User) codec"
 );
