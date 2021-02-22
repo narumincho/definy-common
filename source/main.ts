@@ -470,13 +470,13 @@ const checkTypePartListValidation = (
       typePartIdSet.add(typeParameter.typePartId);
       if (typeParameterNameSet.has(typeParameter.name)) {
         throw new Error(
-          "duplicate type parameter name. name =" + typeParameter.name
+          `duplicate type parameter name. name = ${typeParameter.name} , in ${typePart.name}`
         );
       }
       typeParameterNameSet.add(typeParameter.name);
       if (!util.isFirstLowerCaseName(typeParameter.name)) {
         throw new Error(
-          "type parameter name is invalid. name =" + typeParameter.name
+          `type parameter name is invalid. name = ${typeParameter.name} , in ${typePart.name}`
         );
       }
 
@@ -497,7 +497,8 @@ const checkTypePartListValidation = (
       typePartIdTypeParameterSizeMap,
       new Set(
         typePart.typeParameterList.map((parameter) => parameter.typePartId)
-      )
+      ),
+      typePart.name
     );
   }
   return allTypePartIdTypePartNameMap;
@@ -506,21 +507,24 @@ const checkTypePartListValidation = (
 const checkTypePartBodyValidation = (
   typePartBody: data.TypePartBody,
   typeIdTypeParameterSizeMap: ReadonlyMap<data.TypePartId, number>,
-  typeParameterTypePartIdSet: ReadonlySet<data.TypePartId>
+  typeParameterTypePartIdSet: ReadonlySet<data.TypePartId>,
+  typePartName: string
 ): void => {
   switch (typePartBody._) {
     case "Product":
       checkProductTypeValidation(
         typePartBody.memberList,
         typeIdTypeParameterSizeMap,
-        typeParameterTypePartIdSet
+        typeParameterTypePartIdSet,
+        typePartName
       );
       return;
     case "Sum":
       checkSumTypeValidation(
         typePartBody.patternList,
         typeIdTypeParameterSizeMap,
-        typeParameterTypePartIdSet
+        typeParameterTypePartIdSet,
+        typePartName
       );
   }
 };
@@ -528,17 +532,22 @@ const checkTypePartBodyValidation = (
 const checkProductTypeValidation = (
   memberList: ReadonlyArray<data.Member>,
   typeIdTypeParameterSizeMap: ReadonlyMap<data.TypePartId, number>,
-  typeParameterTypePartIdSet: ReadonlySet<data.TypePartId>
+  typeParameterTypePartIdSet: ReadonlySet<data.TypePartId>,
+  typePartName: string
 ): void => {
   const memberNameSet: Set<string> = new Set();
   for (const member of memberList) {
     if (memberNameSet.has(member.name)) {
-      throw new Error("duplicate member name. name =" + member.name);
+      throw new Error(
+        `duplicate member name. name = ${member.name} in ${typePartName}. メンバー名が重複しています`
+      );
     }
     memberNameSet.add(member.name);
 
     if (!util.isFirstLowerCaseName(member.name)) {
-      throw new Error("member name is invalid. name =" + member.name);
+      throw new Error(
+        `member name is invalid. name = ${member.name} in ${typePartName}. メンバー名が不正です`
+      );
     }
     checkTypeValidation(
       member.type,
@@ -551,17 +560,22 @@ const checkProductTypeValidation = (
 const checkSumTypeValidation = (
   patternList: ReadonlyArray<data.Pattern>,
   typeIdTypeParameterSizeMap: ReadonlyMap<data.TypePartId, number>,
-  typeParameterTypePartIdSet: ReadonlySet<data.TypePartId>
+  typeParameterTypePartIdSet: ReadonlySet<data.TypePartId>,
+  typePartName: string
 ): void => {
   const tagNameSet: Set<string> = new Set();
   for (const pattern of patternList) {
     if (tagNameSet.has(pattern.name)) {
-      throw new Error("duplicate tag name. name =" + pattern.name);
+      throw new Error(
+        `duplicate tag name. name = ${pattern.name} in ${typePartName}. タグ名が重複しています`
+      );
     }
     tagNameSet.add(pattern.name);
 
     if (!util.isFirstUpperCaseName(pattern.name)) {
-      throw new Error("tag name is invalid. name =" + pattern.name);
+      throw new Error(
+        `tag name is invalid. name = ${pattern.name} in ${typePartName}. タグ名が不正です`
+      );
     }
     if (pattern.parameter._ === "Just") {
       checkTypeValidation(
