@@ -27,7 +27,12 @@ export const codecTypeWithTypeParameter = (
 
 const codecName = identifer.fromString("Codec");
 
-/** `Codec<type_>` を表す */
+/**
+ * ```ts
+ * Codec<type_>
+ * ```
+ * を表す
+ */
 export const codecType = (type_: ts.Type): ts.Type =>
   ts.Type.WithTypeParameter({
     type: ts.Type.ScopeInFile(codecName),
@@ -221,5 +226,8 @@ export const getResult = (resultAndNextIndexExpr: ts.Expr): ts.Expr =>
 export const getNextIndex = (resultAndNextIndexExpr: ts.Expr): ts.Expr =>
   tsUtil.get(resultAndNextIndexExpr, util.nextIndexProperty);
 
+/**
+ * 名前の末尾に `Codec` をつける
+ */
 export const codecParameterName = (name: string): ts.Identifer =>
   identifer.fromString(name + "Codec");

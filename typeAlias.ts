@@ -179,12 +179,20 @@ const typePartBodyKernelToTsType = (
     case "List": {
       const [elementType] = typePart.typeParameterList;
       if (elementType === undefined) {
-        throw new Error(
-          "attribute == Just(AsArray) type part need one type parameter"
-        );
+        throw new Error("List need one type parameter");
       }
       return tsUtil.readonlyArrayType(
         ts.Type.ScopeInFile(identifer.fromString(elementType.name))
+      );
+    }
+    case "Dict": {
+      const [id, value] = typePart.typeParameterList;
+      if (id === undefined || value === undefined) {
+        throw new Error("Dict need two type parameter");
+      }
+      return tsUtil.readonlyMapType(
+        ts.Type.ScopeInFile(identifer.fromString(id.name)),
+        ts.Type.ScopeInFile(identifer.fromString(value.name))
       );
     }
   }

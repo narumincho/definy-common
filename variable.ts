@@ -1,6 +1,7 @@
 import * as binary from "./kernelType/binary";
 import * as codec from "./kernelType/codec";
 import * as data from "./data";
+import * as dict from "./kernelType/dict";
 import * as hexString from "./kernelType/hexString";
 import * as identifer from "js-ts-code-generator/identifer";
 import * as int32 from "./kernelType/int32";
@@ -543,6 +544,13 @@ const kernelEncodeDefinitionStatementList = (
       }
       return list.encodeDefinitionStatementList(elementType.name, valueVar);
     }
+    case "Dict": {
+      const [key, value] = typePart.typeParameterList;
+      if (key === undefined || value === undefined) {
+        throw new Error("Dict need 2 type parameters");
+      }
+      return dict.encodeDefinitionStatementList(key.name, value.name, valueVar);
+    }
   }
 };
 
@@ -824,6 +832,18 @@ const kernelDecodeDefinitionStatementList = (
       }
       return list.decodeDefinitionStatementList(
         elementType.name,
+        parameterIndex,
+        parameterBinary
+      );
+    }
+    case "Dict": {
+      const [key, value] = typePart.typeParameterList;
+      if (key === undefined || value === undefined) {
+        throw new Error("Dict need 2 type parameters");
+      }
+      return dict.decodeDefinitionStatementList(
+        key.name,
+        value.name,
         parameterIndex,
         parameterBinary
       );

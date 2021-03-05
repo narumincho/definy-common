@@ -1,6 +1,7 @@
 import * as data from "./data";
 import * as identifer from "js-ts-code-generator/identifer";
 import * as ts from "js-ts-code-generator/data";
+import * as tsUtil from "js-ts-code-generator/util";
 
 export const maybeMap = <Input, Output>(
   maybe: data.Maybe<Input>,
@@ -168,6 +169,27 @@ export const decodePropertyName = "decode";
 export const helperName = "helper";
 export const resultProperty = "result";
 export const nextIndexProperty = "nextIndex";
+
+/**
+ * エンコードの関数を呼ぶ
+ * ```ts
+ * code.encode(value)
+ * ```
+ */
+export const callEncode = (codecExpr: ts.Expr, value: ts.Expr): ts.Expr =>
+  tsUtil.callMethod(codecExpr, encodePropertyName, [value]);
+
+/**
+ * デコードの関数を呼ぶ
+ * ```ts
+ * codec.decode(index, binary)
+ * ```
+ */
+export const callDecode = (
+  codecExpr: ts.Expr,
+  index: ts.Expr,
+  binary: ts.Expr
+): ts.Expr => tsUtil.callMethod(codecExpr, decodePropertyName, [index, binary]);
 
 export const toTypeName = (
   type: data.Type,
