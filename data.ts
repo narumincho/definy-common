@@ -393,6 +393,21 @@ export type ElmCustomTypeExportLevel =
   | "ExportTypeAndVariant";
 
 /**
+ * quest の アカウント
+ * @typePartId 4e6857a774597ae66e5c316642a8ae8b
+ */
+export type QAccount = {
+  /**
+   * アカウント名
+   */
+  readonly name: String;
+  /**
+   * アイコン画像のハッシュ値
+   */
+  readonly iconHash: ImageHash;
+};
+
+/**
  * 関数のパラメーター. パラメーター名, 型
  * @typePartId 5433bade7738da21e7663ff043f588d5
  */
@@ -549,7 +564,8 @@ export type TypePartBodyKernel =
   | "Binary"
   | "Id"
   | "Token"
-  | "List";
+  | "List"
+  | "Dict";
 
 /**
  * 文字列. JavaScriptのstringで扱う. バイナリ形式はUTF-8. 不正な文字が入っている可能性がある
@@ -643,7 +659,7 @@ export type Result<ok extends unknown, error extends unknown> =
   | { readonly _: "Error"; readonly error: error };
 
 /**
- * デバッグモードかどうか,言語とページの場所. URLとして表現されるデータ. Googleなどの検索エンジンの都合( https://support.google.com/webmasters/answer/182192?hl=ja )で,URLにページの言語を入れて,言語ごとに別のURLである必要がある. デバッグ時のホスト名は http://localhost になる
+ * 言語とページの場所. URLとして表現されるデータ. Googleなどの検索エンジンの都合( https://support.google.com/webmasters/answer/182192?hl=ja )で,URLにページの言語を入れて,言語ごとに別のURLである必要がある.
  * @typePartId 7210f04a85c5f0f58f7aa20826d67f05
  */
 export type UrlData = {
@@ -651,10 +667,6 @@ export type UrlData = {
    * 場所
    */
   readonly location: Location;
-  /**
-   * クライアントモード. ローカルで動作するデバッグモードか, リリースされたもののモードか
-   */
-  readonly clientMode: Int32;
   /**
    * 言語
    */
@@ -1144,6 +1156,12 @@ export type ImportedType = {
 };
 
 /**
+ * アカウントトークンのハッシュ値. データベースに保存する用
+ * @typePartId b553ab17ca45f4975d9fe17fe1a63ac4
+ */
+export type AccountTokenHash = string & { readonly _accountTokenHash: never };
+
+/**
  * Definyだけでは表現できない式
  * @typePartId b6eef263a982482747a8ad0bc9f05e21
  */
@@ -1165,7 +1183,7 @@ export type SetTypePartListParameter = {
   /**
    * 型パーツのリスト
    */
-  readonly typePartList: List<IdAndData<Int32, TypePartId>>;
+  readonly typePartList: List<IdAndData<TypePartId, TypePart>>;
 };
 
 /**
@@ -1245,7 +1263,10 @@ export type LogInState =
     }
   | { readonly _: "JumpingToLogInPage"; readonly string: String }
   | { readonly _: "VerifyingAccountToken"; readonly accountToken: AccountToken }
-  | { readonly _: "LoggedIn"; readonly int32: Int32 };
+  | {
+      readonly _: "LoggedIn";
+      readonly accountTokenAndUserId: AccountTokenAndUserId;
+    };
 
 /**
  * for文
@@ -1554,10 +1575,10 @@ export type TagReference = {
 };
 
 /**
- * definy.app を開発する上での動作モード. デベロップモードか, リリースモード
+ * definy.app を開発する上での動作モード. デベロップモード(http://localhost:2520)か, リリースモード(https://definy.app)
  * @typePartId ee0590e764618611ffa8e1a0a2e22f79
  */
-export type ClientMode = "Develop" | "Release";
+export type Mode = "Develop" | "Release";
 
 /**
  * 2項演算子と左右の式
@@ -3740,6 +3761,46 @@ export const ElmCustomTypeExportLevel: {
 };
 
 /**
+ * quest の アカウント
+ * @typePartId 4e6857a774597ae66e5c316642a8ae8b
+ */
+export const QAccount: {
+  readonly codec: Codec<QAccount>;
+  /**
+   * 型を合わせる上で便利なヘルパー関数
+   */
+  readonly helper: (a: QAccount) => QAccount;
+} = {
+  helper: (qAccount: QAccount): QAccount => qAccount,
+  codec: {
+    encode: (value: QAccount): ReadonlyArray<number> =>
+      String.codec
+        .encode(value.name)
+        .concat(ImageHash.codec.encode(value.iconHash)),
+    decode: (
+      index: number,
+      binary: Uint8Array
+    ): { readonly result: QAccount; readonly nextIndex: number } => {
+      const nameAndNextIndex: {
+        readonly result: String;
+        readonly nextIndex: number;
+      } = String.codec.decode(index, binary);
+      const iconHashAndNextIndex: {
+        readonly result: ImageHash;
+        readonly nextIndex: number;
+      } = ImageHash.codec.decode(nameAndNextIndex.nextIndex, binary);
+      return {
+        result: {
+          name: nameAndNextIndex.result,
+          iconHash: iconHashAndNextIndex.result,
+        },
+        nextIndex: iconHashAndNextIndex.nextIndex,
+      };
+    },
+  },
+};
+
+/**
  * 関数のパラメーター. パラメーター名, 型
  * @typePartId 5433bade7738da21e7663ff043f588d5
  */
@@ -4168,6 +4229,10 @@ export const TypePartBodyKernel: {
    * 配列型. TypeScriptではReadonlyArrayとして扱う
    */
   readonly List: TypePartBodyKernel;
+  /**
+   * 辞書型. TypeScriptでは ReadonlyMapとして扱う
+   */
+  readonly Dict: TypePartBodyKernel;
   readonly codec: Codec<TypePartBodyKernel>;
 } = {
   Function: "Function",
@@ -4177,6 +4242,7 @@ export const TypePartBodyKernel: {
   Id: "Id",
   Token: "Token",
   List: "List",
+  Dict: "Dict",
   codec: {
     encode: (value: TypePartBodyKernel): ReadonlyArray<number> => {
       switch (value) {
@@ -4200,6 +4266,9 @@ export const TypePartBodyKernel: {
         }
         case "List": {
           return [6];
+        }
+        case "Dict": {
+          return [7];
         }
       }
     },
@@ -4250,6 +4319,12 @@ export const TypePartBodyKernel: {
       if (patternIndex.result === 6) {
         return {
           result: TypePartBodyKernel.List,
+          nextIndex: patternIndex.nextIndex,
+        };
+      }
+      if (patternIndex.result === 7) {
+        return {
+          result: TypePartBodyKernel.Dict,
           nextIndex: patternIndex.nextIndex,
         };
       }
@@ -4632,7 +4707,7 @@ export const Result: {
 };
 
 /**
- * デバッグモードかどうか,言語とページの場所. URLとして表現されるデータ. Googleなどの検索エンジンの都合( https://support.google.com/webmasters/answer/182192?hl=ja )で,URLにページの言語を入れて,言語ごとに別のURLである必要がある. デバッグ時のホスト名は http://localhost になる
+ * 言語とページの場所. URLとして表現されるデータ. Googleなどの検索エンジンの都合( https://support.google.com/webmasters/answer/182192?hl=ja )で,URLにページの言語を入れて,言語ごとに別のURLである必要がある.
  * @typePartId 7210f04a85c5f0f58f7aa20826d67f05
  */
 export const UrlData: {
@@ -4647,7 +4722,6 @@ export const UrlData: {
     encode: (value: UrlData): ReadonlyArray<number> =>
       Location.codec
         .encode(value.location)
-        .concat(Int32.codec.encode(value.clientMode))
         .concat(Language.codec.encode(value.language)),
     decode: (
       index: number,
@@ -4657,18 +4731,13 @@ export const UrlData: {
         readonly result: Location;
         readonly nextIndex: number;
       } = Location.codec.decode(index, binary);
-      const clientModeAndNextIndex: {
-        readonly result: Int32;
-        readonly nextIndex: number;
-      } = Int32.codec.decode(locationAndNextIndex.nextIndex, binary);
       const languageAndNextIndex: {
         readonly result: Language;
         readonly nextIndex: number;
-      } = Language.codec.decode(clientModeAndNextIndex.nextIndex, binary);
+      } = Language.codec.decode(locationAndNextIndex.nextIndex, binary);
       return {
         result: {
           location: locationAndNextIndex.result,
-          clientMode: clientModeAndNextIndex.result,
           language: languageAndNextIndex.result,
         },
         nextIndex: languageAndNextIndex.nextIndex,
@@ -6712,6 +6781,25 @@ export const ImportedType: {
 };
 
 /**
+ * アカウントトークンのハッシュ値. データベースに保存する用
+ * @typePartId b553ab17ca45f4975d9fe17fe1a63ac4
+ */
+export const AccountTokenHash: { readonly codec: Codec<AccountTokenHash> } = {
+  codec: {
+    encode: (value: AccountTokenHash): ReadonlyArray<number> =>
+      encodeToken(value),
+    decode: (
+      index: number,
+      binary: Uint8Array
+    ): { readonly result: AccountTokenHash; readonly nextIndex: number } =>
+      decodeToken(index, binary) as {
+        readonly result: AccountTokenHash;
+        readonly nextIndex: number;
+      },
+  },
+};
+
+/**
  * Definyだけでは表現できない式
  * @typePartId b6eef263a982482747a8ad0bc9f05e21
  */
@@ -6798,7 +6886,7 @@ export const SetTypePartListParameter: {
         .encode(value.accountToken)
         .concat(ProjectId.codec.encode(value.projectId))
         .concat(
-          List.codec(IdAndData.codec(Int32.codec, TypePartId.codec)).encode(
+          List.codec(IdAndData.codec(TypePartId.codec, TypePart.codec)).encode(
             value.typePartList
           )
         ),
@@ -6818,9 +6906,9 @@ export const SetTypePartListParameter: {
         readonly nextIndex: number;
       } = ProjectId.codec.decode(accountTokenAndNextIndex.nextIndex, binary);
       const typePartListAndNextIndex: {
-        readonly result: List<IdAndData<Int32, TypePartId>>;
+        readonly result: List<IdAndData<TypePartId, TypePart>>;
         readonly nextIndex: number;
-      } = List.codec(IdAndData.codec(Int32.codec, TypePartId.codec)).decode(
+      } = List.codec(IdAndData.codec(TypePartId.codec, TypePart.codec)).decode(
         projectIdAndNextIndex.nextIndex,
         binary
       );
@@ -7159,7 +7247,7 @@ export const LogInState: {
   /**
    * ログインしている状態
    */
-  readonly LoggedIn: (a: Int32) => LogInState;
+  readonly LoggedIn: (a: AccountTokenAndUserId) => LogInState;
   readonly codec: Codec<LogInState>;
 } = {
   LoadingAccountTokenFromIndexedDB: { _: "LoadingAccountTokenFromIndexedDB" },
@@ -7175,7 +7263,10 @@ export const LogInState: {
     _: "VerifyingAccountToken",
     accountToken,
   }),
-  LoggedIn: (int32: Int32): LogInState => ({ _: "LoggedIn", int32 }),
+  LoggedIn: (accountTokenAndUserId: AccountTokenAndUserId): LogInState => ({
+    _: "LoggedIn",
+    accountTokenAndUserId,
+  }),
   codec: {
     encode: (value: LogInState): ReadonlyArray<number> => {
       switch (value._) {
@@ -7197,7 +7288,9 @@ export const LogInState: {
           return [4].concat(AccountToken.codec.encode(value.accountToken));
         }
         case "LoggedIn": {
-          return [5].concat(Int32.codec.encode(value.int32));
+          return [5].concat(
+            AccountTokenAndUserId.codec.encode(value.accountTokenAndUserId)
+          );
         }
       }
     },
@@ -7250,9 +7343,9 @@ export const LogInState: {
       }
       if (patternIndex.result === 5) {
         const result: {
-          readonly result: Int32;
+          readonly result: AccountTokenAndUserId;
           readonly nextIndex: number;
-        } = Int32.codec.decode(patternIndex.nextIndex, binary);
+        } = AccountTokenAndUserId.codec.decode(patternIndex.nextIndex, binary);
         return {
           result: LogInState.LoggedIn(result.result),
           nextIndex: result.nextIndex,
@@ -8294,24 +8387,24 @@ export const TagReference: {
 };
 
 /**
- * definy.app を開発する上での動作モード. デベロップモードか, リリースモード
+ * definy.app を開発する上での動作モード. デベロップモード(http://localhost:2520)か, リリースモード(https://definy.app)
  * @typePartId ee0590e764618611ffa8e1a0a2e22f79
  */
-export const ClientMode: {
+export const Mode: {
   /**
    * ローカルで開発するときのモード. オリジンは http://localshot:2520
    */
-  readonly Develop: ClientMode;
+  readonly Develop: Mode;
   /**
    * リリースモード. オリジンは https://definy.app
    */
-  readonly Release: ClientMode;
-  readonly codec: Codec<ClientMode>;
+  readonly Release: Mode;
+  readonly codec: Codec<Mode>;
 } = {
   Develop: "Develop",
   Release: "Release",
   codec: {
-    encode: (value: ClientMode): ReadonlyArray<number> => {
+    encode: (value: Mode): ReadonlyArray<number> => {
       switch (value) {
         case "Develop": {
           return [0];
@@ -8324,22 +8417,16 @@ export const ClientMode: {
     decode: (
       index: number,
       binary: Uint8Array
-    ): { readonly result: ClientMode; readonly nextIndex: number } => {
+    ): { readonly result: Mode; readonly nextIndex: number } => {
       const patternIndex: {
         readonly result: number;
         readonly nextIndex: number;
       } = Int32.codec.decode(index, binary);
       if (patternIndex.result === 0) {
-        return {
-          result: ClientMode.Develop,
-          nextIndex: patternIndex.nextIndex,
-        };
+        return { result: Mode.Develop, nextIndex: patternIndex.nextIndex };
       }
       if (patternIndex.result === 1) {
-        return {
-          result: ClientMode.Release,
-          nextIndex: patternIndex.nextIndex,
-        };
+        return { result: Mode.Release, nextIndex: patternIndex.nextIndex };
       }
       throw new Error("存在しないパターンを指定された 型を更新してください");
     },
