@@ -27,7 +27,7 @@ export const encodeDefinitionStatementList = (
       name: resultName,
       type: tsUtil.arrayType(ts.Type.Number),
       expr: ts.Expr.TypeAssertion({
-        expr: int32.encode(tsUtil.get(valueVar, "length")),
+        expr: int32.encode(tsUtil.get(valueVar, "size")),
         type: tsUtil.arrayType(ts.Type.Number),
       }),
     }),
