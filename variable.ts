@@ -29,7 +29,11 @@ const typePartToVariable = (
     name: identifer.fromString(typePart.name),
     document: typePart.description + "\n@typePartId " + (typePartId as string),
     type: typePartToVariableType(typePart, allTypePartIdTypePartNameMap),
-    expr: typePartToVariableExpr(typePart, allTypePartIdTypePartNameMap),
+    expr: typePartToVariableExpr(
+      typePartId,
+      typePart,
+      allTypePartIdTypePartNameMap
+    ),
   };
 };
 
@@ -134,9 +138,19 @@ const patternToTagType = (
 };
 
 const typePartToVariableExpr = (
+  typePartId: data.TypePartId,
   typePart: data.TypePart,
   allTypePartIdTypePartNameMap: ReadonlyMap<data.TypePartId, string>
 ): ts.Expr => {
+  const typePartIdMember = ts.Member.KeyValue({
+    key: util.typePartIdPropertyName,
+    value: ts.Expr.TypeAssertion(
+      ts.TypeAssertion.helper({
+        expr: ts.Expr.StringLiteral(typePartId),
+        type: ts.Type.ScopeInFile(identifer.fromString("TypePartId")),
+      })
+    ),
+  });
   switch (typePart.body._) {
     case "Product": {
       const parameterIdentifer = identifer.fromString(
@@ -150,6 +164,7 @@ const typePartToVariableExpr = (
         ),
       });
       return ts.Expr.ObjectLiteral([
+        typePartIdMember,
         ts.Member.KeyValue({
           key: util.helperName,
           value: ts.Expr.Lambda({
@@ -176,6 +191,7 @@ const typePartToVariableExpr = (
     }
     case "Kernel":
       return ts.Expr.ObjectLiteral([
+        typePartIdMember,
         ts.Member.KeyValue({
           key: util.codecPropertyName,
           value: codecExprDefinition(typePart, allTypePartIdTypePartNameMap),
@@ -197,6 +213,7 @@ const typePartToVariableExpr = (
             ),
           })
         ),
+        typePartIdMember,
         ts.Member.KeyValue({
           key: util.codecPropertyName,
           value: codecExprDefinition(typePart, allTypePartIdTypePartNameMap),
