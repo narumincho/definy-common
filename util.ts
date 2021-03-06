@@ -170,6 +170,7 @@ export const helperName = "helper";
 export const resultProperty = "result";
 export const nextIndexProperty = "nextIndex";
 
+export const typePartIdPropertyName = "typePartId";
 /**
  * エンコードの関数を呼ぶ
  * ```ts
