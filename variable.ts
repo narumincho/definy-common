@@ -45,7 +45,13 @@ const typePartToVariableType = (
     name: util.codecPropertyName,
     required: true,
     type: typePartToCodecType(typePart),
-    document: "",
+    document: "独自のバイナリ形式の変換処理ができるコーデック",
+  };
+  const typePartIdMemberType: ts.MemberType = {
+    name: util.typePartIdPropertyName,
+    required: true,
+    type: ts.Type.ScopeInFile(identifer.fromString("TypePartId")),
+    document: "definy.app内 の 型パーツの Id",
   };
 
   switch (typePart.body._) {
@@ -58,6 +64,7 @@ const typePartToVariableType = (
         ),
       });
       return ts.Type.Object([
+        typePartIdMemberType,
         codecTsMemberType,
         {
           name: util.helperName,
@@ -74,25 +81,25 @@ const typePartToVariableType = (
       ]);
     }
     case "Kernel":
-      return ts.Type.Object([codecTsMemberType]);
+      return ts.Type.Object([typePartIdMemberType, codecTsMemberType]);
     case "Sum":
-      return ts.Type.Object(
-        typePart.body.patternList
-          .map(
-            (pattern): ts.MemberType => ({
-              name: pattern.name,
-              required: true,
-              type: patternToTagType(
-                identifer.fromString(typePart.name),
-                typePart.typeParameterList,
-                pattern,
-                allTypePartIdTypePartNameMap
-              ),
-              document: pattern.description,
-            })
-          )
-          .concat(codecTsMemberType)
-      );
+      return ts.Type.Object([
+        typePartIdMemberType,
+        codecTsMemberType,
+        ...typePart.body.patternList.map(
+          (pattern): ts.MemberType => ({
+            name: pattern.name,
+            required: true,
+            type: patternToTagType(
+              identifer.fromString(typePart.name),
+              typePart.typeParameterList,
+              pattern,
+              allTypePartIdTypePartNameMap
+            ),
+            document: pattern.description,
+          })
+        ),
+      ]);
   }
 };
 
