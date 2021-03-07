@@ -813,68 +813,6 @@ const tagPatternCode = (
   }
 };
 
-const kernelDecodeDefinitionStatementList = (
-  typePartBodyKernel: data.TypePartBodyKernel,
-  typePart: data.TypePart,
-  parameterIndex: ts.Expr,
-  parameterBinary: ts.Expr
-): ReadonlyArray<ts.Statement> => {
-  switch (typePartBodyKernel) {
-    case "Function":
-      throw new Error("cannot decode function");
-    case "Int32":
-      return int32.decodeDefinitionStatementList(
-        parameterIndex,
-        parameterBinary
-      );
-    case "String":
-      return kernelString.decodeDefinitionStatementList(
-        parameterIndex,
-        parameterBinary
-      );
-    case "Binary":
-      return binary.decodeDefinitionStatementList(
-        parameterIndex,
-        parameterBinary
-      );
-    case "Id":
-      return hexString.idDecodeDefinitionStatementList(
-        typePart.name,
-        parameterIndex,
-        parameterBinary
-      );
-    case "Token":
-      return hexString.tokenDecodeDefinitionStatementList(
-        typePart.name,
-        parameterIndex,
-        parameterBinary
-      );
-    case "List": {
-      const [elementType] = typePart.typeParameterList;
-      if (elementType === undefined) {
-        throw new Error("List type need one type paramter");
-      }
-      return list.decodeDefinitionStatementList(
-        elementType.name,
-        parameterIndex,
-        parameterBinary
-      );
-    }
-    case "Dict": {
-      const [key, value] = typePart.typeParameterList;
-      if (key === undefined || value === undefined) {
-        throw new Error("Dict need 2 type parameters");
-      }
-      return dict.decodeDefinitionStatementList(
-        key.name,
-        value.name,
-        parameterIndex,
-        parameterBinary
-      );
-    }
-  }
-};
-
 const patternUse = (
   typePartName: string,
   noTypeParameter: boolean,
