@@ -5,7 +5,7 @@ import * as ts from "js-ts-code-generator/data";
 import * as tsUtil from "js-ts-code-generator/util";
 import * as util from "../util";
 
-export const name = identifer.fromString("Url");
+const name = identifer.fromString("Url");
 
 export const type = ts.Type.ScopeInGlobal(name);
 
@@ -14,9 +14,10 @@ export const encodeDefinitionStatementList = (
 ): ReadonlyArray<ts.Statement> => {
   return [
     ts.Statement.Return(
-      tsUtil.callMethod(string.codec(), util.encodePropertyName, [
-        tsUtil.callMethod(valueVar, "toString", []),
-      ])
+      util.callEncode(
+        string.codec(),
+        tsUtil.callMethod(valueVar, "toString", [])
+      )
     ),
   ];
 };
@@ -36,10 +37,7 @@ export const decodeDefinitionStatementList = (
       isConst: true,
       name: resultAndNextIndexAsStringName,
       type: c.decodeReturnType(string.type),
-      expr: tsUtil.callMethod(string.codec(), util.decodePropertyName, [
-        parameterIndex,
-        parameterBinary,
-      ]),
+      expr: util.callDecode(string.codec(), parameterIndex, parameterBinary),
     }),
     c.returnStatement(
       ts.Expr.New({

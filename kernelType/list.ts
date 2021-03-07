@@ -34,13 +34,10 @@ export const encodeDefinitionStatementList = (
           target: ts.Expr.Variable(resultName),
           operatorMaybe: ts.Maybe.Nothing(),
           expr: tsUtil.callMethod(ts.Expr.Variable(resultName), "concat", [
-            ts.Expr.Call({
-              expr: tsUtil.get(
-                ts.Expr.Variable(c.codecParameterName(typeParameterName)),
-                util.encodePropertyName
-              ),
-              parameterList: [ts.Expr.Variable(elementName)],
-            }),
+            util.callEncode(
+              ts.Expr.Variable(c.codecParameterName(typeParameterName)),
+              ts.Expr.Variable(elementName)
+            ),
           ]),
         }),
       ],
@@ -93,13 +90,11 @@ export const decodeDefinitionStatementList = (
           isConst: true,
           name: resultAndNextIndexName,
           type: c.decodeReturnType(elementTypeVar),
-          expr: ts.Expr.Call({
-            expr: tsUtil.get(
-              ts.Expr.Variable(c.codecParameterName(typeParameterName)),
-              util.decodePropertyName
-            ),
-            parameterList: [nextIndexVar, parameterBinary],
-          }),
+          expr: util.callDecode(
+            ts.Expr.Variable(c.codecParameterName(typeParameterName)),
+            nextIndexVar,
+            parameterBinary
+          ),
         }),
         ts.Statement.EvaluateExpr(
           tsUtil.callMethod(resultVar, "push", [

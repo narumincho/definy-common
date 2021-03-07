@@ -4,23 +4,16 @@ import * as ts from "js-ts-code-generator/data";
 import * as tsUtil from "js-ts-code-generator/util";
 import * as util from "../util";
 
-const codec = (): ts.Expr =>
-  tsUtil.get(
-    ts.Expr.Variable(identifer.fromString("Int32")),
-    util.codecPropertyName
-  );
+const codec: ts.Expr = tsUtil.get(
+  ts.Expr.Variable(identifer.fromString("Int32")),
+  util.codecPropertyName
+);
 
 export const encode = (target: ts.Expr): ts.Expr =>
-  ts.Expr.Call({
-    expr: tsUtil.get(codec(), util.encodePropertyName),
-    parameterList: [target],
-  });
+  util.callEncode(codec, target);
 
 export const decode = (index: ts.Expr, binary: ts.Expr): ts.Expr =>
-  ts.Expr.Call({
-    expr: tsUtil.get(codec(), util.decodePropertyName),
-    parameterList: [index, binary],
-  });
+  util.callDecode(codec, index, binary);
 
 /**
  * numberの32bit符号あり整数をSigned Leb128のバイナリに変換するコード

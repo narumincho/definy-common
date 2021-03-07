@@ -5,7 +5,7 @@ import * as ts from "js-ts-code-generator/data";
 import * as tsUtil from "js-ts-code-generator/util";
 import * as util from "../util";
 
-export const name = identifer.fromString("String");
+const name = identifer.fromString("String");
 
 export const type = ts.Type.String;
 
@@ -30,7 +30,7 @@ export const encodeDefinitionStatementList = (
               expr: ts.Expr.GlobalObjects(identifer.fromString("TextEncoder")),
               parameterList: [],
             }),
-            util.encodePropertyName,
+            "encode",
             [valueVar]
           ),
           spread: true,

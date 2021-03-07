@@ -174,7 +174,7 @@ export const typePartIdPropertyName = "typePartId";
 /**
  * エンコードの関数を呼ぶ
  * ```ts
- * code.encode(value)
+ * codec.encode(value)
  * ```
  */
 export const callEncode = (codecExpr: ts.Expr, value: ts.Expr): ts.Expr =>
