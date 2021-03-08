@@ -1,3 +1,5 @@
+# definy のコード生成が正しくできているか確かめるのにいちいちバージョンを上げてリリースするのが面倒なので, https://github.com/narumincho/Definy に統合することにした
+
 [![Gitpod ready-to-code](https://img.shields.io/badge/Gitpod-ready--to--code-blue?logo=gitpod)](https://gitpod.io/#https://github.com/narumincho/definy-core)
 
 # definy-core
